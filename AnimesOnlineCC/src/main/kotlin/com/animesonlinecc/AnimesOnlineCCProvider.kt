@@ -6,7 +6,40 @@ import java.util.EnumSet
 
 class AnimesOnlineCCProvider : MainAPI() {
     override var mainUrl = "https://animesonlinecc.to"
-// ... (código intermediário omitido, mantendo o original)
+    override var name = "Animes Online CC"
+    override val hasMainPage = true
+    override var lang = "pt-BR"
+    
+    // Melhoria 6: Suporte a OVA e Filmes
+    override val supportedTypes = setOf(
+        TvType.Anime,
+        TvType.OVA,
+        TvType.AnimeMovie
+    )
+
+    // REVERTIDO PARA HOME SIMPLES (VERTICAL) PARA CORRIGIR BUG DE CARREGAMENTO
+    override val mainPage = mainPageOf(
+        "$mainUrl/page/" to "Animes Recentes",
+        "$mainUrl/genero/acao/page/" to "Ação",
+        "$mainUrl/genero/aventura/page/" to "Aventura",
+        "$mainUrl/genero/comedia/page/" to "Comédia",
+        "$mainUrl/genero/romance/page/" to "Romance",
+        "$mainUrl/genero/fantasia/page/" to "Fantasia",
+        "$mainUrl/genero/drama/page/" to "Drama",
+        "$mainUrl/genero/escolar/page/" to "Escolar",
+        "$mainUrl/genero/seinen/page/" to "Seinen",
+        "$mainUrl/genero/shounen/page/" to "Shounen",
+        "$mainUrl/genero/sobrenatural/page/" to "Sobrenatural",
+        "$mainUrl/genero/suspense/page/" to "Suspense"
+    )
+
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val document = app.get(request.data + page).document
+        val home = document.select("div.items article.item").mapNotNull {
+            it.toSearchResult()
+        }
+        return newHomePageResponse(request.name, home)
+    }
 
     private fun org.jsoup.nodes.Element.toSearchResult(): AnimeSearchResponse? {
         val title = this.selectFirst("h3")?.text()?.trim() ?: return null

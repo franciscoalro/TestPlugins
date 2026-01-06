@@ -1,8 +1,24 @@
-{
-  "name": "Cloudstream Anime Repo",
-  "description": "Repositório de extensões de anime",
-  "manifestVersion": 1,
-  "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/CloudstreamRepo/providers.json"
-  ]
-}
+[
+  {
+    "name": "AnimesOnlineCC",
+    "internalName": "AnimesOnlineCC",
+    "description": "Assista animes online grátis em HD no AnimesOnlineCC. Grande catálogo de animes legendados e dublados.",
+    "version": 4,
+    "authors": [
+      "franciscoalro"
+    ],
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "status": 1,
+    "language": "pt-BR",
+    "tvTypes": [
+      "Anime",
+      "OVA",
+      "AnimeMovie"
+    ],
+    "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
+    "apiVersion": 1,
+    "isAdult": false,
+    "fileSize": 15000,
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v3.1/AnimesOnlineCC.cs3"
+  }
+]

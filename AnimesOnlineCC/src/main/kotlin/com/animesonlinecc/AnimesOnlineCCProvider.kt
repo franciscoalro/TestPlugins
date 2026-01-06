@@ -44,14 +44,16 @@ class AnimesOnlineCCProvider : MainAPI() {
         val title = this.selectFirst("h3")?.text()?.trim() ?: return null
         val href = fixUrl(this.selectFirst("a")?.attr("href") ?: return null)
         
-        // Melhoria 3: Fallback para poster
+        // BLINDAGEM DE IMAGENS: Busca em todos os lugares possíveis
+        val img = this.selectFirst("img")
         val posterUrl = fixUrlNull(
-            this.selectFirst("img")?.attr("src")
-                ?: this.selectFirst("img")?.attr("data-src")
-                ?: this.selectFirst("img")?.attr("data-lazy-src")
+            img?.attr("src")
+                ?: img?.attr("data-src")
+                ?: img?.attr("data-lazy-src")
+                ?: img?.attr("data-original")
+                ?: img?.attr("srcset")?.substringBefore(" ") // Pega a primeira url do srcset
         )
         
-        // Melhoria 2: Detectar se é dublado
         val isDubbed = title.contains("Dublado", ignoreCase = true)
         
         return newAnimeSearchResponse(title, href, TvType.Anime) {
@@ -64,7 +66,6 @@ class AnimesOnlineCCProvider : MainAPI() {
         }
     }
 
-    // Melhoria 5: Tratamento de erros na busca
     override suspend fun search(query: String): List<SearchResponse> {
         return try {
             val document = app.get("$mainUrl/?s=$query").document
@@ -81,41 +82,40 @@ class AnimesOnlineCCProvider : MainAPI() {
         
         val title = document.selectFirst("h1")?.text()?.trim() ?: ""
         
-        // Melhoria 3: Fallback para poster com múltiplas fontes
-        val poster = document.selectFirst("div.poster img")?.attr("src")
-            ?: document.selectFirst("div.poster img")?.attr("data-src")
-            ?: document.selectFirst("meta[property=og:image]")?.attr("content")
+        // BLINDAGEM NO LOAD: Tenta pegar de várias tags
+        val img = document.selectFirst("div.poster img, .sheader .poster img")
+        val poster = img?.attr("src")
+            ?: img?.attr("data-src")
+            ?: img?.attr("data-lazy-src")
+            ?: img?.attr("data-original")
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content") // Último recurso: imagem do meta tag
         
         val description = document.selectFirst("div.description, div.wp-content")?.text()?.trim()
         
         val genres = document.select("div.sgeneros a").map { it.text() }
         
-        // Melhoria 4: Extrair ano de lançamento
         val year = document.selectFirst("span.date, span.year, .extra span")?.text()
             ?.replace("\\D".toRegex(), "")?.take(4)?.toIntOrNull()
         
-        // Melhoria 2: Detectar se é dublado pelo título
         val isDubbed = title.contains("Dublado", ignoreCase = true)
         val dubStatus = if (isDubbed) DubStatus.Dubbed else DubStatus.Subbed
         
         val episodes = document.select("ul.episodios li").mapNotNull { ep ->
             val epTitle = ep.selectFirst(".episodiotitle a")?.text() ?: return@mapNotNull null
             val epHref = fixUrl(ep.selectFirst("a")?.attr("href") ?: return@mapNotNull null)
-            
-            // Extrai o número do episódio do título
             val epNum = epTitle.replace("\\D".toRegex(), "").toIntOrNull()
             
             newEpisode(epHref) {
                 this.name = epTitle
                 this.episode = epNum
             }
-        }.reversed() // Inverte para ordem crescente
+        }.reversed()
 
         return newAnimeLoadResponse(title, url, TvType.Anime) {
             this.posterUrl = poster
             this.plot = description
             this.tags = genres
-            this.year = year  // Melhoria 4: Ano de lançamento
+            this.year = year
             addEpisodes(dubStatus, episodes)
         }
     }

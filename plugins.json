@@ -1,0 +1,17 @@
+[
+    {
+        "name": "AnimesOnlineCC",
+        "description": "Assista animes online grátis em HD",
+        "version": 1,
+        "authors": [
+            "franciscoalro"
+        ],
+        "status": 1,
+        "language": "pt-BR",
+        "tvTypes": [
+            "Anime"
+        ],
+        "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0/AnimesOnlineCC-v1.cs3"
+    }
+]

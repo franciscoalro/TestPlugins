@@ -1,0 +1,8 @@
+{
+    "name": "AnimesOnlineCC Repository",
+    "description": "Repositório de extensões para animes",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://franciscoalro.github.io/TestPlugins/plugins.json"
+    ]
+}

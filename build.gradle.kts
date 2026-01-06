@@ -8,11 +8,7 @@ buildscript {
         google()
         mavenCentral()
         // Shitpack repo which contains our tools and dependencies
-        maven("https://jitpack.io") {
-            content {
-                includeGroup("com.github.recloudstream")
-            }
-        }
+        maven("https://jitpack.io")
     }
 
     dependencies {
@@ -27,11 +23,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven("https://jitpack.io") {
-            content {
-                includeGroup("com.github.recloudstream")
-            }
-        }
+        maven("https://jitpack.io")
     }
 }
 

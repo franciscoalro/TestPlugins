@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   PUSH PARA GITHUB - TESTPLUGINS
+echo   PUSH PARA GITHUB - TESTPLUGINS (v3.0)
 echo ========================================
 echo.
 echo Executando: git push -u origin main
@@ -14,10 +14,10 @@ echo.
 
 cd /d "d:\TestPlugins-master"
 git add .
-git commit -m "Update plugin to v2.0"
+git commit -m "Update plugin to v3.0"
 git push -u origin main
-git tag -f v2.0
-git push origin v2.0
+git tag -f v3.0
+git push origin v3.0
 
 echo.
 echo ========================================

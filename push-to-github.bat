@@ -13,7 +13,11 @@ echo ========================================
 echo.
 
 cd /d "d:\TestPlugins-master"
+git add .
+git commit -m "Fix plugin URL and trigger release v1.0"
 git push -u origin main
+git tag -f v1.0
+git push origin v1.0
 
 echo.
 echo ========================================

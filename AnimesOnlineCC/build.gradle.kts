@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "Assista animes online grátis em HD"
-    authors = listOf("Usuario")
+    authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("Anime")
     language = "pt-BR"

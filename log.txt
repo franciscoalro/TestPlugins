@@ -1,0 +1,24 @@
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'CloudstreamPlugins'.
+> Could not resolve all artifacts for configuration 'classpath'.
+   > Could not find com.github.vidstige:jadb:master-SNAPSHOT.
+     Searched in the following locations:
+       - https://dl.google.com/dl/android/maven2/com/github/vidstige/jadb/master-SNAPSHOT/maven-metadata.xml
+       - https://dl.google.com/dl/android/maven2/com/github/vidstige/jadb/master-SNAPSHOT/jadb-master-SNAPSHOT.pom
+       - https://repo.maven.apache.org/maven2/com/github/vidstige/jadb/master-SNAPSHOT/maven-metadata.xml
+       - https://repo.maven.apache.org/maven2/com/github/vidstige/jadb/master-SNAPSHOT/jadb-master-SNAPSHOT.pom
+       - https://jitpack.io/com/github/vidstige/jadb/master-SNAPSHOT/maven-metadata.xml
+       - https://jitpack.io/com/github/vidstige/jadb/master-SNAPSHOT/jadb-master-2c3290ae59-1.pom
+     Required by:
+         root project : > com.github.recloudstream:gradle:-SNAPSHOT:cce1b8d84d-1 > com.github.recloudstream.gradle:gradle:-SNAPSHOT:cce1b8d84d-1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 5s

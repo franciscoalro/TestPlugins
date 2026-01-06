@@ -1,0 +1,8 @@
+{
+  "name": "Cloudstream Anime Repo",
+  "description": "Repositório de extensões de anime",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/CloudstreamRepo/providers.json"
+  ]
+}

@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   PUSH PARA GITHUB - TESTPLUGINS
+echo   PUSH PARA GITHUB - TESTPLUGINS (v3.0)
 echo ========================================
 echo.
 echo Executando: git push -u origin main
@@ -14,10 +14,10 @@ echo.
 
 cd /d "d:\TestPlugins-master"
 git add .
-git commit -m "Fix plugin URL and trigger release v1.0"
+git commit -m "Update plugin to v3.0"
 git push -u origin main
-git tag -f v1.0
-git push origin v1.0
+git tag -f v3.0
+git push origin v3.0
 
 echo.
 echo ========================================
@@ -27,4 +27,3 @@ echo.
 echo Acesse: https://github.com/franciscoalro/TestPlugins/actions
 echo Para acompanhar o build
 echo.
-pause

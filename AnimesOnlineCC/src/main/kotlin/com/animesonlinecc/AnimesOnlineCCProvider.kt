@@ -2,7 +2,6 @@ package com.animesonlinecc
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
 
 class AnimesOnlineCCProvider : MainAPI() {
     override var mainUrl = "https://animesonlinecc.to"
@@ -26,7 +25,7 @@ class AnimesOnlineCCProvider : MainAPI() {
         return newHomePageResponse(request.name, home)
     }
 
-    private fun Element.toSearchResult(): AnimeSearchResponse? {
+    private fun org.jsoup.nodes.Element.toSearchResult(): AnimeSearchResponse? {
         val title = this.selectFirst("h3")?.text()?.trim() ?: return null
         val href = fixUrl(this.selectFirst("a")?.attr("href") ?: return null)
         val posterUrl = fixUrlNull(this.selectFirst("img")?.attr("src"))
@@ -59,11 +58,10 @@ class AnimesOnlineCCProvider : MainAPI() {
             // Extrai o número do episódio do título
             val epNum = epTitle.replace("\\D".toRegex(), "").toIntOrNull()
             
-            Episode(
-                data = epHref,
-                name = epTitle,
-                episode = epNum
-            )
+            newEpisode(epHref) {
+                this.name = epTitle
+                this.episode = epNum
+            }
         }.reversed() // Inverte para ordem crescente
 
         return newAnimeLoadResponse(title, url, TvType.Anime) {

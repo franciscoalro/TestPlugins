@@ -16,25 +16,30 @@ class AnimesOnlineCCProvider : MainAPI() {
         TvType.AnimeMovie
     )
 
-    // Melhoria 1: Mais gêneros na página principal
+    // Melhoria: Seções Horizontais (Estilo Netflix)
     override val mainPage = mainPageOf(
+        "$mainUrl/episodio/page/" to "Lançamentos (Episódios)",
         "$mainUrl/page/" to "Animes Recentes",
+        "$mainUrl/genero/filme/page/" to "Filmes",
+        "$mainUrl/animes-dublados/page/" to "Animes Dublados",
+        "$mainUrl/animes-legendados/page/" to "Animes Legendados",
+        // Categorias Gerais para exploração
         "$mainUrl/genero/acao/page/" to "Ação",
         "$mainUrl/genero/aventura/page/" to "Aventura",
-        "$mainUrl/genero/comedia/page/" to "Comédia",
-        "$mainUrl/genero/romance/page/" to "Romance",
-        "$mainUrl/genero/fantasia/page/" to "Fantasia",
-        "$mainUrl/genero/drama/page/" to "Drama",
-        "$mainUrl/genero/escolar/page/" to "Escolar",
-        "$mainUrl/genero/seinen/page/" to "Seinen",
-        "$mainUrl/genero/shounen/page/" to "Shounen",
-        "$mainUrl/genero/sobrenatural/page/" to "Sobrenatural",
-        "$mainUrl/genero/suspense/page/" to "Suspense"
+        "$mainUrl/genero/isekai/page/" to "Isekai"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val document = app.get(request.data + page).document
-        val home = document.select("div.items article.item").mapNotNull {
+        
+        // Seletor inteligente: Tenta pegar episódios OU animes, dependendo da página
+        val itemsSelector = if (request.name.contains("Episódios")) {
+            "div.items article.item.se, div.items article.item" // Seletor para episódios
+        } else {
+            "div.items article.item" // Seletor padrão para animes
+        }
+        
+        val home = document.select(itemsSelector).mapNotNull {
             it.toSearchResult()
         }
         return newHomePageResponse(request.name, home)

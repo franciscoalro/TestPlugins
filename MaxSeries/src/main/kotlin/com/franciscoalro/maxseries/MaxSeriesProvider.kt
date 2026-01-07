@@ -176,15 +176,23 @@ class MaxSeriesProvider : MainAPI() {
             }
         }
 
-        // 3. Look for buttons with onclick/data-player
-        doc.select(".btn, .player-option").forEach { btn ->
-            val link = btn.attr("data-player").ifEmpty { btn.attr("data-link") }
+        // 3. Look for buttons with data-source (primary), onclick/data-player
+        doc.select(".btn, .player-option, button.btn").forEach { btn ->
+            // MaxSeries primarily uses 'data-source' attribute
+            val link = btn.attr("data-source")
+                .ifEmpty { btn.attr("data-player") }
+                .ifEmpty { btn.attr("data-link") }
+                .ifEmpty { btn.attr("data-src") }
+            
             if (link.isNotEmpty()) {
-                try {
-                    loadExtractor(link, data, subtitleCallback, callback)
-                    linksFound++
-                } catch (e: Exception) {
-                    // Ignorar erros individuais
+                val fixedLink = if (link.startsWith("//")) "https:$link" else link
+                if (fixedLink.startsWith("http")) {
+                    try {
+                        loadExtractor(fixedLink, data, subtitleCallback, callback)
+                        linksFound++
+                    } catch (e: Exception) {
+                        Log.e("MaxSeries", "Erro ao carregar extractor para $fixedLink: ${e.message}")
+                    }
                 }
             }
         }

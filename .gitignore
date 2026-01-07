@@ -10,3 +10,12 @@
 .cxx
 local.properties
 .vscode
+TestPlugins-master/
+CloudstreamRepo_Deploy/
+CloudstreamRepo/
+build_log.txt
+log.txt
+*.rar
+*.zip
+*.bat
+!push-to-github.bat

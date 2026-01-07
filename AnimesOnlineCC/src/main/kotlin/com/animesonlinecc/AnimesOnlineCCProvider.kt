@@ -2,6 +2,8 @@ package com.animesonlinecc
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
+import android.util.Log
 import java.util.EnumSet
 
 class AnimesOnlineCCProvider : MainAPI() {
@@ -34,11 +36,19 @@ class AnimesOnlineCCProvider : MainAPI() {
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val document = app.get(request.data + page).document
-        val home = document.select("div.items article.item").mapNotNull {
-            it.toSearchResult()
+        return try {
+            val document = app.get(request.data + page).document
+            val home = document.select("div.items article.item").mapNotNull {
+                it.toSearchResult()
+            }
+            if (home.isEmpty()) {
+                Log.d("AnimesOnlineCC", "⚠️ Nenhum resultado encontrado na página ${request.name} (página $page)")
+            }
+            newHomePageResponse(request.name, home)
+        } catch (e: Exception) {
+            Log.e("AnimesOnlineCC", "❌ Erro ao carregar página principal ${request.name}: ${e.message}")
+            newHomePageResponse(request.name, emptyList())
         }
-        return newHomePageResponse(request.name, home)
     }
 
     private fun org.jsoup.nodes.Element.toSearchResult(): AnimeSearchResponse? {
@@ -68,57 +78,84 @@ class AnimesOnlineCCProvider : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
+        if (query.isBlank()) {
+            Log.d("AnimesOnlineCC", "⚠️ Pesquisa vazia, retornando lista vazia")
+            return emptyList()
+        }
+        
         return try {
+            Log.d("AnimesOnlineCC", "🔍 Pesquisando por: $query")
             val document = app.get("$mainUrl/?s=$query").document
+            
             // FIX: Página de pesquisa usa div.items2, não div.items
-            document.select("div.items2 article.item").mapNotNull {
+            val results = document.select("div.items2 article.item").mapNotNull {
                 it.toSearchResult()
             }
+            
+            Log.d("AnimesOnlineCC", "✅ Encontrados ${results.size} resultados para '$query'")
+            results
         } catch (e: Exception) {
+            Log.e("AnimesOnlineCC", "❌ Erro na pesquisa '$query': ${e.message}")
             emptyList()
         }
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val document = app.get(url).document
-        
-        val title = document.selectFirst("h1")?.text()?.trim() ?: ""
-        
-        // BLINDAGEM NO LOAD: Tenta pegar de várias tags
-        val img = document.selectFirst("div.poster img, .sheader .poster img")
-        val poster = img?.attr("src")
-            ?: img?.attr("data-src")
-            ?: img?.attr("data-lazy-src")
-            ?: img?.attr("data-original")
-            ?: document.selectFirst("meta[property=og:image]")?.attr("content") // Último recurso: imagem do meta tag
-        
-        val description = document.selectFirst("div.description, div.wp-content")?.text()?.trim()
-        
-        val genres = document.select("div.sgeneros a").map { it.text() }
-        
-        val year = document.selectFirst("span.date, span.year, .extra span")?.text()
-            ?.replace("\\D".toRegex(), "")?.take(4)?.toIntOrNull()
-        
-        val isDubbed = title.contains("Dublado", ignoreCase = true)
-        val dubStatus = if (isDubbed) DubStatus.Dubbed else DubStatus.Subbed
-        
-        val episodes = document.select("ul.episodios li").mapNotNull { ep ->
-            val epTitle = ep.selectFirst(".episodiotitle a")?.text() ?: return@mapNotNull null
-            val epHref = fixUrl(ep.selectFirst("a")?.attr("href") ?: return@mapNotNull null)
-            val epNum = epTitle.replace("\\D".toRegex(), "").toIntOrNull()
+        return try {
+            Log.d("AnimesOnlineCC", "📖 Carregando detalhes: $url")
+            val document = app.get(url).document
             
-            newEpisode(epHref) {
-                this.name = epTitle
-                this.episode = epNum
+            val title = document.selectFirst("h1")?.text()?.trim()
+            if (title.isNullOrBlank()) {
+                Log.e("AnimesOnlineCC", "❌ Título não encontrado em: $url")
+                throw ErrorLoadingException("Não foi possível encontrar o título do anime")
             }
-        }.reversed()
+            
+            // BLINDAGEM NO LOAD: Tenta pegar de várias tags
+            val img = document.selectFirst("div.poster img, .sheader .poster img")
+            val poster = img?.attr("src")
+                ?: img?.attr("data-src")
+                ?: img?.attr("data-lazy-src")
+                ?: img?.attr("data-original")
+                ?: document.selectFirst("meta[property=og:image]")?.attr("content")
+            
+            if (poster == null) {
+                Log.d("AnimesOnlineCC", "⚠️ Poster não encontrado para: $title")
+            }
+            
+            val description = document.selectFirst("div.description, div.wp-content")?.text()?.trim()
+            val genres = document.select("div.sgeneros a").map { it.text() }
+            val year = document.selectFirst("span.date, span.year, .extra span")?.text()
+                ?.replace("\\D".toRegex(), "")?.take(4)?.toIntOrNull()
+            
+            val isDubbed = title.contains("Dublado", ignoreCase = true)
+            val dubStatus = if (isDubbed) DubStatus.Dubbed else DubStatus.Subbed
+            
+            val episodes = document.select("ul.episodios li").mapNotNull { ep ->
+                val epTitle = ep.selectFirst(".episodiotitle a")?.text() ?: return@mapNotNull null
+                val epHref = fixUrl(ep.selectFirst("a")?.attr("href") ?: return@mapNotNull null)
+                val epNum = epTitle.replace("\\D".toRegex(), "").toIntOrNull()
+                
+                newEpisode(epHref) {
+                    this.name = epTitle
+                    this.episode = epNum
+                }
+            }.reversed()
+            
+            Log.d("AnimesOnlineCC", "✅ Carregado '$title' com ${episodes.size} episódios")
 
-        return newAnimeLoadResponse(title, url, TvType.Anime) {
-            this.posterUrl = poster
-            this.plot = description
-            this.tags = genres
-            this.year = year
-            addEpisodes(dubStatus, episodes)
+            newAnimeLoadResponse(title, url, TvType.Anime) {
+                this.posterUrl = poster
+                this.plot = description
+                this.tags = genres
+                this.year = year
+                addEpisodes(dubStatus, episodes)
+            }
+        } catch (e: ErrorLoadingException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("AnimesOnlineCC", "❌ Erro ao carregar detalhes de $url: ${e.message}")
+            throw ErrorLoadingException("Erro ao carregar informações do anime")
         }
     }
 
@@ -128,15 +165,22 @@ class AnimesOnlineCCProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        // Melhoria 5: Tratamento de erros
         return try {
+            Log.d("AnimesOnlineCC", "🎬 Carregando links de: $data")
             val document = app.get(data).document
+            var linksFound = 0
             
             // Procura por iframes de vídeo
             document.select("iframe").forEach { iframe ->
                 val iframeUrl = iframe.attr("src").ifBlank { iframe.attr("data-src") }
                 if (iframeUrl.isNotBlank()) {
-                    loadExtractor(iframeUrl, data, subtitleCallback, callback)
+                    try {
+                        loadExtractor(iframeUrl, data, subtitleCallback, callback)
+                        linksFound++
+                        Log.d("AnimesOnlineCC", "✅ Iframe encontrado: $iframeUrl")
+                    } catch (e: Exception) {
+                        Log.e("AnimesOnlineCC", "⚠️ Erro ao extrair iframe $iframeUrl: ${e.message}")
+                    }
                 }
             }
             
@@ -144,12 +188,25 @@ class AnimesOnlineCCProvider : MainAPI() {
             document.select("div.player a, div.playeroptions a, ul.options a").forEach { option ->
                 val videoUrl = option.attr("href")
                 if (videoUrl.isNotBlank() && videoUrl.startsWith("http")) {
-                    loadExtractor(videoUrl, data, subtitleCallback, callback)
+                    try {
+                        loadExtractor(videoUrl, data, subtitleCallback, callback)
+                        linksFound++
+                        Log.d("AnimesOnlineCC", "✅ Link direto encontrado: $videoUrl")
+                    } catch (e: Exception) {
+                        Log.e("AnimesOnlineCC", "⚠️ Erro ao extrair link $videoUrl: ${e.message}")
+                    }
                 }
             }
             
-            true
+            if (linksFound == 0) {
+                Log.e("AnimesOnlineCC", "❌ Nenhum link de vídeo encontrado em: $data")
+            } else {
+                Log.d("AnimesOnlineCC", "✅ Total de $linksFound links encontrados")
+            }
+            
+            linksFound > 0
         } catch (e: Exception) {
+            Log.e("AnimesOnlineCC", "❌ Erro crítico ao carregar links de $data: ${e.message}")
             false
         }
     }

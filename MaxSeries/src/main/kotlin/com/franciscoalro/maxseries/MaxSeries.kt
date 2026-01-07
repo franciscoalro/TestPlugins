@@ -3,6 +3,7 @@ package com.franciscoalro.maxseries
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import org.jsoup.nodes.Element
 
 @CloudstreamPlugin

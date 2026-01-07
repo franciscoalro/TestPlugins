@@ -1,4 +1,4 @@
-version = 3
+version = 4
 
 cloudstream {
     description = "Assista animes online grátis em HD"

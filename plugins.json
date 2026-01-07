@@ -19,13 +19,13 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.5/AnimesOnlineCC.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.6/AnimesOnlineCC.cs3"
     },
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "description": "Assista séries online em HD no MaxSeries.",
-        "version": 1,
+        "version": 2,
         "authors": [
             "franciscoalro"
         ],
@@ -40,6 +40,6 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.5/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.6/MaxSeries.cs3"
     }
 ]

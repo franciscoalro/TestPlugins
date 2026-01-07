@@ -26,8 +26,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
+      - name: Build AnimesOnlineCC
         run: ./gradlew AnimesOnlineCC:make
+
+      - name: Build MaxSeries
+        run: ./gradlew MaxSeries:make
 
       - name: Get version
         id: get_version
@@ -35,17 +38,25 @@ jobs:
           VERSION=$(grep "version = " AnimesOnlineCC/build.gradle.kts | sed 's/version = //' | tr -d ' ')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Upload Plugin
+      - name: Upload AnimesOnlineCC Plugin
         uses: actions/upload-artifact@v4
         with:
           name: AnimesOnlineCC-Plugin
           path: AnimesOnlineCC/build/*.cs3
 
+      - name: Upload MaxSeries Plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: MaxSeries-Plugin
+          path: MaxSeries/build/*.cs3
+
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: AnimesOnlineCC/build/*.cs3
+          files: |
+            AnimesOnlineCC/build/*.cs3
+            MaxSeries/build/*.cs3
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

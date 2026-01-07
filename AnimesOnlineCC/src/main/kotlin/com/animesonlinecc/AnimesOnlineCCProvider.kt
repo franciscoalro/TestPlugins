@@ -171,7 +171,7 @@ class AnimesOnlineCCProvider : MainAPI() {
             var linksFound = 0
             
             // Procura por iframes de vídeo
-            document.select("iframe").forEach { iframe ->
+            document.select("iframe").forEach { iframe: org.jsoup.nodes.Element ->
                 val iframeUrl = iframe.attr("src").ifBlank { iframe.attr("data-src") }
                 if (iframeUrl.isNotBlank()) {
                     try {
@@ -185,7 +185,7 @@ class AnimesOnlineCCProvider : MainAPI() {
             }
             
             // Procura por links diretos de vídeo
-            document.select("div.player a, div.playeroptions a, ul.options a").forEach { option ->
+            document.select("div.player a, div.playeroptions a, ul.options a").forEach { option: org.jsoup.nodes.Element ->
                 val videoUrl = option.attr("href")
                 if (videoUrl.isNotBlank() && videoUrl.startsWith("http")) {
                     try {

@@ -12,6 +12,23 @@ class MaxSeriesProvider : MainAPI() {
     override var lang = "pt"
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
 
+    override val mainPage = mainPageOf(
+        "$mainUrl/" to "Home"
+    )
+
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val doc = app.get(request.data).document
+        val home = doc.select("article.item").mapNotNull {
+            val title = it.selectFirst(".data h3 a")?.text() ?: return@mapNotNull null
+            val href = it.selectFirst(".data h3 a")?.attr("href") ?: return@mapNotNull null
+            val image = it.selectFirst(".poster img")?.attr("src")
+            newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
+                this.posterUrl = image
+            }
+        }
+        return newHomePageResponse(request.name, home)
+    }
+
     override suspend fun search(query: String): List<SearchResponse> {
         val url = "$mainUrl/?s=$query"
         val doc = app.get(url).document

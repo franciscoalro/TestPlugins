@@ -3,11 +3,9 @@ package com.franciscoalro.maxseries
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
-import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import org.jsoup.nodes.Element
 
-@CloudstreamPlugin
-class MaxSeries : MainAPI() {
+class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
     override var name = "MaxSeries"
     override val hasMainPage = true

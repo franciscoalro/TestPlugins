@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
 
+@CloudstreamPlugin
 class MaxSeries : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
     override var name = "MaxSeries"

@@ -3,6 +3,7 @@ package com.franciscoalro.maxseries
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
+import android.util.Log
 import org.jsoup.nodes.Element
 
 class MaxSeriesProvider : MainAPI() {
@@ -13,17 +14,32 @@ class MaxSeriesProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
 
     override val mainPage = mainPageOf(
-        "$mainUrl/" to "Home"
+        "$mainUrl/" to "Home",
+        "$mainUrl/series/" to "Séries",
+        "$mainUrl/filmes/" to "Filmes"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val doc = app.get(request.data).document
+        val url = if (page > 1) {
+            if (request.data.endsWith("/")) "${request.data}page/$page/" else "${request.data}/page/$page/"
+        } else {
+            request.data
+        }
+        val doc = app.get(url).document
         val home = doc.select("article.item").mapNotNull {
             val title = it.selectFirst(".data h3 a")?.text() ?: return@mapNotNull null
             val href = it.selectFirst(".data h3 a")?.attr("href") ?: return@mapNotNull null
             val image = it.selectFirst(".poster img")?.attr("src")
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
-                this.posterUrl = image
+            val isSeries = href.contains("/series/")
+            
+            if (isSeries) {
+                newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
+                    this.posterUrl = image
+                }
+            } else {
+                newMovieSearchResponse(title, href, TvType.Movie) {
+                    this.posterUrl = image
+                }
             }
         }
         return newHomePageResponse(request.name, home)
@@ -37,7 +53,7 @@ class MaxSeriesProvider : MainAPI() {
             val href = it.selectFirst(".details .title a")?.attr("href") ?: return@mapNotNull null
             val image = it.selectFirst(".image img")?.attr("src")
             val typeText = it.selectFirst(".image span")?.text() ?: ""
-            val type = if (typeText.contains("TV", true)) TvType.TvSeries else TvType.Movie
+            val type = if (typeText.contains("TV", true) || href.contains("/series/")) TvType.TvSeries else TvType.Movie
 
             if (type == TvType.TvSeries) {
                 newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
@@ -59,82 +75,64 @@ class MaxSeriesProvider : MainAPI() {
             ?: doc.selectFirst(".entry-content")?.text()
         val poster = doc.selectFirst(".poster img")?.attr("src")
         val bg = doc.selectFirst(".backdrop img")?.attr("src")
-
-        val iframeSrc = doc.select("iframe").map { it.attr("src") }
-            .find { it.contains("playerthree.online") }
-
-        val episodes = ArrayList<Episode>()
         
-        if (iframeSrc != null) {
-            val iframeDoc = app.get(iframeSrc).document
-            // Parse seasons and episodes
-            // Expecting ul#list-seasons for season tabs and ul.list-episodes for items
-            // But usually in these players, all episodes might be loaded in separate divs matchin the season
+        val isSeries = url.contains("/series/")
+
+        if (isSeries) {
+            val episodes = mutableListOf<Episode>()
             
-            // Generic approach for PlayerThree/DooPlay embedded:
-            // S1 is visible, others might be hidden.
-            // Let's grab all .list-episodes a
-            
-            // Check if there are multiple lists or if they are fetched.
-            // Based on subagent, clicking season updated the list. 
-            // It might be using AJAX or just switching hidden classes.
-            // I'll assume they are all in the DOM for now or try to extract from script.
-            
-            val seasonElements = iframeDoc.select("ul#list-seasons li")
-            if (seasonElements.isNotEmpty()) {
-                // If we have seasons, we might need to iterate or check how they work.
-                // For V1, let's just grab what is visible or common patterns.
-                // Inspecting standard PlayerThree:
-                // usually <div id="seasons"><div class="se-c" id="season-1">...</div></div>
+            // Standard DooPlay episode extraction
+            doc.select("ul.episodios li").forEach { ep ->
+                val epA = ep.selectFirst("a") ?: return@forEach
+                val epTitle = epA.text().ifEmpty { ep.selectFirst(".episodiotiitle")?.text() ?: "Episódio" }
+                val epHref = epA.attr("href")
                 
-                val seasonDivs = iframeDoc.select("div.se-c, div[id^=season-]")
-                // If divs exist, mapped by season
-                if (seasonDivs.isNotEmpty()) {
-                   seasonDivs.forEach { sDiv ->
-                       val seasonNum = sDiv.attr("data-season").toIntOrNull() 
-                           ?: sDiv.attr("id").replace("season-","").toIntOrNull() ?: 1
-                       sDiv.select("ul.list-episodes li a").forEach { ep ->
-                           val epNum = ep.select("div.numerando").text().split("-").lastOrNull()?.trim()?.toIntOrNull()
-                           val epName = ep.text()
-                           val epUrl = ep.attr("href") // Likely #id
-                           episodes.add(
-                               newEpisode(iframeSrc) {
-                                   this.name = epName
-                                   this.season = seasonNum
-                                   this.episode = epNum
-                                   this.data = "$iframeSrc|$epUrl" // Pass iframeUrl and the target ID
-                               }
-                           )
-                       }
-                   }
-                } else {
-                    // Fallback: just finding all links
-                     iframeDoc.select("ul.list-episodes li a").forEach { ep ->
-                        val epName = ep.text()
-                        val epUrl = ep.attr("href")
-                        episodes.add(
-                            newEpisode(iframeSrc) {
-                                this.name = epName
-                                this.data = "$iframeSrc|$epUrl"
-                            }
-                        )
+                // Try to extract season/episode from structure or title
+                val seasonNum = ep.parents().select(".se-c").attr("id").replace("season-", "").toIntOrNull() 
+                    ?: ep.parents().select("div[id^=season-]").attr("id").replace("season-", "").toIntOrNull()
+                    ?: 1
+                
+                val epNum = ep.selectFirst(".numerando")?.text()?.split("-")?.lastOrNull()?.trim()?.toIntOrNull()
+                    ?: epTitle.replace(Regex(".*?(\\d+).*"), "$1").toIntOrNull()
+
+                episodes.add(newEpisode(epHref) {
+                    this.name = epTitle
+                    this.episode = epNum
+                    this.season = seasonNum
+                })
+            }
+
+            // Fallback for different DooPlay structures
+            if (episodes.isEmpty()) {
+                doc.select("div.se-c").forEach { sDiv ->
+                    val sNum = sDiv.attr("id").replace("season-", "").toIntOrNull() ?: 1
+                    sDiv.select("ul.list-episodes li a, ul.episodios li a").forEach { ep ->
+                        val epTitle = ep.text()
+                        val epHref = ep.attr("href")
+                        val epNum = ep.selectFirst(".numerando")?.text()?.split("-")?.lastOrNull()?.trim()?.toIntOrNull()
+                        
+                        episodes.add(newEpisode(epHref) {
+                            this.name = epTitle
+                            this.episode = epNum
+                            this.season = sNum
+                        })
                     }
                 }
-            } else {
-                 // No season list, maybe movie or single season
-                 iframeDoc.select("ul.list-episodes li a").forEach { ep ->
-                    episodes.add(newEpisode(iframeSrc) {
-                        this.name = ep.text()
-                        this.data = "$iframeSrc|${ep.attr("href")}"
-                    })
-                 }
             }
-        }
 
-        return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-            this.posterUrl = poster
-            this.plot = desc
-            this.backgroundPosterUrl = bg
+            Log.d("MaxSeries", "✅ Encontrados ${episodes.size} episódios para $title")
+
+            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+                this.posterUrl = poster
+                this.plot = desc
+                this.backgroundPosterUrl = bg
+            }
+        } else {
+            return newMovieLoadResponse(title, url, TvType.Movie, url) {
+                this.posterUrl = poster
+                this.plot = desc
+                this.backgroundPosterUrl = bg
+            }
         }
     }
 
@@ -144,41 +142,53 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        // Data format: iframeSrc|epUrl (epUrl is like #1234)
-        val parts = data.split("|")
-        if (parts.size < 2) return false
-        val iframeSrc = parts[0]
-        val epId = parts[1] // e.g. #1234_5678
-
-        val doc = app.get(iframeSrc).document
+        // Data can be the episode URL or movie URL
+        val doc = app.get(data).document
+        var linksFound = 0
         
-        // The id in href usually corresponds to a div id showing the players
-        // e.g. <div id="1234_5678" class="play-ex"> ... buttons ... </div>
-        // Or it triggers a JS function.
-        // If it's a standard ID reference:
+        // 1. Look for iframes
+        doc.select("iframe").forEach { iframe ->
+            val src = iframe.attr("src").ifEmpty { iframe.attr("data-src") }
+            if (src.isNotEmpty() && !src.contains("facebook.com") && !src.contains("twitter.com") && !src.contains("google.com")) {
+                val fixedSrc = if (src.startsWith("//")) "https:$src" else src
+                if (fixedSrc.startsWith("http")) {
+                    try {
+                        loadExtractor(fixedSrc, data, subtitleCallback, callback)
+                        linksFound++
+                    } catch (e: Exception) {
+                        Log.e("MaxSeries", "Erro ao carregar extractor para $fixedSrc: ${e.message}")
+                    }
+                }
+            }
+        }
         
-        val targetId = epId.removePrefix("#")
-        val playerDiv = doc.selectFirst("div[id='$targetId']") ?: doc.selectFirst("div#$targetId")
-        
-        playerDiv?.select(".btn")?.forEach { btn ->
-            // The button usually has 'data-player' or 'onclick' or 'href'
-            // If href is javascript:..., look for data attributes.
-            // Subagent said: "Selecting a player loads a nested iframe... Player #1... video source"
-            
-            // Common pattern: data-link or data-src
-            // Or an onclick that calls a function with a URL.
-            
-            // Let's look for known attributes
-            var playerUrl = btn.attr("data-src").ifEmpty { btn.attr("href") }
-            
-            // If it's a relative URL or needs fixing
-            if (playerUrl.contains("playerembedapi.link")) {
-                loadExtractor(playerUrl, "$mainUrl/", subtitleCallback, callback)
-            } else if(playerUrl.startsWith("http")) {
-                 loadExtractor(playerUrl, "$mainUrl/", subtitleCallback, callback)
+        // 2. Look for DooPlay player options
+        doc.select("li[data-link], li[data-url]").forEach { li ->
+            val link = li.attr("data-link").ifEmpty { li.attr("data-url") }
+            if (link.isNotEmpty()) {
+                val fixedLink = if (link.startsWith("//")) "https:$link" else link
+                try {
+                    loadExtractor(fixedLink, data, subtitleCallback, callback)
+                    linksFound++
+                } catch (e: Exception) {
+                    Log.e("MaxSeries", "Erro ao carregar extractor para $fixedLink: ${e.message}")
+                }
             }
         }
 
-        return true
+        // 3. Look for buttons with onclick/data-player
+        doc.select(".btn, .player-option").forEach { btn ->
+            val link = btn.attr("data-player").ifEmpty { btn.attr("data-link") }
+            if (link.isNotEmpty()) {
+                try {
+                    loadExtractor(link, data, subtitleCallback, callback)
+                    linksFound++
+                } catch (e: Exception) {
+                    // Ignorar erros individuais
+                }
+            }
+        }
+
+        return linksFound > 0
     }
 }

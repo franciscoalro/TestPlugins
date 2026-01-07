@@ -1,0 +1,8 @@
+{
+    "name": "Francisco Plugins",
+    "description": "Repositório pessoal de extensões",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://franciscoalro.github.io/CloudstreamRepo/plugins.json"
+    ]
+}

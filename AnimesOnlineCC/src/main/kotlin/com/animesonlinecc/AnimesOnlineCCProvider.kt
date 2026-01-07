@@ -70,7 +70,8 @@ class AnimesOnlineCCProvider : MainAPI() {
     override suspend fun search(query: String): List<SearchResponse> {
         return try {
             val document = app.get("$mainUrl/?s=$query").document
-            document.select("div.items article.item").mapNotNull {
+            // FIX: Página de pesquisa usa div.items2, não div.items
+            document.select("div.items2 article.item").mapNotNull {
                 it.toSearchResult()
             }
         } catch (e: Exception) {

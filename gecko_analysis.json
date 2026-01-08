@@ -1,0 +1,226 @@
+{
+  "analysis_timestamp": 1767912712.4102757,
+  "geckodriver_version": "v0.34.0",
+  "base_url": "https://www.maxseries.one",
+  "homepage_analysis": {
+    "url": "https://www.maxseries.one/",
+    "title": "Max Series - Assistir Filmes e Series Online Gratis",
+    "page_source_length": 57458,
+    "series_links": [
+      {
+        "text": "Séries",
+        "href": "https://www.maxseries.one/series/",
+        "visible": true
+      },
+      {
+        "text": "",
+        "href": "https://www.maxseries.one/series/",
+        "visible": false
+      },
+      {
+        "text": "",
+        "href": "https://www.maxseries.one/series/assistir-terra-de-pecados-online",
+        "visible": true
+      },
+      {
+        "text": "Terra de Pecados",
+        "href": "https://www.maxseries.one/series/assistir-terra-de-pecados-online",
+        "visible": true
+      },
+      {
+        "text": "",
+        "href": "https://www.maxseries.one/series/assistir-meu-namorado-coreano-online",
+        "visible": true
+      },
+      {
+        "text": "Meu Namorado Coreano",
+        "href": "https://www.maxseries.one/series/assistir-meu-namorado-coreano-online",
+        "visible": true
+      },
+      {
+        "text": "",
+        "href": "https://www.maxseries.one/series/assistir-o-tempo-das-moscas-online",
+        "visible": true
+      },
+      {
+        "text": "O Tempo das Moscas",
+        "href": "https://www.maxseries.one/series/assistir-o-tempo-das-moscas-online",
+        "visible": true
+      },
+      {
+        "text": "",
+        "href": "https://www.maxseries.one/series/assistir-custe-o-que-custar-online",
+        "visible": true
+      },
+      {
+        "text": "Custe o que Custar",
+        "href": "https://www.maxseries.one/series/assistir-custe-o-que-custar-online",
+        "visible": true
+      }
+    ],
+    "movie_links": [],
+    "navigation_elements": [
+      {
+        "class": "menu",
+        "links_count": 3,
+        "links": [
+          {
+            "text": "",
+            "href": "https://www.maxseries.one/"
+          },
+          {
+            "text": "",
+            "href": "https://www.maxseries.one/filmes/"
+          },
+          {
+            "text": "",
+            "href": "https://www.maxseries.one/series/"
+          }
+        ]
+      },
+      {
+        "class": "menu",
+        "links_count": 3,
+        "links": [
+          {
+            "text": "Início",
+            "href": "https://www.maxseries.one/"
+          },
+          {
+            "text": "DMCA",
+            "href": "https://www.maxseries.one/dmca"
+          },
+          {
+            "text": "Contato",
+            "href": "https://www.maxseries.one/contact"
+          }
+        ]
+      },
+      {
+        "class": "menu",
+        "links_count": 2,
+        "links": [
+          {
+            "text": "Doramas Online",
+            "href": "https://www.doramando.com/"
+          },
+          {
+            "text": "Hentai",
+            "href": "https://www.assistirhentai.com/"
+          }
+        ]
+      },
+      {
+        "class": "menu",
+        "links_count": 1,
+        "links": [
+          {
+            "text": "Sitemap",
+            "href": "https://www.maxseries.one/sitemap_index.xml"
+          }
+        ]
+      }
+    ],
+    "interactive_elements": []
+  },
+  "series_analysis": {
+    "url": "https://www.maxseries.one/series/",
+    "title": "Séries",
+    "description": "Descrição não encontrada",
+    "poster": "https://image.tmdb.org/t/p/w500/awhE322eVF4EAsTq8bNzTscRXB9.jpg",
+    "seasons_analysis": {
+      "dooplay_seasons": [],
+      "season_tabs": [],
+      "season_buttons": [],
+      "total_seasons": 0
+    },
+    "episodes_analysis": {
+      "episode_links": [],
+      "episode_elements": [],
+      "numbering_analysis": [],
+      "clickable_episodes": []
+    },
+    "player_analysis": {
+      "iframes": [],
+      "player_buttons": [],
+      "data_source_buttons": [],
+      "ajax_options": [],
+      "interactive_elements": [
+        {
+          "tag": "button",
+          "text": "",
+          "class": "search-button",
+          "onclick": null
+        },
+        {
+          "tag": "a",
+          "text": "",
+          "class": "btn prevf",
+          "onclick": null
+        },
+        {
+          "tag": "a",
+          "text": "",
+          "class": "btn nextf",
+          "onclick": null
+        }
+      ]
+    },
+    "javascript_analysis": {
+      "script_count": 18,
+      "external_scripts": [
+        "https://www.maxseries.one/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://www.maxseries.one/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/lazyload.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/pwsscrollbar.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/owlcarousel.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/idtabs.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/isrepeater.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8",
+        "https://ib.bobafidges.com/rx6Ao292AGv7US/119582",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.scripts.min.js?ver=2.5.8",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.livesearch.min.js?ver=2.5.8",
+        "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+      ],
+      "inline_scripts": [],
+      "jwplayer_detected": false,
+      "gleam_detected": false,
+      "ajax_patterns": [],
+      "video_urls": []
+    },
+    "network_analysis": {
+      "ajax_endpoints_detected": [
+        "//fonts.googleapis.com",
+        "https://fonts.googleapis.com/css?family=Quicksand%3A300%2C400%2C500%2C700&amp;ver=2.5.8",
+        "dt_main_ajax-js-extra",
+        "/wp-admin/admin-ajax.php",
+        "player_api",
+        "https://www.maxseries.one/wp-json/dooplayer/v2/",
+        "play_ajaxmd",
+        "};\n//# sourceURL=dt_main_ajax-js-extra\n/* ]]> */\n</script>\n<script type=",
+        "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8",
+        "dt_main_ajax-js",
+        ", sans-serif;}\nbody{background-color:#e25b45;}\nheader.main .hbox,#contenedor,.aligncite,footer.main .fbox{max-width:1200px;}\na,.home-blog-post .entry-date .date,.top-imdb-item:hover>.title a,.module .content .items .item .data h3 a:hover,.head-main-nav ul.main-header li:hover>a,.login_box .box a.register{color:#e25b45;}\n.nav_items_module a.btn:hover,.pagination span.current,.w_item_b a:hover>.data .wextra b:before,.comment-respond h3:before,footer.main .fbox .fmenu ul li a:hover{color:#e25b45;}\nheader.main .hbox .search form button[type=submit]:hover,.loading,#seasons .se-c .se-a ul.episodios li .episodiotitle a:hover,.sgeneros a:hover,.page_user nav.user ul li a:hover{color:#e25b45;}\nfooter.main .fbox .fmenu ul li.current-menu-item a,.posts .meta .autor i,.pag_episodes .item a:hover,a.link_a:hover,ul.smenu li a:hover{color:#e25b45;}\nheader.responsive .nav a.active:before, header.responsive .search a.active:before,.dtuser a.clicklogin:hover,.menuresp .menu ul.resp li a:hover,.menuresp .menu ul.resp li ul.sub-menu li a:hover{color:#e25b45;}\n.sl-wrapper a:before,table.account_links tbody td a:hover,.dt_mainmeta nav.genres ul li a:hover{color:#e25b45;}\n.dt_mainmeta nav.genres ul li.current-cat a:before,.dooplay_player .options ul li:hover span.title{color:#e25b45;}\n.head-main-nav ul.main-header li ul.sub-menu li a:hover,form.form-resp-ab button[type=submit]:hover>span,.sidebar aside.widget ul li a:hover{color:#e25b45;}\nheader.top_imdb h1.top-imdb-h1 span,article.post .information .meta span.autor,.w_item_c a:hover>.rating i,span.comment-author-link,.pagination a:hover{color:#e25b45;}\n.letter_home ul.glossary li a:hover, .letter_home ul.glossary li a.active, .user_control a.in-list{color:#e25b45;}\n.headitems a#dooplay_signout:hover, .login_box .box a#c_loginbox:hover{color:#e25b45;}\n.report_modal .box .form form fieldset label:hover > span.title{color:#e25b45;}\n.linktabs ul li a.selected,ul.smenu li a.selected,a.liked,.module .content header span a.see-all,.openHis:hover,.page_user nav.user ul li a.selected,.dt_mainmeta nav.releases ul li a:hover{background:#e25b45;}\na.see_all,p.form-submit input[type=submit]:hover,.report-video-form fieldset input[type=submit],a.mtoc,.contact .wrapper fieldset input[type=submit],span.item_type,a.main{background:#e25b45;}\n.post-comments .comment-reply-link:hover,#seasons .se-c .se-q span.se-o,#edit_link .box .form_edit .cerrar a:hover{background:#e25b45;}\n.user_edit_control ul li a.selected,form.update_profile fieldset input[type=submit],.page_user .content .paged a.load_more:hover,#edit_link .box .form_edit fieldset input[type=",
+        ">\n\t\t\t/*Qualidade*/\nspan.quality {\n    color: #fff;\n    background: #000;\n}\n\n/*Destaque*/\n.featu {\n    background: #e25b45;\n\t\tborder-radius: 5px;\n\t  position: fixed;\n\t\tfont-weight: bold;\n}\n\n/*Background*/\n#dt_contenedor{\n\tbackground-image: linear-gradient(to bottom right, black, grey);\n}\n\n/*Transparencia na logo*/\nheader.main .hbox .logo{\n\tbackground:none;\n}\n\t\n\n/*Botão para passsar slider*/\n.btn {\n    display: inline-block;\n    font-weight: 400;\n    text-align: center;\n    white-space: nowrap;\n    vertical-align: middle;\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n    border: 1px solid transparent;\n    padding: 6px 12px;\n    padding: 0.375rem 0.75rem;\n    font-size: 14px;\n    font-size: .875rem;\n    line-height: 1.5;\n    border-radius: 0.25rem;\n    -webkit-transition: background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;\n    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;\n    -o-transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;\n    cursor: pointer;\n}\n\n/*See all - Ver todos*/\n.module .content header span a.see-all{\n\t\tdisplay: block;\n    font-size: 10px;\n    font-weight: 400;\n    text-transform: uppercase;\n    padding: 1px 20px;\n    border-radius: 3px;\n    margin-left: 0px;\n}\n}\n\n/*Poster*/\n.module .content .items .item .poster{\n\tborder-radius: 10px;\t\n}\n\n/*Título e data*/\n.module .content .items .item .data {\n\ttext-align:center;\n}\n\n/*Gêneros, ano e afins*/\n.sgeneros a {\n\t\tfloat:none;\n}\n\n/*Sinopse*/\n.sinopse {\n    float: left;\n    width: 100%;\n    padding: 15px;\n    border-bottom: solid 3px rgba(255, 255, 255, 0.08);\n}\n\n.sinopse-texto{\n\tmargin-bottom: 0.8rem;\n}\n\n/*Top 5 da semana*/\n.sidebar aside.widget h2.widget-title{\n\t\tbackground-color: #191919;\n\t\tfont-weight: 500;\n    font-size: 17px;\n    width: 100%;\n    text-align: center;\n    padding: 15px;\n    float: left;\n    margin-bottom: 0.8rem;\n    overflow: hidden;\n    display: block;\n\t\tposition: relative;\n}\n\n/*Título original - Linha - Custom Fields*/\n.custom_fields, .srating{\n\t\tborder:none;\n\t\twidth: 100%;\n\t\tfloat: left;\n\t\tpadding: 8px 0;\n\t\tmargin: 0.5rem 0 0;\n}\n\n/*Player*/\n.dooplay_player .play.isnd {padding:0;}\n\n/*Foto player css 100%*/\n.background-foto {\n    width: 100%;\n}\n\n.aviso {\n    background: #fdb8b8;\n    width: 100%;\n    float: left;\n    padding: 15px;\n    font-size: 13px;\n    color: #9f9f9f;\n    text-align: center;\n    border: 1px solid #282828;\n    box-sizing: border-box;\n\t\tcolor: black;\n}\n\n.colmeia {\n    background: #0f0f0fe6;\n    width: 100%;\n    float: left;\n    padding: 15px;\n    font-size: 13px;\n    color: #9f9f9f;\n    text-align: center;\n    box-sizing: border-box;\n\t\tcolor: white;\n}\n\n.module {\n    border-top: 0px;\n}\t\t</style>\n\t\t<script data-cfasync=",
+        "api",
+        "loadingplayer",
+        "Loading player..",
+        "selectaplayer",
+        "Select a video player",
+        "playeradstime",
+        "autoplayer"
+      ],
+      "video_requests": [
+        "document"
+      ],
+      "api_calls": []
+    },
+    "interaction_results": {
+      "clicked_elements": [],
+      "hover_effects": [],
+      "form_interactions": [],
+      "dynamic_content": []
+    }
+  },
+  "generated_kotlin": "package com.franciscoalro.maxseries\n\nimport com.lagradost.cloudstream3.*\nimport com.lagradost.cloudstream3.utils.ExtractorLink\nimport com.lagradost.cloudstream3.utils.loadExtractor\nimport com.lagradost.cloudstream3.utils.Qualities\nimport android.util.Log\n\nclass MaxSeriesProvider : MainAPI() {\n    override var mainUrl = \"https://www.maxseries.one\"\n    override var name = \"MaxSeries\"\n    override val hasMainPage = true\n    override var lang = \"pt\"\n    override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)\n\n    // Baseado na análise GeckoDriver: 0 episódios detectados\n    // Players encontrados: 0 botões data-source\n    // Interações testadas: 0 cliques simulados\n\n    override suspend fun load(url: String): LoadResponse? {\n        val doc = app.get(url).document\n        val title = doc.selectFirst(\".data h1\")?.text() \n            ?: doc.selectFirst(\"h1\")?.text() ?: \"Unknown\"\n        val desc = doc.selectFirst(\".sinopse\")?.text() \n            ?: doc.selectFirst(\".entry-content\")?.text()\n        val poster = doc.selectFirst(\".poster img\")?.attr(\"src\")\n        \n        val isSeries = url.contains(\"/series/\")\n\n        if (isSeries) {\n            val episodes = mutableListOf<Episode>()\n            \n            Log.d(\"MaxSeries\", \"📺 Analisando série (GeckoDriver): $title\")\n            \n            // Método 1: Estrutura detectada pelo GeckoDriver\n            \n            // Nenhum episódio detectado pelo GeckoDriver - usando fallback\n            episodes.add(newEpisode(url) {\n                this.name = \"Episódio 1\"\n                this.episode = 1\n                this.season = 1\n            })\n            \n            Log.d(\"MaxSeries\", \"✅ Total episódios: ${episodes.size}\")\n\n            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {\n                this.posterUrl = poster\n                this.plot = desc\n            }\n        } else {\n            return newMovieLoadResponse(title, url, TvType.Movie, url) {\n                this.posterUrl = poster\n                this.plot = desc\n            }\n        }\n    }\n\n    override suspend fun loadLinks(\n        data: String,\n        isCasting: Boolean,\n        subtitleCallback: (SubtitleFile) -> Unit,\n        callback: (ExtractorLink) -> Unit\n    ): Boolean {\n        Log.d(\"MaxSeries\", \"📺 Processando links (GeckoDriver): $data\")\n        \n        var linksFound = 0\n        val doc = app.get(data).document\n        \n        // Método baseado nas interações GeckoDriver\n        \n            // Nenhum player data-source detectado - usando método padrão\n            doc.select(\"iframe\").forEach { iframe ->\n                val src = iframe.attr(\"src\")\n                if (src.isNotEmpty() && src.startsWith(\"http\")) {\n                    if (loadExtractor(src, data, subtitleCallback, callback)) {\n                        linksFound++\n                    }\n                }\n            }\n        \n        Log.d(\"MaxSeries\", \"✅ Links encontrados: $linksFound\")\n        return linksFound > 0\n    }\n}"
+}

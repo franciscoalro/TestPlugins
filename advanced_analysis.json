@@ -1,0 +1,13 @@
+{
+  "analysis_timestamp": 1767911289.1845515,
+  "base_url": "https://www.maxseries.one",
+  "homepage_analysis": {
+    "url": "https://www.maxseries.one",
+    "title": "N/A",
+    "series_links": [],
+    "movie_links": [],
+    "navigation_structure": {},
+    "content_structure": {}
+  },
+  "generated_kotlin": "\n// Código gerado automaticamente baseado na análise do site\nclass MaxSeriesProvider : MainAPI() {\n    override var mainUrl = \"https://www.maxseries.one\"\n    override var name = \"MaxSeries\"\n    override val hasMainPage = true\n    override var lang = \"pt\"\n    override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)\n\n    override suspend fun load(url: String): LoadResponse? {\n        val doc = app.get(url).document\n        val title = doc.selectFirst(\".data h1\")?.text() \n            ?: doc.selectFirst(\"h1\")?.text() ?: \"Unknown\"\n        val desc = doc.selectFirst(\".sinopse\")?.text() \n            ?: doc.selectFirst(\".entry-content\")?.text()\n        val poster = doc.selectFirst(\".poster img\")?.attr(\"src\")\n        \n        val isSeries = url.contains(\"/series/\")\n\n        if (isSeries) {\n            val episodes = mutableListOf<Episode>()\n            \n            // Método baseado na análise: 0 seletores encontrados\n            \n            \n            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {\n                this.posterUrl = poster\n                this.plot = desc\n            }\n        } else {\n            return newMovieLoadResponse(title, url, TvType.Movie, url) {\n                this.posterUrl = poster\n                this.plot = desc\n            }\n        }\n    }\n\n    override suspend fun loadLinks(\n        data: String,\n        isCasting: Boolean,\n        subtitleCallback: (SubtitleFile) -> Unit,\n        callback: (ExtractorLink) -> Unit\n    ): Boolean {\n        val doc = app.get(data).document\n        var linksFound = 0\n        \n        // Método baseado na análise: 0 tipos de players encontrados\n        \n        \n        return linksFound > 0\n    }\n}\n"
+}

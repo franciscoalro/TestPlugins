@@ -5,15 +5,13 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.Qualities
 import android.util.Log
+import org.jsoup.nodes.Document
 import java.util.Base64
+import org.json.JSONObject
 
 // MaxSeries Provider - Versão 16.0 - EXTRACTORS CORRIGIDOS
 // Problema identificado: Players usam JavaScript complexo que os extractors padrão não conseguem processar
 // Solução: Implementar extractors customizados para PlayerEmbedAPI e MegaEmbed
-// Análise completa realizada em 08/01/2026
-// - 5 episódios detectados por série
-// - Players: playerembedapi.link, megaembed.link
-// - Estrutura: playerthree.online iframes com navegação por fragmentos
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -93,9 +91,8 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (GeckoFinal): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v16.0): $title")
             
-            // Método baseado na análise GeckoDriver: playerthree.online iframes
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
             if (!mainIframe.isNullOrEmpty()) {
@@ -105,28 +102,21 @@ class MaxSeriesProvider : MainAPI() {
                     
                     val iframeDoc = app.get(iframeSrc).document
                     
-                    // Extrair temporadas da navegação (baseado na análise)
                     val seasons = mutableMapOf<String, Int>()
                     iframeDoc.select("ul.header-navigation li[data-season-id]").forEach { seasonLi ->
                         val seasonId = seasonLi.attr("data-season-id")
                         val seasonNumber = seasonLi.attr("data-season-number").toIntOrNull() ?: 1
                         if (seasonId.isNotEmpty()) {
                             seasons[seasonId] = seasonNumber
-                            Log.d("MaxSeries", "🎬 Temporada detectada: $seasonNumber (ID: $seasonId)")
                         }
                     }
                     
-                    // Se não encontrar temporadas na navegação, usar fallback
                     if (seasons.isEmpty()) {
                         seasons["default"] = 1
-                        Log.d("MaxSeries", "🎬 Usando temporada padrão: 1")
                     }
                     
-                    // Extrair episódios (baseado na análise: li[data-season-id][data-episode-id] a)
                     val episodeElements = iframeDoc.select("li[data-season-id][data-episode-id] a")
                     if (episodeElements.isNotEmpty()) {
-                        Log.d("MaxSeries", "📺 Encontrados ${episodeElements.size} episódios via data attributes")
-                        
                         episodeElements.forEachIndexed { index, epLink ->
                             val seasonId = epLink.parent()?.attr("data-season-id") ?: "default"
                             val episodeId = epLink.parent()?.attr("data-episode-id") ?: ""
@@ -137,7 +127,6 @@ class MaxSeriesProvider : MainAPI() {
                                 val seasonNum = seasons[seasonId] ?: 1
                                 val epTitle = "Episódio $epNum"
                                 
-                                // URL do episódio inclui o iframe base + fragmento
                                 val episodeUrl = if (epHref.startsWith("#")) "$iframeSrc$epHref" else epHref
                                 
                                 episodes.add(newEpisode(episodeUrl) {
@@ -145,28 +134,6 @@ class MaxSeriesProvider : MainAPI() {
                                     this.episode = epNum
                                     this.season = seasonNum
                                 })
-                                
-                                Log.d("MaxSeries", "✅ Episódio: T${seasonNum}E${epNum} - $epTitle -> $episodeUrl")
-                            }
-                        }
-                    } else {
-                        // Fallback: procurar por links com fragmentos (#)
-                        Log.d("MaxSeries", "🔄 Fallback: procurando links com fragmentos")
-                        
-                        val fragmentLinks = iframeDoc.select("a[href*='#']")
-                        fragmentLinks.forEachIndexed { index, link ->
-                            val href = link.attr("href")
-                            if (href.contains("#") && href.contains("_")) {
-                                val epNum = index + 1
-                                val episodeUrl = if (href.startsWith("#")) "$iframeSrc$href" else href
-                                
-                                episodes.add(newEpisode(episodeUrl) {
-                                    this.name = "Episódio $epNum"
-                                    this.episode = epNum
-                                    this.season = 1
-                                })
-                                
-                                Log.d("MaxSeries", "✅ Episódio (fallback): E${epNum} -> $episodeUrl")
                             }
                         }
                     }
@@ -176,17 +143,13 @@ class MaxSeriesProvider : MainAPI() {
                 }
             }
             
-            // Fallback final se nenhum episódio for encontrado
             if (episodes.isEmpty()) {
-                Log.d("MaxSeries", "⚠️ Fallback final: criando episódio único")
                 episodes.add(newEpisode(url) {
                     this.name = "Episódio 1"
                     this.episode = 1
                     this.season = 1
                 })
             }
-            
-            Log.d("MaxSeries", "✅ Total: ${episodes.size} episódios em ${episodes.map { it.season }.distinct().size} temporadas")
 
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
@@ -194,7 +157,6 @@ class MaxSeriesProvider : MainAPI() {
                 this.backgroundPosterUrl = bg
             }
         } else {
-            Log.d("MaxSeries", "🎬 Processando filme: $title")
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
                 this.plot = desc
@@ -209,26 +171,18 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v15.1 - AJAX Fix): $data")
+        Log.d("MaxSeries", "📺 Processando links (v16.0 - Extractors Corrigidos): $data")
         
         var linksFound = 0
         
         try {
-            // Verificar se é uma URL de episódio do iframe (contém #)
             if (data.contains("#") && data.contains("playerthree.online")) {
-                Log.d("MaxSeries", "🎯 Processando episódio do iframe playerthree")
-                
-                // Extrair episodeId da URL (formato: #12962_255703)
                 val fragmentMatch = Regex("#\\d+_(\\d+)").find(data)
                 if (fragmentMatch != null) {
                     val episodeId = fragmentMatch.groupValues[1]
-                    Log.d("MaxSeries", "🔍 Episode ID extraído: $episodeId")
                     
-                    // Fazer requisição AJAX para obter os players reais
                     val baseUrl = "https://playerthree.online"
                     val ajaxUrl = "$baseUrl/episodio/$episodeId"
-                    
-                    Log.d("MaxSeries", "📡 Fazendo requisição AJAX: $ajaxUrl")
                     
                     val ajaxHeaders = mapOf(
                         "Referer" to data,
@@ -239,104 +193,54 @@ class MaxSeriesProvider : MainAPI() {
                     
                     if (ajaxResponse.isSuccessful) {
                         val ajaxDoc = ajaxResponse.document
-                        Log.d("MaxSeries", "✅ AJAX Response recebida: ${ajaxResponse.code}")
                         
-                        // Procurar botões de player na resposta AJAX
-                        val playerButtons = ajaxDoc.select("button[data-source], .btn[data-source], button[data-show-player]")
-                        Log.d("MaxSeries", "🎮 Players encontrados via AJAX: ${playerButtons.size}")
+                        val playerButtons = ajaxDoc.select("button[data-source], .btn[data-source]")
                         
                         playerButtons.forEach { button ->
                             val playerName = button.text().trim().ifEmpty { "Player" }
                             val dataSource = button.attr("data-source")
                             
                             if (dataSource.isNotEmpty() && dataSource.startsWith("http")) {
-                                Log.d("MaxSeries", "🎯 Player AJAX: $playerName -> $dataSource")
-                                
-                                // Verificar se não é trailer/YouTube
                                 if (!dataSource.contains("youtube", ignoreCase = true) && 
                                     !dataSource.contains("trailer", ignoreCase = true)) {
                                     
-                        // Usar extractors customizados em vez dos padrão
-                    try {
-                        when {
-                            dataSource.contains("playerembedapi.link") -> {
-                                if (extractPlayerEmbedAPI(dataSource, data, callback)) {
-                                    linksFound++
-                                    Log.d("MaxSeries", "✅ Sucesso PlayerEmbedAPI customizado: $playerName")
-                                }
-                            }
-                            dataSource.contains("megaembed.link") -> {
-                                if (extractMegaEmbed(dataSource, data, callback)) {
-                                    linksFound++
-                                    Log.d("MaxSeries", "✅ Sucesso MegaEmbed customizado: $playerName")
-                                }
-                            }
-                            else -> {
-                                // Fallback para outros extractors
-                                if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
-                                    linksFound++
-                                    Log.d("MaxSeries", "✅ Sucesso extractor padrão: $playerName")
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e("MaxSeries", "❌ Erro ao processar player $playerName: ${e.message}")
-                    }
-                                } else {
-                                    Log.d("MaxSeries", "🚨 Trailer ignorado: $dataSource")
-                                }
-                            }
-                        }
-                    } else {
-                        Log.e("MaxSeries", "❌ Erro na requisição AJAX: ${ajaxResponse.code}")
-                    }
-                } else {
-                    Log.e("MaxSeries", "❌ Não foi possível extrair episodeId de: $data")
-                }
-                
-                // Método 2: Procurar gleam.config nos scripts (fallback)
-                if (linksFound == 0) {
-                    Log.d("MaxSeries", "🔄 Fallback: Procurando gleam.config")
-                    
-                    val doc = app.get(data).document
-                    doc.select("script").forEach { script ->
-                        val scriptContent = script.html()
-                        
-                        if (scriptContent.contains("gleam.config", ignoreCase = true)) {
-                            Log.d("MaxSeries", "🎬 Script gleam.config encontrado")
-                            
-                            // Extrair URL do gleam.config
-                            val gleamUrlRegex = Regex(""""url"\s*:\s*"([^"]+)"""")
-                            val gleamMatch = gleamUrlRegex.find(scriptContent)
-                            
-                            if (gleamMatch != null) {
-                                val gleamUrl = gleamMatch.groupValues[1].replace("\\/", "/")
-                                Log.d("MaxSeries", "🎯 Gleam URL: $gleamUrl")
-                                
-                                if (gleamUrl.startsWith("http")) {
-                                    try {
-                                        if (loadExtractor(gleamUrl, data, subtitleCallback, callback)) {
-                                            linksFound++
+                                    Log.d("MaxSeries", "🎯 Processando player: $playerName -> $dataSource")
+                                    
+                                    // Usar extractors customizados em vez dos padrão
+                                    when {
+                                        dataSource.contains("playerembedapi.link") -> {
+                                            if (extractPlayerEmbedAPI(dataSource, data, callback)) {
+                                                linksFound++
+                                            }
                                         }
-                                    } catch (e: Exception) {
-                                        Log.e("MaxSeries", "❌ Erro ao processar gleam URL: ${e.message}")
+                                        dataSource.contains("megaembed.link") -> {
+                                            if (extractMegaEmbed(dataSource, data, callback)) {
+                                                linksFound++
+                                            }
+                                        }
+                                        else -> {
+                                            // Fallback para outros extractors
+                                            try {
+                                                if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
+                                                    linksFound++
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e("MaxSeries", "❌ Erro no extractor padrão: ${e.message}")
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-                
             } else {
                 // Processamento padrão para URLs que não são de iframe
-                Log.d("MaxSeries", "🔄 Processamento padrão")
                 val doc = app.get(data).document
                 
-                // Procurar iframe principal
                 val mainIframe = doc.selectFirst("iframe")?.attr("src")
                 if (!mainIframe.isNullOrEmpty()) {
                     val iframeSrc = if (mainIframe.startsWith("//")) "https:$mainIframe" else mainIframe
-                    Log.d("MaxSeries", "📺 Carregando iframe principal: $iframeSrc")
                     
                     try {
                         if (loadExtractor(iframeSrc, data, subtitleCallback, callback)) {
@@ -344,44 +248,6 @@ class MaxSeriesProvider : MainAPI() {
                         }
                     } catch (e: Exception) {
                         Log.e("MaxSeries", "❌ Erro ao carregar iframe: ${e.message}")
-                    }
-                }
-                
-                // Fallback: DooPlay AJAX players
-                if (linksFound == 0) {
-                    Log.d("MaxSeries", "🔄 Tentando DooPlay AJAX")
-                    
-                    doc.select("#playeroptionsul li, .playeroptionsul li").forEach { option ->
-                        val playerId = option.attr("data-post")
-                        val playerNum = option.attr("data-nume")
-                        val playerType = option.attr("data-type").ifEmpty { "movie" }
-                        
-                        if (playerId.isNotEmpty() && playerNum.isNotEmpty()) {
-                            try {
-                                val ajaxUrl = "$mainUrl/wp-admin/admin-ajax.php"
-                                val ajaxData = mapOf(
-                                    "action" to "doo_player_ajax",
-                                    "post" to playerId,
-                                    "nume" to playerNum,
-                                    "type" to playerType
-                                )
-                                
-                                val ajaxResponse = app.post(ajaxUrl, data = ajaxData).text
-                                val iframeRegex = Regex("""src=["']([^"']+)["']""")
-                                val iframeMatch = iframeRegex.find(ajaxResponse)
-                                
-                                if (iframeMatch != null) {
-                                    val iframeUrl = iframeMatch.groupValues[1]
-                                    val cleanUrl = if (iframeUrl.startsWith("//")) "https:$iframeUrl" else iframeUrl
-                                    
-                                    if (loadExtractor(cleanUrl, data, subtitleCallback, callback)) {
-                                        linksFound++
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                Log.e("MaxSeries", "❌ Erro no player AJAX: ${e.message}")
-                            }
-                        }
                     }
                 }
             }
@@ -406,7 +272,7 @@ class MaxSeriesProvider : MainAPI() {
             val response = app.get(url, referer = referer)
             val content = response.text
             
-            // Procurar dados base64 no JavaScript (padrão do PlayerEmbedAPI)
+            // Procurar dados base64 no JavaScript
             val base64Regex = Regex("""atob\(["']([^"']+)["']\)""")
             val base64Match = base64Regex.find(content)
             
@@ -415,7 +281,7 @@ class MaxSeriesProvider : MainAPI() {
                     val base64Data = base64Match.groupValues[1]
                     val decodedData = String(Base64.getDecoder().decode(base64Data))
                     
-                    Log.d("MaxSeries", "🔍 Dados decodificados PlayerEmbedAPI encontrados")
+                    Log.d("MaxSeries", "🔍 Dados decodificados encontrados")
                     
                     // Procurar URLs de vídeo nos dados decodificados
                     val videoUrlRegex = Regex(""""(?:file|source|url)"\s*:\s*"([^"]+\.(?:m3u8|mp4)[^"]*)"''')
@@ -455,28 +321,7 @@ class MaxSeriesProvider : MainAPI() {
                 callback.invoke(
                     ExtractorLink(
                         "PlayerEmbedAPI",
-                        "PlayerEmbedAPI Direct",
-                        videoUrl,
-                        referer,
-                        Qualities.P720.value,
-                        videoUrl.contains(".m3u8")
-                    )
-                )
-                return true
-            }
-            
-            // Último fallback: procurar qualquer URL de vídeo
-            val anyVideoRegex = Regex("""(https?://[^"'\s]+\.(?:m3u8|mp4)[^"'\s]*)""")
-            val anyMatches = anyVideoRegex.findAll(content)
-            
-            anyMatches.forEach { match ->
-                val videoUrl = match.groupValues[1]
-                Log.d("MaxSeries", "✅ Vídeo genérico PlayerEmbedAPI: $videoUrl")
-                
-                callback.invoke(
-                    ExtractorLink(
                         "PlayerEmbedAPI",
-                        "PlayerEmbedAPI Generic",
                         videoUrl,
                         referer,
                         Qualities.P720.value,
@@ -504,7 +349,6 @@ class MaxSeriesProvider : MainAPI() {
         try {
             val response = app.get(url, referer = referer)
             val content = response.text
-            val doc = response.document
             
             // MegaEmbed usa JavaScript moderno com módulos
             // Procurar por assets JavaScript
@@ -525,7 +369,7 @@ class MaxSeriesProvider : MainAPI() {
                     configMatches.forEach { match ->
                         val videoUrl = match.groupValues[1]
                         if (videoUrl.startsWith("http") && (videoUrl.contains(".m3u8") || videoUrl.contains(".mp4"))) {
-                            Log.d("MaxSeries", "✅ Vídeo MegaEmbed asset encontrado: $videoUrl")
+                            Log.d("MaxSeries", "✅ Vídeo MegaEmbed encontrado: $videoUrl")
                             
                             callback.invoke(
                                 ExtractorLink(
@@ -541,11 +385,12 @@ class MaxSeriesProvider : MainAPI() {
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("MaxSeries", "⚠️ Erro ao carregar asset MegaEmbed: ${e.message}")
+                    Log.d("MaxSeries", "⚠️ Erro ao carregar asset: ${e.message}")
                 }
             }
             
             // Fallback: procurar iframes aninhados
+            val doc = response.document
             val iframes = doc.select("iframe[src]")
             
             for (iframe in iframes) {
@@ -569,7 +414,7 @@ class MaxSeriesProvider : MainAPI() {
                             callback.invoke(
                                 ExtractorLink(
                                     "MegaEmbed",
-                                    "MegaEmbed Iframe",
+                                    "MegaEmbed",
                                     videoUrl,
                                     referer,
                                     Qualities.P720.value,
@@ -582,27 +427,6 @@ class MaxSeriesProvider : MainAPI() {
                         Log.d("MaxSeries", "⚠️ Erro ao processar iframe MegaEmbed: ${e.message}")
                     }
                 }
-            }
-            
-            // Último fallback: procurar qualquer URL de vídeo no conteúdo
-            val anyVideoRegex = Regex("""(https?://[^"'\s]+\.(?:m3u8|mp4)[^"'\s]*)""")
-            val anyMatches = anyVideoRegex.findAll(content)
-            
-            anyMatches.forEach { match ->
-                val videoUrl = match.groupValues[1]
-                Log.d("MaxSeries", "✅ Vídeo genérico MegaEmbed: $videoUrl")
-                
-                callback.invoke(
-                    ExtractorLink(
-                        "MegaEmbed",
-                        "MegaEmbed Generic",
-                        videoUrl,
-                        referer,
-                        Qualities.P720.value,
-                        videoUrl.contains(".m3u8")
-                    )
-                )
-                return true
             }
             
         } catch (e: Exception) {

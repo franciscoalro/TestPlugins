@@ -1,0 +1,134 @@
+{
+  "series_1": {
+    "url": "https://www.maxseries.one/series/assistir-terra-de-pecados-online",
+    "title": "Terra de Pecados",
+    "description": "SINOPSE\n\nDepois que um adolescente desaparece, uma policial com vínculos pessoais ao caso embarca em uma investigação tensa, que revela alianças e antigos conflitos familiares.",
+    "poster": "https://image.tmdb.org/t/p/w500/awhE322eVF4EAsTq8bNzTscRXB9.jpg",
+    "seasons": {
+      "dooplay_seasons": [],
+      "season_tabs": [],
+      "total_seasons": 0
+    },
+    "episodes": {
+      "episode_links": [],
+      "total_episodes": 0,
+      "selectors_tested": [
+        {
+          "selector": "ul.episodios li a",
+          "count": 0
+        },
+        {
+          "selector": ".episodios a",
+          "count": 0
+        },
+        {
+          "selector": ".episode-list a",
+          "count": 0
+        },
+        {
+          "selector": "li[data-episode] a",
+          "count": 0
+        },
+        {
+          "selector": "a[href*=\"episodio\"]",
+          "count": 0
+        },
+        {
+          "selector": "a[href*=\"episode\"]",
+          "count": 0
+        },
+        {
+          "selector": ".se-c ul.episodios li a",
+          "count": 0
+        }
+      ]
+    },
+    "players": {
+      "data_source_buttons": [],
+      "ajax_options": [],
+      "player_buttons": []
+    },
+    "iframes": {
+      "iframes": [
+        {
+          "index": 0,
+          "src": "https://playerthree.online/embed/synden/",
+          "class": "",
+          "id": "",
+          "visible": true,
+          "size": {
+            "height": 500.0,
+            "width": 809.0
+          }
+        }
+      ],
+      "total_iframes": 1
+    }
+  },
+  "series_2": {
+    "url": "https://www.maxseries.one/series/assistir-meu-namorado-coreano-online",
+    "title": "Meu Namorado Coreano",
+    "description": "SINOPSE\n\nCinco brasileiras, em diferentes níveis de relacionamento, desembarcam na agitada Seul para descobrir se as relações sobreviverão à distância, às diferenças culturais e à nova rotina.",
+    "poster": "https://image.tmdb.org/t/p/w500/aiI3uREUvRGa7vawCG58yd4jJz8.jpg",
+    "seasons": {
+      "dooplay_seasons": [],
+      "season_tabs": [],
+      "total_seasons": 0
+    },
+    "episodes": {
+      "episode_links": [],
+      "total_episodes": 0,
+      "selectors_tested": [
+        {
+          "selector": "ul.episodios li a",
+          "count": 0
+        },
+        {
+          "selector": ".episodios a",
+          "count": 0
+        },
+        {
+          "selector": ".episode-list a",
+          "count": 0
+        },
+        {
+          "selector": "li[data-episode] a",
+          "count": 0
+        },
+        {
+          "selector": "a[href*=\"episodio\"]",
+          "count": 0
+        },
+        {
+          "selector": "a[href*=\"episode\"]",
+          "count": 0
+        },
+        {
+          "selector": ".se-c ul.episodios li a",
+          "count": 0
+        }
+      ]
+    },
+    "players": {
+      "data_source_buttons": [],
+      "ajax_options": [],
+      "player_buttons": []
+    },
+    "iframes": {
+      "iframes": [
+        {
+          "index": 0,
+          "src": "https://playerthree.online/embed/meu-namorado-coreano/",
+          "class": "",
+          "id": "",
+          "visible": true,
+          "size": {
+            "height": 500.0,
+            "width": 809.0
+          }
+        }
+      ],
+      "total_iframes": 1
+    }
+  }
+}

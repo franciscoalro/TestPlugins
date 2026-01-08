@@ -1,0 +1,48 @@
+{
+  "site_structure": {
+    "player_iframe": "https://viewplayer.online",
+    "player_buttons": [
+      {
+        "text": "#1 Dublado",
+        "data_source": "https://playerembedapi.link/?v=izD1HrKWL"
+      },
+      {
+        "text": "#2 Dublado",
+        "data_source": "https://megaembed.link/#gsbqjz"
+      },
+      {
+        "text": "#3 Dublado",
+        "data_source": "https://myvidplay.com/e/kieb85xhpkf3"
+      },
+      {
+        "text": "#1 Legendado",
+        "data_source": "https://playerembedapi.link/?v=94_YZIB9a"
+      },
+      {
+        "text": "#2 Legendado",
+        "data_source": "https://megaembed.link/#poev3s"
+      },
+      {
+        "text": "#3 Legendado",
+        "data_source": "https://myvidplay.com/e/lsp5ozsw6zc9"
+      }
+    ],
+    "javascript_config": {
+      "gleam_config": true,
+      "jwplayer_key": "jfGgo35z3c4llrHaVi0Y4ormVgOyy9\\/NiI7qQFjvcFY=",
+      "viewplayer_url": "https://viewplayer.online"
+    }
+  },
+  "episode_patterns": {
+    "dooplay_structure": true,
+    "season_containers": "div.se-c",
+    "episode_lists": "ul.episodios li",
+    "episode_links": "ul.episodios li a",
+    "numbering_element": ".numerando"
+  },
+  "player_patterns": {
+    "iframe_selector": "iframe.metaframe, iframe[src*=viewplayer]",
+    "button_selector": "button[data-source], .btn[data-source]",
+    "ajax_selector": "#playeroptionsul li"
+  }
+}

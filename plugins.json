@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v12.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v13.0/MaxSeries.cs3",
         "status": 1,
-        "version": 12,
+        "version": 13,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "Assista séries online em HD - Versão robusta com detecção avançada de episódios (v12).",
+        "description": "Scraper real com temporadas/episódios corretos + fluxo completo de player (v13).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

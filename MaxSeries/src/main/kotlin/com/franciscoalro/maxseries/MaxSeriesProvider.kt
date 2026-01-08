@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getQualityFromName
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import android.util.Log
 import org.jsoup.nodes.Element
 
@@ -311,12 +312,12 @@ class MaxSeriesProvider : MainAPI() {
                                 } else {
                                     // For direct mp4/mkv links
                                     callback.invoke(
-                                        com.lagradost.cloudstream3.utils.ExtractorLink(
-                                            playerName,
-                                            playerName,
-                                            streamUrl,
-                                            fixedLink,
-                                            getQualityFromName(""),
+                                        newExtractorLink(
+                                            source = playerName,
+                                            name = playerName,
+                                            url = streamUrl,
+                                            referer = fixedLink,
+                                            quality = getQualityFromName(""),
                                         )
                                     )
                                 }

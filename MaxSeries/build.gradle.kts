@@ -1,7 +1,7 @@
-version = 13
+version = 14
 
 cloudstream {
-    description = "Scraper real com temporadas/episódios corretos + fluxo completo de player (v13)"
+    description = "Correção avançada de detecção de episódios e temporadas (v14)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -3,6 +3,8 @@ package com.franciscoalro.maxseries
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.getQualityFromName
 import android.util.Log
 import org.jsoup.nodes.Element
 

@@ -1,7 +1,7 @@
-version = 7
+version = 8
 
 cloudstream {
-    description = "Assista séries online em HD"
+    description = "Assista séries online em HD - Compatível com CloudStream v9.0"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

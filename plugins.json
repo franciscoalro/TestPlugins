@@ -24,8 +24,8 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "Assista séries online em HD no MaxSeries. Correção profunda de links (v7).",
-        "version": 7,
+        "description": "Assista séries online em HD no MaxSeries. Compatível com CloudStream v9.0 (v8).",
+        "version": 8,
         "authors": [
             "franciscoalro"
         ],

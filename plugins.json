@@ -19,7 +19,7 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.7/AnimesOnlineCC.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v6.0/AnimesOnlineCC.cs3"
     },
     {
         "name": "MaxSeries",
@@ -40,6 +40,6 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v5.7/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v6.0/MaxSeries.cs3"
     }
 ]

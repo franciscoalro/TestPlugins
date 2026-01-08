@@ -19,13 +19,13 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v7.0/AnimesOnlineCC.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v8.0/AnimesOnlineCC.cs3"
     },
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "Assista séries online em HD no MaxSeries. Correção de reprodução (redirects).",
-        "version": 5,
+        "description": "Assista séries online em HD no MaxSeries. Correção anti-anúncios e carregamento direto.",
+        "version": 6,
         "authors": [
             "franciscoalro"
         ],
@@ -40,6 +40,6 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v7.0/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v8.0/MaxSeries.cs3"
     }
 ]

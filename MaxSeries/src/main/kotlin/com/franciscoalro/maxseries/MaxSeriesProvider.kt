@@ -246,12 +246,18 @@ class MaxSeriesProvider : MainAPI() {
                         try {
                             Log.d("MaxSeries", "🔄 Resolvendo redirect para: $fixedLink")
                             // Follow redirects to get the final URL (likely Abyss.to)
-                            val response = app.get(fixedLink, allowRedirects = false)
+                            // IMPORTANT: valid Referer is required or it redirects to home
+                            val headers = mapOf(
+                                "Referer" to iframeUrl,
+                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                            )
+                            val response = app.get(fixedLink, headers = headers, allowRedirects = false)
+                            
                             if (response.code == 301 || response.code == 302) {
                                 val location = response.headers["location"] ?: response.headers["Location"]
                                 if (!location.isNullOrEmpty()) {
                                     fixedLink = if (location.startsWith("//")) "https:$location" else location
-                                    Log.d("MaxSeries", "✅ Redirect resolvido: $fixedLink")
+                                    Log.d("MaxSeries", "✅ Redirect resolvido (com referer): $fixedLink")
                                 }
                             }
                         } catch (e: Exception) {
@@ -262,6 +268,8 @@ class MaxSeriesProvider : MainAPI() {
                     Log.d("MaxSeries", "✅ Link encontrado ($playerName): $fixedLink")
                     
                     try {
+                        // Pass the resolved link (e.g. abyss.to) to the extractor
+                        // We also pass the original iframeUrl as referer just in case
                         loadExtractor(fixedLink, iframeUrl, subtitleCallback, callback)
                         linksFound++
                     } catch (e: Exception) {

@@ -297,16 +297,27 @@ class MaxSeriesProvider : MainAPI() {
                             matches.forEach { match ->
                                 val streamUrl = match.groupValues[1].replace("\\/", "/")
                                 Log.d("MaxSeries", "🎯 Link manual encontrado: $streamUrl")
-                                callback.invoke(
-                                    ExtractorLink(
-                                        playerName,
+                                
+                                if (streamUrl.contains(".m3u8")) {
+                                    // For m3u8 streams, use M3u8Helper
+                                    com.lagradost.cloudstream3.utils.M3u8Helper.generateM3u8(
                                         playerName,
                                         streamUrl,
                                         fixedLink,
-                                        Qualities.Unknown.value,
-                                        isM3u8 = streamUrl.contains(".m3u8")
+                                        headers = mapOf("Referer" to iframeUrl)
+                                    ).forEach(callback)
+                                } else {
+                                    // For direct mp4/mkv links
+                                    callback.invoke(
+                                        com.lagradost.cloudstream3.utils.ExtractorLink(
+                                            playerName,
+                                            playerName,
+                                            streamUrl,
+                                            fixedLink,
+                                            getQualityFromName(""),
+                                        )
                                     )
-                                )
+                                }
                                 manualFound = true
                                 linksFound++
                             }

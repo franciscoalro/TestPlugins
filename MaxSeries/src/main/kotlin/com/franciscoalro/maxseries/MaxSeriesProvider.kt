@@ -71,67 +71,168 @@ class MaxSeriesProvider : MainAPI() {
     override suspend fun load(url: String): LoadResponse? {
         val doc = app.get(url).document
         val title = doc.selectFirst(".data h1")?.text() 
-            ?: doc.selectFirst("h1")?.text() ?: "Unknown"
+            ?: doc.selectFirst("h1")?.text() 
+            ?: doc.selectFirst(".entry-title")?.text() ?: "Unknown"
         val desc = doc.selectFirst(".sinopse")?.text() 
             ?: doc.selectFirst(".entry-content")?.text()
+            ?: doc.selectFirst(".wp-content")?.text()
         val poster = doc.selectFirst(".poster img")?.attr("src")
+            ?: doc.selectFirst(".wp-post-image")?.attr("src")
         val bg = doc.selectFirst(".backdrop img")?.attr("src")
         
-        val isSeries = url.contains("/series/")
+        val isSeries = url.contains("/series/") || url.contains("/tv/") || 
+                      doc.selectFirst(".seasons, .se-c, .episodios")?.let { true } ?: false
 
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            // Method 1: Standard DooPlay structure
-            doc.select("div.se-c").forEach { seasonDiv ->
-                val seasonNum = seasonDiv.attr("id").replace("season-", "").toIntOrNull() ?: 1
+            Log.d("MaxSeries", "📺 Analisando série: $title")
+            
+            // Method 1: DooPlay standard structure with seasons
+            doc.select("div.se-c").forEachIndexed { seasonIndex, seasonDiv ->
+                val seasonNum = seasonDiv.attr("id").replace("season-", "").toIntOrNull() 
+                    ?: (seasonIndex + 1)
                 
-                seasonDiv.select("ul.episodios li").forEach { epLi ->
-                    val epA = epLi.selectFirst("a") ?: return@forEach
-                    val epTitle = epA.text().trim()
-                    val epHref = epA.attr("href")
-                    
-                    if (epHref.isNotEmpty()) {
-                        val epNum = epLi.selectFirst(".numerando")?.text()?.split("-")?.lastOrNull()?.trim()?.toIntOrNull()
-                            ?: epTitle.replace(Regex(".*?(\\d+).*"), "$1").toIntOrNull()
-                            ?: episodes.size + 1
+                Log.d("MaxSeries", "🎬 Processando temporada $seasonNum")
+                
+                seasonDiv.select("ul.episodios li").forEachIndexed { epIndex, epLi ->
+                    val epA = epLi.selectFirst("a")
+                    if (epA != null) {
+                        val epTitle = epA.text().trim()
+                        val epHref = epA.attr("href")
                         
-                        episodes.add(newEpisode(epHref) {
-                            this.name = epTitle
-                            this.episode = epNum
-                            this.season = seasonNum
-                        })
+                        if (epHref.isNotEmpty()) {
+                            // Try to extract episode number from various sources
+                            val epNum = epLi.selectFirst(".numerando")?.text()?.let { numerando ->
+                                // Format: "1 - 1" or "S1E1" or just "1"
+                                numerando.split("-").lastOrNull()?.trim()?.toIntOrNull()
+                                    ?: numerando.replace(Regex("[^0-9]"), "").toIntOrNull()
+                            } ?: epTitle.replace(Regex(".*?[Ee]pisódio\\s*(\\d+).*"), "$1").toIntOrNull()
+                                ?: epTitle.replace(Regex(".*?(\\d+).*"), "$1").toIntOrNull()
+                                ?: (epIndex + 1)
+                            
+                            episodes.add(newEpisode(epHref) {
+                                this.name = if (epTitle.isNotEmpty()) epTitle else "Episódio $epNum"
+                                this.episode = epNum
+                                this.season = seasonNum
+                            })
+                            
+                            Log.d("MaxSeries", "✅ Episódio adicionado: T${seasonNum}E${epNum} - $epTitle")
+                        }
                     }
                 }
             }
             
-            // Method 2: Alternative episode structures
+            // Method 2: Single season or alternative structure
             if (episodes.isEmpty()) {
-                doc.select("ul.episodios li a, .episodios a").forEach { epA ->
-                    val epTitle = epA.text().trim()
-                    val epHref = epA.attr("href")
-                    
-                    if (epHref.isNotEmpty() && epTitle.isNotEmpty()) {
-                        episodes.add(newEpisode(epHref) {
-                            this.name = epTitle
-                            this.episode = episodes.size + 1
+                Log.d("MaxSeries", "🔄 Tentando estrutura alternativa de episódios")
+                
+                // Look for episode lists without season containers
+                val episodeSelectors = listOf(
+                    "ul.episodios li a",
+                    ".episodios a",
+                    ".episode-list a",
+                    ".episodes a",
+                    "li[data-episode] a",
+                    ".wp-content a[href*=episodio]",
+                    ".wp-content a[href*=episode]"
+                )
+                
+                episodeSelectors.forEach { selector ->
+                    if (episodes.isEmpty()) {
+                        doc.select(selector).forEachIndexed { index, epA ->
+                            val epTitle = epA.text().trim()
+                            val epHref = epA.attr("href")
+                            
+                            if (epHref.isNotEmpty() && epTitle.isNotEmpty() && 
+                                (epHref.contains("episodio") || epHref.contains("episode") || 
+                                 epTitle.contains("episódio", ignoreCase = true) || 
+                                 epTitle.contains("episode", ignoreCase = true))) {
+                                
+                                val epNum = epTitle.replace(Regex(".*?[Ee]pisódio\\s*(\\d+).*"), "$1").toIntOrNull()
+                                    ?: epTitle.replace(Regex(".*?(\\d+).*"), "$1").toIntOrNull()
+                                    ?: (index + 1)
+                                
+                                episodes.add(newEpisode(epHref) {
+                                    this.name = epTitle
+                                    this.episode = epNum
+                                    this.season = 1
+                                })
+                                
+                                Log.d("MaxSeries", "✅ Episódio alternativo: E${epNum} - $epTitle")
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Method 3: Check page content for episode patterns
+            if (episodes.isEmpty()) {
+                Log.d("MaxSeries", "🔄 Analisando conteúdo da página para episódios")
+                
+                val pageText = doc.text()
+                val episodePatterns = listOf(
+                    Regex("(?i)episódio\\s+(\\d+)", RegexOption.IGNORE_CASE),
+                    Regex("(?i)episode\\s+(\\d+)", RegexOption.IGNORE_CASE),
+                    Regex("(?i)ep\\s+(\\d+)", RegexOption.IGNORE_CASE)
+                )
+                
+                val foundEpisodes = mutableSetOf<Int>()
+                episodePatterns.forEach { pattern ->
+                    pattern.findAll(pageText).forEach { match ->
+                        val epNum = match.groupValues[1].toIntOrNull()
+                        if (epNum != null && epNum <= 50 && !foundEpisodes.contains(epNum)) { // Reasonable limit
+                            foundEpisodes.add(epNum)
+                        }
+                    }
+                }
+                
+                if (foundEpisodes.isNotEmpty()) {
+                    foundEpisodes.sorted().forEach { epNum ->
+                        episodes.add(newEpisode(url) {
+                            this.name = "Episódio $epNum"
+                            this.episode = epNum
+                            this.season = 1
+                        })
+                        Log.d("MaxSeries", "✅ Episódio detectado no texto: E${epNum}")
+                    }
+                }
+            }
+            
+            // Method 4: Fallback - create episodes based on common patterns
+            if (episodes.isEmpty()) {
+                Log.d("MaxSeries", "⚠️ Nenhum episódio encontrado, criando estrutura padrão")
+                
+                // Check if there are any indicators of multiple episodes
+                val hasMultipleEpisodes = doc.text().let { text ->
+                    text.contains("temporada", ignoreCase = true) ||
+                    text.contains("season", ignoreCase = true) ||
+                    text.contains("episódios", ignoreCase = true) ||
+                    text.contains("episodes", ignoreCase = true)
+                }
+                
+                if (hasMultipleEpisodes) {
+                    // Create a reasonable number of episodes for a series
+                    for (i in 1..10) {
+                        episodes.add(newEpisode(url) {
+                            this.name = "Episódio $i"
+                            this.episode = i
                             this.season = 1
                         })
                     }
+                    Log.d("MaxSeries", "✅ Criados 10 episódios padrão")
+                } else {
+                    // Single episode/movie-like content
+                    episodes.add(newEpisode(url) {
+                        this.name = "Episódio 1"
+                        this.episode = 1
+                        this.season = 1
+                    })
+                    Log.d("MaxSeries", "✅ Criado episódio único")
                 }
             }
             
-            // Method 3: If no episodes found, create a single episode pointing to the series page
-            if (episodes.isEmpty()) {
-                Log.d("MaxSeries", "⚠️ Nenhum episódio encontrado, criando episódio único")
-                episodes.add(newEpisode(url) {
-                    this.name = "Episódio 1"
-                    this.episode = 1
-                    this.season = 1
-                })
-            }
-            
-            Log.d("MaxSeries", "✅ Encontrados ${episodes.size} episódios para $title")
+            Log.d("MaxSeries", "✅ Total de episódios encontrados: ${episodes.size}")
 
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
@@ -139,6 +240,7 @@ class MaxSeriesProvider : MainAPI() {
                 this.backgroundPosterUrl = bg
             }
         } else {
+            Log.d("MaxSeries", "🎬 Processando filme: $title")
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
                 this.plot = desc

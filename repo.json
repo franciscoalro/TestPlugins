@@ -1,8 +1,8 @@
 {
-    "name": "AnimesOnlineCC Repository",
-    "description": "Repositório de extensões para animes",
+    "name": "TestPlugins Repository",
+    "description": "Repositório de extensões CloudStream - MaxSeries e AnimesOnlineCC",
     "manifestVersion": 1,
     "pluginLists": [
-        "https://franciscoalro.github.io/TestPlugins/plugins.json"
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
     ]
 }

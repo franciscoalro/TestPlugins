@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v8.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v11.0/MaxSeries.cs3",
         "status": 1,
-        "version": 8,
+        "version": 11,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "Assista series online em HD no MaxSeries. Compativel com CloudStream v9.0 (v8).",
+        "description": "Assista séries online em HD - Versão simplificada e estável. Fix para ViewPlayer e estrutura de botões com data-source (v11).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

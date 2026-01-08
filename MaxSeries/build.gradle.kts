@@ -1,7 +1,7 @@
-version = 11
+version = 12
 
 cloudstream {
-    description = "Assista séries online em HD - Versão simplificada e estável"
+    description = "Assista séries online em HD - Versão robusta com detecção avançada de episódios (v12)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

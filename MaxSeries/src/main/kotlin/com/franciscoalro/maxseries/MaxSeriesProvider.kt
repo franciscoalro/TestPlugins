@@ -207,7 +207,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (GeckoFinal): $data")
+        Log.d("MaxSeries", "📺 Processando links (v15.1 - AJAX Fix): $data")
         
         var linksFound = 0
         
@@ -216,46 +216,69 @@ class MaxSeriesProvider : MainAPI() {
             if (data.contains("#") && data.contains("playerthree.online")) {
                 Log.d("MaxSeries", "🎯 Processando episódio do iframe playerthree")
                 
-                // Carregar a página do iframe com o fragmento do episódio
-                val doc = app.get(data).document
-                
-                // Método 1: Procurar botões de player (baseado na análise)
-                val playerButtons = doc.select("button[data-source], .btn[data-source], button[data-show-player]")
-                
-                if (playerButtons.isNotEmpty()) {
-                    Log.d("MaxSeries", "🎮 Encontrados ${playerButtons.size} players")
+                // Extrair episodeId da URL (formato: #12962_255703)
+                val fragmentMatch = Regex("#\\d+_(\\d+)").find(data)
+                if (fragmentMatch != null) {
+                    val episodeId = fragmentMatch.groupValues[1]
+                    Log.d("MaxSeries", "🔍 Episode ID extraído: $episodeId")
                     
-                    playerButtons.forEach { button ->
-                        val playerName = button.text().trim().ifEmpty { "Player" }
-                        Log.d("MaxSeries", "🔄 Testando player: $playerName")
+                    // Fazer requisição AJAX para obter os players reais
+                    val baseUrl = "https://playerthree.online"
+                    val ajaxUrl = "$baseUrl/episodio/$episodeId"
+                    
+                    Log.d("MaxSeries", "📡 Fazendo requisição AJAX: $ajaxUrl")
+                    
+                    val ajaxHeaders = mapOf(
+                        "Referer" to data,
+                        "X-Requested-With" to "XMLHttpRequest"
+                    )
+                    
+                    val ajaxResponse = app.get(ajaxUrl, headers = ajaxHeaders)
+                    
+                    if (ajaxResponse.isSuccessful) {
+                        val ajaxDoc = ajaxResponse.document
+                        Log.d("MaxSeries", "✅ AJAX Response recebida: ${ajaxResponse.code}")
                         
-                        try {
-                            // Procurar URLs nos atributos (baseado na análise)
+                        // Procurar botões de player na resposta AJAX
+                        val playerButtons = ajaxDoc.select("button[data-source], .btn[data-source], button[data-show-player]")
+                        Log.d("MaxSeries", "🎮 Players encontrados via AJAX: ${playerButtons.size}")
+                        
+                        playerButtons.forEach { button ->
+                            val playerName = button.text().trim().ifEmpty { "Player" }
                             val dataSource = button.attr("data-source")
-                            val dataUrl = button.attr("data-url")
-                            val dataPlayer = button.attr("data-player")
                             
-                            val videoUrl = dataSource.ifEmpty { dataUrl.ifEmpty { dataPlayer } }
-                            
-                            if (videoUrl.isNotEmpty() && videoUrl.startsWith("http")) {
-                                Log.d("MaxSeries", "🎯 URL encontrada: $videoUrl")
+                            if (dataSource.isNotEmpty() && dataSource.startsWith("http")) {
+                                Log.d("MaxSeries", "🎯 Player AJAX: $playerName -> $dataSource")
                                 
-                                if (loadExtractor(videoUrl, data, subtitleCallback, callback)) {
-                                    linksFound++
-                                    Log.d("MaxSeries", "✅ Sucesso: $playerName -> $videoUrl")
+                                // Verificar se não é trailer/YouTube
+                                if (!dataSource.contains("youtube", ignoreCase = true) && 
+                                    !dataSource.contains("trailer", ignoreCase = true)) {
+                                    
+                                    try {
+                                        if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
+                                            linksFound++
+                                            Log.d("MaxSeries", "✅ Sucesso AJAX: $playerName -> $dataSource")
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("MaxSeries", "❌ Erro ao processar player AJAX $playerName: ${e.message}")
+                                    }
+                                } else {
+                                    Log.d("MaxSeries", "🚨 Trailer ignorado: $dataSource")
                                 }
                             }
-                            
-                        } catch (e: Exception) {
-                            Log.e("MaxSeries", "❌ Erro ao processar player $playerName: ${e.message}")
                         }
+                    } else {
+                        Log.e("MaxSeries", "❌ Erro na requisição AJAX: ${ajaxResponse.code}")
                     }
+                } else {
+                    Log.e("MaxSeries", "❌ Não foi possível extrair episodeId de: $data")
                 }
                 
-                // Método 2: Procurar gleam.config nos scripts (baseado na análise)
+                // Método 2: Procurar gleam.config nos scripts (fallback)
                 if (linksFound == 0) {
-                    Log.d("MaxSeries", "🔄 Procurando gleam.config")
+                    Log.d("MaxSeries", "🔄 Fallback: Procurando gleam.config")
                     
+                    val doc = app.get(data).document
                     doc.select("script").forEach { script ->
                         val scriptContent = script.html()
                         
@@ -277,35 +300,6 @@ class MaxSeriesProvider : MainAPI() {
                                         }
                                     } catch (e: Exception) {
                                         Log.e("MaxSeries", "❌ Erro ao processar gleam URL: ${e.message}")
-                                    }
-                                }
-                            }
-                            
-                            // Procurar outras URLs de vídeo no script
-                            val videoPatterns = listOf(
-                                Regex(""""file"\s*:\s*"([^"]+)""""),
-                                Regex(""""source"\s*:\s*"([^"]+)""""),
-                                Regex(""""video"\s*:\s*"([^"]+)""""),
-                                Regex("""https://[^"'\s]+\.(?:m3u8|mp4|mkv|avi)""")
-                            )
-                            
-                            videoPatterns.forEach { pattern ->
-                                pattern.findAll(scriptContent).forEach { match ->
-                                    val videoUrl = match.groupValues.getOrNull(1) ?: match.value
-                                    
-                                    if (videoUrl.startsWith("http") && 
-                                        !videoUrl.contains("ads", ignoreCase = true) &&
-                                        !videoUrl.contains("analytics", ignoreCase = true)) {
-                                        
-                                        Log.d("MaxSeries", "🎯 URL encontrada no script: $videoUrl")
-                                        
-                                        try {
-                                            if (loadExtractor(videoUrl, data, subtitleCallback, callback)) {
-                                                linksFound++
-                                            }
-                                        } catch (e: Exception) {
-                                            Log.e("MaxSeries", "❌ Erro ao processar URL do script: ${e.message}")
-                                        }
                                     }
                                 }
                             }

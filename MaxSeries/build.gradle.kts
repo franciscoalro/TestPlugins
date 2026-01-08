@@ -1,7 +1,7 @@
-version = 12
+version = 13
 
 cloudstream {
-    description = "Assista séries online em HD - Versão robusta com detecção avançada de episódios (v12)"
+    description = "Scraper real com temporadas/episódios corretos + fluxo completo de player (v13)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

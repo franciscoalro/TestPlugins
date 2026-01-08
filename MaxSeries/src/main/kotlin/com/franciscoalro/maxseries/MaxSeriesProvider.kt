@@ -239,41 +239,91 @@ class MaxSeriesProvider : MainAPI() {
                         return@forEach
                     }
                     
-                    // Handle redirects for known embed domains (maxseries uses these to hide real hosts like abyss.to)
+                    // Handle redirects for known embed domains (maxseries uses these to hide real hosts)
                     if (fixedLink.contains("playerembedapi.link") || 
                         fixedLink.contains("megaembed.link") || 
-                        fixedLink.contains("bysebuho.com")) {
+                        fixedLink.contains("bysebuho.com") ||
+                        fixedLink.contains("embed") || 
+                        fixedLink.contains("storage")) {
                         try {
-                            Log.d("MaxSeries", "🔄 Resolvendo redirect para: $fixedLink")
-                            // Follow redirects to get the final URL (likely Abyss.to)
-                            // IMPORTANT: valid Referer is required or it redirects to home
+                            Log.d("MaxSeries", "🔄 Resolvendo cadeia de redirects para: $fixedLink")
+                            var currentLink = fixedLink
+                            var redirects = 0
                             val headers = mapOf(
                                 "Referer" to iframeUrl,
                                 "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                             )
-                            val response = app.get(fixedLink, headers = headers, allowRedirects = false)
                             
-                            if (response.code == 301 || response.code == 302) {
-                                val location = response.headers["location"] ?: response.headers["Location"]
-                                if (!location.isNullOrEmpty()) {
-                                    fixedLink = if (location.startsWith("//")) "https:$location" else location
-                                    Log.d("MaxSeries", "✅ Redirect resolvido (com referer): $fixedLink")
+                            // Follow redirects manually to find the final host
+                            while (redirects < 5) {
+                                val response = app.get(currentLink, headers = headers, allowRedirects = false)
+                                if (response.code in 301..308) {
+                                    val location = response.headers["location"] ?: response.headers["Location"]
+                                    if (!location.isNullOrEmpty()) {
+                                        currentLink = if (location.startsWith("//")) "https:$location" else if (location.startsWith("/")) {
+                                            val uri = java.net.URI(currentLink)
+                                            "${uri.scheme}://${uri.host}$location"
+                                        } else location
+                                        redirects++
+                                        Log.d("MaxSeries", "  ↳ Pulou para ($redirects): $currentLink")
+                                        continue
+                                    }
                                 }
+                                break
                             }
+                            fixedLink = currentLink
                         } catch (e: Exception) {
-                            Log.e("MaxSeries", "❌ Erro ao resolver redirect: ${e.message}")
+                            Log.e("MaxSeries", "❌ Erro ao resolver cadeia de redirects: ${e.message}")
                         }
                     }
                     
-                    Log.d("MaxSeries", "✅ Link encontrado ($playerName): $fixedLink")
+                    Log.d("MaxSeries", "✅ Link final encontrado: $fixedLink")
                     
                     try {
-                        // Pass the resolved link (e.g. abyss.to) to the extractor
-                        // We also pass the original iframeUrl as referer just in case
-                        loadExtractor(fixedLink, iframeUrl, subtitleCallback, callback)
-                        linksFound++
+                        // 1. Try standard extractor
+                        val loaded = loadExtractor(fixedLink, iframeUrl, subtitleCallback, callback)
+                        
+                        // 2. Fallback: Manual extraction for hosts like Abyss.to or BySebuho (embedwish)
+                        if (!loaded) {
+                            Log.d("MaxSeries", "🛠️ Tentando extração manual para: $fixedLink")
+                            val pageHeaders = mapOf("Referer" to iframeUrl)
+                            val pageContent = app.get(fixedLink, headers = pageHeaders).text
+                            
+                            // Look for .m3u8 or .mp4 links in the page source
+                            val videoRegex = Regex("""["'](http[^"']+\.(?:m3u8|mp4|mkv)[^"']*)["']""")
+                            val matches = videoRegex.findAll(pageContent)
+                            
+                            var manualFound = false
+                            matches.forEach { match ->
+                                val streamUrl = match.groupValues[1].replace("\\/", "/")
+                                Log.d("MaxSeries", "🎯 Link manual encontrado: $streamUrl")
+                                callback.invoke(
+                                    ExtractorLink(
+                                        playerName,
+                                        playerName,
+                                        streamUrl,
+                                        fixedLink,
+                                        Qualities.Unknown.value,
+                                        isM3u8 = streamUrl.contains(".m3u8")
+                                    )
+                                )
+                                manualFound = true
+                                linksFound++
+                            }
+                            
+                            if (manualFound) {
+                                linksFound++
+                            } else if (fixedLink.contains("abyss.to")) {
+                                // Specific fallback for Abyss.to if regex fails
+                                Log.d("MaxSeries", "🔎 Tentando extração específica para Abyss.to")
+                                // Abyss sometimes hides the link in a data attribute or base64
+                                // For now, we rely on the generic regex above, but could add more here
+                            }
+                        } else {
+                            linksFound++
+                        }
                     } catch (e: Exception) {
-                        Log.e("MaxSeries", "❌ Erro ao carregar extractor para $fixedLink: ${e.message}")
+                        Log.e("MaxSeries", "❌ Erro ao processar link $fixedLink: ${e.message}")
                     }
                 }
             }

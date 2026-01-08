@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v10.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v11.0/MaxSeries.cs3",
         "status": 1,
-        "version": 10,
+        "version": 11,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "Assista series online em HD no MaxSeries. Reescrito com foco em DooPlay AJAX (v10).",
+        "description": "Assista series online em HD no MaxSeries. Versao simplificada e estavel (v11).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

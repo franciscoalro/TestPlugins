@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v15.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v15.1/MaxSeries.cs3",
         "status": 1,
         "version": 15,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v15 - Versão Final baseada em análise GeckoDriver. Correção completa dos episódios e players.",
+        "description": "MaxSeries v15.1 - CORREÇÃO DEFINITIVA! Requisições AJAX implementadas para players reais (não trailers).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

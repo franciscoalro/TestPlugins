@@ -203,13 +203,20 @@ class MaxSeriesProvider : MainAPI() {
         val doc = app.get(pageUrl).document
         var linksFound = 0
         
-        // Step 1: Extract the main iframe (playerthree.online or viewplayer.online)
+        // Step 1: Try multiple iframe selectors for MaxSeries
         val mainIframe = doc.selectFirst("iframe.metaframe")?.attr("src")
-            ?: doc.selectFirst("iframe[src*=playerthree], iframe[src*=viewplayer]")?.attr("src")
+            ?: doc.selectFirst("iframe[src*=playerthree]")?.attr("src")
+            ?: doc.selectFirst("iframe[src*=viewplayer]")?.attr("src")
+            ?: doc.selectFirst("iframe[src*=embed]")?.attr("src")
+            ?: doc.selectFirst("div.player iframe")?.attr("src")
+            ?: doc.selectFirst("#player iframe")?.attr("src")
+            ?: doc.selectFirst(".video-player iframe")?.attr("src")
         
         if (mainIframe.isNullOrEmpty()) {
             Log.e("MaxSeries", "❌ Nenhum iframe principal encontrado em $pageUrl")
-            return false
+            
+            // Fallback: Try to find direct video links in the page
+            return tryDirectVideoExtraction(doc, pageUrl, subtitleCallback, callback)
         }
         
         val iframeSrc = if (mainIframe.startsWith("//")) "https:$mainIframe" else mainIframe
@@ -217,7 +224,6 @@ class MaxSeriesProvider : MainAPI() {
         
         // Step 2: Navigate to the iframe and extract player buttons
         try {
-            // If we have an episode ID, we need to construct the URL with the episode
             val iframeUrl = if (episodeId != null) {
                 "$iframeSrc?ep=$episodeId"
             } else {
@@ -225,140 +231,60 @@ class MaxSeriesProvider : MainAPI() {
             }
             
             Log.d("MaxSeries", "🎬 Acessando: $iframeUrl")
-            val iframeDoc = app.get(iframeUrl).document
+            val iframeDoc = app.get(iframeUrl, headers = mapOf(
+                "Referer" to pageUrl,
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )).document
             
-            // Look for player buttons with data-source attribute
-            iframeDoc.select("button.btn[data-source]").forEach { btn ->
-                val playerName = btn.text().trim()
-                val videoLink = btn.attr("data-source")
-                
-                if (videoLink.isNotEmpty()) {
-                    var fixedLink = if (videoLink.startsWith("//")) "https:$videoLink" else videoLink
-                    
-                    // Filter out YouTube trailers
-                    if (fixedLink.contains("youtube.com", ignoreCase = true) || 
-                        fixedLink.contains("youtu.be", ignoreCase = true)) {
-                        Log.w("MaxSeries", "⚠️ Ignorando trailer do YouTube: $fixedLink")
-                        return@forEach
-                    }
-                    
-                    // Handle redirects for known embed domains (maxseries uses these to hide real hosts)
-                    if (fixedLink.contains("playerembedapi.link") || 
-                        fixedLink.contains("megaembed.link") || 
-                        fixedLink.contains("bysebuho.com") ||
-                        fixedLink.contains("embed") || 
-                        fixedLink.contains("storage")) {
-                        try {
-                            Log.d("MaxSeries", "🔄 Resolvendo cadeia de redirects para: $fixedLink")
-                            var currentLink = fixedLink
-                            var redirects = 0
-                            val headers = mapOf(
-                                "Referer" to iframeUrl,
-                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                            )
-                            
-                            // Follow redirects manually to find the final host
-                            while (redirects < 5) {
-                                val response = app.get(currentLink, headers = headers, allowRedirects = false)
-                                if (response.code in 301..308) {
-                                    val location = response.headers["location"] ?: response.headers["Location"]
-                                    if (!location.isNullOrEmpty()) {
-                                        currentLink = if (location.startsWith("//")) "https:$location" else if (location.startsWith("/")) {
-                                            val uri = java.net.URI(currentLink)
-                                            "${uri.scheme}://${uri.host}$location"
-                                        } else location
-                                        redirects++
-                                        Log.d("MaxSeries", "  ↳ Pulou para ($redirects): $currentLink")
-                                        continue
-                                    }
-                                }
-                                break
-                            }
-                            fixedLink = currentLink
-                        } catch (e: Exception) {
-                            Log.e("MaxSeries", "❌ Erro ao resolver cadeia de redirects: ${e.message}")
+            // Step 3: Look for multiple types of player buttons and links
+            val playerSelectors = listOf(
+                "button.btn[data-source]",
+                "button[data-url]",
+                "a.player-option[data-src]",
+                ".server-item[data-video]",
+                "li[data-video]",
+                "button[onclick*='http']",
+                "a[href*='embed']"
+            )
+            
+            playerSelectors.forEach { selector ->
+                iframeDoc.select(selector).forEach { element ->
+                    val playerName = element.text().trim().ifEmpty { "Player" }
+                    val videoLink = element.attr("data-source")
+                        .ifEmpty { element.attr("data-url") }
+                        .ifEmpty { element.attr("data-src") }
+                        .ifEmpty { element.attr("data-video") }
+                        .ifEmpty { element.attr("href") }
+                        .ifEmpty { 
+                            // Extract from onclick attribute
+                            val onclick = element.attr("onclick")
+                            Regex("""['"]([^'"]*(?:embed|player|stream)[^'"]*)['"]""").find(onclick)?.groupValues?.get(1) ?: ""
                         }
-                    }
                     
-                    Log.d("MaxSeries", "✅ Link final encontrado: $fixedLink")
-                    
-                    try {
-                        // 1. Try standard extractor
-                        val loaded = loadExtractor(fixedLink, iframeUrl, subtitleCallback, callback)
-                        
-                        // 2. Fallback: Manual extraction for hosts like Abyss.to or BySebuho (embedwish)
-                        if (!loaded) {
-                            Log.d("MaxSeries", "🛠️ Tentando extração manual para: $fixedLink")
-                            val pageHeaders = mapOf("Referer" to iframeUrl)
-                            val pageContent = app.get(fixedLink, headers = pageHeaders).text
-                            
-                            // Look for .m3u8 or .mp4 links in the page source
-                            val videoRegex = Regex("""["'](http[^"']+\.(?:m3u8|mp4|mkv)[^"']*)["']""")
-                            val matches = videoRegex.findAll(pageContent)
-                            
-                            var manualFound = false
-                            matches.forEach { match ->
-                                val streamUrl = match.groupValues[1].replace("\\/", "/")
-                                Log.d("MaxSeries", "🎯 Link manual encontrado: $streamUrl")
-                                
-                                if (streamUrl.contains(".m3u8")) {
-                                    // For m3u8 streams, use M3u8Helper
-                                    com.lagradost.cloudstream3.utils.M3u8Helper.generateM3u8(
-                                        playerName,
-                                        streamUrl,
-                                        fixedLink,
-                                        headers = mapOf("Referer" to iframeUrl)
-                                    ).forEach(callback)
-                                } else {
-                                    // For direct mp4/mkv links
-                                    callback.invoke(
-                                        newExtractorLink(
-                                            playerName,
-                                            playerName,
-                                            streamUrl
-                                        ) {
-                                            this.referer = fixedLink
-                                            this.quality = Qualities.Unknown.value
-                                        }
-                                    )
-                                }
-                                manualFound = true
-                                linksFound++
-                            }
-                            
-                            if (manualFound) {
-                                linksFound++
-                            } else if (fixedLink.contains("abyss.to")) {
-                                // Specific fallback for Abyss.to if regex fails
-                                Log.d("MaxSeries", "🔎 Tentando extração específica para Abyss.to")
-                                // Abyss sometimes hides the link in a data attribute or base64
-                                // For now, we rely on the generic regex above, but could add more here
-                            }
-                        } else {
-                            linksFound++
-                        }
-                    } catch (e: Exception) {
-                        Log.e("MaxSeries", "❌ Erro ao processar link $fixedLink: ${e.message}")
+                    if (videoLink.isNotEmpty()) {
+                        linksFound += processVideoLink(videoLink, playerName, iframeUrl, pageUrl, subtitleCallback, callback)
                     }
                 }
             }
             
-            // Fallback: Look for any iframes inside the player iframe
+            // Step 4: Look for embedded video sources in script tags
+            if (linksFound == 0) {
+                linksFound += extractFromScripts(iframeDoc, iframeUrl, pageUrl, subtitleCallback, callback)
+            }
+            
+            // Step 5: Fallback - look for nested iframes
             if (linksFound == 0) {
                 iframeDoc.select("iframe").forEach { iframe ->
                     val src = iframe.attr("src").ifEmpty { iframe.attr("data-src") }
-                    if (src.isNotEmpty() && !src.contains("facebook.com") && 
-                        !src.contains("twitter.com") && !src.contains("google.com") &&
-                        !src.contains("youtube.com", ignoreCase = true)) {
+                    if (src.isNotEmpty() && isValidVideoSource(src)) {
                         val fixedSrc = if (src.startsWith("//")) "https:$src" else src
-                        if (fixedSrc.startsWith("http")) {
-                            try {
-                                Log.d("MaxSeries", "🔄 Tentando iframe aninhado: $fixedSrc")
-                                loadExtractor(fixedSrc, iframeUrl, subtitleCallback, callback)
+                        try {
+                            Log.d("MaxSeries", "🔄 Tentando iframe aninhado: $fixedSrc")
+                            if (loadExtractor(fixedSrc, iframeUrl, subtitleCallback, callback)) {
                                 linksFound++
-                            } catch (e: Exception) {
-                                Log.e("MaxSeries", "❌ Erro ao carregar iframe aninhado: ${e.message}")
                             }
+                        } catch (e: Exception) {
+                            Log.e("MaxSeries", "❌ Erro ao carregar iframe aninhado: ${e.message}")
                         }
                     }
                 }
@@ -375,5 +301,238 @@ class MaxSeriesProvider : MainAPI() {
         }
         
         return linksFound > 0
+    }
+    
+    private suspend fun processVideoLink(
+        videoLink: String,
+        playerName: String,
+        iframeUrl: String,
+        pageUrl: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Int {
+        var fixedLink = if (videoLink.startsWith("//")) "https:$videoLink" else videoLink
+        
+        // Block YouTube trailers and ads
+        if (isBlockedSource(fixedLink)) {
+            Log.w("MaxSeries", "⚠️ Bloqueando fonte indesejada: $fixedLink")
+            return 0
+        }
+        
+        // Handle redirects for known embed domains
+        if (needsRedirectResolution(fixedLink)) {
+            fixedLink = resolveRedirects(fixedLink, iframeUrl)
+        }
+        
+        Log.d("MaxSeries", "✅ Processando link: $fixedLink")
+        
+        return try {
+            // Try standard extractor first
+            if (loadExtractor(fixedLink, iframeUrl, subtitleCallback, callback)) {
+                1
+            } else {
+                // Manual extraction fallback
+                extractManualLinks(fixedLink, playerName, iframeUrl, subtitleCallback, callback)
+            }
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro ao processar link $fixedLink: ${e.message}")
+            0
+        }
+    }
+    
+    private fun isBlockedSource(url: String): Boolean {
+        val blockedDomains = listOf(
+            "youtube.com", "youtu.be", "facebook.com", "twitter.com",
+            "ads.", "ad.", "doubleclick", "googleads", "googlesyndication",
+            "popads", "popcash", "propellerads", "adnxs", "adsystem"
+        )
+        return blockedDomains.any { url.contains(it, ignoreCase = true) }
+    }
+    
+    private fun isValidVideoSource(url: String): Boolean {
+        val validDomains = listOf(
+            "embed", "player", "stream", "video", "watch",
+            "abyss.to", "streamwish", "filemoon", "mixdrop"
+        )
+        return validDomains.any { url.contains(it, ignoreCase = true) } && !isBlockedSource(url)
+    }
+    
+    private fun needsRedirectResolution(url: String): Boolean {
+        val redirectDomains = listOf(
+            "playerembedapi.link", "megaembed.link", "bysebuho.com",
+            "embed", "storage", "short"
+        )
+        return redirectDomains.any { url.contains(it, ignoreCase = true) }
+    }
+    
+    private suspend fun resolveRedirects(url: String, referer: String): String {
+        var currentLink = url
+        var redirects = 0
+        val headers = mapOf(
+            "Referer" to referer,
+            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+        
+        try {
+            while (redirects < 5) {
+                val response = app.get(currentLink, headers = headers, allowRedirects = false)
+                if (response.code in 301..308) {
+                    val location = response.headers["location"] ?: response.headers["Location"]
+                    if (!location.isNullOrEmpty()) {
+                        currentLink = if (location.startsWith("//")) {
+                            "https:$location"
+                        } else if (location.startsWith("/")) {
+                            val uri = java.net.URI(currentLink)
+                            "${uri.scheme}://${uri.host}$location"
+                        } else {
+                            location
+                        }
+                        redirects++
+                        Log.d("MaxSeries", "  ↳ Redirect ($redirects): $currentLink")
+                        continue
+                    }
+                }
+                break
+            }
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro ao resolver redirects: ${e.message}")
+        }
+        
+        return currentLink
+    }
+    
+    private suspend fun extractManualLinks(
+        url: String,
+        playerName: String,
+        referer: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Int {
+        return try {
+            Log.d("MaxSeries", "🛠️ Extração manual para: $url")
+            val pageHeaders = mapOf("Referer" to referer)
+            val pageContent = app.get(url, headers = pageHeaders).text
+            
+            var linksFound = 0
+            
+            // Enhanced regex patterns for video extraction
+            val videoPatterns = listOf(
+                Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']"""),
+                Regex("""["'](https?://[^"']+\.mp4[^"']*)["']"""),
+                Regex("""["'](https?://[^"']+\.mkv[^"']*)["']"""),
+                Regex("""file["'\s]*:["'\s]*["']([^"']+)["']"""),
+                Regex("""source["'\s]*:["'\s]*["']([^"']+)["']"""),
+                Regex("""src["'\s]*:["'\s]*["']([^"']+)["']""")
+            )
+            
+            videoPatterns.forEach { pattern ->
+                pattern.findAll(pageContent).forEach { match ->
+                    val streamUrl = match.groupValues[1].replace("\\/", "/")
+                    if (streamUrl.isNotEmpty() && !isBlockedSource(streamUrl)) {
+                        Log.d("MaxSeries", "🎯 Link manual encontrado: $streamUrl")
+                        
+                        if (streamUrl.contains(".m3u8")) {
+                            com.lagradost.cloudstream3.utils.M3u8Helper.generateM3u8(
+                                playerName,
+                                streamUrl,
+                                url,
+                                headers = mapOf("Referer" to referer)
+                            ).forEach(callback)
+                        } else {
+                            callback.invoke(
+                                newExtractorLink(
+                                    playerName,
+                                    playerName,
+                                    streamUrl
+                                ) {
+                                    this.referer = url
+                                    this.quality = Qualities.Unknown.value
+                                }
+                            )
+                        }
+                        linksFound++
+                    }
+                }
+            }
+            
+            linksFound
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro na extração manual: ${e.message}")
+            0
+        }
+    }
+    
+    private suspend fun extractFromScripts(
+        doc: org.jsoup.nodes.Document,
+        iframeUrl: String,
+        pageUrl: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Int {
+        var linksFound = 0
+        
+        doc.select("script").forEach { script ->
+            val scriptContent = script.html()
+            
+            // Look for video sources in JavaScript
+            val jsPatterns = listOf(
+                Regex("""['"]([^'"]*\.m3u8[^'"]*)['"]"""),
+                Regex("""['"]([^'"]*\.mp4[^'"]*)['"]"""),
+                Regex("""source['":\s]*['"]([^'"]+)['"]"""),
+                Regex("""file['":\s]*['"]([^'"]+)['"]""")
+            )
+            
+            jsPatterns.forEach { pattern ->
+                pattern.findAll(scriptContent).forEach { match ->
+                    val videoUrl = match.groupValues[1]
+                    if (videoUrl.isNotEmpty() && !isBlockedSource(videoUrl) && videoUrl.startsWith("http")) {
+                        Log.d("MaxSeries", "🎯 Link encontrado em script: $videoUrl")
+                        
+                        try {
+                            if (loadExtractor(videoUrl, iframeUrl, subtitleCallback, callback)) {
+                                linksFound++
+                            }
+                        } catch (e: Exception) {
+                            Log.e("MaxSeries", "❌ Erro ao processar link do script: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+        
+        return linksFound
+    }
+    
+    private suspend fun tryDirectVideoExtraction(
+        doc: org.jsoup.nodes.Document,
+        pageUrl: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        Log.d("MaxSeries", "🔄 Tentando extração direta da página")
+        
+        // Look for direct video elements
+        doc.select("video source, video").forEach { video ->
+            val src = video.attr("src")
+            if (src.isNotEmpty() && !isBlockedSource(src)) {
+                try {
+                    callback.invoke(
+                        newExtractorLink(
+                            "Direct",
+                            "Direct Video",
+                            src
+                        ) {
+                            this.referer = pageUrl
+                            this.quality = Qualities.Unknown.value
+                        }
+                    )
+                    return true
+                } catch (e: Exception) {
+                    Log.e("MaxSeries", "❌ Erro ao processar vídeo direto: ${e.message}")
+                }
+            }
+        }
+        
+        return false
     }
 }

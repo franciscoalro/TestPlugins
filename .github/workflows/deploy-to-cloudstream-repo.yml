@@ -1,0 +1,81 @@
+name: Deploy to CloudstreamRepo
+
+on:
+  workflow_run:
+    workflows: ["Build and Release"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout TestPlugins
+        uses: actions/checkout@v4
+        with:
+          path: testplugins
+
+      - name: Checkout CloudstreamRepo
+        uses: actions/checkout@v4
+        with:
+          repository: franciscoalro/CloudstreamRepo
+          token: ${{ secrets.CLOUDSTREAM_REPO_TOKEN }}
+          path: cloudstream-repo
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: artifacts
+
+      - name: Copy CS3 Files
+        run: |
+          echo "📦 Copiando arquivos .cs3..."
+          find artifacts -name "*.cs3" -exec cp {} cloudstream-repo/ \;
+          ls -la cloudstream-repo/*.cs3
+
+      - name: Update plugins.json
+        run: |
+          echo "📝 Atualizando plugins.json..."
+          cp testplugins/plugins.json cloudstream-repo/
+          
+          echo "📊 Verificando alterações..."
+          cd cloudstream-repo
+          git status
+
+      - name: Commit and Push
+        run: |
+          cd cloudstream-repo
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "🔄 Fazendo commit das alterações..."
+            git add .
+            git commit -m "Auto-update plugins from TestPlugins build $(date +'%Y-%m-%d %H:%M:%S')"
+            git push
+            echo "✅ Deploy realizado com sucesso!"
+          else
+            echo "ℹ️ Nenhuma alteração detectada"
+          fi
+
+      - name: Create Summary
+        run: |
+          echo "## 🚀 Deploy Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Files Updated:" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 CS3 plugins copied to CloudstreamRepo" >> $GITHUB_STEP_SUMMARY
+          echo "- 📝 plugins.json updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Repository:" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [CloudstreamRepo](https://github.com/franciscoalro/CloudstreamRepo)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Plugin JSON URL:" >> $GITHUB_STEP_SUMMARY
+          echo "📋 \`https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/plugins.json\`" >> $GITHUB_STEP_SUMMARY

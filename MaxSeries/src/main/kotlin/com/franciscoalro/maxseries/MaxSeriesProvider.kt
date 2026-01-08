@@ -230,13 +230,33 @@ class MaxSeriesProvider : MainAPI() {
                 val videoLink = btn.attr("data-source")
                 
                 if (videoLink.isNotEmpty()) {
-                    val fixedLink = if (videoLink.startsWith("//")) "https:$videoLink" else videoLink
+                    var fixedLink = if (videoLink.startsWith("//")) "https:$videoLink" else videoLink
                     
                     // Filter out YouTube trailers
                     if (fixedLink.contains("youtube.com", ignoreCase = true) || 
                         fixedLink.contains("youtu.be", ignoreCase = true)) {
                         Log.w("MaxSeries", "⚠️ Ignorando trailer do YouTube: $fixedLink")
                         return@forEach
+                    }
+                    
+                    // Handle redirects for known embed domains (maxseries uses these to hide real hosts like abyss.to)
+                    if (fixedLink.contains("playerembedapi.link") || 
+                        fixedLink.contains("megaembed.link") || 
+                        fixedLink.contains("bysebuho.com")) {
+                        try {
+                            Log.d("MaxSeries", "🔄 Resolvendo redirect para: $fixedLink")
+                            // Follow redirects to get the final URL (likely Abyss.to)
+                            val response = app.get(fixedLink, allowRedirects = false)
+                            if (response.code == 301 || response.code == 302) {
+                                val location = response.headers["location"] ?: response.headers["Location"]
+                                if (!location.isNullOrEmpty()) {
+                                    fixedLink = if (location.startsWith("//")) "https:$location" else location
+                                    Log.d("MaxSeries", "✅ Redirect resolvido: $fixedLink")
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("MaxSeries", "❌ Erro ao resolver redirect: ${e.message}")
+                        }
                     }
                     
                     Log.d("MaxSeries", "✅ Link encontrado ($playerName): $fixedLink")

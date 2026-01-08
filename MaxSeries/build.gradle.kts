@@ -1,4 +1,4 @@
-version = 4
+version = 5
 
 cloudstream {
     description = "Assista séries online em HD"

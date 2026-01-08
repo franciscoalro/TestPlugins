@@ -313,12 +313,13 @@ class MaxSeriesProvider : MainAPI() {
                                     // For direct mp4/mkv links
                                     callback.invoke(
                                         newExtractorLink(
-                                            source = playerName,
-                                            name = playerName,
-                                            url = streamUrl,
-                                            referer = fixedLink,
-                                            quality = getQualityFromName(""),
-                                        )
+                                            playerName,
+                                            playerName,
+                                            streamUrl
+                                        ) {
+                                            this.referer = fixedLink
+                                            this.quality = Qualities.Unknown.value
+                                        }
                                     )
                                 }
                                 manualFound = true

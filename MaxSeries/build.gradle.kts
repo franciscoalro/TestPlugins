@@ -1,7 +1,7 @@
-version = 10
+version = 11
 
 cloudstream {
-    description = "Assista séries online em HD - Reescrito com foco em DooPlay AJAX"
+    description = "Assista séries online em HD - Versão simplificada e estável"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,0 +1,78 @@
+[
+  {
+    "name": "PlayerEmbedAPI",
+    "source_url": "https://abysscdn.com/?v=K8R6OOjS7",
+    "video_urls": [],
+    "interesting_urls": [
+      "https://abyss.to/favicon.ico",
+      "https://playerembedapi.link/?v=kBJLtxCD3",
+      "https://iamcdn.net/player-v2/core.bundle.js",
+      "https://abysscdn.com/?v=K8R6OOjS7",
+      "https://short.icu/K8R6OOjS7",
+      "https://abyss.to/"
+    ]
+  },
+  {
+    "name": "MegaEmbed",
+    "source_url": "https://megaembed.link/assets/vidstack-DqAw8m9J-DzNDcSGt.js",
+    "video_urls": [
+      {
+        "url": "https://s0.2mdn.net/instream/video/client.js",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\""
+        },
+        "type": "request"
+      },
+      {
+        "url": "https://mc.yandex.ru/watch/98086865?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%233wnuij&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A(Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9re1r%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A235568809495%3Ahid%3A417035275%3Az%3A-180%3Ai%3A20260109123404%3Aet%3A1767972845%3Ac%3A1%3Arn%3A502197787%3Arqn%3A1%3Au%3A1767972845798400601%3Aw%3A929x865%3As%3A1920x1080x24%3Ask%3A1%3Awv%3A2%3Ads%3A20%2C172%2C330%2C1%2C1%2C0%2C%2C170%2C0%2C%2C%2C%2C966%3Aco%3A0%3Acpf%3A1%3Ans%3A1767972841596%3Agi%3AR0ExLjEuMTY2NjE0NzIyLjE3Njc5NzI4NDM%3D%3Arqnl%3A1%3Ast%3A1767972845%3At%3ALand.of.Sin.S01E01.1080p.NF.WEB-DL.DDP5.1.Atmos.H.264.DUAL-DUBLASERIES.mp4&t=gdpr(14)clc(0-0-0)rqnt(1)aw(1)rcm(1)cdl(na)eco(83952128)ti(1)",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\""
+        },
+        "type": "request"
+      },
+      {
+        "url": "https://mc.yandex.ru/watch/98086865/1?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%233wnuij&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A%28Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9re1r%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A235568809495%3Ahid%3A417035275%3Az%3A-180%3Ai%3A20260109123404%3Aet%3A1767972845%3Ac%3A1%3Arn%3A502197787%3Arqn%3A1%3Au%3A1767972845798400601%3Aw%3A929x865%3As%3A1920x1080x24%3Ask%3A1%3Awv%3A2%3Ads%3A20%2C172%2C330%2C1%2C1%2C0%2C%2C170%2C0%2C%2C%2C%2C966%3Aco%3A0%3Acpf%3A1%3Ans%3A1767972841596%3Agi%3AR0ExLjEuMTY2NjE0NzIyLjE3Njc5NzI4NDM%3D%3Arqnl%3A1%3Ast%3A1767972845%3At%3ALand.of.Sin.S01E01.1080p.NF.WEB-DL.DDP5.1.Atmos.H.264.DUAL-DUBLASERIES.mp4&t=gdpr%2814%29clc%280-0-0%29rqnt%281%29aw%281%29rcm%281%29cdl%28na%29eco%2883952128%29ti%281%29&redirnss=1",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        },
+        "type": "request"
+      },
+      {
+        "url": "https://s0.2mdn.net/instream/video/client.js",
+        "status": 200,
+        "mime": "text/javascript",
+        "type": "response"
+      },
+      {
+        "url": "https://mc.yandex.ru/watch/98086865/1?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%233wnuij&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A%28Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9re1r%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A235568809495%3Ahid%3A417035275%3Az%3A-180%3Ai%3A20260109123404%3Aet%3A1767972845%3Ac%3A1%3Arn%3A502197787%3Arqn%3A1%3Au%3A1767972845798400601%3Aw%3A929x865%3As%3A1920x1080x24%3Ask%3A1%3Awv%3A2%3Ads%3A20%2C172%2C330%2C1%2C1%2C0%2C%2C170%2C0%2C%2C%2C%2C966%3Aco%3A0%3Acpf%3A1%3Ans%3A1767972841596%3Agi%3AR0ExLjEuMTY2NjE0NzIyLjE3Njc5NzI4NDM%3D%3Arqnl%3A1%3Ast%3A1767972845%3At%3ALand.of.Sin.S01E01.1080p.NF.WEB-DL.DDP5.1.Atmos.H.264.DUAL-DUBLASERIES.mp4&t=gdpr%2814%29clc%280-0-0%29rqnt%281%29aw%281%29rcm%281%29cdl%28na%29eco%2883952128%29ti%281%29&redirnss=1",
+        "status": 200,
+        "mime": "application/json",
+        "type": "response"
+      }
+    ],
+    "interesting_urls": [
+      "https://megaembed.link/assets/vidstack-CwTj4H1w-BCQqYYxA.js",
+      "https://megaembed.link/assets/index-DsSvO8OB.css",
+      "https://megaembed.link/assets/index-CQ0L9dOW.js",
+      "https://megaembed.link/assets/vidstack-player-default-layout-D7pukxBn.js",
+      "https://megaembed.link/assets/vidstack-D3ltXc3a-BJ35gvzJ.js",
+      "https://megaembed.link/assets/vidstack-DqAw8m9J-DzNDcSGt.js",
+      "https://megaembed.link/assets/prod-CZuje_L2.js",
+      "https://megaembed.link/assets/vidstack-hls-CA4Oz_S-.js",
+      "https://megaembed.link/assets/vidstack-Bq6c3Bam-D24jZtKx.js",
+      "https://megaembed.link/",
+      "https://megaembed.link/api/v1/info?id=3wnuij",
+      "https://megaembed.link/assets/vidstack-player-ui-Cl6jTwhR.js",
+      "https://megaembed.link/assets/vidstack-video--9k1x1Vz.js"
+    ]
+  }
+]

@@ -322,8 +322,22 @@ class MaxSeriesProvider : MainAPI() {
     
     private val hardHosts = listOf("megaembed.link", "playerembedapi.link")
     
+    // Domínios de trailer/YouTube que devem ser IGNORADOS
+    private val youtubeTrailerDomains = listOf(
+        "youtube.com", "youtu.be", "youtube-nocookie.com",
+        "ytimg.com", "googlevideo.com/videoplayback" // YouTube domains
+    )
+    
     private fun isDoodStreamClone(url: String) = doodStreamDomains.any { url.contains(it, true) }
     private fun isHardHost(url: String) = hardHosts.any { url.contains(it, true) }
+    
+    // Verifica se é URL do YouTube (trailers) - deve ser IGNORADO
+    private fun isYoutubeOrTrailer(url: String): Boolean {
+        val urlLower = url.lowercase()
+        return youtubeTrailerDomains.any { urlLower.contains(it) } ||
+               urlLower.contains("trailer") ||
+               urlLower.contains("/embed/") && urlLower.contains("youtube")
+    }
 
     // ==================== LOAD LINKS ====================
 
@@ -358,7 +372,13 @@ class MaxSeriesProvider : MainAPI() {
                 val doc = app.get(data).document
                 val iframe = doc.selectFirst("iframe")?.attr("src")
                 if (!iframe.isNullOrEmpty()) {
-                    playerUrls.add(if (iframe.startsWith("//")) "https:$iframe" else iframe)
+                    val iframeFull = if (iframe.startsWith("//")) "https:$iframe" else iframe
+                    // IGNORAR YouTube/trailers
+                    if (!isYoutubeOrTrailer(iframeFull)) {
+                        playerUrls.add(iframeFull)
+                    } else {
+                        Log.d("MaxSeries", "Ignorando trailer/YouTube: $iframeFull")
+                    }
                 }
             }
             
@@ -366,6 +386,11 @@ class MaxSeriesProvider : MainAPI() {
             val sortedUrls = playerUrls.sortedByDescending { isDoodStreamClone(it) }
             
             for (playerUrl in sortedUrls) {
+                // Pular URLs do YouTube/trailers
+                if (isYoutubeOrTrailer(playerUrl)) {
+                    Log.d("MaxSeries", "Pulando trailer: $playerUrl")
+                    continue
+                }
                 Log.d("MaxSeries", "Processando: $playerUrl")
                 
                 // 1. DoodStream clones

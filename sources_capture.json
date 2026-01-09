@@ -1,0 +1,26 @@
+{
+  "episodes": [
+    {
+      "id": "255703",
+      "title": "1 - You’ve Been Warned",
+      "sources": [
+        {
+          "name": "Player #1",
+          "url": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "type": "iframe",
+          "id": "209708",
+          "subtitles": "",
+          "host": "PlayerEmbedAPI"
+        },
+        {
+          "name": "Player #2",
+          "url": "https://megaembed.link/#3wnuij",
+          "type": "iframe",
+          "id": "209709",
+          "subtitles": "",
+          "host": "MegaEmbed"
+        }
+      ]
+    }
+  ]
+}

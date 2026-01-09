@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v19.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v20.0/MaxSeries.cs3",
         "status": 1,
-        "version": 19,
+        "version": 20,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v19.0 - COMPATIBILIDADE KOTLIN CORRIGIDA! Usando Kotlin 2.0+ compatível com CloudStream. Baseado em análise HAR.",
+        "description": "MaxSeries v20.0 - KOTLIN 2.2.21 EXATO! Plugin class corrigida para Plugin() em vez de BasePlugin(). Compatibilidade total com CloudStream.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

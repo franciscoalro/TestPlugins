@@ -1,7 +1,7 @@
-version = 18
+version = 19
 
 cloudstream {
-    description = "MaxSeries v18.0 - Corrigido newExtractorLink com parâmetros nomeados baseado em HAR"
+    description = "MaxSeries v19.0 - Corrigido compatibilidade Kotlin 2.0+ e workflow focado"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

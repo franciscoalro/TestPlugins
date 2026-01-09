@@ -1,7 +1,7 @@
-version = 23
+version = 25
 
 cloudstream {
-    description = "MaxSeries v23.0 - Simplificado apenas loadExtractor"
+    description = "MaxSeries v25.0 - Simplificado com extractors padrão"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,7 +1,7 @@
-version = 29
+version = 30
 
 cloudstream {
-    description = "MaxSeries v29 - Ignora trailers YouTube + Anti-detecção PlayerEmbedAPI"
+    description = "MaxSeries v30 - API Direta MegaEmbed + WebView Agressivo + DoodStream"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

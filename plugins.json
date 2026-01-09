@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v15.1/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v16.0/MaxSeries.cs3",
         "status": 1,
-        "version": 15,
+        "version": 16,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v15.1 - CORREÇÃO DEFINITIVA! Requisições AJAX implementadas para players reais (não trailers).",
+        "description": "MaxSeries v16.0 - EXTRACTORS CORRIGIDOS! Implementados extractors customizados para PlayerEmbedAPI e MegaEmbed que realmente funcionam.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

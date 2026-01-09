@@ -2,6 +2,7 @@
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
 
 class MaxSeriesProvider : MainAPI() {
@@ -83,28 +84,269 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
 
-    override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
-        var found = 0
+    // ==================== EXTRACTORS ====================
+
+    // DoodStream Extractor (igual ao oficial do CloudStream)
+    private suspend fun extractDoodStream(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
+            val embedUrl = url.replace("/d/", "/e/")
+            val req = app.get(embedUrl)
+            val host = getBaseUrl(req.url)
+            val html = req.text
+            
+            val md5Path = Regex("/pass_md5/[^']*").find(html)?.value ?: return false
+            val md5Url = host + md5Path
+            
+            val trueUrl = app.get(md5Url, referer = req.url).text + 
+                          createHashTable() + 
+                          "?token=" + md5Path.substringAfterLast("/")
+            
+            val quality = Regex("\\d{3,4}p")
+                .find(html.substringAfter("<title>").substringBefore("</title>"))
+                ?.value
+            
+            val sourceName = when {
+                url.contains("myvidplay") -> "MyVidPlay"
+                url.contains("bysebuho") -> "Bysebuho"
+                url.contains("g9r6") -> "G9R6"
+                else -> "DoodStream"
+            }
+            
+            callback(
+                newExtractorLink(
+                    sourceName,
+                    sourceName,
+                    trueUrl,
+                ) {
+                    this.referer = "$host/"
+                    this.quality = getQualityFromName(quality)
+                }
+            )
+            
+            return true
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "DoodStream erro: ${e.message}")
+            return false
+        }
+    }
+    
+    // StreamWish-like Extractor (usa JsUnpacker)
+    private suspend fun extractWithUnpack(url: String, callback: (ExtractorLink) -> Unit): Boolean {
+        try {
+            val response = app.get(url)
+            val html = response.text
+            
+            // Tentar desempacotar JavaScript P.A.C.K.E.R.
+            val packed = getPacked(html)
+            val unpacked = if (!packed.isNullOrEmpty()) {
+                JsUnpacker(packed).unpack()
+            } else {
+                html
+            }
+            
+            if (unpacked == null) return false
+            
+            // Procurar URL do vídeo
+            val videoUrl = Regex("""file:\s*["']([^"']+\.m3u8[^"']*)["']""").find(unpacked)?.groupValues?.get(1)
+                ?: Regex("""sources:\s*\[\s*\{\s*file:\s*["']([^"']+)["']""").find(unpacked)?.groupValues?.get(1)
+                ?: Regex("""source:\s*["']([^"']+\.m3u8[^"']*)["']""").find(unpacked)?.groupValues?.get(1)
+            
+            if (videoUrl != null) {
+                val sourceName = when {
+                    url.contains("megaembed") -> "MegaEmbed"
+                    url.contains("playerembedapi") -> "PlayerEmbedAPI"
+                    else -> "Unpacked"
+                }
+                
+                if (videoUrl.contains(".m3u8")) {
+                    M3u8Helper.generateM3u8(
+                        sourceName,
+                        videoUrl,
+                        url
+                    ).forEach(callback)
+                } else {
+                    callback(
+                        newExtractorLink(sourceName, sourceName, videoUrl) {
+                            this.referer = url
+                            this.quality = Qualities.Unknown.value
+                        }
+                    )
+                }
+                return true
+            }
+            
+            return false
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "Unpack erro: ${e.message}")
+            return false
+        }
+    }
+    
+    // WebView Extractor (fallback final) - com script customizado para capturar vídeo
+    private suspend fun extractWithWebView(url: String, callback: (ExtractorLink) -> Unit): Boolean {
+        try {
+            Log.d("MaxSeries", "WebView: $url")
+            
+            // Script JS para tentar capturar URL do vídeo após decriptação
+            val captureScript = """
+                (function() {
+                    var video = document.querySelector('video');
+                    if (video && video.src) return video.src;
+                    var source = document.querySelector('video source');
+                    if (source && source.src) return source.src;
+                    var jwplayer = window.jwplayer;
+                    if (jwplayer && jwplayer().getPlaylistItem) {
+                        var item = jwplayer().getPlaylistItem();
+                        if (item && item.file) return item.file;
+                    }
+                    return '';
+                })()
+            """.trimIndent()
+            
+            var capturedUrl: String? = null
+            
+            val resolver = WebViewResolver(
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/"""),
+                additionalUrls = listOf(Regex("""\.m3u8|\.mp4|\.ts""")),
+                useOkhttp = false,  // IMPORTANTE: false para bypass Cloudflare
+                script = captureScript,
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result != "\"\"") {
+                        capturedUrl = result.trim('"')
+                        Log.d("MaxSeries", "Script capturou: $capturedUrl")
+                    }
+                },
+                timeout = 25_000L
+            )
+            
+            val response = app.get(url, interceptor = resolver)
+            val interceptedUrl = response.url
+            
+            // Usar URL interceptada ou capturada pelo script
+            val videoUrl = when {
+                interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4") -> interceptedUrl
+                !capturedUrl.isNullOrEmpty() && (capturedUrl!!.contains(".m3u8") || capturedUrl!!.contains(".mp4")) -> capturedUrl!!
+                else -> null
+            }
+            
+            if (videoUrl != null) {
+                val sourceName = when {
+                    url.contains("megaembed") -> "MegaEmbed"
+                    url.contains("playerembedapi") -> "PlayerEmbedAPI"
+                    else -> "WebView"
+                }
+                
+                if (videoUrl.contains(".m3u8")) {
+                    M3u8Helper.generateM3u8(sourceName, videoUrl, url).forEach(callback)
+                } else {
+                    callback(
+                        newExtractorLink(sourceName, sourceName, videoUrl) {
+                            this.referer = url
+                            this.quality = Qualities.Unknown.value
+                        }
+                    )
+                }
+                return true
+            }
+            
+            return false
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "WebView erro: ${e.message}")
+            return false
+        }
+    }
+    
+    // Helpers
+    private fun createHashTable(): String {
+        val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return buildString { repeat(10) { append(alphabet.random()) } }
+    }
+    
+    private fun getBaseUrl(url: String): String {
+        return Regex("""^(https?://[^/]+)""").find(url)?.value ?: url
+    }
+    
+
+    
+    private val doodStreamDomains = listOf(
+        "myvidplay.com", "bysebuho.com", "g9r6.com",
+        "doodstream.com", "dood.to", "dood.watch", "dood.pm",
+        "dood.wf", "dood.re", "dood.so", "dood.cx",
+        "dood.la", "dood.ws", "dood.sh", "doodstream.co",
+        "d0000d.com", "d000d.com", "dooood.com", "ds2play.com"
+    )
+    
+    private val hardHosts = listOf("megaembed.link", "playerembedapi.link")
+    
+    private fun isDoodStreamClone(url: String) = doodStreamDomains.any { url.contains(it, true) }
+    private fun isHardHost(url: String) = hardHosts.any { url.contains(it, true) }
+
+    // ==================== LOAD LINKS ====================
+
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        var found = 0
+        
+        try {
+            val playerUrls = mutableListOf<String>()
+            
             if (data.contains("#") && data.contains("playerthree")) {
                 val epId = Regex("#\\d+_(\\d+)").find(data)?.groupValues?.get(1) ?: return false
-                val ajax = app.get("https://playerthree.online/episodio/$epId", headers = mapOf("Referer" to data, "X-Requested-With" to "XMLHttpRequest"))
+                
+                val ajax = app.get(
+                    "https://playerthree.online/episodio/$epId",
+                    headers = mapOf("Referer" to data, "X-Requested-With" to "XMLHttpRequest")
+                )
+                
                 if (ajax.isSuccessful) {
                     ajax.document.select("button[data-source]").forEach { btn ->
                         val src = btn.attr("data-source")
                         if (src.startsWith("http") && !src.contains("youtube", true)) {
-                            try { if (loadExtractor(src, data, subtitleCallback, callback)) found++ } catch (_: Exception) {}
+                            playerUrls.add(src)
                         }
                     }
                 }
             } else {
-                val iframe = app.get(data).document.selectFirst("iframe")?.attr("src")
+                val doc = app.get(data).document
+                val iframe = doc.selectFirst("iframe")?.attr("src")
                 if (!iframe.isNullOrEmpty()) {
-                    val src = if (iframe.startsWith("//")) "https:$iframe" else iframe
-                    try { if (loadExtractor(src, data, subtitleCallback, callback)) found++ } catch (_: Exception) {}
+                    playerUrls.add(if (iframe.startsWith("//")) "https:$iframe" else iframe)
                 }
             }
-        } catch (_: Exception) {}
+            
+            // Ordenar: DoodStream primeiro (mais confiável)
+            val sortedUrls = playerUrls.sortedByDescending { isDoodStreamClone(it) }
+            
+            for (playerUrl in sortedUrls) {
+                Log.d("MaxSeries", "Processando: $playerUrl")
+                
+                // 1. DoodStream clones
+                if (isDoodStreamClone(playerUrl)) {
+                    if (extractDoodStream(playerUrl, callback)) { found++; continue }
+                }
+                
+                // 2. Extractor padrão do CloudStream
+                try {
+                    if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { found++; continue }
+                } catch (_: Exception) {}
+                
+                // 3. Tentar desempacotar JavaScript
+                if (extractWithUnpack(playerUrl, callback)) { found++; continue }
+                
+                // 4. WebView como fallback
+                if (isHardHost(playerUrl)) {
+                    if (extractWithWebView(playerUrl, callback)) { found++; continue }
+                }
+            }
+            
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "Erro: ${e.message}")
+        }
+        
         return found > 0
     }
 }

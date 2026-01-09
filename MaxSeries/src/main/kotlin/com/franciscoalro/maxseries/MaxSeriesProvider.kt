@@ -2,11 +2,13 @@ package com.franciscoalro.maxseries
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.Qualities
 import android.util.Log
 
-// MaxSeries Provider - Versão 17.0 - LIMPO E FUNCIONAL
-// Versão simplificada que compila sem erros
-// Baseado em descobertas HAR mas com código limpo
+// MaxSeries Provider - Versão 18.0 - CORRIGIDO newExtractorLink
+// Versão que compila sem erros usando newExtractorLink com parâmetros nomeados
+// Baseado em descobertas HAR mas com sintaxe Kotlin correta
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -86,7 +88,7 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (v17.0): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v18.0): $title")
             
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
@@ -166,7 +168,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v17.0): $data")
+        Log.d("MaxSeries", "📺 Processando links (v18.0): $data")
         
         var linksFound = 0
         
@@ -211,15 +213,15 @@ class MaxSeriesProvider : MainAPI() {
                                             linksFound++
                                             Log.d("MaxSeries", "✅ Extractor padrão: $playerName")
                                         } else {
-                                            // Fallback: criar link direto
+                                            // Fallback: criar link direto usando newExtractorLink
                                             callback.invoke(
-                                                ExtractorLink(
-                                                    playerName,
-                                                    playerName,
-                                                    dataSource,
-                                                    data,
-                                                    Qualities.Unknown.value,
-                                                    false
+                                                newExtractorLink(
+                                                    source = playerName,
+                                                    name = playerName,
+                                                    url = dataSource,
+                                                    referer = data,
+                                                    quality = Qualities.Unknown.value,
+                                                    isM3u8 = false
                                                 )
                                             )
                                             linksFound++

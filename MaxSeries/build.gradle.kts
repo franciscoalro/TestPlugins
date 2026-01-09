@@ -1,7 +1,7 @@
-version = 17
+version = 18
 
 cloudstream {
-    description = "MaxSeries v17.0 - Baseado em análise HAR com APIs específicas do MegaEmbed"
+    description = "MaxSeries v18.0 - Corrigido newExtractorLink com parâmetros nomeados baseado em HAR"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

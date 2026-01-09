@@ -31,13 +31,16 @@ jobs:
         with:
           cache-read-only: false
 
+      - name: Clean build cache
+        run: rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.recloudstream
+
       - name: Build MaxSeries (with retry)
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 15
           max_attempts: 5
           retry_wait_seconds: 60
-          command: ./gradlew MaxSeries:make --no-daemon --refresh-dependencies
+          command: ./gradlew MaxSeries:make --no-daemon --no-build-cache
 
       - name: Get version
         id: get_version

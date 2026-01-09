@@ -1,0 +1,274 @@
+{
+  "iframe_1": {
+    "url": "https://playerthree.online/embed/synden/",
+    "title": "Terra de Pecados - Synden",
+    "page_source_length": 8840,
+    "episodes": {
+      "episode_links": [
+        {
+          "index": 0,
+          "text": "",
+          "href": "https://playerthree.online/embed/synden/#12962_255703",
+          "data_season_id": null,
+          "data_episode_id": null,
+          "data_season_number": null,
+          "visible": false,
+          "selector_used": "li[data-season-id][data-episode-id] a"
+        },
+        {
+          "index": 1,
+          "text": "",
+          "href": "https://playerthree.online/embed/synden/#12962_255704",
+          "data_season_id": null,
+          "data_episode_id": null,
+          "data_season_number": null,
+          "visible": false,
+          "selector_used": "li[data-season-id][data-episode-id] a"
+        },
+        {
+          "index": 2,
+          "text": "",
+          "href": "https://playerthree.online/embed/synden/#12962_255705",
+          "data_season_id": null,
+          "data_episode_id": null,
+          "data_season_number": null,
+          "visible": false,
+          "selector_used": "li[data-season-id][data-episode-id] a"
+        },
+        {
+          "index": 3,
+          "text": "",
+          "href": "https://playerthree.online/embed/synden/#12962_255706",
+          "data_season_id": null,
+          "data_episode_id": null,
+          "data_season_number": null,
+          "visible": false,
+          "selector_used": "li[data-season-id][data-episode-id] a"
+        },
+        {
+          "index": 4,
+          "text": "",
+          "href": "https://playerthree.online/embed/synden/#12962_255707",
+          "data_season_id": null,
+          "data_episode_id": null,
+          "data_season_number": null,
+          "visible": false,
+          "selector_used": "li[data-season-id][data-episode-id] a"
+        }
+      ],
+      "episode_buttons": [],
+      "episode_navigation": [],
+      "selectors_tested": [
+        {
+          "selector": "li[data-season-id][data-episode-id] a",
+          "count": 5
+        }
+      ]
+    },
+    "seasons": {
+      "season_navigation": [
+        {
+          "index": 0,
+          "text": "",
+          "data_season_id": "12962",
+          "data_season_number": "1",
+          "visible": false
+        },
+        {
+          "index": 0,
+          "text": "",
+          "data_season_id": "12962",
+          "data_season_number": "1",
+          "visible": false
+        }
+      ],
+      "season_buttons": [],
+      "selectors_tested": [
+        {
+          "selector": "ul.header-navigation li[data-season-id]",
+          "count": 1
+        },
+        {
+          "selector": ".season-navigation li",
+          "count": 0
+        },
+        {
+          "selector": "button[data-season]",
+          "count": 0
+        },
+        {
+          "selector": ".season-tab",
+          "count": 0
+        },
+        {
+          "selector": "li[data-season-number]",
+          "count": 1
+        }
+      ]
+    },
+    "players": {
+      "player_buttons": [
+        {
+          "index": 0,
+          "text": "",
+          "data_source": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 1,
+          "text": "",
+          "data_source": "https://megaembed.link/#3wnuij",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 0,
+          "text": "",
+          "data_source": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 1,
+          "text": "",
+          "data_source": "https://megaembed.link/#3wnuij",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 0,
+          "text": "",
+          "data_source": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 1,
+          "text": "",
+          "data_source": "https://megaembed.link/#3wnuij",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 0,
+          "text": "",
+          "data_source": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 1,
+          "text": "",
+          "data_source": "https://megaembed.link/#3wnuij",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 0,
+          "text": "",
+          "data_source": "https://playerembedapi.link/?v=kBJLtxCD3",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        },
+        {
+          "index": 1,
+          "text": "",
+          "data_source": "https://megaembed.link/#3wnuij",
+          "data_show_player": "true",
+          "data_type": "iframe",
+          "visible": false,
+          "enabled": true
+        }
+      ],
+      "data_source_buttons": [],
+      "selectors_tested": [
+        {
+          "selector": "button[data-source]",
+          "count": 2
+        },
+        {
+          "selector": ".btn[data-source]",
+          "count": 2
+        },
+        {
+          "selector": "button[data-show-player]",
+          "count": 2
+        },
+        {
+          "selector": ".player-option",
+          "count": 0
+        },
+        {
+          "selector": "#players button",
+          "count": 2
+        },
+        {
+          "selector": ".choose-player button",
+          "count": 2
+        }
+      ]
+    },
+    "navigation": {
+      "navigation_elements": [
+        {
+          "index": 0,
+          "class": "header-navigation",
+          "id": "",
+          "links_count": 0,
+          "buttons_count": 0,
+          "list_items_count": 1
+        }
+      ],
+      "clickable_elements": 8
+    },
+    "javascript": {
+      "scripts_count": 11,
+      "external_scripts": [
+        "https://ib.bobafidges.com/rx6Ao292AGv7US/119582",
+        "https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+        "https://cdn.plyr.io/3.6.3/plyr.js",
+        "https://vjs.zencdn.net/7.10.2/video.min.js",
+        "https://playerthree.online/static/js/jwplayer.js?v=1725467574",
+        "https://playerthree.online/static/js/app.js?v=1757386115",
+        "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+      ],
+      "gleam_detected": true,
+      "video_urls": [],
+      "config_objects": [
+        {
+          "type": "gleam",
+          "config": {
+            "ad_enabled": false,
+            "ad_skip_duration": 5,
+            "ad_video_url": "https://cvt-s2.agl004.fun/v/_jMvMjFjOTA4ZTAtYTE5ZSWWMDUyLTlhMmItNTAwNTIxZjc3Njg3.xml?cp.host=a9ad5771db9941d393fd33fea05c261c|MegaCine.top&amp;amp;amp;amp;cp.domain=MegaCine.pics",
+            "jwplayer_cast_appid": "00000000",
+            "jwplayer_key": "jfGgo35z3c4llrHaVi0Y4ormVgOyy9/NiI7qQFjvcFY=",
+            "redirector_tvshow_enabled": false,
+            "redirector_url": "https://tason.me/campanha.php?auth={token}",
+            "url": "https://playerthree.online"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -4,14 +4,14 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.Qualities
-import com.lagradost.cloudstream3.utils.*
 import android.util.Log
+import org.jsoup.nodes.Document
+import java.util.Base64
+import org.json.JSONObject
 
-// MaxSeries Provider - Versão 17.0 - BASEADO EM DESCOBERTAS HAR
-// Implementa extractor específico para MegaEmbed baseado em análise HAR
-// APIs descobertas: /api/v1/video?id=X&w=2144&h=1206&r=playerthree.online
-// Headers específicos incluídos conforme HAR
-// Análise completa realizada em 08/01/2026
+// MaxSeries Provider - Versão 16.0 - EXTRACTORS CORRIGIDOS
+// Problema identificado: Players usam JavaScript complexo que os extractors padrão não conseguem processar
+// Solução: Implementar extractors customizados para PlayerEmbedAPI e MegaEmbed
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -171,7 +171,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v16.0 - Simplificado): $data")
+        Log.d("MaxSeries", "📺 Processando links (v16.0 - Extractors Corrigidos): $data")
         
         var linksFound = 0
         
@@ -206,56 +206,28 @@ class MaxSeriesProvider : MainAPI() {
                                     
                                     Log.d("MaxSeries", "🎯 Processando player: $playerName -> $dataSource")
                                     
-                                    try {
-                                        // Usar extractors padrão do CloudStream
-                                        // Eles devem funcionar melhor agora que temos os links corretos
-                                        if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
-                                            linksFound++
-                                            Log.d("MaxSeries", "✅ Sucesso: $playerName -> $dataSource")
-                                        } else {
-                                            Log.d("MaxSeries", "⚠️ Extractor não encontrado para: $dataSource")
-                                            
-                                            // Implementar extractor específico baseado em HAR
-                                            when {
-                                                dataSource.contains("megaembed.link") -> {
-                                                    if (extractMegaEmbedHAR(dataSource, data, callback)) {
-                                                        linksFound++
-                                                        Log.d("MaxSeries", "✅ Sucesso MegaEmbed HAR: $playerName")
-                                                    } else {
-                                                        // Fallback: criar link direto
-                                                        callback.invoke(
-                                                            newExtractorLink(
-                                                                source = playerName,
-                                                                name = playerName,
-                                                                url = dataSource,
-                                                                referer = data,
-                                                                quality = Qualities.Unknown.value,
-                                                                isM3u8 = false
-                                                            )
-                                                        )
-                                                        linksFound++
-                                                        Log.d("MaxSeries", "✅ Link direto criado: $playerName")
-                                                    }
-                                                }
-                                                else -> {
-                                                    // Fallback: criar link direto
-                                                    callback.invoke(
-                                                        newExtractorLink(
-                                                            source = playerName,
-                                                            name = playerName,
-                                                            url = dataSource,
-                                                            referer = data,
-                                                            quality = Qualities.Unknown.value,
-                                                            isM3u8 = false
-                                                        )
-                                                    )
-                                                    linksFound++
-                                                    Log.d("MaxSeries", "✅ Link direto criado: $playerName")
-                                                }
+                                    // Usar extractors customizados em vez dos padrão
+                                    when {
+                                        dataSource.contains("playerembedapi.link") -> {
+                                            if (extractPlayerEmbedAPI(dataSource, data, callback)) {
+                                                linksFound++
                                             }
                                         }
-                                    } catch (e: Exception) {
-                                        Log.e("MaxSeries", "❌ Erro ao processar player $playerName: ${e.message}")
+                                        dataSource.contains("megaembed.link") -> {
+                                            if (extractMegaEmbed(dataSource, data, callback)) {
+                                                linksFound++
+                                            }
+                                        }
+                                        else -> {
+                                            // Fallback para outros extractors
+                                            try {
+                                                if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
+                                                    linksFound++
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e("MaxSeries", "❌ Erro no extractor padrão: ${e.message}")
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -288,83 +260,177 @@ class MaxSeriesProvider : MainAPI() {
         return linksFound > 0
     }
 
-    // EXTRACTOR MEGAEMBED BASEADO EM DESCOBERTAS HAR
-    private suspend fun extractMegaEmbedHAR(
+    // EXTRACTOR CUSTOMIZADO - PlayerEmbedAPI
+    private suspend fun extractPlayerEmbedAPI(
         url: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "🔧 Extractor MegaEmbed HAR-based: $url")
+        Log.d("MaxSeries", "🔧 Extractor customizado PlayerEmbedAPI: $url")
         
         try {
-            // Extrair ID do MegaEmbed da URL (formato: #ldrmeg)
-            val idMatch = Regex("#([^&?]+)").find(url)
-            if (idMatch == null) {
-                Log.d("MaxSeries", "❌ ID não encontrado na URL MegaEmbed")
-                return false
-            }
+            val response = app.get(url, referer = referer)
+            val content = response.text
             
-            val megaId = idMatch.groupValues[1]
-            Log.d("MaxSeries", "🔍 MegaEmbed ID extraído: $megaId")
+            // Procurar dados base64 no JavaScript
+            val base64Regex = Regex("""atob\(["']([^"']+)["']\)""")
+            val base64Match = base64Regex.find(content)
             
-            // Headers baseados na análise HAR
-            val harHeaders = mapOf(
-                "Referer" to "https://megaembed.link/",
-                "Origin" to "https://megaembed.link",
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
-            )
-            
-            // API descoberta no HAR: /api/v1/video
-            val videoApiUrl = "https://megaembed.link/api/v1/video?id=$megaId&w=2144&h=1206&r=playerthree.online"
-            Log.d("MaxSeries", "📡 Tentando API HAR: $videoApiUrl")
-            
-            val videoResponse = app.get(videoApiUrl, headers = harHeaders)
-            
-            if (videoResponse.isSuccessful) {
-                Log.d("MaxSeries", "✅ API HAR sucesso: ${videoResponse.code}")
-                
-                val responseText = videoResponse.text
-                Log.d("MaxSeries", "📄 Resposta API: ${responseText.take(200)}...")
-                
-                // Procurar URLs de vídeo na resposta (pode ser JSON ou HTML)
-                val videoUrlPatterns = listOf(
-                    """"url"\s*:\s*"([^"]+)"''',
-                    """"source"\s*:\s*"([^"]+)"''',
-                    """"file"\s*:\s*"([^"]+)"''',
-                    """"stream"\s*:\s*"([^"]+)"''',
-                    """https?://[^"'\s]+\.(?:m3u8|mp4)[^"'\s]*"""
-                )
-                
-                for (pattern in videoUrlPatterns) {
-                    val matches = Regex(pattern).findAll(responseText)
-                    for (match in matches) {
-                        val videoUrl = if (match.groupValues.size > 1) match.groupValues[1] else match.value
-                        
-                        if (videoUrl.startsWith("http") && (videoUrl.contains(".m3u8") || videoUrl.contains(".mp4"))) {
-                            Log.d("MaxSeries", "✅ Vídeo HAR encontrado: $videoUrl")
+            if (base64Match != null) {
+                try {
+                    val base64Data = base64Match.groupValues[1]
+                    val decodedData = String(Base64.getDecoder().decode(base64Data))
+                    
+                    Log.d("MaxSeries", "🔍 Dados decodificados encontrados")
+                    
+                    // Procurar URLs de vídeo nos dados decodificados
+                    val videoUrlRegex = Regex(""""(?:file|source|url)"\s*:\s*"([^"]+\.(?:m3u8|mp4)[^"]*)"''')
+                    val videoMatches = videoUrlRegex.findAll(decodedData)
+                    
+                    videoMatches.forEach { match ->
+                        val videoUrl = match.groupValues[1]
+                        if (videoUrl.startsWith("http")) {
+                            Log.d("MaxSeries", "✅ Vídeo PlayerEmbedAPI encontrado: $videoUrl")
                             
                             callback.invoke(
-                                newExtractorLink(
-                                    source = "MegaEmbed HAR",
-                                    name = "MegaEmbed HAR",
-                                    url = videoUrl,
-                                    referer = referer,
-                                    quality = Qualities.P720.value,
-                                    isM3u8 = videoUrl.contains(".m3u8")
+                                ExtractorLink(
+                                    "PlayerEmbedAPI",
+                                    "PlayerEmbedAPI",
+                                    videoUrl,
+                                    referer,
+                                    if (videoUrl.contains(".m3u8")) Qualities.Unknown.value else Qualities.P720.value,
+                                    videoUrl.contains(".m3u8")
                                 )
                             )
                             return true
                         }
                     }
+                } catch (e: Exception) {
+                    Log.e("MaxSeries", "❌ Erro ao decodificar base64: ${e.message}")
                 }
+            }
+            
+            // Fallback: procurar URLs diretas no JavaScript
+            val directUrlRegex = Regex(""""(?:file|source)"\s*:\s*"(https?://[^"]+\.(?:m3u8|mp4)[^"]*)"''')
+            val directMatches = directUrlRegex.findAll(content)
+            
+            directMatches.forEach { match ->
+                val videoUrl = match.groupValues[1]
+                Log.d("MaxSeries", "✅ Vídeo direto PlayerEmbedAPI: $videoUrl")
                 
-                Log.d("MaxSeries", "⚠️ Nenhuma URL de vídeo encontrada na resposta da API HAR")
-            } else {
-                Log.d("MaxSeries", "❌ API HAR falhou: ${videoResponse.code}")
+                callback.invoke(
+                    ExtractorLink(
+                        "PlayerEmbedAPI",
+                        "PlayerEmbedAPI",
+                        videoUrl,
+                        referer,
+                        Qualities.P720.value,
+                        videoUrl.contains(".m3u8")
+                    )
+                )
+                return true
             }
             
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro no extractor MegaEmbed HAR: ${e.message}")
+            Log.e("MaxSeries", "❌ Erro no extractor PlayerEmbedAPI: ${e.message}")
+        }
+        
+        return false
+    }
+
+    // EXTRACTOR CUSTOMIZADO - MegaEmbed
+    private suspend fun extractMegaEmbed(
+        url: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        Log.d("MaxSeries", "🔧 Extractor customizado MegaEmbed: $url")
+        
+        try {
+            val response = app.get(url, referer = referer)
+            val content = response.text
+            
+            // MegaEmbed usa JavaScript moderno com módulos
+            // Procurar por assets JavaScript
+            val assetRegex = Regex("""/assets/[^"']+\.js""")
+            val assetMatches = assetRegex.findAll(content)
+            
+            for (assetMatch in assetMatches) {
+                val assetUrl = "https://megaembed.link" + assetMatch.value
+                
+                try {
+                    val assetResponse = app.get(assetUrl, referer = url)
+                    val assetContent = assetResponse.text
+                    
+                    // Procurar configurações de vídeo no asset
+                    val videoConfigRegex = Regex(""""(?:file|source|url)"\s*:\s*"([^"]+)"''')
+                    val configMatches = videoConfigRegex.findAll(assetContent)
+                    
+                    configMatches.forEach { match ->
+                        val videoUrl = match.groupValues[1]
+                        if (videoUrl.startsWith("http") && (videoUrl.contains(".m3u8") || videoUrl.contains(".mp4"))) {
+                            Log.d("MaxSeries", "✅ Vídeo MegaEmbed encontrado: $videoUrl")
+                            
+                            callback.invoke(
+                                ExtractorLink(
+                                    "MegaEmbed",
+                                    "MegaEmbed",
+                                    videoUrl,
+                                    referer,
+                                    Qualities.P720.value,
+                                    videoUrl.contains(".m3u8")
+                                )
+                            )
+                            return true
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.d("MaxSeries", "⚠️ Erro ao carregar asset: ${e.message}")
+                }
+            }
+            
+            // Fallback: procurar iframes aninhados
+            val doc = response.document
+            val iframes = doc.select("iframe[src]")
+            
+            for (iframe in iframes) {
+                val iframeSrc = iframe.attr("src")
+                if (iframeSrc.isNotEmpty()) {
+                    val fullIframeUrl = if (iframeSrc.startsWith("//")) "https:$iframeSrc" 
+                                       else if (iframeSrc.startsWith("/")) "https://megaembed.link$iframeSrc"
+                                       else iframeSrc
+                    
+                    try {
+                        val iframeResponse = app.get(fullIframeUrl, referer = url)
+                        val iframeContent = iframeResponse.text
+                        
+                        val videoRegex = Regex(""""(?:file|source)"\s*:\s*"(https?://[^"]+\.(?:m3u8|mp4)[^"]*)"''')
+                        val videoMatches = videoRegex.findAll(iframeContent)
+                        
+                        videoMatches.forEach { match ->
+                            val videoUrl = match.groupValues[1]
+                            Log.d("MaxSeries", "✅ Vídeo MegaEmbed iframe: $videoUrl")
+                            
+                            callback.invoke(
+                                ExtractorLink(
+                                    "MegaEmbed",
+                                    "MegaEmbed",
+                                    videoUrl,
+                                    referer,
+                                    Qualities.P720.value,
+                                    videoUrl.contains(".m3u8")
+                                )
+                            )
+                            return true
+                        }
+                    } catch (e: Exception) {
+                        Log.d("MaxSeries", "⚠️ Erro ao processar iframe MegaEmbed: ${e.message}")
+                    }
+                }
+            }
+            
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro no extractor MegaEmbed: ${e.message}")
         }
         
         return false

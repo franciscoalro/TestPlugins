@@ -1,7 +1,7 @@
-version = 14
+version = 17
 
 cloudstream {
-    description = "Correção avançada de detecção de episódios e temporadas (v14)"
+    description = "MaxSeries v17.0 - Baseado em análise HAR com APIs específicas do MegaEmbed"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

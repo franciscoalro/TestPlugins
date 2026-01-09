@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <script>
+            var gleam = {};
+
+            // Passa as configurações para o frontend
+            gleam.config = {"url":"https:\/\/playerthree.online","jwplayer_key":"jfGgo35z3c4llrHaVi0Y4ormVgOyy9\/NiI7qQFjvcFY=","jwplayer_cast_appid":"00000000","redirector_tvshow_enabled":false,"redirector_url":"https:\/\/tason.me\/campanha.php?auth={token}","ad_enabled":false,"ad_video_url":"https:\/\/cvt-s2.agl004.fun\/v\/_jMvMjFjOTA4ZTAtYTE5ZSWWMDUyLTlhMmItNTAwNTIxZjc3Njg3.xml?cp.host=a9ad5771db9941d393fd33fea05c261c|MegaCine.top&amp;amp;amp;amp;cp.domain=MegaCine.pics","ad_skip_duration":5};
+            gleam.redirect = function (player) {
+                var redirector_url = gleam.config.redirector_url;
+
+                player.subtitles = player.subtitles || null;
+
+                var token = btoa(JSON.stringify({
+    type: player.type,
+    cc: player.subtitles,
+    url: player.url
+}));
+
+var url = redirector_url.replace('{token}', token);
+
+window.open(url);            };
+        </script>
+
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link 
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" 
+            rel="stylesheet"
+        >
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css">
+        <link rel="stylesheet" href="/static/css/app.css?v=1754232065">
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.6.3/plyr.css" />
+        <link rel="stylesheet" type="text/css" href="https://vjs.zencdn.net/7.10.2/video-js.css">
+
+        
+        <title>Terra de Pecados - Synden</title>
+
+        
+        <style></style>
+    </head>
+    <body>
+        
+<main class="main">
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">
+            Terra de Pecados - Synden        </h1>
+        <h2 class="header-subtitle" id="season-title">
+            1</span>º Temporada
+        </h2>
+        <ul class="header-navigation">
+                            <li 
+                    class="selected" 
+                    data-season-id="12962"
+                    data-season-number="1"
+                >
+                    1                </li>
+                    </ul>
+    </header>
+
+    <!-- Cards -->
+    <div class="cards">
+                                    <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Dublado</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <ul>
+                                                            <li 
+                                    data-season-id="12962" 
+                                    data-episode-id="255703"
+                                    class="d-none d-block"
+                                >
+                                    <a href="#12962_255703">
+                                        1 - You’ve Been Warned                                    </a>
+                                </li>
+                                                            <li 
+                                    data-season-id="12962" 
+                                    data-episode-id="255704"
+                                    class="d-none d-block"
+                                >
+                                    <a href="#12962_255704">
+                                        2 - Unidentified Man #1                                    </a>
+                                </li>
+                                                            <li 
+                                    data-season-id="12962" 
+                                    data-episode-id="255705"
+                                    class="d-none d-block"
+                                >
+                                    <a href="#12962_255705">
+                                        3 - Brothers                                    </a>
+                                </li>
+                                                            <li 
+                                    data-season-id="12962" 
+                                    data-episode-id="255706"
+                                    class="d-none d-block"
+                                >
+                                    <a href="#12962_255706">
+                                        4 - Järven                                    </a>
+                                </li>
+                                                            <li 
+                                    data-season-id="12962" 
+                                    data-episode-id="255707"
+                                    class="d-none d-block"
+                                >
+                                    <a href="#12962_255707">
+                                        5 - Queen Bee - Final de Temporada                                    </a>
+                                </li>
+                                                    </ul>
+                    </div>
+                </div>
+                                            </div>
+</main>
+
+<div style="display:none" id="play" class="play">
+    <button class="btn" id="play-back" style="display: block">
+        Voltar
+    </button>
+</div>
+        <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.plyr.io/3.6.3/plyr.js"></script>
+        <script src="https://vjs.zencdn.net/7.10.2/video.min.js"></script>
+        <script src="/static/js/jwplayer.js?v=1725467574"></script>
+        <script src="/static/js/app.js?v=1757386115"></script>
+
+        <script></script>
+          
+
+        <img src="https://whos.amung.us/swidget/viewplayer.gif" style="display:none"/>
+<!--<script data-cfasync="false" async type="text/javascript" src="//ui.startermarsian.com/rcXno1Pf1wWpY706/122764"></script>-->
+<!-- pp<script data-cfasync="false" async type="text/javascript" src="//ib.bobafidges.com/rx6Ao292AGv7US/119582"></script>-->
+
+<script>
+(function () {
+    const MAX_VIEWS = 2;
+    const STORAGE_KEY = 'popup_bobafidges';
+    const TODAY = new Date().toISOString().split('T')[0];
+
+    let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    // Novo dia → reset
+    if (data.date !== TODAY) {
+        data.date = TODAY;
+        data.count = 0;
+    }
+
+    // Se já abriu 2x hoje, não carrega o script
+    if (data.count >= MAX_VIEWS) {
+        return;
+    }
+
+    // Incrementa
+    data.count++;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+    // Injeta o script do popup
+    const script = document.createElement('script');
+    script.src = "//ib.bobafidges.com/rx6Ao292AGv7US/119582";
+    script.async = true;
+    script.setAttribute("data-cfasync", "false");
+    document.head.appendChild(script);
+})();
+</script>    </body>
+</html>

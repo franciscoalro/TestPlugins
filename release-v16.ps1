@@ -1,3 +1,16 @@
+#!/usr/bin/env pwsh
+# Release MaxSeries v16.0 - Extractors Corrigidos
+
+Write-Host "🚀 MAXSERIES V16.0 - EXTRACTORS CORRIGIDOS" -ForegroundColor Green
+
+# Atualizar versão no build.gradle.kts
+$buildGradleContent = Get-Content "build.gradle.kts" -Raw
+$buildGradleContent = $buildGradleContent -replace 'version = \d+', 'version = 16'
+Set-Content "build.gradle.kts" -Value $buildGradleContent
+Write-Host "✅ Versão atualizada para 16" -ForegroundColor Green
+
+# Atualizar plugins.json
+$pluginsContent = @'
 [
     {
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v8.0/AnimesOnlineCC.cs3",
@@ -30,3 +43,27 @@
         "isAdult": false
     }
 ]
+'@
+
+Set-Content "plugins.json" -Value $pluginsContent -Encoding UTF8
+Write-Host "✅ plugins.json atualizado" -ForegroundColor Green
+
+# Commit e push
+Write-Host "📤 Fazendo commit e push..." -ForegroundColor Yellow
+
+git add .
+git commit -m "feat: MaxSeries v16.0 - Extractors corrigidos
+
+- Implementados extractors customizados para PlayerEmbedAPI e MegaEmbed
+- Solução para players JavaScript complexos que não funcionavam
+- Suporte a decodificação Base64 e assets modernos
+- Múltiplos fallbacks para máxima compatibilidade
+
+Fixes: Vídeos não reproduziam no CloudStream"
+
+git tag -a "v16.0" -m "MaxSeries v16.0 - Extractors Corrigidos"
+git push origin main
+git push origin v16.0
+
+Write-Host "✅ Release v16.0 criado!" -ForegroundColor Green
+Write-Host "🔗 Acesse: https://github.com/franciscoalro/TestPlugins/releases/tag/v16.0" -ForegroundColor Cyan

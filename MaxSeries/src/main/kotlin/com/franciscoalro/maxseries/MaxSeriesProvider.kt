@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
+import org.mozilla.javascript.Context as RhinoContext
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -182,33 +183,65 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
     
-    // WebView Extractor (fallback final)
+    // WebView Extractor (fallback final) - com script customizado para capturar vídeo
     private suspend fun extractWithWebView(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
             Log.d("MaxSeries", "WebView: $url")
             
+            // Script JS para tentar capturar URL do vídeo após decriptação
+            val captureScript = """
+                (function() {
+                    var video = document.querySelector('video');
+                    if (video && video.src) return video.src;
+                    var source = document.querySelector('video source');
+                    if (source && source.src) return source.src;
+                    var jwplayer = window.jwplayer;
+                    if (jwplayer && jwplayer().getPlaylistItem) {
+                        var item = jwplayer().getPlaylistItem();
+                        if (item && item.file) return item.file;
+                    }
+                    return '';
+                })()
+            """.trimIndent()
+            
+            var capturedUrl: String? = null
+            
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt"""),
-                additionalUrls = listOf(Regex("""\.m3u8|\.mp4""")),
-                useOkhttp = false,
-                timeout = 20_000L
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/"""),
+                additionalUrls = listOf(Regex("""\.m3u8|\.mp4|\.ts""")),
+                useOkhttp = false,  // IMPORTANTE: false para bypass Cloudflare
+                script = captureScript,
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result != "\"\"") {
+                        capturedUrl = result.trim('"')
+                        Log.d("MaxSeries", "Script capturou: $capturedUrl")
+                    }
+                },
+                timeout = 25_000L
             )
             
             val response = app.get(url, interceptor = resolver)
             val interceptedUrl = response.url
             
-            if (interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4")) {
+            // Usar URL interceptada ou capturada pelo script
+            val videoUrl = when {
+                interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4") -> interceptedUrl
+                !capturedUrl.isNullOrEmpty() && (capturedUrl!!.contains(".m3u8") || capturedUrl!!.contains(".mp4")) -> capturedUrl!!
+                else -> null
+            }
+            
+            if (videoUrl != null) {
                 val sourceName = when {
                     url.contains("megaembed") -> "MegaEmbed"
                     url.contains("playerembedapi") -> "PlayerEmbedAPI"
                     else -> "WebView"
                 }
                 
-                if (interceptedUrl.contains(".m3u8")) {
-                    M3u8Helper.generateM3u8(sourceName, interceptedUrl, url).forEach(callback)
+                if (videoUrl.contains(".m3u8")) {
+                    M3u8Helper.generateM3u8(sourceName, videoUrl, url).forEach(callback)
                 } else {
                     callback(
-                        newExtractorLink(sourceName, sourceName, interceptedUrl) {
+                        newExtractorLink(sourceName, sourceName, videoUrl) {
                             this.referer = url
                             this.quality = Qualities.Unknown.value
                         }
@@ -232,6 +265,22 @@ class MaxSeriesProvider : MainAPI() {
     
     private fun getBaseUrl(url: String): String {
         return Regex("""^(https?://[^/]+)""").find(url)?.value ?: url
+    }
+    
+    // Executa JavaScript usando Rhino (para deobfuscação)
+    private fun evaluateJs(jsCode: String): String? {
+        return try {
+            val rhino = RhinoContext.enter()
+            rhino.initSafeStandardObjects()
+            rhino.setInterpretedMode(true)
+            val scope = rhino.initStandardObjects()
+            val result = rhino.evaluateString(scope, jsCode, "JavaScript", 1, null)
+            RhinoContext.exit()
+            result?.toString()
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "Rhino erro: ${e.message}")
+            null
+        }
     }
     
     private val doodStreamDomains = listOf(

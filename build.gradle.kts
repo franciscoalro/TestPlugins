@@ -12,9 +12,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.2.1") // Versão mais estável
-        classpath("com.github.recloudstream:gradle:master-SNAPSHOT") // Usar master-SNAPSHOT explícito
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.21") // Kotlin 2.2 para compatibilidade com dependências
+        classpath("com.android.tools.build:gradle:8.2.1")
+        classpath("com.github.recloudstream:gradle:cce1b8d84d")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
     }
 }
 

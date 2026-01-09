@@ -26,8 +26,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build MaxSeries
-        run: ./gradlew MaxSeries:make
+      - name: Build MaxSeries (with retry)
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: ./gradlew MaxSeries:make --no-daemon
 
       - name: Get version
         id: get_version
@@ -50,5 +55,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-

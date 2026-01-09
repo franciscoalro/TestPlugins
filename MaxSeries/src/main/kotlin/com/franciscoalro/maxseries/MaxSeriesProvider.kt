@@ -2,13 +2,11 @@ package com.franciscoalro.maxseries
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.Qualities
 import android.util.Log
 
-// MaxSeries Provider - Versão 22.0 - FINALMENTE CORRETO
-// BasePlugin + newExtractorLink com initializer block
-// Sintaxe CloudStream moderna baseada em descobertas HAR
+// MaxSeries Provider - Versão 23.0 - SIMPLIFICADO
+// Apenas loadExtractor sem newExtractorLink problemático
+// Baseado em descobertas HAR com código limpo
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -88,7 +86,7 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (v22.0): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v23.0): $title")
             
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
@@ -168,7 +166,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v22.0): $data")
+        Log.d("MaxSeries", "📺 Processando links (v23.0): $data")
         
         var linksFound = 0
         
@@ -208,26 +206,10 @@ class MaxSeriesProvider : MainAPI() {
                                     Log.d("MaxSeries", "🎯 Player: $playerName -> $dataSource")
                                     
                                     try {
-                                        // Tentar extractor padrão primeiro
+                                        // Usar extractor padrão do CloudStream
                                         if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
                                             linksFound++
-                                            Log.d("MaxSeries", "✅ Extractor padrão: $playerName")
-                                        } else {
-                                            // Fallback: criar link direto usando newExtractorLink
-                                            callback.invoke(
-                                                newExtractorLink(
-                                                    playerName,
-                                                    playerName,
-                                                    dataSource
-                                                ) {
-                                                    // Configurar propriedades do link no initializer
-                                                    this.referer = data
-                                                    this.quality = Qualities.Unknown.value
-                                                    this.isM3u8 = false
-                                                }
-                                            )
-                                            linksFound++
-                                            Log.d("MaxSeries", "✅ Link direto: $playerName")
+                                            Log.d("MaxSeries", "✅ Extractor: $playerName")
                                         }
                                     } catch (e: Exception) {
                                         Log.e("MaxSeries", "❌ Erro player $playerName: ${e.message}")

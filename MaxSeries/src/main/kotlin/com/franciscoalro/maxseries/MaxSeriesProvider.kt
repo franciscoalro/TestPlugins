@@ -4,8 +4,6 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
-import org.json.JSONObject
-import org.json.JSONArray
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -88,22 +86,41 @@ class MaxSeriesProvider : MainAPI() {
 
     // ==================== EXTRACTORS ====================
 
-    // DoodStream Extractor (igual ao oficial do CloudStream)
+    // DoodStream Extractor - HTTP puro (validado via engenharia reversa)
     private suspend fun extractDoodStream(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
+            Log.d("MaxSeries", "DoodStream HTTP: $url")
             val embedUrl = url.replace("/d/", "/e/")
             val req = app.get(embedUrl)
             val host = getBaseUrl(req.url)
             val html = req.text
             
-            val md5Path = Regex("/pass_md5/[^']*").find(html)?.value ?: return false
+            // Regex melhorado para capturar pass_md5 path completo
+            val md5Path = Regex("""/pass_md5/[^'"\s]+""").find(html)?.value
+            if (md5Path == null) {
+                Log.e("MaxSeries", "DoodStream: pass_md5 não encontrado")
+                return false
+            }
+            
             val md5Url = host + md5Path
+            Log.d("MaxSeries", "DoodStream pass_md5: $md5Url")
             
-            val trueUrl = app.get(md5Url, referer = req.url).text + 
-                          createHashTable() + 
-                          "?token=" + md5Path.substringAfterLast("/")
+            // Obter URL base do vídeo
+            val baseUrl = app.get(md5Url, referer = req.url).text.trim()
+            if (baseUrl.isEmpty() || !baseUrl.startsWith("http")) {
+                Log.e("MaxSeries", "DoodStream: baseUrl inválida: $baseUrl")
+                return false
+            }
             
-            val quality = Regex("\\d{3,4}p")
+            // Montar URL final com hash, token e expiry (igual ao JavaScript makePlay())
+            val token = md5Path.substringAfterLast("/")
+            val expiry = System.currentTimeMillis()
+            val trueUrl = "$baseUrl${createHashTable()}?token=$token&expiry=$expiry"
+            
+            Log.d("MaxSeries", "DoodStream URL final: $trueUrl")
+            
+            // Extrair qualidade do título
+            val quality = Regex("""\d{3,4}p""")
                 .find(html.substringAfter("<title>").substringBefore("</title>"))
                 ?.value
             
@@ -117,7 +134,7 @@ class MaxSeriesProvider : MainAPI() {
             callback(
                 newExtractorLink(
                     sourceName,
-                    sourceName,
+                    "$sourceName - ${quality ?: "HD"}",
                     trueUrl,
                 ) {
                     this.referer = "$host/"
@@ -184,296 +201,147 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
     
-    // Extrator direto para MegaEmbed/PlayerEmbedAPI - Tenta API antes do WebView
-    private suspend fun extractDirectAPI(url: String, callback: (ExtractorLink) -> Unit): Boolean {
-        try {
-            Log.d("MaxSeries", "Tentando API direta: $url")
-            
-            // Extrair ID do vídeo da URL
-            val videoId = when {
-                url.contains("#") -> url.substringAfter("#").takeIf { it.isNotEmpty() }
-                url.contains("?v=") -> Regex("[?&]v=([^&]+)").find(url)?.groupValues?.get(1)
-                url.contains("/embed/") -> url.substringAfter("/embed/").substringBefore("?")
-                else -> null
-            }
-            
-            if (videoId.isNullOrEmpty()) {
-                Log.d("MaxSeries", "ID não encontrado na URL")
-                return false
-            }
-            
-            Log.d("MaxSeries", "Video ID: $videoId")
-            
-            // Determinar qual API chamar
-            val apiUrl = when {
-                url.contains("megaembed") -> "https://megaembed.link/api/v1/info?id=$videoId"
-                url.contains("playerembedapi") -> "https://playerembedapi.link/api/source?v=$videoId"
-                else -> return false
-            }
-            
-            // Fazer requisição à API
-            val apiResponse = app.get(
-                apiUrl,
-                headers = mapOf(
-                    "Referer" to url,
-                    "Accept" to "application/json",
-                    "X-Requested-With" to "XMLHttpRequest"
-                )
-            )
-            
-            if (!apiResponse.isSuccessful) {
-                Log.d("MaxSeries", "API retornou ${apiResponse.code}")
-                return false
-            }
-            
-            val jsonText = apiResponse.text
-            Log.d("MaxSeries", "API Response: ${jsonText.take(200)}")
-            
-            // Tentar parsear JSON e encontrar URL
-            try {
-                val json = JSONObject(jsonText)
-                
-                // Procurar campos comuns de URL de vídeo
-                val possibleKeys = listOf("file", "url", "source", "src", "stream", "hls", "mp4", "video", "link")
-                
-                for (key in possibleKeys) {
-                    if (json.has(key)) {
-                        val value = json.optString(key)
-                        if (value.isNotEmpty() && (value.contains(".m3u8") || value.contains(".mp4"))) {
-                            Log.d("MaxSeries", "URL encontrada via API: $value")
-                            
-                            val sourceName = when {
-                                url.contains("megaembed") -> "MegaEmbed"
-                                url.contains("playerembedapi") -> "PlayerEmbedAPI"
-                                else -> "DirectAPI"
-                            }
-                            
-                            if (value.contains(".m3u8")) {
-                                M3u8Helper.generateM3u8(sourceName, value, url).forEach(callback)
-                            } else {
-                                callback(
-                                    newExtractorLink(sourceName, sourceName, value) {
-                                        this.referer = url
-                                        this.quality = Qualities.Unknown.value
-                                    }
-                                )
-                            }
-                            return true
-                        }
-                    }
-                }
-                
-                // Procurar em arrays
-                if (json.has("sources")) {
-                    val sources = json.optJSONArray("sources")
-                    if (sources != null && sources.length() > 0) {
-                        for (i in 0 until sources.length()) {
-                            val source = sources.optJSONObject(i)
-                            if (source != null) {
-                                val file = source.optString("file") 
-                                    ?: source.optString("src")
-                                    ?: source.optString("url")
-                                    
-                                if (!file.isNullOrEmpty() && (file.contains(".m3u8") || file.contains(".mp4"))) {
-                                    Log.d("MaxSeries", "URL encontrada em sources: $file")
-                                    
-                                    val quality = source.optString("label") ?: "Unknown"
-                                    
-                                    callback(
-                                        newExtractorLink("DirectAPI", "DirectAPI - $quality", file) {
-                                            this.referer = url
-                                            this.quality = getQualityFromName(quality)
-                                        }
-                                    )
-                                    return true
-                                }
-                            }
-                        }
-                    }
-                }
-                
-            } catch (e: Exception) {
-                Log.d("MaxSeries", "Erro parseando JSON: ${e.message}")
-            }
-            
-            return false
-            
-        } catch (e: Exception) {
-            Log.e("MaxSeries", "DirectAPI erro: ${e.message}")
-            return false
-        }
-    }
-    
-    // WebView Extractor (fallback final) - com script AGRESSIVO para capturar vídeo
+    // WebView Extractor (fallback para players que requerem JS)
     private suspend fun extractWithWebView(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
-            Log.d("MaxSeries", "WebView iniciando: $url")
+            Log.d("MaxSeries", "WebView fallback: $url")
             
-            // Script JS MUITO AGRESSIVO que:
-            // 1. Clica em TUDO que parece um botão de play
-            // 2. Aguarda e tenta repetidamente
-            // 3. Captura de múltiplas fontes
+            // Script JS avançado: auto-click no play + captura de múltiplos players
             val captureScript = """
                 (function() {
-                    var videoUrl = '';
+                    // Auto-click em botões de play comuns
+                    var playButtons = [
+                        '.vjs-big-play-button',
+                        '.play-button',
+                        '#play-button',
+                        '[class*="play"]',
+                        'button[data-show-player]',
+                        '.jw-icon-playback',
+                        '#overlay'
+                    ];
                     
-                    // Função para capturar URL do vídeo de várias fontes
-                    function getVideoUrl() {
-                        // 1. Elemento video direto
-                        var video = document.querySelector('video');
-                        if (video) {
-                            if (video.src && video.src.length > 20 && !video.src.startsWith('blob:')) return video.src;
-                            if (video.currentSrc && video.currentSrc.length > 20 && !video.currentSrc.startsWith('blob:')) return video.currentSrc;
+                    for (var i = 0; i < playButtons.length; i++) {
+                        var btn = document.querySelector(playButtons[i]);
+                        if (btn) { 
+                            btn.click(); 
+                            break; 
                         }
-                        
-                        // 2. Source dentro de video
-                        var sources = document.querySelectorAll('video source');
-                        for (var i = 0; i < sources.length; i++) {
-                            if (sources[i].src && sources[i].src.length > 20) return sources[i].src;
-                        }
-                        
-                        // 3. JWPlayer
-                        try {
-                            if (typeof jwplayer !== 'undefined') {
-                                var jw = jwplayer();
-                                if (jw && jw.getPlaylistItem) {
-                                    var item = jw.getPlaylistItem();
-                                    if (item && item.file) return item.file;
-                                    if (item && item.sources && item.sources[0]) return item.sources[0].file;
-                                }
-                            }
-                        } catch(e) {}
-                        
-                        // 4. HLS.js
-                        try {
-                            if (window.hls && window.hls.url) return window.hls.url;
-                        } catch(e) {}
-                        
-                        // 5. Video.js
-                        try {
-                            var vjs = document.querySelector('.video-js');
-                            if (vjs && vjs.player && vjs.player.src) return vjs.player.src();
-                        } catch(e) {}
-                        
-                        // 6. Plyr
-                        try {
-                            if (window.player && window.player.source) {
-                                var src = window.player.source;
-                                if (typeof src === 'string') return src;
-                                if (src.sources && src.sources[0]) return src.sources[0].src;
-                            }
-                        } catch(e) {}
-                        
-                        // 7. Procurar em variáveis globais comuns
-                        try {
-                            if (window.videoSource) return window.videoSource;
-                            if (window.hlsUrl) return window.hlsUrl;
-                            if (window.videoUrl) return window.videoUrl;
-                            if (window.streamUrl) return window.streamUrl;
-                            if (window.source) return window.source;
-                        } catch(e) {}
-                        
-                        return '';
                     }
                     
-                    // Função para clicar em botões de play
-                    function clickPlayButtons() {
-                        // Lista EXTENSA de seletores de botões de play
-                        var selectors = [
-                            '.play-btn', '.btn-play', '.play-button', '.playButton',
-                            '[class*="play"]', '[id*="play"]',
-                            '.vjs-big-play-button', '.jw-icon-display',
-                            '.plyr__control--overlaid', '.ytp-large-play-button',
-                            'button[aria-label*="play"]', 'button[aria-label*="Play"]',
-                            '.player-play', '#play', '.play', '[data-action="play"]',
-                            '.mejs__button--playpause', '.mejs__overlay-play',
-                            '.video-play-button', '.video__play',
-                            'svg[class*="play"]', '.icon-play',
-                            '.fp-play', '.flowplayer .fp-ui'
-                        ];
-                        
-                        selectors.forEach(function(selector) {
-                            try {
-                                var buttons = document.querySelectorAll(selector);
-                                buttons.forEach(function(btn) {
-                                    try { 
-                                        btn.click();
-                                        btn.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
-                                    } catch(e) {}
-                                });
-                            } catch(e) {}
-                        });
-                        
-                        // Clicar no centro do player/video
-                        var containers = document.querySelectorAll('.player, #player, .video-container, .video-wrapper, .embed-responsive, video, .plyr, .jw-wrapper, .vjs-tech');
-                        containers.forEach(function(container) {
-                            try {
-                                var rect = container.getBoundingClientRect();
-                                if (rect.width > 50 && rect.height > 50) {
-                                    var event = new MouseEvent('click', {
-                                        bubbles: true, cancelable: true, view: window,
-                                        clientX: rect.left + rect.width/2,
-                                        clientY: rect.top + rect.height/2
-                                    });
-                                    container.dispatchEvent(event);
+                    // Aguardar um pouco para player carregar
+                    return new Promise(function(resolve) {
+                        setTimeout(function() {
+                            var result = '';
+                            
+                            // 1. Video element
+                            var video = document.querySelector('video');
+                            if (video && video.src && video.src.length > 10) {
+                                result = video.src;
+                            }
+                            
+                            // 2. JWPlayer
+                            if (!result && window.jwplayer) {
+                                try {
+                                    var jw = window.jwplayer();
+                                    if (jw) {
+                                        var item = jw.getPlaylistItem && jw.getPlaylistItem();
+                                        if (item && item.file) result = item.file;
+                                        
+                                        if (!result) {
+                                            var playlist = jw.getPlaylist && jw.getPlaylist();
+                                            if (playlist && playlist[0] && playlist[0].file) result = playlist[0].file;
+                                        }
+                                    }
+                                } catch(e) {}
+                            }
+                            
+                            // 3. VideoJS
+                            if (!result && window.videojs) {
+                                try {
+                                    var vjs = document.querySelector('.video-js');
+                                    if (vjs && vjs.player) {
+                                        var src = vjs.player.src();
+                                        if (src) result = src;
+                                    }
+                                } catch(e) {}
+                            }
+                            
+                            // 4. Plyr
+                            if (!result && window.Plyr) {
+                                try {
+                                    var plyr = document.querySelector('.plyr');
+                                    if (plyr && plyr.plyr) {
+                                        var src = plyr.plyr.source;
+                                        if (src) result = src;
+                                    }
+                                } catch(e) {}
+                            }
+                            
+                            // 5. Source elements
+                            if (!result) {
+                                var sources = document.querySelectorAll('source[src]');
+                                for (var j = 0; j < sources.length; j++) {
+                                    var s = sources[j].src;
+                                    if (s && (s.includes('.m3u8') || s.includes('.mp4'))) {
+                                        result = s;
+                                        break;
+                                    }
                                 }
-                            } catch(e) {}
-                        });
-                    }
-                    
-                    // Executar cliques imediatamente
-                    clickPlayButtons();
-                    
-                    // Tentar capturar imediatamente
-                    videoUrl = getVideoUrl();
-                    if (videoUrl) return videoUrl;
-                    
-                    // Se não encontrou, retornar vazio (o interceptor vai pegar via rede)
-                    return '';
+                            }
+                            
+                            resolve(result);
+                        }, 3000);  // Aguardar 3s para player inicializar
+                    });
                 })()
             """.trimIndent()
             
             var capturedUrl: String? = null
             
             val resolver = WebViewResolver(
-                // Interceptar URLs de vídeo incluindo Google Storage
-                interceptUrl = Regex("""\\.m3u8|\\.mp4|storage\\.googleapis\\.com|master\\.txt|/hls/|/video/|googlevideo|akamaized"""),
-                additionalUrls = listOf(Regex("""\\.m3u8|\\.mp4|\\.ts|storage\\.googleapis""")),
+                // Interceptar múltiplos padrões de URL de vídeo
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|cloudatacdn|abyss\.to.*\.mp4"""),
+                additionalUrls = listOf(
+                    Regex("""\.m3u8"""),
+                    Regex("""\.mp4"""),
+                    Regex("""\.ts\?"""),
+                    Regex("""cloudatacdn\.com"""),
+                    Regex("""sssrr\.org.*\.m3u8""")
+                ),
                 useOkhttp = false,  // IMPORTANTE: false para bypass Cloudflare
                 script = captureScript,
                 scriptCallback = { result ->
-                    if (result.isNotEmpty() && result != "null" && result != "\"\"" && result.length > 10) {
+                    if (result.isNotEmpty() && result != "null" && result != "\"\"" && result.startsWith("http")) {
                         capturedUrl = result.trim('"')
-                        Log.d("MaxSeries", "Script capturou: $capturedUrl")
+                        Log.d("MaxSeries", "WebView script capturou: $capturedUrl")
                     }
                 },
-                timeout = 30_000L  // Aumentar timeout para dar tempo ao JS
+                timeout = 35_000L  // Timeout maior para players com JS pesado
             )
             
             val response = app.get(url, interceptor = resolver)
             val interceptedUrl = response.url
             
-            Log.d("MaxSeries", "URL interceptada: $interceptedUrl")
+            Log.d("MaxSeries", "WebView intercepted: $interceptedUrl")
             
             // Usar URL interceptada ou capturada pelo script
             val videoUrl = when {
-                interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4") || interceptedUrl.contains("storage.googleapis.com") -> interceptedUrl
-                !capturedUrl.isNullOrEmpty() && (capturedUrl!!.contains(".m3u8") || capturedUrl!!.contains(".mp4") || capturedUrl!!.contains("storage.googleapis.com")) -> capturedUrl!!
+                interceptedUrl.contains(".m3u8") -> interceptedUrl
+                interceptedUrl.contains(".mp4") && interceptedUrl.contains("cloudatacdn") -> interceptedUrl
+                interceptedUrl.contains(".mp4") && !interceptedUrl.contains("playerembedapi") -> interceptedUrl
+                !capturedUrl.isNullOrEmpty() && capturedUrl!!.contains(".m3u8") -> capturedUrl!!
+                !capturedUrl.isNullOrEmpty() && capturedUrl!!.contains(".mp4") -> capturedUrl!!
                 else -> null
             }
             
             if (videoUrl != null) {
-                Log.d("MaxSeries", "Vídeo encontrado: $videoUrl")
+                Log.d("MaxSeries", "WebView video URL: $videoUrl")
                 
                 val sourceName = when {
                     url.contains("megaembed") -> "MegaEmbed"
-                    url.contains("playerembedapi") -> "PlayerEmbedAPI"
-                    videoUrl.contains("googleapis") -> "GoogleStorage"
+                    url.contains("playerembedapi") -> "PlayerEmbed"
+                    url.contains("abyss") -> "Abyss"
                     else -> "WebView"
                 }
-                
-                // Extrair qualidade da URL se disponível
-                val quality = Regex("(\\d{3,4})p").find(videoUrl)?.groupValues?.get(1)?.toIntOrNull()
                 
                 if (videoUrl.contains(".m3u8")) {
                     M3u8Helper.generateM3u8(sourceName, videoUrl, url).forEach(callback)
@@ -481,13 +349,14 @@ class MaxSeriesProvider : MainAPI() {
                     callback(
                         newExtractorLink(sourceName, sourceName, videoUrl) {
                             this.referer = url
-                            this.quality = quality ?: Qualities.Unknown.value
+                            this.quality = Qualities.Unknown.value
                         }
                     )
                 }
                 return true
             }
             
+            Log.w("MaxSeries", "WebView: nenhum vídeo encontrado")
             return false
         } catch (e: Exception) {
             Log.e("MaxSeries", "WebView erro: ${e.message}")
@@ -517,22 +386,8 @@ class MaxSeriesProvider : MainAPI() {
     
     private val hardHosts = listOf("megaembed.link", "playerembedapi.link")
     
-    // Domínios de trailer/YouTube que devem ser IGNORADOS
-    private val youtubeTrailerDomains = listOf(
-        "youtube.com", "youtu.be", "youtube-nocookie.com",
-        "ytimg.com", "googlevideo.com/videoplayback" // YouTube domains
-    )
-    
     private fun isDoodStreamClone(url: String) = doodStreamDomains.any { url.contains(it, true) }
     private fun isHardHost(url: String) = hardHosts.any { url.contains(it, true) }
-    
-    // Verifica se é URL do YouTube (trailers) - deve ser IGNORADO
-    private fun isYoutubeOrTrailer(url: String): Boolean {
-        val urlLower = url.lowercase()
-        return youtubeTrailerDomains.any { urlLower.contains(it) } ||
-               urlLower.contains("trailer") ||
-               urlLower.contains("/embed/") && urlLower.contains("youtube")
-    }
 
     // ==================== LOAD LINKS ====================
 
@@ -567,13 +422,7 @@ class MaxSeriesProvider : MainAPI() {
                 val doc = app.get(data).document
                 val iframe = doc.selectFirst("iframe")?.attr("src")
                 if (!iframe.isNullOrEmpty()) {
-                    val iframeFull = if (iframe.startsWith("//")) "https:$iframe" else iframe
-                    // IGNORAR YouTube/trailers
-                    if (!isYoutubeOrTrailer(iframeFull)) {
-                        playerUrls.add(iframeFull)
-                    } else {
-                        Log.d("MaxSeries", "Ignorando trailer/YouTube: $iframeFull")
-                    }
+                    playerUrls.add(if (iframe.startsWith("//")) "https:$iframe" else iframe)
                 }
             }
             
@@ -581,14 +430,9 @@ class MaxSeriesProvider : MainAPI() {
             val sortedUrls = playerUrls.sortedByDescending { isDoodStreamClone(it) }
             
             for (playerUrl in sortedUrls) {
-                // Pular URLs do YouTube/trailers
-                if (isYoutubeOrTrailer(playerUrl)) {
-                    Log.d("MaxSeries", "Pulando trailer: $playerUrl")
-                    continue
-                }
                 Log.d("MaxSeries", "Processando: $playerUrl")
                 
-                // 1. DoodStream clones
+                // 1. DoodStream clones (HTTP puro - prioridade máxima)
                 if (isDoodStreamClone(playerUrl)) {
                     if (extractDoodStream(playerUrl, callback)) { found++; continue }
                 }
@@ -598,18 +442,14 @@ class MaxSeriesProvider : MainAPI() {
                     if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { found++; continue }
                 } catch (_: Exception) {}
                 
-                // 3. Tentar desempacotar JavaScript
+                // 3. Tentar desempacotar JavaScript P.A.C.K.E.R.
                 if (extractWithUnpack(playerUrl, callback)) { found++; continue }
                 
-                // 4. Tentar API direta (mais rápido que WebView)
-                if (isHardHost(playerUrl)) {
-                    if (extractDirectAPI(playerUrl, callback)) { found++; continue }
-                }
+                // 4. WebView como fallback UNIVERSAL para qualquer player restante
+                // Isso cobre playerembedapi.link, megaembed.link, e outros players JS
+                if (extractWithWebView(playerUrl, callback)) { found++; continue }
                 
-                // 5. WebView como fallback final
-                if (isHardHost(playerUrl)) {
-                    if (extractWithWebView(playerUrl, callback)) { found++; continue }
-                }
+                Log.w("MaxSeries", "Nenhum extrator funcionou para: $playerUrl")
             }
             
         } catch (e: Exception) {

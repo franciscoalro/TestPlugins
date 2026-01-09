@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v18.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v19.0/MaxSeries.cs3",
         "status": 1,
-        "version": 18,
+        "version": 19,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v18.0 - CORRIGIDO! Usando newExtractorLink com parâmetros nomeados. Baseado em análise HAR para MegaEmbed e PlayerEmbedAPI.",
+        "description": "MaxSeries v19.0 - COMPATIBILIDADE KOTLIN CORRIGIDA! Usando Kotlin 2.0+ compatível com CloudStream. Baseado em análise HAR.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

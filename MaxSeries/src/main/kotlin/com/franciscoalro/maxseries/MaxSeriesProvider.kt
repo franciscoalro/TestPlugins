@@ -6,9 +6,9 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import android.util.Log
 
-// MaxSeries Provider - Versão 18.0 - CORRIGIDO newExtractorLink
-// Versão que compila sem erros usando newExtractorLink com parâmetros nomeados
-// Baseado em descobertas HAR mas com sintaxe Kotlin correta
+// MaxSeries Provider - Versão 19.0 - COMPATIBILIDADE KOTLIN CORRIGIDA
+// Versão com Kotlin 2.0+ compatível com CloudStream library
+// Baseado em descobertas HAR com sintaxe correta
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -88,7 +88,7 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (v18.0): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v19.0): $title")
             
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
@@ -168,7 +168,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v18.0): $data")
+        Log.d("MaxSeries", "📺 Processando links (v19.0): $data")
         
         var linksFound = 0
         

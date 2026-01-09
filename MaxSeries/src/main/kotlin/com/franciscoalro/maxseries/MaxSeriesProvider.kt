@@ -214,7 +214,7 @@ class MaxSeriesProvider : MainAPI() {
                                             
                                             // Fallback: criar link direto
                                             callback.invoke(
-                                                ExtractorLink(
+                                                newExtractorLink(
                                                     playerName,
                                                     playerName,
                                                     dataSource,

@@ -4,7 +4,6 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
-import org.mozilla.javascript.Context as RhinoContext
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -267,21 +266,7 @@ class MaxSeriesProvider : MainAPI() {
         return Regex("""^(https?://[^/]+)""").find(url)?.value ?: url
     }
     
-    // Executa JavaScript usando Rhino (para deobfuscação)
-    private fun evaluateJs(jsCode: String): String? {
-        return try {
-            val rhino = RhinoContext.enter()
-            rhino.initSafeStandardObjects()
-            rhino.setInterpretedMode(true)
-            val scope = rhino.initStandardObjects()
-            val result = rhino.evaluateString(scope, jsCode, "JavaScript", 1, null)
-            RhinoContext.exit()
-            result?.toString()
-        } catch (e: Exception) {
-            Log.e("MaxSeries", "Rhino erro: ${e.message}")
-            null
-        }
-    }
+
     
     private val doodStreamDomains = listOf(
         "myvidplay.com", "bysebuho.com", "g9r6.com",

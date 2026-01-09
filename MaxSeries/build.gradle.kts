@@ -1,7 +1,7 @@
-version = 26
+version = 28
 
 cloudstream {
-    description = "MaxSeries v26.0 - WebView com script customizado e DoodStream extractors"
+    description = "MaxSeries v28 - Anti-detecção PlayerEmbedAPI + WebView + storage.googleapis.com"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -182,59 +182,103 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
     
-    // WebView Extractor (fallback final) - com script customizado para capturar vídeo
+    // WebView Extractor (fallback final) - com script que simula clique e captura vídeo
     private suspend fun extractWithWebView(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
             Log.d("MaxSeries", "WebView: $url")
             
-            // Script JS para tentar capturar URL do vídeo após decriptação
+            // Script JS avançado que:
+            // 1. Tenta clicar automaticamente no botão de play
+            // 2. Espera o vídeo carregar
+            // 3. Captura a URL do elemento video
             val captureScript = """
                 (function() {
-                    var video = document.querySelector('video');
-                    if (video && video.src) return video.src;
-                    var source = document.querySelector('video source');
-                    if (source && source.src) return source.src;
-                    var jwplayer = window.jwplayer;
-                    if (jwplayer && jwplayer().getPlaylistItem) {
-                        var item = jwplayer().getPlaylistItem();
-                        if (item && item.file) return item.file;
+                    // Função para capturar URL do vídeo
+                    function getVideoUrl() {
+                        var video = document.querySelector('video');
+                        if (video) {
+                            if (video.src && video.src.length > 10) return video.src;
+                            if (video.currentSrc && video.currentSrc.length > 10) return video.currentSrc;
+                        }
+                        var source = document.querySelector('video source');
+                        if (source && source.src) return source.src;
+                        
+                        // Tentar jwplayer
+                        if (typeof jwplayer !== 'undefined' && jwplayer().getPlaylistItem) {
+                            var item = jwplayer().getPlaylistItem();
+                            if (item && item.file) return item.file;
+                        }
+                        
+                        // Tentar Plyr
+                        if (typeof Plyr !== 'undefined') {
+                            var plyr = document.querySelector('.plyr');
+                            if (plyr && plyr.plyr && plyr.plyr.source) return plyr.plyr.source;
+                        }
+                        
+                        return '';
                     }
-                    return '';
+                    
+                    // Tentar clicar em botões de play
+                    var playButtons = document.querySelectorAll('[class*="play"], .play-btn, .btn-play, button[aria-label*="play"], .vjs-big-play-button');
+                    playButtons.forEach(function(btn) {
+                        try { btn.click(); } catch(e) {}
+                    });
+                    
+                    // Tentar clicar no centro do player
+                    var player = document.querySelector('.player, .video-container, .embed-responsive, #player');
+                    if (player) {
+                        try {
+                            var event = new MouseEvent('click', {bubbles: true, cancelable: true, view: window});
+                            player.dispatchEvent(event);
+                        } catch(e) {}
+                    }
+                    
+                    // Retornar URL se já disponível
+                    return getVideoUrl();
                 })()
             """.trimIndent()
             
             var capturedUrl: String? = null
             
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/"""),
-                additionalUrls = listOf(Regex("""\.m3u8|\.mp4|\.ts""")),
+                // Interceptar URLs de vídeo incluindo Google Storage
+                interceptUrl = Regex("""\\.m3u8|\\.mp4|storage\\.googleapis\\.com|master\\.txt|/hls/|/video/|googlevideo|akamaized"""),
+                additionalUrls = listOf(Regex("""\\.m3u8|\\.mp4|\\.ts|storage\\.googleapis""")),
                 useOkhttp = false,  // IMPORTANTE: false para bypass Cloudflare
                 script = captureScript,
                 scriptCallback = { result ->
-                    if (result.isNotEmpty() && result != "null" && result != "\"\"") {
+                    if (result.isNotEmpty() && result != "null" && result != "\"\"" && result.length > 10) {
                         capturedUrl = result.trim('"')
                         Log.d("MaxSeries", "Script capturou: $capturedUrl")
                     }
                 },
-                timeout = 25_000L
+                timeout = 30_000L  // Aumentar timeout para dar tempo ao JS
             )
             
             val response = app.get(url, interceptor = resolver)
             val interceptedUrl = response.url
             
+            Log.d("MaxSeries", "URL interceptada: $interceptedUrl")
+            
             // Usar URL interceptada ou capturada pelo script
             val videoUrl = when {
-                interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4") -> interceptedUrl
-                !capturedUrl.isNullOrEmpty() && (capturedUrl!!.contains(".m3u8") || capturedUrl!!.contains(".mp4")) -> capturedUrl!!
+                interceptedUrl.contains(".m3u8") || interceptedUrl.contains(".mp4") || interceptedUrl.contains("storage.googleapis.com") -> interceptedUrl
+                !capturedUrl.isNullOrEmpty() && (capturedUrl!!.contains(".m3u8") || capturedUrl!!.contains(".mp4") || capturedUrl!!.contains("storage.googleapis.com")) -> capturedUrl!!
                 else -> null
             }
             
             if (videoUrl != null) {
+                Log.d("MaxSeries", "Vídeo encontrado: $videoUrl")
+                
                 val sourceName = when {
                     url.contains("megaembed") -> "MegaEmbed"
                     url.contains("playerembedapi") -> "PlayerEmbedAPI"
+                    videoUrl.contains("googleapis") -> "GoogleStorage"
                     else -> "WebView"
                 }
+                
+                // Extrair qualidade da URL se disponível
+                val quality = Regex("(\\d{3,4})p").find(videoUrl)?.groupValues?.get(1)?.toIntOrNull()
                 
                 if (videoUrl.contains(".m3u8")) {
                     M3u8Helper.generateM3u8(sourceName, videoUrl, url).forEach(callback)
@@ -242,7 +286,7 @@ class MaxSeriesProvider : MainAPI() {
                     callback(
                         newExtractorLink(sourceName, sourceName, videoUrl) {
                             this.referer = url
-                            this.quality = Qualities.Unknown.value
+                            this.quality = quality ?: Qualities.Unknown.value
                         }
                     )
                 }

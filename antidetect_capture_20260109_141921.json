@@ -1,0 +1,14 @@
+{
+  "input_url": "https://www.maxseries.one/series/assistir-a-casa-do-dragao-online/",
+  "videos": [
+    {
+      "url": "https://storage.googleapis.com/mediastorage/1767979132278/okbx129j7ol/432279301.mp4#mp4/chunk/1/432279301/2097152/360p/h264?maxChunkSize=5242880",
+      "source_type": "element",
+      "quality": null,
+      "referer": null
+    }
+  ],
+  "started_at": "2026-01-09T14:17:31.635274",
+  "success": true,
+  "finished_at": "2026-01-09T14:19:21.145349"
+}

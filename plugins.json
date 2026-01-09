@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v26/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v29/MaxSeries.cs3",
         "status": 1,
-        "version": 26,
+        "version": 28,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v26.0 - WebView com DoodStream extractors",
+        "description": "MaxSeries v28 - Anti-detecção PlayerEmbedAPI + WebView + storage.googleapis.com",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

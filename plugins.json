@@ -15,14 +15,14 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v17.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v18.0/MaxSeries.cs3",
         "status": 1,
-        "version": 17,
+        "version": 18,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v17.0 - BASEADO EM HAR! Extractor específico para MegaEmbed usando APIs descobertas na análise de rede do navegador.",
+        "description": "MaxSeries v18.0 - CORRIGIDO! Usando newExtractorLink com parâmetros nomeados. Baseado em análise HAR para MegaEmbed e PlayerEmbedAPI.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

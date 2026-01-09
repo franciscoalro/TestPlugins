@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v31/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v32.0/MaxSeries.cs3",
         "status": 1,
-        "version": 30,
+        "version": 32,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v30 - API Direta MegaEmbed + WebView Agressivo + DoodStream",
+        "description": "MaxSeries v32 - HTTP DoodStream + WebView Fallback Universal",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

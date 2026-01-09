@@ -215,12 +215,12 @@ class MaxSeriesProvider : MainAPI() {
                                             // Fallback: criar link direto
                                             callback.invoke(
                                                 newExtractorLink(
-                                                    playerName,
-                                                    playerName,
-                                                    dataSource,
-                                                    data,
-                                                    Qualities.Unknown.value,
-                                                    false
+                                                    source = playerName,
+                                                    name = playerName,
+                                                    url = dataSource,
+                                                    referer = data,
+                                                    quality = Qualities.Unknown.value,
+                                                    isM3u8 = false
                                                 )
                                             )
                                             linksFound++

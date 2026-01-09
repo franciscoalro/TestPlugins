@@ -6,25 +6,36 @@
         "apiVersion": 1,
         "name": "AnimesOnlineCC",
         "internalName": "AnimesOnlineCC",
-        "authors": ["franciscoalro"],
+        "authors": [
+            "franciscoalro"
+        ],
         "description": "Assista animes online gratis em HD no AnimesOnlineCC. Grande catalogo de animes legendados e dublados.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": ["Anime", "OVA", "AnimeMovie"],
+        "tvTypes": [
+            "Anime",
+            "OVA",
+            "AnimeMovie"
+        ],
         "language": "pt-BR",
         "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v29/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v31/MaxSeries.cs3",
         "status": 1,
-        "version": 28,
+        "version": 30,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "authors": ["franciscoalro"],
-        "description": "MaxSeries v28 - Anti-detecção PlayerEmbedAPI + WebView + storage.googleapis.com",
+        "authors": [
+            "franciscoalro"
+        ],
+        "description": "MaxSeries v30 - API Direta MegaEmbed + WebView Agressivo + DoodStream",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": ["TvSeries", "Movie"],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
         "language": "pt-BR",
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
         "isAdult": false

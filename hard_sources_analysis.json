@@ -1,0 +1,71 @@
+[
+  {
+    "name": "PlayerEmbedAPI - Casa do Dragão",
+    "url": "https://playerembedapi.link/?v=tx3jQLbTT",
+    "video_urls": [],
+    "m3u8_urls": [],
+    "mp4_urls": [],
+    "interesting_requests": [],
+    "page_source_snippets": [],
+    "errors": []
+  },
+  {
+    "name": "MegaEmbed - Casa do Dragão",
+    "url": "https://megaembed.link/#dqd1uk",
+    "video_urls": [],
+    "m3u8_urls": [],
+    "mp4_urls": [
+      "https://mc.yandex.ru/watch/98086865?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%23dqd1uk&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A(Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9reu7%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A342692435254%3Ahid%3A321329745%3Az%3A-180%3Ai%3A20260109115007%3Aet%3A1767970208%3Ac%3A1%3Arn%3A587466360%3Arqn%3A1%3Au%3A176797020860187628%3Aw%3A1904x933%3As%3A1920x1080x24%3Ask%3A1%3Afp%3A2136%3Awv%3A2%3Ads%3A267%2C469%2C336%2C105%2C1%2C0%2C%2C123%2C0%2C%2C%2C%2C1571%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1767970205222%3Agi%3AR0ExLjEuOTMxOTA1MzYxLjE3Njc5NzAyMDc%3D%3Arqnl%3A1%3Ast%3A1767970208%3At%3AA.Casa.do.Dragao.S01E01.Dublado.mp4&t=gdpr(14)clc(0-0-0)rqnt(1)aw(1)rcm(1)cdl(na)eco(83952128)ti(1)",
+      "https://mc.yandex.ru/watch/98086865/1?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%23dqd1uk&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A%28Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9reu7%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A342692435254%3Ahid%3A321329745%3Az%3A-180%3Ai%3A20260109115007%3Aet%3A1767970208%3Ac%3A1%3Arn%3A587466360%3Arqn%3A1%3Au%3A176797020860187628%3Aw%3A1904x933%3As%3A1920x1080x24%3Ask%3A1%3Afp%3A2136%3Awv%3A2%3Ads%3A267%2C469%2C336%2C105%2C1%2C0%2C%2C123%2C0%2C%2C%2C%2C1571%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1767970205222%3Agi%3AR0ExLjEuOTMxOTA1MzYxLjE3Njc5NzAyMDc%3D%3Arqnl%3A1%3Ast%3A1767970208%3At%3AA.Casa.do.Dragao.S01E01.Dublado.mp4&t=gdpr%2814%29clc%280-0-0%29rqnt%281%29aw%281%29rcm%281%29cdl%28na%29eco%2883952128%29ti%281%29&redirnss=1"
+    ],
+    "interesting_requests": [
+      {
+        "url": "https://s0.2mdn.net/instream/video/client.js",
+        "method": "GET",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\""
+        },
+        "type": "Script"
+      },
+      {
+        "url": "https://mc.yandex.ru/watch/98086865?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%23dqd1uk&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A(Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9reu7%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A342692435254%3Ahid%3A321329745%3Az%3A-180%3Ai%3A20260109115007%3Aet%3A1767970208%3Ac%3A1%3Arn%3A587466360%3Arqn%3A1%3Au%3A176797020860187628%3Aw%3A1904x933%3As%3A1920x1080x24%3Ask%3A1%3Afp%3A2136%3Awv%3A2%3Ads%3A267%2C469%2C336%2C105%2C1%2C0%2C%2C123%2C0%2C%2C%2C%2C1571%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1767970205222%3Agi%3AR0ExLjEuOTMxOTA1MzYxLjE3Njc5NzAyMDc%3D%3Arqnl%3A1%3Ast%3A1767970208%3At%3AA.Casa.do.Dragao.S01E01.Dublado.mp4&t=gdpr(14)clc(0-0-0)rqnt(1)aw(1)rcm(1)cdl(na)eco(83952128)ti(1)",
+        "method": "GET",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\""
+        },
+        "type": "Fetch"
+      },
+      {
+        "url": "https://mc.yandex.ru/watch/98086865/1?wmode=7&page-url=https%3A%2F%2Fmegaembed.link%2F%23dqd1uk&charset=utf-8&uah=chu%0A%22Google%20Chrome%22%3Bv%3D%22143%22%2C%22Chromium%22%3Bv%3D%22143%22%2C%22Not%20A%28Brand%22%3Bv%3D%2224%22%0Achm%0A%3F0%0Achp%0AWindows&browser-info=pv%3A1%3Avf%3A6dxo56vtzxzyyn24rskrmvjm9reu7%3Afu%3A0%3Aen%3Autf-8%3Ala%3Apt-BR%3Av%3A2331%3Acn%3A1%3Adp%3A0%3Als%3A342692435254%3Ahid%3A321329745%3Az%3A-180%3Ai%3A20260109115007%3Aet%3A1767970208%3Ac%3A1%3Arn%3A587466360%3Arqn%3A1%3Au%3A176797020860187628%3Aw%3A1904x933%3As%3A1920x1080x24%3Ask%3A1%3Afp%3A2136%3Awv%3A2%3Ads%3A267%2C469%2C336%2C105%2C1%2C0%2C%2C123%2C0%2C%2C%2C%2C1571%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1767970205222%3Agi%3AR0ExLjEuOTMxOTA1MzYxLjE3Njc5NzAyMDc%3D%3Arqnl%3A1%3Ast%3A1767970208%3At%3AA.Casa.do.Dragao.S01E01.Dublado.mp4&t=gdpr%2814%29clc%280-0-0%29rqnt%281%29aw%281%29rcm%281%29cdl%28na%29eco%2883952128%29ti%281%29&redirnss=1",
+        "method": "GET",
+        "headers": {
+          "Referer": "https://megaembed.link/",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
+        "type": "Fetch"
+      }
+    ],
+    "page_source_snippets": [],
+    "errors": []
+  },
+  {
+    "name": "MyVidPlay - Garota Sequestrada (funciona)",
+    "url": "https://myvidplay.com/e/tilgznkxayrx",
+    "video_urls": [],
+    "m3u8_urls": [],
+    "mp4_urls": [],
+    "interesting_requests": [],
+    "page_source_snippets": [],
+    "errors": [
+      "HTTPConnectionPool(host='localhost', port=61142): Read timed out. (read timeout=120)"
+    ]
+  }
+]

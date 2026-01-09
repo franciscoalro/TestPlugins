@@ -1,0 +1,150 @@
+[
+  {
+    "url": "https://www.maxseries.one/series/assistir-a-casa-do-dragao-online/",
+    "iframes": [
+      "https://playerthree.online/embed/houseofthedragon/"
+    ],
+    "video_sources": [
+      {
+        "name": "Player #1",
+        "url": "https://playerembedapi.link/?v=tx3jQLbTT"
+      },
+      {
+        "name": "Player #2",
+        "url": "https://megaembed.link/#dqd1uk"
+      }
+    ],
+    "youtube_sources": [],
+    "player_buttons": [],
+    "network_requests": [
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video-js.css",
+        "type": "Stylesheet",
+        "initiator": "parser"
+      },
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video.min.js",
+        "type": "Script",
+        "initiator": "parser"
+      }
+    ],
+    "errors": []
+  },
+  {
+    "series_url": "https://www.maxseries.one/series/assistir-a-casa-do-dragao-online/",
+    "episode_sources": [
+      {
+        "url": "https://playerembedapi.link/?v=tx3jQLbTT",
+        "is_youtube": false,
+        "type": "PlayerEmbedAPI"
+      },
+      {
+        "url": "https://megaembed.link/#dqd1uk",
+        "is_youtube": false,
+        "type": "MegaEmbed"
+      },
+      {
+        "url": "https://playerembedapi.link/?v=tx3jQLbTT",
+        "is_youtube": false,
+        "type": "PlayerEmbedAPI"
+      },
+      {
+        "url": "https://megaembed.link/#dqd1uk",
+        "is_youtube": false,
+        "type": "MegaEmbed"
+      }
+    ],
+    "ajax_responses": [
+      {
+        "url": "https://playerthree.online/episodio/219179",
+        "response": "\n\n<div class=\"play-banner\" id=\"play\" style=\"background-image: url('https://media.themoviedb.org/t/p/w1280/2xGcSLyTAzConiHAByWqhfLiatT.jpg')\">\n\t<div class=\"play-overlay\">\n\t\t<div class=\"play\">\n\t\t\t\t\t\t\t<button id=\"play-back\" class=\"btn\">\n\t\t\t\t\tVoltar\n\t\t\t\t</button>\n\t\t\t\n\t\t\t\t\t\t\t<div id=\"player\"></div>\n\n\t\t\t\t<div class=\"choose-player\" id=\"player-chooser\">\n\t\t\t\t    <h1>Escolha um player</h1>\n\n\t\t\t\t    <div id=\"players\">\n\t\t\t\t        \t\t\t\t            \t\t\t\t                <button \n\t\t\t\t                    class=\"btn\"\n\t\t\t\t                    data-show-player=\"true\"\n\t\t\t\t                    data-source=\"https://playerembedapi.link/?v=tx3jQLbTT\"\n\t\t\t\t                    data-subtitles=\"\"\n\t\t\t\t                    data-type=\"iframe\"\n\t\t\t\t                    data-id=\"172306\"\n\t\t\t\t                >\n\t\t\t\t                    Player #1\t\t\t\t                </button>\n\t\t\t\t            \t\t\t\t                <button \n\t\t\t\t                    class=\"btn\"\n\t\t\t\t                    data-show-player=\"true\"\n\t\t\t\t                    data-source=\"https://megaembed.link/#dqd1uk\"\n\t\t\t\t                    data-subtitles=\"\"\n\t\t\t\t                    data-type=\"iframe\"\n\t\t\t\t                    data-id=\"172307\"\n\t\t\t\t                >\n\t\t\t\t                    Player #2\t\t\t\t                </button>\n\t\t\t\t            \t\t\t\t        \t\t\t\t    </div>\n\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t</div>\n</div>"
+      }
+    ]
+  },
+  {
+    "url": "https://www.maxseries.one/series/assistir-garota-sequestrada-online/",
+    "iframes": [
+      "https://playerthree.online/embed/girl-taken/"
+    ],
+    "video_sources": [
+      {
+        "name": "Player #1",
+        "url": "https://playerembedapi.link/?v=4PHWs34H0"
+      },
+      {
+        "name": "Player #2",
+        "url": "https://megaembed.link/#xef8u6"
+      },
+      {
+        "name": "Player #3",
+        "url": "https://myvidplay.com/e/tilgznkxayrx"
+      }
+    ],
+    "youtube_sources": [],
+    "player_buttons": [],
+    "network_requests": [
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video-js.css",
+        "type": "Stylesheet",
+        "initiator": "parser"
+      },
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video.min.js",
+        "type": "Script",
+        "initiator": "parser"
+      },
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video-js.css",
+        "type": "Stylesheet",
+        "initiator": "parser"
+      },
+      {
+        "url": "https://vjs.zencdn.net/7.10.2/video.min.js",
+        "type": "Script",
+        "initiator": "parser"
+      }
+    ],
+    "errors": []
+  },
+  {
+    "series_url": "https://www.maxseries.one/series/assistir-garota-sequestrada-online/",
+    "episode_sources": [
+      {
+        "url": "https://playerembedapi.link/?v=4PHWs34H0",
+        "is_youtube": false,
+        "type": "PlayerEmbedAPI"
+      },
+      {
+        "url": "https://megaembed.link/#xef8u6",
+        "is_youtube": false,
+        "type": "MegaEmbed"
+      },
+      {
+        "url": "https://myvidplay.com/e/tilgznkxayrx",
+        "is_youtube": false,
+        "type": "MyVidPlay (DoodStream)"
+      },
+      {
+        "url": "https://playerembedapi.link/?v=4PHWs34H0",
+        "is_youtube": false,
+        "type": "PlayerEmbedAPI"
+      },
+      {
+        "url": "https://megaembed.link/#xef8u6",
+        "is_youtube": false,
+        "type": "MegaEmbed"
+      },
+      {
+        "url": "https://myvidplay.com/e/tilgznkxayrx",
+        "is_youtube": false,
+        "type": "MyVidPlay (DoodStream)"
+      }
+    ],
+    "ajax_responses": [
+      {
+        "url": "https://playerthree.online/episodio/258444",
+        "response": "\n\n<div class=\"play-banner\" id=\"play\" style=\"background-image: url('https://image.tmdb.org/t/p/w1280/1mqzGV6pzZ4Hw0wM5lBfBhfFTtU.jpg')\">\n\t<div class=\"play-overlay\">\n\t\t<div class=\"play\">\n\t\t\t\t\t\t\t<button id=\"play-back\" class=\"btn\">\n\t\t\t\t\tVoltar\n\t\t\t\t</button>\n\t\t\t\n\t\t\t\t\t\t\t<div id=\"player\"></div>\n\n\t\t\t\t<div class=\"choose-player\" id=\"player-chooser\">\n\t\t\t\t    <h1>Escolha um player</h1>\n\n\t\t\t\t    <div id=\"players\">\n\t\t\t\t        \t\t\t\t            \t\t\t\t                <button \n\t\t\t\t                    class=\"btn\"\n\t\t\t\t                    data-show-player=\"true\"\n\t\t\t\t                    data-source=\"https://playerembedapi.link/?v=4PHWs34H0\"\n\t\t\t\t                    data-subtitles=\"\"\n\t\t\t\t                    data-type=\"iframe\"\n\t\t\t\t                    data-id=\"212780\"\n\t\t\t\t                >\n\t\t\t\t                    Player #1\t\t\t\t                </button>\n\t\t\t\t            \t\t\t\t                <button \n\t\t\t\t                    class=\"btn\"\n\t\t\t\t                    data-show-player=\"true\"\n\t\t\t\t                    data-source=\"https://megaembed.link/#xef8u6\"\n\t\t\t\t                    data-subtitles=\"\"\n\t\t\t\t                    data-type=\"iframe\"\n\t\t\t\t                    data-id=\"212781\"\n\t\t\t\t                >\n\t\t\t\t                    Player #2\t\t\t\t                </button>\n\t\t\t\t            \t\t\t\t                <button \n\t\t\t\t                    class=\"btn\"\n\t\t\t\t                    data-show-player=\"true\"\n\t\t\t\t                    data-source=\"https://myvidplay.com/e/tilgznkxayrx\"\n\t\t\t\t                    data-subtitles=\"\"\n\t\t\t\t                    data-type=\"iframe\"\n\t\t\t\t                    data-id=\"212782\"\n\t\t\t\t                >\n\t\t\t\t                    Player #3\t\t\t\t                </button>\n\t\t\t\t            \t\t\t\t        \t\t\t\t    </div>\n\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t</div>\n</div>"
+      }
+    ]
+  }
+]

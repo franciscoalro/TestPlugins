@@ -19,3 +19,4 @@ log.txt
 *.zip
 *.bat
 !push-to-github.bat
+cloudstream-4.6.0/

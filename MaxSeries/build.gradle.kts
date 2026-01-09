@@ -1,7 +1,7 @@
-version = 30
+version = 32
 
 cloudstream {
-    description = "MaxSeries v30 - API Direta MegaEmbed + WebView Agressivo + DoodStream"
+    description = "MaxSeries v32 - HTTP DoodStream + WebView Fallback Universal"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

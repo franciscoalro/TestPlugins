@@ -1,7 +1,7 @@
-version = 20
+version = 21
 
 cloudstream {
-    description = "MaxSeries v20.0 - Kotlin 2.2.21 exato + Plugin class corrigida"
+    description = "MaxSeries v21.0 - Plugin load(context) + newExtractorLink posicional"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

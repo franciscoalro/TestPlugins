@@ -6,9 +6,9 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import android.util.Log
 
-// MaxSeries Provider - Versão 20.0 - KOTLIN 2.2.21 EXATO
-// Versão com Kotlin 2.2.21 exato (mesmo que CloudStream library)
-// Plugin class corrigida para Plugin() em vez de BasePlugin()
+// MaxSeries Provider - Versão 21.0 - PLUGIN CORRIGIDO
+// Plugin load(context) + newExtractorLink com parâmetros posicionais
+// Baseado em descobertas HAR com sintaxe CloudStream correta
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -88,7 +88,7 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (v20.0): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v21.0): $title")
             
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
@@ -168,7 +168,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v20.0): $data")
+        Log.d("MaxSeries", "📺 Processando links (v21.0): $data")
         
         var linksFound = 0
         
@@ -216,12 +216,12 @@ class MaxSeriesProvider : MainAPI() {
                                             // Fallback: criar link direto usando newExtractorLink
                                             callback.invoke(
                                                 newExtractorLink(
-                                                    source = playerName,
-                                                    name = playerName,
-                                                    url = dataSource,
-                                                    referer = data,
-                                                    quality = Qualities.Unknown.value,
-                                                    isM3u8 = false
+                                                    playerName,
+                                                    playerName,
+                                                    dataSource,
+                                                    data,
+                                                    Qualities.Unknown.value,
+                                                    false
                                                 )
                                             )
                                             linksFound++

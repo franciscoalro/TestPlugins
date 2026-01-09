@@ -22,7 +22,7 @@
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": ["franciscoalro"],
-        "description": "MaxSeries v25.0 - Simplificado com extractors padrao do CloudStream",
+        "description": "MaxSeries v25.0 - Simplificado com extractors padrao CloudStream",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": ["TvSeries", "Movie"],
         "language": "pt-BR",

@@ -4,9 +4,8 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import android.util.Log
 
-// MaxSeries Provider - Versão 23.0 - SIMPLIFICADO
-// Apenas loadExtractor sem newExtractorLink problemático
-// Baseado em descobertas HAR com código limpo
+// MaxSeries Provider - Versão 24.0
+// Com extractor customizado para Bysebuho/Doodstream
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -14,6 +13,14 @@ class MaxSeriesProvider : MainAPI() {
     override val hasMainPage = true
     override var lang = "pt"
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
+
+    companion object {
+        // Domínios Doodstream conhecidos
+        val doodDomains = listOf(
+            "bysebuho.com", "g9r6.com", "dood.wf", "dood.pm", 
+            "dood.so", "dood.to", "dood.watch", "doodstream.com"
+        )
+    }
 
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Home",
@@ -86,7 +93,7 @@ class MaxSeriesProvider : MainAPI() {
         if (isSeries) {
             val episodes = mutableListOf<Episode>()
             
-            Log.d("MaxSeries", "📺 Analisando série (v23.0): $title")
+            Log.d("MaxSeries", "📺 Analisando série (v24.0): $title")
             
             val mainIframe = doc.selectFirst("iframe")?.attr("src")
             
@@ -160,13 +167,96 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
 
+    // Extrator customizado para Bysebuho/Doodstream
+    private suspend fun extractBysebuho(
+        url: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        Log.d("MaxSeries", "🔍 Extraindo Bysebuho: $url")
+        
+        try {
+            // Extrair video ID da URL
+            val videoId = Regex("/e/([a-zA-Z0-9]+)").find(url)?.groupValues?.get(1)
+                ?: Regex("#([a-zA-Z0-9]+)").find(url)?.groupValues?.get(1)
+                ?: return false
+            
+            Log.d("MaxSeries", "📺 Video ID: $videoId")
+            
+            // Obter embed_frame_url via API
+            val apiUrl = "https://bysebuho.com/api/videos/$videoId/embed/details"
+            val apiResponse = app.get(apiUrl).text
+            
+            val embedUrl = Regex("\"embed_frame_url\"\\s*:\\s*\"([^\"]+)\"")
+                .find(apiResponse)?.groupValues?.get(1)
+            
+            if (embedUrl != null) {
+                Log.d("MaxSeries", "🎯 Embed URL: $embedUrl")
+                
+                // Carregar página do embed para obter pass_md5
+                val embedDoc = app.get(embedUrl, referer = url).document
+                val embedHtml = embedDoc.html()
+                
+                // Procurar pass_md5 path
+                val passMatch = Regex("'/pass_md5/([^']+)'").find(embedHtml)
+                if (passMatch != null) {
+                    val passPath = "/pass_md5/${passMatch.groupValues[1]}"
+                    val domain = Regex("(https?://[^/]+)").find(embedUrl)?.groupValues?.get(1) ?: return false
+                    val passUrl = "$domain$passPath"
+                    
+                    Log.d("MaxSeries", "🔑 Pass URL: $passUrl")
+                    
+                    // Obter base URL do vídeo
+                    val passResponse = app.get(passUrl, referer = embedUrl).text.trim()
+                    
+                    if (passResponse.startsWith("http")) {
+                        // Procurar token no HTML
+                        val tokenMatch = Regex("'([a-zA-Z0-9]{10,})'").find(embedHtml)
+                        val token = tokenMatch?.groupValues?.get(1) ?: ""
+                        val expiry = System.currentTimeMillis()
+                        
+                        // Construir URL final
+                        val videoUrl = if (token.isNotEmpty()) {
+                            "$passResponse?token=$token&expiry=$expiry"
+                        } else {
+                            passResponse
+                        }
+                        
+                        Log.d("MaxSeries", "✅ Video URL: $videoUrl")
+                        
+                        callback.invoke(
+                            ExtractorLink(
+                                source = "Bysebuho",
+                                name = "Bysebuho",
+                                url = videoUrl,
+                                referer = embedUrl,
+                                quality = Qualities.Unknown.value,
+                                isM3u8 = videoUrl.contains(".m3u8")
+                            )
+                        )
+                        return true
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro Bysebuho: ${e.message}")
+        }
+        
+        return false
+    }
+
+    // Verificar se URL é de um domínio Doodstream
+    private fun isDoodDomain(url: String): Boolean {
+        return doodDomains.any { url.contains(it, ignoreCase = true) }
+    }
+
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("MaxSeries", "📺 Processando links (v23.0): $data")
+        Log.d("MaxSeries", "📺 Processando links (v24.0): $data")
         
         var linksFound = 0
         
@@ -176,7 +266,6 @@ class MaxSeriesProvider : MainAPI() {
                 if (fragmentMatch != null) {
                     val episodeId = fragmentMatch.groupValues[1]
                     
-                    // Headers baseados na análise HAR
                     val harHeaders = mapOf(
                         "Referer" to data,
                         "X-Requested-With" to "XMLHttpRequest",
@@ -186,13 +275,12 @@ class MaxSeriesProvider : MainAPI() {
                     val baseUrl = "https://playerthree.online"
                     val ajaxUrl = "$baseUrl/episodio/$episodeId"
                     
-                    Log.d("MaxSeries", "📡 AJAX HAR: $ajaxUrl")
+                    Log.d("MaxSeries", "📡 AJAX: $ajaxUrl")
                     
                     val ajaxResponse = app.get(ajaxUrl, headers = harHeaders)
                     
                     if (ajaxResponse.isSuccessful) {
                         val ajaxDoc = ajaxResponse.document
-                        
                         val playerButtons = ajaxDoc.select("button[data-source], .btn[data-source]")
                         
                         playerButtons.forEach { button ->
@@ -206,10 +294,18 @@ class MaxSeriesProvider : MainAPI() {
                                     Log.d("MaxSeries", "🎯 Player: $playerName -> $dataSource")
                                     
                                     try {
-                                        // Usar extractor padrão do CloudStream
+                                        // Tentar extrator customizado para Bysebuho/Dood
+                                        if (isDoodDomain(dataSource)) {
+                                            if (extractBysebuho(dataSource, data, callback)) {
+                                                linksFound++
+                                                Log.d("MaxSeries", "✅ Bysebuho extraído!")
+                                            }
+                                        }
+                                        
+                                        // Tentar extractor padrão do CloudStream
                                         if (loadExtractor(dataSource, data, subtitleCallback, callback)) {
                                             linksFound++
-                                            Log.d("MaxSeries", "✅ Extractor: $playerName")
+                                            Log.d("MaxSeries", "✅ Extractor padrão: $playerName")
                                         }
                                     } catch (e: Exception) {
                                         Log.e("MaxSeries", "❌ Erro player $playerName: ${e.message}")
@@ -220,7 +316,6 @@ class MaxSeriesProvider : MainAPI() {
                     }
                 }
             } else {
-                // Processamento padrão para URLs que não são de iframe
                 val doc = app.get(data).document
                 
                 val mainIframe = doc.selectFirst("iframe")?.attr("src")
@@ -228,6 +323,12 @@ class MaxSeriesProvider : MainAPI() {
                     val iframeSrc = if (mainIframe.startsWith("//")) "https:$mainIframe" else mainIframe
                     
                     try {
+                        if (isDoodDomain(iframeSrc)) {
+                            if (extractBysebuho(iframeSrc, data, callback)) {
+                                linksFound++
+                            }
+                        }
+                        
                         if (loadExtractor(iframeSrc, data, subtitleCallback, callback)) {
                             linksFound++
                         }

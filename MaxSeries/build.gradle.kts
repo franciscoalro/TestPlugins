@@ -1,7 +1,7 @@
-version = 25
+version = 26
 
 cloudstream {
-    description = "MaxSeries v25.0 - Simplificado com extractors padrão"
+    description = "MaxSeries v26.0 - WebView com script customizado e Rhino JS"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

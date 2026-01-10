@@ -184,23 +184,25 @@ class MegaEmbedExtractor : ExtractorApi() {
             var capturedUrl: String? = null
             
             // Interceptar requisições de rede para URLs de vídeo
+            // IMPORTANTE: Ser específico para não capturar .js ou outros arquivos
             val resolver = WebViewResolver(
-                // Padrões para interceptar
+                // Padrões para interceptar - apenas URLs de vídeo
                 interceptUrl = Regex(
-                    """\.m3u8|\.mp4|master\.txt|/hls/|/video/|/stream/|/cf-master\.|/tt/master\.""",
+                    """(\.m3u8|\.mp4|\.ts|master\.txt|/cf-master\.|/tt/master\.)(\?|$|#)""",
                     RegexOption.IGNORE_CASE
                 ),
                 additionalUrls = listOf(
-                    Regex("""\.m3u8""", RegexOption.IGNORE_CASE),
-                    Regex("""\.mp4""", RegexOption.IGNORE_CASE),
-                    Regex("""master\.txt""", RegexOption.IGNORE_CASE)
+                    Regex("""\.m3u8(\?|$)""", RegexOption.IGNORE_CASE),
+                    Regex("""\.mp4(\?|$)""", RegexOption.IGNORE_CASE),
+                    Regex("""master\.txt(\?|$)""", RegexOption.IGNORE_CASE)
                 ),
                 useOkhttp = false,
                 script = captureScript,
                 scriptCallback = { result ->
                     if (result.isNotEmpty() && result != "null" && result != "\"\"" && result != "undefined") {
                         val cleanResult = result.trim('"', '\'', ' ')
-                        if (isValidVideoUrl(cleanResult)) {
+                        // Ignorar arquivos .js
+                        if (isValidVideoUrl(cleanResult) && !cleanResult.contains(".js")) {
                             capturedUrl = cleanResult
                             Log.d(TAG, "Script capturou: $capturedUrl")
                         }
@@ -223,12 +225,13 @@ class MegaEmbedExtractor : ExtractorApi() {
             Log.d(TAG, "URL interceptada: $interceptedUrl")
             
             // Priorizar URL interceptada da rede (mais confiável)
+            // Mas ignorar se for .js ou outro arquivo não-vídeo
             val videoUrl = when {
-                isValidVideoUrl(interceptedUrl) -> {
+                isValidVideoUrl(interceptedUrl) && !interceptedUrl.contains(".js") -> {
                     Log.d(TAG, "Usando URL interceptada da rede")
                     interceptedUrl
                 }
-                !capturedUrl.isNullOrEmpty() -> {
+                !capturedUrl.isNullOrEmpty() && isValidVideoUrl(capturedUrl) -> {
                     Log.d(TAG, "Usando URL do script")
                     capturedUrl!!
                 }
@@ -302,6 +305,13 @@ class MegaEmbedExtractor : ExtractorApi() {
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
+        
+        // Ignorar arquivos que não são vídeo
+        if (url.contains(".js") || url.contains(".css") || url.contains(".png") || 
+            url.contains(".jpg") || url.contains(".gif") || url.contains(".svg") ||
+            url.contains(".woff") || url.contains(".ttf")) {
+            return false
+        }
         
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 

@@ -1,7 +1,7 @@
-version = 41
+version = 42
 
 cloudstream {
-    description = "MaxSeries v41 - Regex Ultra-Específico para Bloquear .js no WebView"
+    description = "MaxSeries v42 - Suporte para Links .txt e Domínios Rotativos (MegaEmbed)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

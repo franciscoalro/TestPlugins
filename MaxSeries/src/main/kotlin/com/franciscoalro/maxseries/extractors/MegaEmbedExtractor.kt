@@ -85,7 +85,9 @@ class MegaEmbedExtractor : ExtractorApi() {
                                    url.includes('/hls/') ||
                                    url.includes('/video/') ||
                                    url.includes('master.txt') ||
-                                   url.includes('/stream/');
+                                   url.includes('/stream/') ||
+                                   url.includes('/v4/db/') ||
+                                   url.includes('index-');
                         }
                         
                         // Função para extrair URL
@@ -190,11 +192,13 @@ class MegaEmbedExtractor : ExtractorApi() {
             val resolver = WebViewResolver(
                 // Regex que EXIGE extensão de vídeo no final OU padrões de streaming específicos
                 // E NÃO pode conter .js em nenhum lugar
-                interceptUrl = Regex("""^(?!.*\.js).*(?:\.m3u8(?:\?|$)|\.mp4(?:\?|$)|master\.txt|/cf-master\.|/tt/master\.)""", RegexOption.IGNORE_CASE),
+                // ATUALIZADO: Suporte para .txt ofuscado (index-*.txt)
+                interceptUrl = Regex("""^(?!.*\.js).*(?:\.m3u8(?:\?|$)|\.mp4(?:\?|$)|master\.txt|index-.*\.txt|/cf-master\.|/tt/master\.)""", RegexOption.IGNORE_CASE),
                 additionalUrls = listOf(
                     // Padrões adicionais para HLS e MP4 (também excluindo .js)
                     Regex("""^(?!.*\.js).*\.m3u8(?:\?|$)""", RegexOption.IGNORE_CASE),
-                    Regex("""^(?!.*\.js).*\.mp4(?:\?|$)""", RegexOption.IGNORE_CASE)
+                    Regex("""^(?!.*\.js).*\.mp4(?:\?|$)""", RegexOption.IGNORE_CASE),
+                    Regex("""^(?!.*\.js).*\.txt(?:\?|$)""", RegexOption.IGNORE_CASE)
                 ),
                 useOkhttp = false,
                 script = captureScript,
@@ -212,7 +216,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                             cleanResult.contains(".png", ignoreCase = true) ||
                             cleanResult.contains(".jpg", ignoreCase = true) ||
                             cleanResult.contains("client.js", ignoreCase = true) ||
-                            cleanResult.contains("index-", ignoreCase = true) ||
+                            // cleanResult.contains("index-", ignoreCase = true) || // REMOVIDO: index- agora é usado em playlists
                             cleanResult.contains("chunk-", ignoreCase = true) ||
                             cleanResult.contains("vendor-", ignoreCase = true) ||
                             cleanResult.contains("assets/", ignoreCase = true)) {
@@ -342,7 +346,7 @@ class MegaEmbedExtractor : ExtractorApi() {
             ".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", 
             ".woff", ".woff2", ".ttf", ".eot", ".ico", ".webp",
             ".html", ".htm", ".php", ".asp", ".json",
-            "client.js", "index-", "chunk-", "vendor-", "app-",
+            "client.js", "chunk-", "vendor-", "app-", // REMOVIDO: index-
             "assets/index", "assets/client", "assets/vendor",
             "/assets/", "/static/", "/dist/",
             "analytics", "gtag", "facebook", "twitter", "google-analytics"
@@ -369,7 +373,9 @@ class MegaEmbedExtractor : ExtractorApi() {
             "/tt/master",
             "mediastorage",
             "/playlist/",
-            "/manifest/"
+            "/manifest/",
+            "/v4/db/", // NOVO: Padrão descoberto rivonqengineering
+            "index-"   // NOVO: Padrão de playlist ofuscada
         )
         
         for (allowed in whitelist) {

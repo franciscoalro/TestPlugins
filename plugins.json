@@ -30,7 +30,7 @@
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v42 - Regex Negativo para Bloquear .js no WebView",
+        "description": "MaxSeries v42 - Suporte para Links .txt e Domínios Rotativos (MegaEmbed)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

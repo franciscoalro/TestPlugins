@@ -1,243 +1,198 @@
 #!/usr/bin/env python3
 """
-Teste da API do PlayerThree para descobrir como carregar vídeos
+Teste para extrair link direto do PlayerThree
+Foco: Encontrar API calls ou endpoints que retornam URLs de vídeo
 """
 
 import requests
-import json
 import re
-from bs4 import BeautifulSoup
+import json
+from urllib.parse import urljoin, urlparse
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/html, */*',
-    'Referer': 'https://playerthree.online/',
-    'Origin': 'https://playerthree.online',
-}
-
-def get_app_js():
-    """Baixa e analisa o app.js"""
-    print("="*60)
-    print("ANALISANDO APP.JS")
-    print("="*60)
+def test_playerthree_api():
+    print("🎯 TESTE PLAYERTHREE API - LINK DIRETO")
+    print("=" * 50)
     
-    url = "https://playerthree.online/static/js/app.js"
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    })
+    
+    player_url = "https://playerthree.online/embed/breakingbad/"
     
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=30)
-        print(f"Status: {resp.status_code}")
-        print(f"Tamanho: {len(resp.text)} bytes")
+        # 1. Analisar HTML do player
+        print("🔍 1. Analisando HTML do player...")
+        response = session.get(player_url, timeout=15)
+        html = response.text
         
-        # Salvar
-        with open('playerthree_app.js', 'w', encoding='utf-8') as f:
-            f.write(resp.text)
-        print("Salvo em: playerthree_app.js")
+        print(f"✅ Status: {response.status_code}")
+        print(f"📄 HTML size: {len(html)} chars")
         
-        # Procurar endpoints de API
+        # 2. Procurar endpoints de API
+        print("\n🔍 2. Procurando endpoints de API...")
+        
         api_patterns = [
-            r'(\/api\/[^"\'<>\s]+)',
-            r'(\/episode[^"\'<>\s]*)',
-            r'(\/player[^"\'<>\s]*)',
-            r'(\/video[^"\'<>\s]*)',
+            r'["\']([^"\']*api[^"\']*)["\']',
+            r'["\']([^"\']*ajax[^"\']*)["\']',
+            r'["\']([^"\']*episodio[^"\']*)["\']',
             r'fetch\(["\']([^"\']+)["\']',
             r'\.get\(["\']([^"\']+)["\']',
-            r'\.post\(["\']([^"\']+)["\']',
-            r'url:\s*["\']([^"\']+)["\']',
+            r'url:\s*["\']([^"\']+)["\']'
         ]
         
-        print("\nEndpoints encontrados:")
-        found = set()
+        found_apis = set()
         for pattern in api_patterns:
-            matches = re.findall(pattern, resp.text)
-            for m in matches:
-                if m not in found and len(m) > 3:
-                    found.add(m)
-                    print(f"  -> {m}")
+            matches = re.findall(pattern, html, re.IGNORECASE)
+            for match in matches:
+                if match.startswith('/') or match.startswith('http'):
+                    found_apis.add(match)
         
-        # Procurar como o episódio é carregado
-        print("\nProcurando lógica de carregamento de episódio...")
+        print(f"🔗 APIs encontradas: {len(found_apis)}")
+        for api in list(found_apis)[:10]:  # Mostrar apenas 10
+            print(f"   - {api}")
         
-        # Procurar event handlers
-        click_patterns = [
-            r'click.*?function.*?\{([^}]{100,500})',
-            r'data-episode-id.*?([^}]{50,300})',
-            r'episode.*?([^}]{50,200})',
+        # 3. Extrair ID do episódio/série
+        print("\n🔍 3. Extraindo IDs...")
+        
+        # Procurar IDs no HTML
+        id_patterns = [
+            r'episode[_-]?id["\']?\s*[:=]\s*["\']?(\d+)',
+            r'video[_-]?id["\']?\s*[:=]\s*["\']?(\d+)',
+            r'id["\']?\s*[:=]\s*["\']?(\d+)',
+            r'data-episode["\']?\s*[:=]\s*["\']?(\d+)'
         ]
         
-        for pattern in click_patterns:
-            matches = re.findall(pattern, resp.text, re.I | re.S)
-            for m in matches[:3]:
-                print(f"\n  Trecho: {m[:200]}...")
+        found_ids = set()
+        for pattern in id_patterns:
+            matches = re.findall(pattern, html, re.IGNORECASE)
+            found_ids.update(matches)
+        
+        print(f"🆔 IDs encontrados: {list(found_ids)}")
+        
+        # 4. Testar endpoints comuns do PlayerThree
+        print("\n🔍 4. Testando endpoints comuns...")
+        
+        base_url = "https://playerthree.online"
+        test_endpoints = [
+            "/api/episode/",
+            "/api/video/",
+            "/episodio/",
+            "/ajax/episode/",
+            "/get_video/",
+            "/player/",
+            "/source/"
+        ]
+        
+        # Testar com IDs encontrados
+        for endpoint in test_endpoints:
+            for ep_id in list(found_ids)[:3]:  # Testar apenas 3 IDs
+                test_url = f"{base_url}{endpoint}{ep_id}"
+                try:
+                    print(f"🔗 Testando: {test_url}")
+                    api_response = session.get(
+                        test_url,
+                        headers={'Referer': player_url},
+                        timeout=10
+                    )
+                    
+                    if api_response.status_code == 200:
+                        print(f"   ✅ Sucesso: {api_response.status_code}")
+                        
+                        # Verificar se retorna JSON
+                        try:
+                            json_data = api_response.json()
+                            print(f"   📄 JSON: {str(json_data)[:200]}...")
+                            
+                            # Procurar URLs de vídeo no JSON
+                            json_str = json.dumps(json_data)
+                            video_urls = re.findall(r'https?://[^"\']+\.(?:m3u8|mp4)[^"\']*', json_str)
+                            if video_urls:
+                                print(f"   🎥 VÍDEO ENCONTRADO: {video_urls[0]}")
+                                return video_urls[0]
+                                
+                        except:
+                            # Não é JSON, verificar HTML
+                            response_text = api_response.text
+                            video_urls = re.findall(r'https?://[^"\']+\.(?:m3u8|mp4)[^"\']*', response_text)
+                            if video_urls:
+                                print(f"   🎥 VÍDEO ENCONTRADO: {video_urls[0]}")
+                                return video_urls[0]
+                    else:
+                        print(f"   ❌ Erro: {api_response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Erro: {str(e)[:50]}")
+        
+        # 5. Procurar no JavaScript inline
+        print("\n🔍 5. Analisando JavaScript inline...")
+        
+        # Extrair todos os scripts
+        script_matches = re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
+        
+        for i, script in enumerate(script_matches):
+            if len(script) > 100:  # Apenas scripts grandes
+                print(f"📜 Script {i+1}: {len(script)} chars")
+                
+                # Procurar configurações de vídeo
+                video_configs = re.findall(r'(?:file|source|src):\s*["\']([^"\']+)["\']', script)
+                for config in video_configs:
+                    if '.m3u8' in config or '.mp4' in config:
+                        print(f"   🎥 Config encontrada: {config}")
+                        if config.startswith('http'):
+                            return config
+                
+                # Procurar URLs completas
+                full_urls = re.findall(r'https?://[^"\']+\.(?:m3u8|mp4)[^"\']*', script)
+                if full_urls:
+                    print(f"   🎥 URL completa: {full_urls[0]}")
+                    return full_urls[0]
+        
+        # 6. Tentar método de força bruta com breakingbad
+        print("\n🔍 6. Tentativa com série específica...")
+        
+        series_endpoints = [
+            f"{base_url}/api/series/breakingbad",
+            f"{base_url}/episodio/breakingbad/1/1",  # S01E01
+            f"{base_url}/player/breakingbad",
+            f"{base_url}/source/breakingbad"
+        ]
+        
+        for endpoint in series_endpoints:
+            try:
+                print(f"🔗 Testando: {endpoint}")
+                response = session.get(endpoint, headers={'Referer': player_url}, timeout=10)
+                
+                if response.status_code == 200:
+                    print(f"   ✅ Sucesso: {response.status_code}")
+                    
+                    # Procurar vídeos na resposta
+                    video_urls = re.findall(r'https?://[^"\']+\.(?:m3u8|mp4)[^"\']*', response.text)
+                    if video_urls:
+                        print(f"   🎥 VÍDEO ENCONTRADO: {video_urls[0]}")
+                        return video_urls[0]
+                else:
+                    print(f"   ❌ Erro: {response.status_code}")
+                    
+            except Exception as e:
+                print(f"   ❌ Erro: {str(e)[:50]}")
+        
+        print("\n❌ NENHUM LINK DIRETO ENCONTRADO")
+        print("💡 PlayerThree pode usar:")
+        print("   - Autenticação por token")
+        print("   - JavaScript complexo para gerar URLs")
+        print("   - WebSocket ou outras tecnologias")
+        print("   - Proteção anti-bot")
+        
+        return None
         
     except Exception as e:
-        print(f"Erro: {e}")
-
-def test_episode_api():
-    """Testa possíveis endpoints de episódio"""
-    print("\n" + "="*60)
-    print("TESTANDO ENDPOINTS DE EPISÓDIO")
-    print("="*60)
-    
-    base_url = "https://playerthree.online"
-    
-    # IDs encontrados no HTML
-    season_id = "12962"
-    episode_ids = ["255703", "255704", "255705"]
-    
-    # Possíveis endpoints
-    endpoints = [
-        f"/api/episode/{episode_ids[0]}",
-        f"/api/video/{episode_ids[0]}",
-        f"/episode/{episode_ids[0]}",
-        f"/video/{episode_ids[0]}",
-        f"/api/season/{season_id}/episode/{episode_ids[0]}",
-        f"/embed/synden/{episode_ids[0]}",
-        f"/embed/synden/episode/{episode_ids[0]}",
-        f"/player/{episode_ids[0]}",
-    ]
-    
-    for ep in endpoints:
-        url = base_url + ep
-        print(f"\nTestando: {url}")
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=10, allow_redirects=True)
-            print(f"  Status: {resp.status_code}")
-            print(f"  URL final: {resp.url}")
-            if resp.status_code == 200:
-                # Verificar se tem vídeo
-                if 'm3u8' in resp.text.lower() or 'mp4' in resp.text.lower():
-                    print("  -> CONTÉM REFERÊNCIA A VÍDEO!")
-                    
-                    # Extrair URLs
-                    video_urls = re.findall(r'(https?://[^"\'<>\s]+\.(?:m3u8|mp4)[^"\'<>\s]*)', resp.text)
-                    for v in video_urls[:5]:
-                        print(f"     {v}")
-                
-                print(f"  Response: {resp.text[:300]}...")
-        except Exception as e:
-            print(f"  Erro: {e}")
-
-def test_ajax_episode():
-    """Testa carregamento via AJAX"""
-    print("\n" + "="*60)
-    print("TESTANDO AJAX PARA EPISÓDIO")
-    print("="*60)
-    
-    base_url = "https://playerthree.online"
-    episode_id = "255703"
-    season_id = "12962"
-    
-    # Testar POST
-    ajax_endpoints = [
-        "/api/episode",
-        "/api/video",
-        "/api/player",
-        "/ajax/episode",
-    ]
-    
-    for ep in ajax_endpoints:
-        url = base_url + ep
-        print(f"\nPOST {url}")
-        
-        data = {
-            'episode_id': episode_id,
-            'season_id': season_id,
-            'id': episode_id,
-        }
-        
-        try:
-            resp = requests.post(url, data=data, headers=HEADERS, timeout=10)
-            print(f"  Status: {resp.status_code}")
-            if resp.status_code == 200 and resp.text:
-                print(f"  Response: {resp.text[:300]}...")
-        except Exception as e:
-            print(f"  Erro: {e}")
-
-def analyze_with_selenium():
-    """Usa Selenium para capturar a requisição real"""
-    print("\n" + "="*60)
-    print("ANÁLISE COM SELENIUM")
-    print("="*60)
-    
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.common.by import By
-    import time
-    
-    options = Options()
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    
-    driver = webdriver.Chrome(options=options)
-    driver.execute_cdp_cmd('Network.enable', {})
-    
-    try:
-        url = "https://playerthree.online/embed/synden/"
-        print(f"Carregando: {url}")
-        driver.get(url)
-        time.sleep(3)
-        
-        # Clicar no primeiro episódio
-        episodes = driver.find_elements(By.CSS_SELECTOR, '[data-episode-id]')
-        print(f"Episódios encontrados: {len(episodes)}")
-        
-        if episodes:
-            print(f"Clicando no primeiro episódio...")
-            driver.execute_script("arguments[0].click();", episodes[0])
-            time.sleep(10)  # Esperar carregar
-            
-            # Capturar logs de rede
-            logs = driver.get_log('performance')
-            
-            print(f"\nRequisições capturadas: {len(logs)}")
-            
-            video_requests = []
-            for entry in logs:
-                try:
-                    log = json.loads(entry['message'])['message']
-                    if log.get('method') == 'Network.requestWillBeSent':
-                        url = log.get('params', {}).get('request', {}).get('url', '')
-                        if any(x in url.lower() for x in ['m3u8', 'mp4', 'video', 'episode', 'api', 'player']):
-                            video_requests.append({
-                                'url': url,
-                                'headers': log.get('params', {}).get('request', {}).get('headers', {})
-                            })
-                except:
-                    pass
-            
-            print(f"\nRequisições de interesse:")
-            for req in video_requests:
-                print(f"  URL: {req['url']}")
-                if 'Referer' in req['headers']:
-                    print(f"  Referer: {req['headers']['Referer']}")
-            
-            # Verificar se há vídeo tocando
-            try:
-                video = driver.find_element(By.TAG_NAME, 'video')
-                src = video.get_attribute('src')
-                print(f"\nVideo src: {src}")
-            except:
-                print("\nNenhum elemento video encontrado")
-            
-            # Verificar iframes
-            iframes = driver.find_elements(By.TAG_NAME, 'iframe')
-            print(f"Iframes: {len(iframes)}")
-            for iframe in iframes:
-                src = iframe.get_attribute('src')
-                print(f"  -> {src}")
-        
-        input("\nPressione ENTER para fechar...")
-        
-    finally:
-        driver.quit()
-
-def main():
-    get_app_js()
-    test_episode_api()
-    test_ajax_episode()
-    analyze_with_selenium()
+        print(f"❌ Erro geral: {e}")
+        return None
 
 if __name__ == "__main__":
-    main()
+    result = test_playerthree_api()
+    if result:
+        print(f"\n🏆 SUCESSO! Link direto: {result}")
+    else:
+        print(f"\n❌ Falhou em encontrar link direto")

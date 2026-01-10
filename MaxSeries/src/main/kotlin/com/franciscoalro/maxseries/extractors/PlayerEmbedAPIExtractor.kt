@@ -2,10 +2,8 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.network.WebViewResolver
-import com.lagradost.nicehttp.Requests.Companion.await
-import com.lagradost.nicehttp.ResponseParser.getPacked
 import com.lagradost.cloudstream3.utils.JsUnpacker
+import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
 
 /**
@@ -300,11 +298,11 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         // Tentar desempacotar JavaScript P.A.C.K.E.R.
-        val packed = getPacked(html)
+        val packed = getPackedCode(html)
         if (!packed.isNullOrEmpty()) {
             try {
-                val unpacked = JsUnpacker(packed).unpack()
-                if (unpacked != null) {
+                val unpacked = JsUnpacker(packed).unpack() ?: ""
+                if (unpacked.isNotEmpty()) {
                     for (pattern in patterns) {
                         val match = pattern.find(unpacked)
                         if (match != null) {
@@ -321,6 +319,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         return null
+    }
+    
+    /**
+     * Extrai código P.A.C.K.E.R. do HTML
+     */
+    private fun getPackedCode(html: String): String? {
+        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
+            .find(html)?.value
     }
 
     /**
@@ -366,7 +372,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                         this.referer = effectiveReferer
                         this.quality = quality
                         this.isM3u8 = true
-                        this.headers = headers
                     }
                 )
             }
@@ -380,7 +385,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 ) {
                     this.referer = effectiveReferer
                     this.quality = quality
-                    this.headers = headers
                 }
             )
         }

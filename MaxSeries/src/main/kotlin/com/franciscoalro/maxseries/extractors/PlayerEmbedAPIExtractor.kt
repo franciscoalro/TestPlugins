@@ -323,7 +323,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     /**
      * Emite ExtractorLink para o CloudStream
      */
-    private fun emitExtractorLink(
+    private suspend fun emitExtractorLink(
         videoUrl: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
@@ -364,30 +364,28 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 ).forEach(callback)
             } catch (e: Exception) {
                 callback(
-                    newExtractorLink(
-                        name,
-                        "$name HLS",
-                        cleanUrl
-                    ) {
-                        this.referer = effectiveReferer
-                        this.quality = quality
-                        this.isM3u8 = true
-                        this.headers = headers
-                    }
+                    ExtractorLink(
+                        source = name,
+                        name = "$name HLS",
+                        url = cleanUrl,
+                        referer = effectiveReferer,
+                        quality = quality,
+                        isM3u8 = true,
+                        headers = headers
+                    )
                 )
             }
         } else {
             // MP4 direto (GCS)
             callback(
-                newExtractorLink(
-                    name,
-                    if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
-                    cleanUrl
-                ) {
-                    this.referer = effectiveReferer
-                    this.quality = quality
-                    this.headers = headers
-                }
+                ExtractorLink(
+                    source = name,
+                    name = if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
+                    url = cleanUrl,
+                    referer = effectiveReferer,
+                    quality = quality,
+                    headers = headers
+                )
             )
         }
     }

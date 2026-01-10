@@ -332,7 +332,7 @@ class MegaEmbedExtractor : ExtractorApi() {
     /**
      * Emite ExtractorLink para o CloudStream
      */
-    private fun emitExtractorLink(
+    private suspend fun emitExtractorLink(
         videoUrl: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
@@ -358,6 +358,11 @@ class MegaEmbedExtractor : ExtractorApi() {
                     videoUrl
                 ) {
                     this.referer = referer
+                    this.quality = Qualities.Unknown.value
+                }
+            )
+        }
+    }
                     this.quality = Qualities.Unknown.value
                     this.headers = mapOf(
                         "User-Agent" to USER_AGENT,

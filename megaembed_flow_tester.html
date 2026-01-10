@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MegaEmbed Full Flow Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 1rem;
+            background: #121212;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .section {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .section h2 {
+            font-size: .9rem;
+            margin: 0 0 .5rem 0;
+            color: #2196F3;
+        }
+
+        input {
+            padding: .5rem;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            margin-right: .5rem;
+        }
+
+        button {
+            padding: .5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            background: #2196F3;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: .5rem;
+        }
+
+        button:hover {
+            background: #1976D2;
+        }
+
+        pre {
+            background: #0a0a0a;
+            padding: .5rem;
+            border-radius: 4px;
+            font-size: .7rem;
+            max-height: 120px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: .5rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin: .3rem 0;
+            padding: .5rem;
+            background: #252525;
+            border-radius: 4px;
+        }
+
+        .step-num {
+            background: #2196F3;
+            color: #fff;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .7rem;
+        }
+
+        .step-name {
+            flex: 1;
+            font-size: .8rem;
+        }
+
+        .step-status {
+            font-size: .8rem;
+        }
+
+        .success {
+            color: #66BB6A;
+        }
+
+        .error {
+            color: #EF5350;
+        }
+
+        .pending {
+            color: #FFA726;
+        }
+
+        #videoContainer {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 8px;
+            margin-top: .5rem;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .warning {
+            background: #ff980020;
+            border: 1px solid #ff9800;
+            padding: .5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: .8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔬 MegaEmbed Full Flow Test (Headers Exatos)</h1>
+
+    <div class="warning">
+        ⚠️ <strong>Limitação do navegador:</strong> Devido a CORS, alguns headers (como Referer customizado) não podem
+        ser enviados.
+        O código Kotlin no Android não tem essa limitação e funcionará corretamente.
+    </div>
+
+    <div class="section">
+        <h2>📋 Configuração</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:.5rem; align-items:center;">
+            <label>Video ID:</label>
+            <input id="videoId" value="3wnuij" style="width:100px;" />
+            <label>Ref Domain:</label>
+            <input id="refDomain" value="playerthree.online" style="width:150px;" />
+            <label>W:</label>
+            <input id="width" value="1920" style="width:60px;" />
+            <label>H:</label>
+            <input id="height" value="1080" style="width:60px;" />
+        </div>
+        <div style="margin-top:.5rem;">
+            <button id="runBtn">▶ Executar Fluxo Completo</button>
+            <button id="clearBtn" style="background:#666;">🗑 Limpar</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔄 Fluxo de Requisições</h2>
+
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-name">megaembed.link/ (init session)</span>
+            <span id="s1" class="step-status pending">⏳</span>
+        </div>
+
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-name">/api/v1/info?id={videoId}</span>
+            <span id="s2" class="step-status pending">⏳</span>
+        </div>
+
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-name">/api/v1/video?id={}&w={}&h={}&r={}</span>
+            <span id="s3" class="step-status pending">⏳</span>
+        </div>
+
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-name">/api/v1/player?t={token}</span>
+            <span id="s4" class="step-status pending">⏳</span>
+        </div>
+
+        <div class="step">
+            <span class="step-num">5</span>
+            <span class="step-name">Playlist HLS Final (.txt)</span>
+            <span id="s5" class="step-status pending">⏳</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Log Detalhado</h2>
+        <pre id="log">Aguardando...</pre>
+    </div>
+
+    <div class="section">
+        <h2>🎬 Player</h2>
+        <input id="playlistUrl" placeholder="URL da playlist (preenchido automaticamente)" style="width:80%;" />
+        <button id="playBtn">▶ Play</button>
+        <div id="videoContainer">
+            <video id="video" controls></video>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const PROXY = 'https://corsproxy.io/?';
+        const BASE = 'https://megaembed.link';
+
+        const log = (msg) => {
+            console.log(msg);
+            document.getElementById('log').textContent += '\n' + msg;
+        };
+
+        const setStatus = (step, status, ok = true) => {
+            const el = document.getElementById('s' + step);
+            el.textContent = status;
+            el.className = 'step-status ' + (ok ? 'success' : 'error');
+        };
+
+        async function fetchApi(url, referer = BASE + '/') {
+            try {
+                const resp = await fetch(PROXY + encodeURIComponent(url));
+                log(`📡 ${resp.status} - ${url.substring(0, 60)}...`);
+                return { ok: resp.ok, status: resp.status, text: await resp.text() };
+            } catch (e) {
+                log(`❌ Erro: ${e.message}`);
+                return { ok: false, status: 0, text: '' };
+            }
+        }
+
+        function extractToken(text) {
+            try {
+                const json = JSON.parse(text);
+                if (json.token) return json.token;
+                if (json.t) return json.t;
+            } catch (e) { }
+            const match = text.match(/[a-f0-9]{100,}/i);
+            return match ? match[0] : null;
+        }
+
+        function extractPlaylistUrl(text) {
+            const match = text.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
+            return match ? match[0].replace(/['"]/g, '') : null;
+        }
+
+        async function runFlow() {
+            const videoId = document.getElementById('videoId').value;
+            const refDomain = document.getElementById('refDomain').value;
+            const w = document.getElementById('width').value;
+            const h = document.getElementById('height').value;
+
+            document.getElementById('log').textContent = '🚀 Iniciando fluxo...';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('s' + i).textContent = '⏳';
+                document.getElementById('s' + i).className = 'step-status pending';
+            }
+
+            // Step 1: Init session
+            log('\n=== Passo 1: Inicializar sessão ===');
+            const r1 = await fetchApi(BASE + '/');
+            setStatus(1, r1.ok ? '✅' : '❌', r1.ok);
+
+            // Step 2: Info
+            log('\n=== Passo 2: Info do vídeo ===');
+            const r2 = await fetchApi(BASE + '/api/v1/info?id=' + videoId);
+            setStatus(2, r2.ok ? '✅' : '❌', r2.ok);
+            log('Response: ' + r2.text.substring(0, 200));
+
+            // Step 3: Video token
+            log('\n=== Passo 3: Token do vídeo ===');
+            const videoUrl = `${BASE}/api/v1/video?id=${videoId}&w=${w}&h=${h}&r=${refDomain}`;
+            const r3 = await fetchApi(videoUrl);
+            setStatus(3, r3.ok ? '✅' : '❌', r3.ok);
+            log('Response: ' + r3.text.substring(0, 200));
+
+            const token = extractToken(r3.text);
+            if (!token) {
+                log('❌ Token não encontrado!');
+                setStatus(3, '❌ no token', false);
+                return;
+            }
+            log('🔑 Token: ' + token.substring(0, 50) + '...');
+
+            // Step 4: Player
+            log('\n=== Passo 4: Player URL ===');
+            const r4 = await fetchApi(BASE + '/api/v1/player?t=' + token);
+            setStatus(4, r4.ok ? '✅' : '❌', r4.ok);
+            log('Response: ' + r4.text.substring(0, 300));
+
+            // Check for error
+            if (r4.text.includes('"error"')) {
+                log('⚠️ API retornou erro: ' + r4.text);
+                setStatus(4, '⚠️ error', false);
+            }
+
+            const playlist = extractPlaylistUrl(r4.text);
+            if (!playlist) {
+                log('❌ Playlist URL não encontrada');
+                return;
+            }
+            log('🎬 Playlist: ' + playlist);
+            document.getElementById('playlistUrl').value = playlist;
+
+            // Step 5: Fetch playlist
+            log('\n=== Passo 5: Baixar playlist ===');
+            const r5 = await fetchApi(playlist);
+            setStatus(5, r5.ok && r5.text.includes('#EXTM3U') ? '✅ HLS OK' : '❌', r5.ok);
+            log('Playlist content (first 300 chars):\n' + r5.text.substring(0, 300));
+        }
+
+        function playVideo() {
+            const url = document.getElementById('playlistUrl').value;
+            if (!url) { alert('Sem URL'); return; }
+
+            const video = document.getElementById('video');
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(PROXY + encodeURIComponent(url));
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            }
+        }
+
+        document.getElementById('runBtn').addEventListener('click', runFlow);
+        document.getElementById('playBtn').addEventListener('click', playVideo);
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('log').textContent = 'Limpo.';
+            document.getElementById('playlistUrl').value = '';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('s' + i).textContent = '⏳';
+                document.getElementById('s' + i).className = 'step-status pending';
+            }
+        });
+    </script>
+</body>
+
+</html>

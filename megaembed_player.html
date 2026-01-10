@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>🎬 MegaEmbed Player - Teste Rápido</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin: 0 0 1rem 0;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(30, 30, 46, 0.9);
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: .95rem;
+            margin: 0 0 .8rem 0;
+            color: #64b5f6;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #5c6bc0;
+        }
+
+        .instructions ol {
+            margin: .5rem 0 0 1.2rem;
+            padding: 0;
+        }
+
+        .instructions li {
+            margin-bottom: .4rem;
+            font-size: .9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: .8rem;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: .8rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #64b5f6;
+            outline: none;
+        }
+
+        button {
+            padding: .8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: .95rem;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-right: .5rem;
+            margin-bottom: .5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+            color: white;
+        }
+
+        #videoContainer {
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .log {
+            background: #0d0d0d;
+            padding: .8rem;
+            border-radius: 8px;
+            font-size: .75rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .success {
+            color: #4caf50;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .warning {
+            color: #ff9800;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem;
+            background: #252535;
+            border-radius: 8px;
+            margin-bottom: .8rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .status-indicator.ready {
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.loading {
+            background: #ff9800;
+            animation: pulse 0.5s infinite;
+        }
+
+        .status-indicator.error {
+            background: #f44336;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎬 MegaEmbed Player - Teste Rápido</h1>
+
+    <div class="instructions">
+        <strong>📋 Como testar (URL expira em ~30 segundos!):</strong>
+        <ol>
+            <li>No celular, abra o <strong>Web Video Caster</strong> + MaxSeries</li>
+            <li>Escolha um episódio e clique para reproduzir</li>
+            <li>Copie a URL que aparece (termina em <code>.txt</code> ou <code>.m3u8</code>)</li>
+            <li>Cole aqui <strong>IMEDIATAMENTE</strong> e clique <strong>▶ PLAY</strong></li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>🔗 URL do Vídeo</h2>
+        <input id="videoUrl" placeholder="Cole a URL aqui (ex: https://.../cf-master.xxx.txt)" autofocus />
+        <div>
+            <button id="playBtn" class="btn-primary">▶ PLAY</button>
+            <button id="testBtn" class="btn-secondary">🔍 Testar</button>
+            <button id="clearBtn" class="btn-danger">🗑 Limpar</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="status-bar">
+            <div id="statusIndicator" class="status-indicator"></div>
+            <span id="statusText">Aguardando URL...</span>
+        </div>
+        <div id="videoContainer">
+            <video id="video" controls playsinline></video>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Log</h2>
+        <div id="log" class="log">Pronto para reproduzir...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const urlInput = document.getElementById('videoUrl');
+        const playBtn = document.getElementById('playBtn');
+        const testBtn = document.getElementById('testBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const video = document.getElementById('video');
+        const logEl = document.getElementById('log');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+
+        let hls = null;
+
+        function log(msg, type = '') {
+            const time = new Date().toLocaleTimeString();
+            const line = `[${time}] ${msg}`;
+            console.log(line);
+            const span = document.createElement('div');
+            span.textContent = line;
+            if (type) span.className = type;
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function setStatus(text, state = 'ready') {
+            statusText.textContent = text;
+            statusIndicator.className = 'status-indicator ' + state;
+        }
+
+        async function testUrl() {
+            const url = urlInput.value.trim();
+            if (!url) { alert('Cole uma URL primeiro!'); return; }
+
+            setStatus('Testando...', 'loading');
+            log('🔍 Testando URL...');
+
+            try {
+                // Tentar fetch direto primeiro (funciona se CORS permitir)
+                const resp = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                log('✅ URL acessível (HEAD request OK)');
+                setStatus('URL válida!', 'ready');
+            } catch (e) {
+                log('⚠️ Não foi possível verificar (CORS) - tente reproduzir mesmo assim', 'warning');
+                setStatus('Tente reproduzir', 'ready');
+            }
+        }
+
+        function playVideo() {
+            const url = urlInput.value.trim();
+            if (!url) {
+                alert('Cole uma URL primeiro!');
+                urlInput.focus();
+                return;
+            }
+
+            // Limpar player anterior
+            if (hls) { hls.destroy(); hls = null; }
+            video.src = '';
+
+            setStatus('Carregando...', 'loading');
+            log('▶️ Iniciando reprodução...');
+            log('🔗 ' + url);
+
+            // Verificar se é HLS ou MP4
+            const isHLS = url.includes('.m3u8') || url.includes('.txt');
+
+            if (isHLS && Hls.isSupported()) {
+                log('📺 Usando hls.js para HLS');
+
+                hls = new Hls({
+                    debug: false,
+                    enableWorker: true,
+                    lowLatencyMode: false,
+                    // Tentar contornar alguns problemas
+                    xhrSetup: function (xhr, hlsUrl) {
+                        // Não podemos setar Referer no browser, mas no Android funciona
+                    }
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                    log('✅ Manifest HLS carregado! Níveis: ' + data.levels.length, 'success');
+                    setStatus('Reproduzindo!', 'ready');
+                    video.play().catch(e => {
+                        log('⚠️ Clique no player para iniciar', 'warning');
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        log('❌ Erro fatal: ' + data.type + ' - ' + data.details, 'error');
+                        setStatus('Erro: ' + data.details, 'error');
+
+                        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                            log('💡 Dica: A URL pode ter expirado. Capture uma nova!', 'warning');
+                        }
+                    }
+                });
+
+                hls.on(Hls.Events.FRAG_LOADED, function (event, data) {
+                    if (data.frag.sn <= 2) {
+                        log('🎞️ Fragmento #' + data.frag.sn + ' carregado');
+                    }
+                });
+
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari com suporte nativo
+                log('📺 Usando player nativo (Safari)');
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    log('✅ Vídeo carregado!', 'success');
+                    setStatus('Reproduzindo!', 'ready');
+                    video.play();
+                });
+                video.addEventListener('error', (e) => {
+                    log('❌ Erro: ' + (video.error?.message || 'desconhecido'), 'error');
+                    setStatus('Erro', 'error');
+                });
+            } else if (!isHLS) {
+                // MP4 direto
+                log('📺 Tentando MP4 direto');
+                video.src = url;
+                video.play().catch(e => log('❌ Erro: ' + e.message, 'error'));
+            } else {
+                log('❌ Navegador não suporta HLS', 'error');
+                setStatus('Sem suporte HLS', 'error');
+            }
+        }
+
+        function clearAll() {
+            if (hls) { hls.destroy(); hls = null; }
+            video.src = '';
+            urlInput.value = '';
+            logEl.innerHTML = 'Limpo. Pronto para nova URL...';
+            setStatus('Aguardando URL...', '');
+            urlInput.focus();
+        }
+
+        // Event listeners
+        playBtn.addEventListener('click', playVideo);
+        testBtn.addEventListener('click', testUrl);
+        clearBtn.addEventListener('click', clearAll);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') playVideo();
+        });
+
+        // Auto-focus
+        urlInput.focus();
+    </script>
+</body>
+
+</html>

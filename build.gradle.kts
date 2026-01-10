@@ -13,7 +13,7 @@ buildscript {
 
     dependencies {
         classpath("com.android.tools.build:gradle:8.2.1")
-        classpath("com.github.recloudstream:gradle:a71501c")
+// classpath("com.github.recloudstream:gradle:a71501c")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
     }
 }
@@ -79,6 +79,8 @@ subprojects {
         // IMPORTANT: Do not bump Jackson above 2.13.1, as newer versions will
         // break compatibility on older Android devices.
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1") // JSON Parser
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
+        implementation("androidx.webkit:webkit:1.8.0")
     }
 }
 

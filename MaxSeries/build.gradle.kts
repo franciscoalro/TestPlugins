@@ -1,7 +1,7 @@
-version = 42
+version = 43
 
 cloudstream {
-    description = "MaxSeries v42 - Suporte para Links .txt e Domínios Rotativos (MegaEmbed)"
+    description = "MaxSeries v43 - MegaEmbed Native Header Fix (OkHttp)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

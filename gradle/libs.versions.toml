@@ -1,0 +1,14 @@
+[versions]
+agp = "8.2.2"
+kotlin = "1.9.22"
+dokka = "1.9.10"
+buildkonfig = "0.15.1"
+cs3 = "4.2.1"
+
+[libraries]
+gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildkonfig" }
+
+[plugins]

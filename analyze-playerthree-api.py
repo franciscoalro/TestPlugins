@@ -1,151 +1,144 @@
 #!/usr/bin/env python3
 """
-Analisa a API do playerthree.online
+Analisa a API do PlayerThree - /episodio/255703
+Captura a resposta e identifica o fluxo para o vídeo
 """
 
+import requests
 import json
-import time
 import re
-import undetected_chromedriver as uc
-from selenium.webdriver.common.by import By
 
-def capture():
-    print("="*60)
+# API descoberta
+API_URL = "https://playerthree.online/episodio/255703"
+EMBED_URL = "https://playerthree.online/embed/synden/"
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "Accept": "*/*",
+    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": EMBED_URL,
+    "Origin": "https://playerthree.online",
+}
+
+def analyze_api():
+    print("="*70)
     print("ANÁLISE API PLAYERTHREE")
-    print("="*60)
+    print("="*70)
     
-    options = uc.ChromeOptions()
-    options.add_argument('--window-size=1920,1080')
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    # 1. Primeiro, pegar a página embed para ver a estrutura
+    print("\n[1] Analisando página embed...")
     
-    driver = uc.Chrome(options=options)
+    resp = requests.get(EMBED_URL, headers=headers)
+    print(f"  Status: {resp.status_code}")
     
+    # Procurar scripts e dados
+    html = resp.text
+    
+    # Salvar HTML
+    with open("playerthree_embed.html", "w", encoding="utf-8") as f:
+        f.write(html)
+    print("  Salvo em playerthree_embed.html")
+    
+    # Procurar IDs e configurações
+    print("\n  Procurando dados no HTML...")
+    
+    # Procurar data attributes
+    data_matches = re.findall(r'data-(\w+)=["\']([^"\']+)["\']', html)
+    for name, value in data_matches[:20]:
+        print(f"    data-{name}: {value}")
+    
+    # Procurar URLs de iframe
+    iframe_matches = re.findall(r'<iframe[^>]+src=["\']([^"\']+)["\']', html)
+    for url in iframe_matches:
+        print(f"    iframe: {url}")
+    
+    # Procurar megaembed
+    mega_matches = re.findall(r'megaembed[^"\'>\s]+', html)
+    for m in set(mega_matches):
+        print(f"    megaembed: {m}")
+    
+    # 2. Chamar API do episódio
+    print(f"\n[2] Chamando API: {API_URL}")
+    
+    resp = requests.get(API_URL, headers=headers)
+    print(f"  Status: {resp.status_code}")
+    print(f"  Content-Type: {resp.headers.get('Content-Type')}")
+    
+    # Salvar resposta
+    with open("playerthree_api_response.txt", "w", encoding="utf-8") as f:
+        f.write(resp.text)
+    
+    print(f"\n  Resposta ({len(resp.text)} chars):")
+    print(f"  {resp.text[:500]}")
+    
+    # Tentar parsear como JSON
     try:
-        # Acessar página
-        url = "https://www.maxseries.one/series/assistir-terra-de-pecados-online"
-        print(f"\n1. Acessando: {url}")
-        driver.get(url)
-        time.sleep(8)
+        data = resp.json()
+        print(f"\n  JSON parseado:")
+        print(json.dumps(data, indent=2, ensure_ascii=False)[:1000])
         
-        # Entrar no iframe
-        print("\n2. Entrando no iframe playerthree...")
-        iframes = driver.find_elements(By.TAG_NAME, 'iframe')
-        for iframe in iframes:
-            src = iframe.get_attribute('src') or ''
-            if 'playerthree' in src:
-                driver.switch_to.frame(iframe)
-                break
+        # Procurar URLs de vídeo no JSON
+        def find_urls(obj, path=""):
+            urls = []
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    urls.extend(find_urls(v, f"{path}.{k}"))
+            elif isinstance(obj, list):
+                for i, v in enumerate(obj):
+                    urls.extend(find_urls(v, f"{path}[{i}]"))
+            elif isinstance(obj, str):
+                if any(x in obj for x in ['.m3u8', '.mp4', 'http', 'megaembed']):
+                    urls.append((path, obj))
+            return urls
         
-        time.sleep(3)
+        urls = find_urls(data)
+        if urls:
+            print(f"\n  URLs encontradas:")
+            for path, url in urls:
+                print(f"    {path}: {url}")
+                
+    except:
+        print("  Não é JSON, analisando como HTML/texto...")
         
-        # Limpar logs anteriores
-        driver.get_log('performance')
+        # Procurar URLs no texto
+        url_matches = re.findall(r'https?://[^\s"\'<>]+', resp.text)
+        if url_matches:
+            print(f"\n  URLs encontradas:")
+            for url in set(url_matches)[:20]:
+                print(f"    {url}")
         
-        # Clicar no episódio
-        print("\n3. Clicando no episódio...")
-        ep_links = driver.find_elements(By.CSS_SELECTOR, 'li[data-episode-id] a')
-        
-        if ep_links:
-            # Pegar info do episódio
-            parent = ep_links[0].find_element(By.XPATH, '..')
-            season_id = parent.get_attribute('data-season-id')
-            episode_id = parent.get_attribute('data-episode-id')
-            print(f"   Season ID: {season_id}")
-            print(f"   Episode ID: {episode_id}")
-            
-            # Clicar
-            driver.execute_script("arguments[0].click();", ep_links[0])
-            time.sleep(5)
-            
-            # Capturar requisições AJAX
-            print("\n4. Analisando requisições de rede...")
-            logs = driver.get_log('performance')
-            
-            api_calls = []
-            for log in logs:
-                try:
-                    msg = json.loads(log['message'])['message']
-                    method = msg.get('method', '')
-                    
-                    if method == 'Network.requestWillBeSent':
-                        req = msg.get('params', {}).get('request', {})
-                        req_url = req.get('url', '')
-                        req_method = req.get('method', '')
-                        
-                        # Filtrar requisições interessantes
-                        if any(x in req_url for x in ['api', 'episode', 'player', 'source', 'embed']):
-                            api_calls.append({
-                                'url': req_url,
-                                'method': req_method,
-                                'headers': req.get('headers', {})
-                            })
-                            print(f"   {req_method} {req_url[:80]}...")
-                    
-                    if method == 'Network.responseReceived':
-                        resp = msg.get('params', {}).get('response', {})
-                        resp_url = resp.get('url', '')
-                        
-                        if any(x in resp_url for x in ['api', 'episode', 'player', 'source']):
-                            print(f"   RESPONSE: {resp_url[:80]}...")
-                            
-                except:
-                    pass
-            
-            # Verificar HTML após clique
-            print("\n5. Verificando HTML após clique...")
-            html = driver.page_source
-            
-            # Salvar HTML
-            with open('playerthree_after_click.html', 'w', encoding='utf-8') as f:
-                f.write(html)
-            print(f"   HTML salvo ({len(html)} chars)")
-            
-            # Procurar elementos de player
-            play_div = driver.find_elements(By.ID, 'play')
-            if play_div:
-                style = play_div[0].get_attribute('style')
-                inner = play_div[0].get_attribute('innerHTML')[:500]
-                print(f"   #play style: {style}")
-                print(f"   #play inner: {inner[:200]}...")
-            
-            # Procurar iframes de player
-            player_iframes = driver.find_elements(By.CSS_SELECTOR, 'iframe')
-            print(f"\n   Iframes: {len(player_iframes)}")
-            for pf in player_iframes:
-                src = pf.get_attribute('src') or ''
-                if src:
-                    print(f"     - {src[:60]}...")
-            
-            # Executar JavaScript para ver variáveis
-            print("\n6. Verificando variáveis JavaScript...")
-            
-            js_vars = driver.execute_script("""
-                var result = {};
-                if (window.gleam) result.gleam = window.gleam;
-                if (window.player) result.player = window.player;
-                if (window.sources) result.sources = window.sources;
-                if (window.episode) result.episode = window.episode;
-                return JSON.stringify(result, null, 2);
-            """)
-            
-            print(f"   JS vars: {js_vars[:500]}...")
-            
-            # Salvar
-            with open('playerthree_api_analysis.json', 'w', encoding='utf-8') as f:
-                json.dump({
-                    'season_id': season_id,
-                    'episode_id': episode_id,
-                    'api_calls': api_calls,
-                    'js_vars': js_vars
-                }, f, indent=2)
-        
-        print("\n\nAnálise completa!")
-        
-    finally:
+        # Procurar megaembed
+        mega_matches = re.findall(r'megaembed\.link/e/([a-zA-Z0-9]+)', resp.text)
+        if mega_matches:
+            print(f"\n  MegaEmbed IDs:")
+            for mid in set(mega_matches):
+                print(f"    {mid} -> https://megaembed.link/e/{mid}")
+    
+    # 3. Testar outras variações da API
+    print("\n[3] Testando outras APIs...")
+    
+    test_urls = [
+        "https://playerthree.online/api/episodio/255703",
+        "https://playerthree.online/api/v1/episodio/255703",
+        "https://playerthree.online/embed/synden/255703",
+        "https://megaembed.link/api/v1/info?id=3wnuij",
+    ]
+    
+    for url in test_urls:
         try:
-            driver.quit()
-        except:
-            pass
+            resp = requests.get(url, headers=headers, timeout=10)
+            print(f"\n  {url}")
+            print(f"    Status: {resp.status_code}")
+            if resp.status_code == 200:
+                print(f"    Response: {resp.text[:200]}")
+        except Exception as e:
+            print(f"\n  {url}")
+            print(f"    Erro: {e}")
+    
+    print("\n" + "="*70)
+    print("ANÁLISE COMPLETA")
+    print("="*70)
+
 
 if __name__ == "__main__":
-    capture()
+    analyze_api()

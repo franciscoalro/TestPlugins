@@ -1,0 +1,14 @@
+{
+  "master_playlist": "https://sd8g.gametech.cfd/v4/db/6pyw3v/cf-master.1767387529.txt",
+  "base_url": "https://sd8g.gametech.cfd/v4/db/6pyw3v",
+  "streams": [
+    {
+      "resolution": "1280x720",
+      "url": "https://sd8g.gametech.cfd/v4/db/6pyw3v/index-f1-v1-a1.txt"
+    },
+    {
+      "resolution": "1920x1080",
+      "url": "https://sd8g.gametech.cfd/v4/db/6pyw3v/index-f2-v1-a1.txt"
+    }
+  ]
+}

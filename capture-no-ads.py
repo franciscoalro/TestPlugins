@@ -1,330 +1,313 @@
 #!/usr/bin/env python3
 """
-Captura de vídeo com bloqueio de popups e ads
+Captura MegaEmbed SEM ADS - Bloqueia ads e intercepta API diretamente
 """
 
 import json
 import time
-import random
+import subprocess
+import sys
 
 try:
-    import undetected_chromedriver as uc
+    from seleniumwire import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
 except ImportError:
-    import subprocess
-    subprocess.run(['pip', 'install', 'undetected-chromedriver'], check=True)
-    import undetected_chromedriver as uc
+    subprocess.run([sys.executable, "-m", "pip", "install", "selenium-wire"], check=True)
+    from seleniumwire import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
+VIDEO_ID = "3wnuij"
+MEGAEMBED_URL = f"https://megaembed.link/e/{VIDEO_ID}"
 
-def create_driver_no_ads():
-    """Driver com bloqueio de popups e ads"""
+# Lista de domínios de ads para bloquear
+AD_DOMAINS = [
+    'doubleclick', 'googlesyndication', 'googleadservices', 'google-analytics',
+    'facebook', 'fbcdn', 'twitter', 'analytics', 'adservice', 'adsense',
+    'popads', 'popcash', 'propellerads', 'exoclick', 'juicyads', 'trafficjunky',
+    'adsterra', 'hilltopads', 'clickadu', 'pushground', 'evadav', 'monetag',
+    'yandex.ru/watch', 'mc.yandex', 'entrapsoorki', 'cdn-cgi/rum'
+]
+
+def block_ads(request):
+    """Intercepta e bloqueia requisições de ads"""
+    url = request.url.lower()
     
-    options = uc.ChromeOptions()
+    # Bloquear domínios de ads
+    for ad in AD_DOMAINS:
+        if ad in url:
+            request.abort()
+            return
     
-    # Anti-detecção
-    options.add_argument('--disable-blink-features=AutomationControlled')
-    options.add_argument('--window-size=1920,1080')
-    options.add_argument('--start-maximized')
+    # Bloquear por padrão de URL
+    if any(x in url for x in ['/ads/', '/ad/', 'banner', 'popup', 'popunder']):
+        request.abort()
+        return
+
+def capture_without_ads():
+    print("="*70)
+    print("CAPTURA MEGAEMBED - SEM ADS")
+    print("="*70)
     
-    # BLOQUEIO DE POPUPS E ADS
-    options.add_argument('--disable-popup-blocking')  # Desabilita bloqueio nativo para controlar manualmente
-    options.add_argument('--disable-notifications')
-    options.add_argument('--disable-infobars')
-    options.add_argument('--disable-extensions')
-    
-    # Bloquear popups via preferências
-    prefs = {
-        'profile.default_content_setting_values.popups': 2,  # Bloquear popups
-        'profile.default_content_setting_values.notifications': 2,
-        'profile.default_content_setting_values.automatic_downloads': 2,
-        'profile.default_content_setting_values.ads': 2,  # Bloquear ads
-        'profile.managed_default_content_settings.popups': 2,
-        'profile.managed_default_content_settings.notifications': 2,
-        'safebrowsing.enabled': False,
+    seleniumwire_options = {
+        'disable_encoding': True,
     }
-    options.add_experimental_option('prefs', prefs)
     
-    # Logs de performance
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--autoplay-policy=no-user-gesture-required")
+    chrome_options.add_argument("--disable-popup-blocking")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     
-    driver = uc.Chrome(options=options)
+    # Bloquear notificações e popups
+    prefs = {
+        "profile.default_content_setting_values.notifications": 2,
+        "profile.default_content_setting_values.popups": 2,
+    }
+    chrome_options.add_experimental_option("prefs", prefs)
     
-    # Injetar script para bloquear popups e ads
+    driver = webdriver.Chrome(
+        seleniumwire_options=seleniumwire_options,
+        options=chrome_options
+    )
+    
+    # Configurar interceptador de ads
+    driver.request_interceptor = block_ads
+    
+    # Remover webdriver flag
     driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
         'source': '''
-            // Bloquear window.open (popups)
-            window._originalOpen = window.open;
-            window.open = function(url, name, features) {
-                console.log('[BLOCKED POPUP]:', url);
-                return null;
-            };
-            
-            // Bloquear popunders
-            Object.defineProperty(window, 'open', {
-                configurable: false,
-                writable: false,
-                value: function() { return null; }
-            });
-            
-            // Bloquear alert/confirm/prompt
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            // Bloquear popups
+            window.open = function() { return null; };
+            // Bloquear alerts
             window.alert = function() {};
             window.confirm = function() { return true; };
-            window.prompt = function() { return null; };
-            
-            // Remover event listeners de click que abrem popups
-            document.addEventListener('click', function(e) {
-                // Verificar se o clique vai abrir popup
-                var target = e.target;
-                while (target) {
-                    if (target.tagName === 'A') {
-                        var href = target.getAttribute('href');
-                        var targetAttr = target.getAttribute('target');
-                        // Bloquear links externos suspeitos
-                        if (targetAttr === '_blank' && href && !href.includes('maxseries')) {
-                            console.log('[BLOCKED LINK]:', href);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            return false;
-                        }
-                    }
-                    target = target.parentElement;
-                }
-            }, true);
-            
-            // Remover iframes de ads
-            setInterval(function() {
-                var iframes = document.querySelectorAll('iframe');
-                iframes.forEach(function(iframe) {
-                    var src = iframe.src || '';
-                    if (src.includes('ads') || src.includes('doubleclick') || 
-                        src.includes('googlesyndication') || src.includes('adservice') ||
-                        src.includes('popads') || src.includes('popcash')) {
-                        iframe.remove();
-                        console.log('[REMOVED AD IFRAME]:', src);
-                    }
-                });
-                
-                // Remover divs de overlay/ads
-                var overlays = document.querySelectorAll('[class*="overlay"], [class*="popup"], [class*="modal"], [id*="overlay"], [id*="popup"]');
-                overlays.forEach(function(el) {
-                    if (el.style.position === 'fixed' || el.style.position === 'absolute') {
-                        var zIndex = parseInt(window.getComputedStyle(el).zIndex) || 0;
-                        if (zIndex > 1000) {
-                            el.remove();
-                            console.log('[REMOVED OVERLAY]');
-                        }
-                    }
-                });
-            }, 1000);
-            
-            // Bloquear beforeunload
-            window.onbeforeunload = null;
-            window.addEventListener('beforeunload', function(e) {
-                e.stopPropagation();
-            }, true);
-            
-            // Remover webdriver
-            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
         '''
     })
     
-    return driver
-
-def close_extra_tabs(driver):
-    """Fecha todas as abas extras (popups)"""
-    main_window = driver.window_handles[0]
-    for handle in driver.window_handles[1:]:
-        try:
-            driver.switch_to.window(handle)
-            driver.close()
-        except:
-            pass
-    driver.switch_to.window(main_window)
-
-def safe_click(driver, element):
-    """Clique seguro que fecha popups após"""
-    initial_handles = len(driver.window_handles)
+    results = {
+        "api_response": None,
+        "video_urls": [],
+        "decrypted_data": None
+    }
     
     try:
-        # Scroll para o elemento
-        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
-        time.sleep(0.5)
+        # 1. Carregar página
+        print(f"\n[1] Carregando: {MEGAEMBED_URL}")
+        driver.get(MEGAEMBED_URL)
+        time.sleep(3)
         
-        # Clicar
-        element.click()
-        time.sleep(1)
-        
-        # Fechar popups que abriram
-        if len(driver.window_handles) > initial_handles:
-            print(f"   [!] {len(driver.window_handles) - initial_handles} popup(s) bloqueado(s)")
-            close_extra_tabs(driver)
-        
-        return True
-    except Exception as e:
-        print(f"   Erro no clique: {e}")
-        return False
-
-def capture_video():
-    """Captura URL do vídeo"""
-    
-    print("="*60)
-    print("CAPTURA COM BLOQUEIO DE ADS")
-    print("="*60)
-    
-    driver = create_driver_no_ads()
-    results = {'players': [], 'videos': []}
-    
-    try:
-        # 1. Acessar episódio
-        url = "https://www.maxseries.one/episodio/terra-de-pecados-1x1/"
-        print(f"\n1. Acessando: {url}")
-        driver.get(url)
-        time.sleep(4)
-        
-        # Fechar popups iniciais
-        close_extra_tabs(driver)
-        
-        # 2. Encontrar players
-        print("\n2. Procurando players...")
-        
-        # Remover overlays de ads primeiro
+        # 2. Remover overlays de ads via JavaScript
+        print("\n[2] Removendo overlays de ads...")
         driver.execute_script("""
-            // Remover overlays
-            document.querySelectorAll('[class*="ad"], [id*="ad"], [class*="overlay"]').forEach(el => el.remove());
-            // Remover scripts de ads
-            document.querySelectorAll('script[src*="ads"], script[src*="pop"]').forEach(el => el.remove());
+            // Remover elementos de ads
+            var adSelectors = [
+                '[class*="ad"]', '[id*="ad"]', '[class*="popup"]', '[id*="popup"]',
+                '[class*="overlay"]', '[class*="banner"]', 'iframe[src*="ad"]',
+                '[class*="modal"]', '[style*="z-index: 9999"]', '[style*="z-index:9999"]'
+            ];
+            adSelectors.forEach(function(sel) {
+                document.querySelectorAll(sel).forEach(function(el) {
+                    if (!el.querySelector('video')) {
+                        el.remove();
+                    }
+                });
+            });
+            
+            // Remover event listeners de click que abrem popups
+            document.body.onclick = null;
+            document.onclick = null;
         """)
         
-        time.sleep(1)
+        # 3. Interceptar chamada da API via JavaScript
+        print("\n[3] Interceptando API via JavaScript...")
         
-        buttons = driver.find_elements(By.CSS_SELECTOR, 'button[data-source]')
-        print(f"   Botões encontrados: {len(buttons)}")
+        api_data = driver.execute_script("""
+            return new Promise(function(resolve) {
+                // Fazer chamada direta à API
+                var videoId = window.location.pathname.split('/').pop() || '""" + VIDEO_ID + """';
+                
+                fetch('/api/v1/info?id=' + videoId)
+                    .then(function(r) { return r.text(); })
+                    .then(function(data) {
+                        resolve({
+                            id: videoId,
+                            raw_response: data,
+                            url: '/api/v1/info?id=' + videoId
+                        });
+                    })
+                    .catch(function(e) {
+                        resolve({error: e.toString()});
+                    });
+            });
+        """)
         
-        for btn in buttons:
-            try:
-                source = btn.get_attribute('data-source')
-                text = btn.text.strip() or "Player"
-                if source:
-                    results['players'].append({'name': text, 'url': source})
-                    print(f"   ✓ {text}: {source[:50]}...")
-            except:
-                pass
+        if api_data:
+            print(f"\n[API Response]")
+            print(f"  ID: {api_data.get('id')}")
+            print(f"  Raw: {str(api_data.get('raw_response', ''))[:200]}...")
+            results["api_response"] = api_data
         
-        # 3. Testar primeiro player
-        if results['players']:
-            player = results['players'][0]
-            print(f"\n3. Testando: {player['name']}")
-            print(f"   URL: {player['url']}")
-            
-            # Encontrar e clicar no botão
-            btn = driver.find_element(By.CSS_SELECTOR, f'button[data-source="{player["url"]}"]')
-            safe_click(driver, btn)
-            time.sleep(3)
-            
-            # Fechar popups
-            close_extra_tabs(driver)
-            
-            # Verificar iframe do player
-            iframes = driver.find_elements(By.TAG_NAME, 'iframe')
-            print(f"   Iframes: {len(iframes)}")
-            
-            player_iframe = None
-            for iframe in iframes:
-                src = iframe.get_attribute('src') or ''
-                if any(x in src for x in ['playerembed', 'megaembed', 'playerthree', 'abyss', 'short.icu', 'dood']):
-                    player_iframe = iframe
-                    print(f"   → Player iframe: {src[:60]}...")
-                    break
-            
-            if player_iframe:
-                # Entrar no iframe
-                driver.switch_to.frame(player_iframe)
-                time.sleep(3)
+        # 4. Tentar extrair URL do vídeo via JavaScript do player
+        print("\n[4] Extraindo URL do vídeo via JS...")
+        
+        video_data = driver.execute_script("""
+            // Aguardar player carregar
+            return new Promise(function(resolve) {
+                var attempts = 0;
+                var maxAttempts = 30;
                 
-                # Verificar iframes aninhados
-                nested = driver.find_elements(By.TAG_NAME, 'iframe')
-                for n in nested:
-                    src = n.get_attribute('src') or ''
-                    print(f"   → Nested: {src[:60]}...")
-                    if any(x in src for x in ['abyss', 'short.icu', 'abysscdn']):
-                        driver.switch_to.frame(n)
-                        time.sleep(3)
-                        break
+                function checkVideo() {
+                    attempts++;
+                    
+                    // Verificar elemento video
+                    var video = document.querySelector('video');
+                    if (video && (video.src || video.currentSrc)) {
+                        var src = video.src || video.currentSrc;
+                        if (src.startsWith('http')) {
+                            resolve({
+                                type: 'video_element',
+                                url: src,
+                                duration: video.duration
+                            });
+                            return;
+                        }
+                    }
+                    
+                    // Verificar se há player Vidstack
+                    var mediaPlayer = document.querySelector('media-player');
+                    if (mediaPlayer) {
+                        var src = mediaPlayer.getAttribute('src');
+                        if (src) {
+                            resolve({
+                                type: 'media_player',
+                                url: src
+                            });
+                            return;
+                        }
+                    }
+                    
+                    // Verificar variáveis globais
+                    if (window.playerConfig) {
+                        resolve({
+                            type: 'playerConfig',
+                            data: window.playerConfig
+                        });
+                        return;
+                    }
+                    
+                    if (window.videoUrl) {
+                        resolve({
+                            type: 'videoUrl',
+                            url: window.videoUrl
+                        });
+                        return;
+                    }
+                    
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkVideo, 1000);
+                    } else {
+                        resolve({type: 'timeout', attempts: attempts});
+                    }
+                }
                 
-                # Aguardar player carregar
-                print("\n4. Aguardando player (20s)...")
-                time.sleep(20)
+                // Simular clique para iniciar
+                setTimeout(function() {
+                    var video = document.querySelector('video');
+                    if (video) video.click();
+                    
+                    var playBtn = document.querySelector('media-play-button, .vds-play-button');
+                    if (playBtn) playBtn.click();
+                }, 2000);
                 
-                # Capturar logs de rede
-                print("\n5. Analisando requisições...")
-                logs = driver.get_log('performance')
+                checkVideo();
+            });
+        """)
+        
+        print(f"\n[Video Data] {video_data}")
+        
+        if video_data and video_data.get('url'):
+            results["video_urls"].append(video_data['url'])
+        
+        # 5. Monitorar requisições de rede
+        print("\n[5] Monitorando requisições (30s)...")
+        
+        for i in range(30):
+            time.sleep(1)
+            
+            for req in driver.requests:
+                url = req.url
                 
-                for log in logs:
-                    try:
-                        msg = json.loads(log['message'])['message']
-                        method = msg.get('method', '')
-                        
-                        if method == 'Network.requestWillBeSent':
-                            req = msg.get('params', {}).get('request', {})
-                            url = req.get('url', '')
-                            headers = req.get('headers', {})
+                # Verificar URLs de vídeo
+                if any(x in url.lower() for x in ['.m3u8', '.mp4', 'master.txt', '/hls/']):
+                    if '.js' not in url and url not in results["video_urls"]:
+                        # Verificar se não é ad
+                        is_ad = any(ad in url.lower() for ad in AD_DOMAINS)
+                        if not is_ad:
+                            results["video_urls"].append(url)
+                            print(f"\n  [VIDEO] {url}")
                             
-                            # Verificar se é vídeo
-                            if any(x in url.lower() for x in ['.m3u8', '.mp4', '/hls/', 'master', '/video/', '.ts']):
-                                video = {
-                                    'url': url,
-                                    'headers': headers,
-                                    'player': player['name']
-                                }
-                                if url not in [v['url'] for v in results['videos']]:
-                                    results['videos'].append(video)
-                                    print(f"\n   🎬 VÍDEO: {url[:80]}...")
-                                    print(f"      Referer: {headers.get('Referer', 'N/A')[:50]}")
+                            # Capturar headers
+                            if req.headers:
+                                print(f"    Referer: {req.headers.get('Referer', 'N/A')}")
+                
+                # Capturar resposta da API
+                if '/api/' in url and req.response and req.response.body:
+                    try:
+                        body = req.response.body.decode('utf-8')
+                        print(f"\n  [API] {url}")
+                        print(f"    Response: {body[:300]}...")
+                        results["api_response"] = {
+                            "url": url,
+                            "body": body
+                        }
                     except:
                         pass
-                
-                # Verificar elemento video
-                videos = driver.find_elements(By.TAG_NAME, 'video')
-                for v in videos:
-                    src = v.get_attribute('src')
-                    if src and src.startswith('http'):
-                        print(f"   📹 <video>: {src[:60]}...")
-                        if src not in [x['url'] for x in results['videos']]:
-                            results['videos'].append({'url': src, 'type': 'element'})
-                
-                driver.switch_to.default_content()
+            
+            if results["video_urls"] and i > 10:
+                break
+            
+            if i % 5 == 0:
+                print(f"    ... {i}s")
         
-        # Resumo
-        print(f"\n\n{'='*60}")
-        print("RESULTADOS")
-        print(f"{'='*60}")
-        print(f"Players: {len(results['players'])}")
-        print(f"Vídeos: {len(results['videos'])}")
+        # 6. Resultado
+        print("\n" + "="*70)
+        print("RESULTADO")
+        print("="*70)
         
-        for v in results['videos']:
-            print(f"\n🎬 {v['url']}")
-            if 'headers' in v:
-                print(f"   Referer: {v['headers'].get('Referer', 'N/A')}")
+        if results["api_response"]:
+            print(f"\n[API]")
+            print(f"  {results['api_response']}")
+        
+        valid_urls = [u for u in results["video_urls"] if '.m3u8' in u or '.mp4' in u]
+        
+        if valid_urls:
+            print(f"\n[Video URLs] {len(valid_urls)}")
+            for v in valid_urls:
+                print(f"  {v}")
+            
+            # VLC
+            try:
+                vlc = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
+                subprocess.Popen([vlc, valid_urls[0]])
+                print("\n[+] VLC aberto!")
+            except:
+                print(f"\n  vlc \"{valid_urls[0]}\"")
+        else:
+            print("\n[!] Nenhuma URL de vídeo encontrada")
         
         # Salvar
-        with open('capture_results.json', 'w', encoding='utf-8') as f:
+        with open("capture_no_ads_result.json", "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         
         return results
         
-    except Exception as e:
-        print(f"\nERRO: {e}")
-        import traceback
-        traceback.print_exc()
-        
     finally:
-        try:
-            driver.quit()
-        except:
-            pass
+        input("\nENTER para fechar...")
+        driver.quit()
+
 
 if __name__ == "__main__":
-    capture_video()
+    capture_without_ads()

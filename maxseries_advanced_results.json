@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-01-10T13:03:10.612042",
+  "video_urls": [
+    "https://vjs.zencdn.net/7.10.2/video-js.css",
+    "https://www.maxseries.one/cdn-cgi/rum?",
+    "https://playerthree.online/cdn-cgi/rum?",
+    "https://vjs.zencdn.net/7.10.2/video.min.js"
+  ],
+  "player_apis": [
+    {
+      "name": "Video.js",
+      "obj": "window.videojs"
+    },
+    {
+      "name": "JW Player",
+      "obj": "window.jwplayer"
+    },
+    {
+      "name": "Plyr",
+      "obj": "window.Plyr"
+    }
+  ],
+  "iframes": [
+    "https://playerthree.online/embed/synden/ (id=, class=)"
+  ],
+  "total_requests": 150,
+  "statistics": {
+    "video_urls_count": 4,
+    "player_apis_count": 3,
+    "iframes_count": 1
+  }
+}

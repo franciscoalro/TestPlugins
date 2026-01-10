@@ -1,6 +1,0 @@
-{
-  "season_id": "12962",
-  "episode_id": "255703",
-  "api_calls": [],
-  "js_vars": "{\n  \"gleam\": {\n    \"config\": {\n      \"url\": \"https://playerthree.online\",\n      \"jwplayer_key\": \"jfGgo35z3c4llrHaVi0Y4ormVgOyy9/NiI7qQFjvcFY=\",\n      \"jwplayer_cast_appid\": \"00000000\",\n      \"redirector_tvshow_enabled\": false,\n      \"redirector_url\": \"https://tason.me/campanha.php?auth={token}\",\n      \"ad_enabled\": false,\n      \"ad_video_url\": \"https://cvt-s2.agl004.fun/v/_jMvMjFjOTA4ZTAtYTE5ZSWWMDUyLTlhMmItNTAwNTIxZjc3Njg3.xml?cp.host=a9ad5771db9941d393fd33fea05c261c|MegaCine.top&amp;amp;amp;amp;cp.domain=MegaCine.pics\",\n      \"ad_skip_duration\": 5\n    }\n  },\n  \"player\": {}\n}"
-}

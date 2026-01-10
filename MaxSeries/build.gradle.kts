@@ -1,7 +1,7 @@
-version = 32
+version = 33
 
 cloudstream {
-    description = "MaxSeries v32 - HTTP DoodStream + WebView Fallback Universal"
+    description = "MaxSeries v33 - Qualities Fix + API verified"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

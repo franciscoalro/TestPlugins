@@ -5,16 +5,18 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.JsUnpacker
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
-import org.json.JSONObject
 
 /**
  * MegaEmbed Extractor para CloudStream
  * 
- * Fluxo de extração:
- * 1. Extrair ID do hash da URL (megaembed.link/#ID)
- * 2. Chamar API /api/v1/info?id=ID
- * 3. Se API retornar dados criptografados, usar WebView como fallback
- * 4. Retornar ExtractorLink com m3u8/mp4
+ * O MegaEmbed usa criptografia AES-CBC no JavaScript para proteger as URLs.
+ * A única forma confiável de extrair é via WebView que executa o JavaScript.
+ * 
+ * Fluxo:
+ * 1. Carregar página no WebView
+ * 2. Aguardar JavaScript descriptografar
+ * 3. Interceptar requisições de rede para .m3u8/.mp4
+ * 4. Ou capturar do elemento video/player
  */
 class MegaEmbedExtractor : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -23,13 +25,11 @@ class MegaEmbedExtractor : ExtractorApi() {
 
     companion object {
         private const val TAG = "MegaEmbedExtractor"
-        private const val API_ENDPOINT = "/api/v1/info"
-        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
-        // Domínios conhecidos do MegaEmbed
         val DOMAINS = listOf(
             "megaembed.link",
-            "megaembed.xyz",
+            "megaembed.xyz", 
             "megaembed.to"
         )
         
@@ -44,256 +44,137 @@ class MegaEmbedExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "Extraindo: $url")
+        Log.d(TAG, "=== MegaEmbed Extractor ===")
+        Log.d(TAG, "URL: $url")
         
-        // Extrair ID do hash
-        val videoId = extractVideoId(url)
-        if (videoId.isNullOrEmpty()) {
-            Log.e(TAG, "ID não encontrado na URL: $url")
-            return
-        }
-        
-        Log.d(TAG, "Video ID: $videoId")
-        
-        // Tentar método 1: API direta
-        if (tryApiExtraction(videoId, url, callback)) {
-            return
-        }
-        
-        // Tentar método 2: Parse HTML direto
-        if (tryHtmlExtraction(url, callback)) {
-            return
-        }
-        
-        // Fallback: WebView
-        tryWebViewExtraction(url, callback)
+        // WebView é o único método confiável para MegaEmbed
+        tryWebViewExtraction(url, referer, callback)
     }
 
     /**
-     * Extrai o ID do vídeo da URL
-     * Formatos suportados:
-     * - megaembed.link/#ID
-     * - megaembed.link/?v=ID
-     * - megaembed.link/embed/ID
-     */
-    private fun extractVideoId(url: String): String? {
-        return when {
-            url.contains("#") -> url.substringAfter("#").takeIf { it.isNotEmpty() }
-            url.contains("?v=") -> Regex("[?&]v=([^&]+)").find(url)?.groupValues?.get(1)
-            url.contains("/embed/") -> url.substringAfter("/embed/").substringBefore("?")
-            else -> null
-        }
-    }
-
-    /**
-     * Método 1: Tentar extrair via API JSON
-     */
-    private suspend fun tryApiExtraction(
-        videoId: String,
-        originalUrl: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        try {
-            val apiUrl = "$mainUrl$API_ENDPOINT?id=$videoId"
-            Log.d(TAG, "Chamando API: $apiUrl")
-            
-            val response = app.get(
-                apiUrl,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to originalUrl,
-                    "Accept" to "application/json",
-                    "Origin" to mainUrl
-                )
-            )
-            
-            if (!response.isSuccessful) {
-                Log.w(TAG, "API retornou ${response.code}")
-                return false
-            }
-            
-            val json = response.text
-            Log.d(TAG, "API Response: ${json.take(500)}")
-            
-            // Tentar parsear JSON
-            val jsonObj = JSONObject(json)
-            
-            // Procurar URL do vídeo em campos comuns
-            val videoUrl = findVideoUrlInJson(jsonObj)
-            
-            if (!videoUrl.isNullOrEmpty()) {
-                Log.d(TAG, "URL encontrada via API: $videoUrl")
-                emitExtractorLink(videoUrl, originalUrl, callback)
-                return true
-            }
-            
-            // Se tiver dados criptografados, logar para análise
-            if (jsonObj.has("data") || jsonObj.has("encrypted")) {
-                Log.w(TAG, "API retornou dados criptografados - necessário WebView")
-            }
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Erro na API: ${e.message}")
-        }
-        
-        return false
-    }
-
-    /**
-     * Procura URL de vídeo em objeto JSON
-     */
-    private fun findVideoUrlInJson(json: JSONObject): String? {
-        val possibleKeys = listOf(
-            "file", "url", "source", "src", "stream", "video",
-            "hls", "m3u8", "mp4", "link", "playUrl", "videoUrl"
-        )
-        
-        for (key in possibleKeys) {
-            if (json.has(key)) {
-                val value = json.optString(key)
-                if (isValidVideoUrl(value)) {
-                    return value
-                }
-            }
-        }
-        
-        // Procurar em arrays
-        if (json.has("sources")) {
-            val sources = json.optJSONArray("sources")
-            if (sources != null && sources.length() > 0) {
-                for (i in 0 until sources.length()) {
-                    val source = sources.optJSONObject(i)
-                    if (source != null) {
-                        val url = source.optString("file") 
-                            ?: source.optString("src")
-                            ?: source.optString("url")
-                        if (isValidVideoUrl(url)) {
-                            return url
-                        }
-                    }
-                }
-            }
-        }
-        
-        return null
-    }
-
-    /**
-     * Método 2: Tentar extrair via HTML parsing
-     */
-    private suspend fun tryHtmlExtraction(
-        url: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        try {
-            val response = app.get(
-                url,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Accept" to "text/html,application/xhtml+xml"
-                )
-            )
-            
-            val html = response.text
-            
-            // Procurar URLs de vídeo no HTML/JS
-            val patterns = listOf(
-                Regex("""file:\s*["']([^"']+\.m3u8[^"']*)["']"""),
-                Regex("""source:\s*["']([^"']+\.m3u8[^"']*)["']"""),
-                Regex("""src:\s*["']([^"']+\.m3u8[^"']*)["']"""),
-                Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']"""),
-                Regex("""["'](https?://[^"']+\.mp4[^"']*)["']"""),
-                Regex("""hls:\s*["']([^"']+)["']"""),
-                Regex("""playUrl:\s*["']([^"']+)["']""")
-            )
-            
-            for (pattern in patterns) {
-                val match = pattern.find(html)
-                if (match != null) {
-                    val videoUrl = match.groupValues[1]
-                    if (isValidVideoUrl(videoUrl)) {
-                        Log.d(TAG, "URL encontrada via HTML: $videoUrl")
-                        emitExtractorLink(videoUrl, url, callback)
-                        return true
-                    }
-                }
-            }
-            
-            // Tentar desempacotar JavaScript P.A.C.K.E.R.
-            val packed = getPackedCode(html)
-            if (!packed.isNullOrEmpty()) {
-                val unpacked = JsUnpacker(packed).unpack() ?: ""
-                if (unpacked.isNotEmpty()) {
-                    for (pattern in patterns) {
-                        val match = pattern.find(unpacked)
-                        if (match != null) {
-                            val videoUrl = match.groupValues[1]
-                            if (isValidVideoUrl(videoUrl)) {
-                                Log.d(TAG, "URL encontrada via unpack: $videoUrl")
-                                emitExtractorLink(videoUrl, url, callback)
-                                return true
-                            }
-                        }
-                    }
-                }
-            }
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Erro no HTML parsing: ${e.message}")
-        }
-        
-        return false
-    }
-    
-    /**
-     * Extrai código P.A.C.K.E.R. do HTML
-     */
-    private fun getPackedCode(html: String): String? {
-        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
-            .find(html)?.value
-    }
-
-    /**
-     * Método 3: WebView como fallback final
+     * WebView Extraction - Método principal
+     * 
+     * O MegaEmbed descriptografa a URL do vídeo via JavaScript.
+     * Precisamos:
+     * 1. Carregar a página completa
+     * 2. Simular clique no play (se necessário)
+     * 3. Interceptar a URL do vídeo quando o player carregar
      */
     private suspend fun tryWebViewExtraction(
         url: String,
+        referer: String?,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         try {
-            Log.d(TAG, "Usando WebView para: $url")
+            Log.d(TAG, "Iniciando WebView extraction...")
             
+            // Script avançado para capturar URL do vídeo
+            // Executa após a página carregar e tenta múltiplos métodos
             val captureScript = """
                 (function() {
                     return new Promise(function(resolve) {
                         var attempts = 0;
+                        var maxAttempts = 100; // 10 segundos
+                        var foundUrl = '';
+                        
+                        // Função para validar URL de vídeo
+                        function isVideoUrl(url) {
+                            if (!url || typeof url !== 'string') return false;
+                            return url.includes('.m3u8') || 
+                                   url.includes('.mp4') || 
+                                   url.includes('/hls/') ||
+                                   url.includes('/video/') ||
+                                   url.includes('master.txt') ||
+                                   url.includes('/stream/');
+                        }
+                        
+                        // Função para extrair URL
+                        function tryCapture() {
+                            // 1. Elemento video direto
+                            var video = document.querySelector('video');
+                            if (video) {
+                                if (video.src && isVideoUrl(video.src)) return video.src;
+                                if (video.currentSrc && isVideoUrl(video.currentSrc)) return video.currentSrc;
+                                
+                                // Source dentro do video
+                                var source = video.querySelector('source');
+                                if (source && source.src && isVideoUrl(source.src)) return source.src;
+                            }
+                            
+                            // 2. Player global (VidStack, JWPlayer, etc)
+                            if (window.player) {
+                                if (window.player.src && isVideoUrl(window.player.src)) return window.player.src;
+                                if (window.player.getPlaylistItem) {
+                                    var item = window.player.getPlaylistItem();
+                                    if (item && item.file && isVideoUrl(item.file)) return item.file;
+                                }
+                            }
+                            
+                            // 3. HLS.js
+                            if (window.hls) {
+                                if (window.hls.url && isVideoUrl(window.hls.url)) return window.hls.url;
+                                if (window.hls.levels && window.hls.levels.length > 0) {
+                                    var level = window.hls.levels[0];
+                                    if (level.url && isVideoUrl(level.url)) return level.url;
+                                }
+                            }
+                            
+                            // 4. Variáveis globais comuns
+                            var globals = ['source', 'videoUrl', 'streamUrl', 'hlsUrl', 'file', 'src'];
+                            for (var i = 0; i < globals.length; i++) {
+                                if (window[globals[i]] && isVideoUrl(window[globals[i]])) {
+                                    return window[globals[i]];
+                                }
+                            }
+                            
+                            // 5. Media-provider do VidStack
+                            var mediaProvider = document.querySelector('media-provider video');
+                            if (mediaProvider) {
+                                if (mediaProvider.src && isVideoUrl(mediaProvider.src)) return mediaProvider.src;
+                                if (mediaProvider.currentSrc && isVideoUrl(mediaProvider.currentSrc)) return mediaProvider.currentSrc;
+                            }
+                            
+                            return '';
+                        }
+                        
+                        // Tentar clicar no play automaticamente
+                        function tryClickPlay() {
+                            var playSelectors = [
+                                '#play',
+                                '.play-button',
+                                '.vjs-big-play-button',
+                                '[class*="play"]',
+                                'button[class*="play"]',
+                                '#player-button-container'
+                            ];
+                            
+                            for (var i = 0; i < playSelectors.length; i++) {
+                                var btn = document.querySelector(playSelectors[i]);
+                                if (btn && btn.click) {
+                                    try { btn.click(); } catch(e) {}
+                                }
+                            }
+                        }
+                        
+                        // Clicar no play após 1 segundo
+                        setTimeout(tryClickPlay, 1000);
+                        setTimeout(tryClickPlay, 2000);
+                        
+                        // Loop de captura
                         var interval = setInterval(function() {
                             attempts++;
-                            var result = '';
                             
-                            // Tentar capturar do player VidStack
-                            if (window.player && window.player.src) result = window.player.src;
-                            
-                            // Tentar capturar de elemento video
-                            if (!result) {
-                                var video = document.querySelector('video');
-                                if (video && video.src) result = video.src;
+                            var url = tryCapture();
+                            if (url && url.length > 0) {
+                                foundUrl = url;
+                                clearInterval(interval);
+                                resolve(foundUrl);
+                                return;
                             }
                             
-                            if (!result) {
-                                var source = document.querySelector('video source');
-                                if (source && source.src) result = source.src;
-                            }
-                            
-                            // Tentar capturar de HLS.js
-                            if (!result && window.hls && window.hls.url) result = window.hls.url;
-                            
-                            if (result && result.length > 0) {
+                            if (attempts >= maxAttempts) {
                                 clearInterval(interval);
-                                resolve(result);
-                            } else if (attempts > 50) { // 5s timeout
-                                clearInterval(interval);
-                                resolve('');
+                                resolve(foundUrl);
                             }
                         }, 100);
                     });
@@ -302,37 +183,69 @@ class MegaEmbedExtractor : ExtractorApi() {
             
             var capturedUrl: String? = null
             
+            // Interceptar requisições de rede para URLs de vídeo
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|/stream/"""),
-                additionalUrls = listOf(Regex("""\.m3u8|\.mp4|\.ts""")),
+                // Padrões para interceptar
+                interceptUrl = Regex(
+                    """\.m3u8|\.mp4|master\.txt|/hls/|/video/|/stream/|/cf-master\.|/tt/master\.""",
+                    RegexOption.IGNORE_CASE
+                ),
+                additionalUrls = listOf(
+                    Regex("""\.m3u8""", RegexOption.IGNORE_CASE),
+                    Regex("""\.mp4""", RegexOption.IGNORE_CASE),
+                    Regex("""master\.txt""", RegexOption.IGNORE_CASE)
+                ),
                 useOkhttp = false,
                 script = captureScript,
                 scriptCallback = { result ->
-                    if (result.isNotEmpty() && result != "null" && result != "\"\"") {
-                        capturedUrl = result.trim('"')
-                        Log.d(TAG, "WebView capturou: $capturedUrl")
+                    if (result.isNotEmpty() && result != "null" && result != "\"\"" && result != "undefined") {
+                        val cleanResult = result.trim('"', '\'', ' ')
+                        if (isValidVideoUrl(cleanResult)) {
+                            capturedUrl = cleanResult
+                            Log.d(TAG, "Script capturou: $capturedUrl")
+                        }
                     }
                 },
-                timeout = 30_000L
+                timeout = 45_000L // 45 segundos para dar tempo de descriptografar
             )
             
-            val response = app.get(url, interceptor = resolver)
-            val interceptedUrl = response.url
+            val response = app.get(
+                url,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to (referer ?: mainUrl),
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                ),
+                interceptor = resolver
+            )
             
+            val interceptedUrl = response.url
+            Log.d(TAG, "URL interceptada: $interceptedUrl")
+            
+            // Priorizar URL interceptada da rede (mais confiável)
             val videoUrl = when {
-                isValidVideoUrl(interceptedUrl) -> interceptedUrl
-                !capturedUrl.isNullOrEmpty() && isValidVideoUrl(capturedUrl!!) -> capturedUrl!!
+                isValidVideoUrl(interceptedUrl) -> {
+                    Log.d(TAG, "Usando URL interceptada da rede")
+                    interceptedUrl
+                }
+                !capturedUrl.isNullOrEmpty() -> {
+                    Log.d(TAG, "Usando URL do script")
+                    capturedUrl!!
+                }
                 else -> null
             }
             
             if (videoUrl != null) {
-                Log.d(TAG, "WebView extraiu: $videoUrl")
+                Log.d(TAG, "✅ URL final: $videoUrl")
                 emitExtractorLink(videoUrl, url, callback)
                 return true
             }
             
+            Log.w(TAG, "❌ Nenhuma URL de vídeo encontrada")
+            
         } catch (e: Exception) {
             Log.e(TAG, "Erro no WebView: ${e.message}")
+            e.printStackTrace()
         }
         
         return false
@@ -346,33 +259,57 @@ class MegaEmbedExtractor : ExtractorApi() {
         referer: String,
         callback: (ExtractorLink) -> Unit
     ) {
-        if (videoUrl.contains(".m3u8")) {
-            // HLS - usar M3u8Helper para múltiplas qualidades
-            M3u8Helper.generateM3u8(name, videoUrl, referer).forEach(callback)
+        // Determinar referer correto
+        val effectiveReferer = when {
+            videoUrl.contains("cf-master") || videoUrl.contains("/cf/") -> "https://megaembed.link/"
+            videoUrl.contains("tt/master") || videoUrl.contains("/tt/") -> "https://megaembed.link/"
+            else -> referer
+        }
+        
+        Log.d(TAG, "Emitindo link: $videoUrl (referer: $effectiveReferer)")
+        
+        if (videoUrl.contains(".m3u8") || videoUrl.contains("master.txt")) {
+            try {
+                // HLS - usar M3u8Helper para múltiplas qualidades
+                M3u8Helper.generateM3u8(name, videoUrl, effectiveReferer).forEach { link ->
+                    Log.d(TAG, "M3u8Helper gerou: ${link.name} - ${link.quality}")
+                    callback(link)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro no M3u8Helper: ${e.message}")
+                // Fallback: emitir link direto
+                callback(
+                    newExtractorLink(name, "$name HLS", videoUrl) {
+                        this.referer = effectiveReferer
+                        this.quality = Qualities.Unknown.value
+                    }
+                )
+            }
         } else {
             // MP4 direto
             callback(
-                newExtractorLink(
-                    name,
-                    name,
-                    videoUrl
-                ) {
-                    this.referer = referer
+                newExtractorLink(name, name, videoUrl) {
+                    this.referer = effectiveReferer
                     this.quality = Qualities.Unknown.value
                 }
             )
         }
     }
 
-
     /**
      * Valida se é uma URL de vídeo válida
      */
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
-        return url.startsWith("http") && 
-               (url.contains(".m3u8") || url.contains(".mp4") || 
-                url.contains("/hls/") || url.contains("/video/"))
+        if (!url.startsWith("http")) return false
+        
+        return url.contains(".m3u8") || 
+               url.contains(".mp4") || 
+               url.contains("/hls/") || 
+               url.contains("/video/") ||
+               url.contains("master.txt") ||
+               url.contains("/stream/") ||
+               url.contains("/cf-master") ||
+               url.contains("/tt/master")
     }
-
 }

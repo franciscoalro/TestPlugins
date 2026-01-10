@@ -362,22 +362,24 @@ class MaxSeriesProvider : MainAPI() {
                     if (extractDoodStream(playerUrl, callback)) { found++; continue }
                 }
 
-                // 2. Extratores Dedicados (MegaEmbed / PlayerEmbedAPI)
-                if (MegaEmbedExtractor.canHandle(playerUrl)) {
-                    megaEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
-                    found++
-                    continue
-                }
-
-                if (PlayerEmbedAPIExtractor.canHandle(playerUrl)) {
-                    playerEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
-                    found++
-                    continue
-                }
-                
-                // 3. Extractor padrão do CloudStream
+                // 2. Extractor padrão do CloudStream (tentar primeiro)
                 try {
                     if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { found++; continue }
+                } catch (_: Exception) {}
+
+                // 3. Extratores Dedicados como fallback (MegaEmbed / PlayerEmbedAPI)
+                try {
+                    if (MegaEmbedExtractor.canHandle(playerUrl)) {
+                        megaEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
+                        // Não incrementa found aqui pois não sabemos se funcionou
+                    }
+                } catch (_: Exception) {}
+
+                try {
+                    if (PlayerEmbedAPIExtractor.canHandle(playerUrl)) {
+                        playerEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
+                        // Não incrementa found aqui pois não sabemos se funcionou
+                    }
                 } catch (_: Exception) {}
                 
                 // 4. WebView como fallback UNIVERSAL para qualquer player restante

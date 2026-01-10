@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v37.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v38.0/MaxSeries.cs3",
         "status": 1,
-        "version": 37,
+        "version": 38,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v37 - Fix Syntax Error in MegaEmbedExtractor",
+        "description": "MaxSeries v38 - Fix Deprecated ExtractorLink",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

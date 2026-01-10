@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-01-10T17:18:42.140Z",
+  "totalRequests": 20,
+  "videoUrls": [
+    "https://cdn.plyr.io/static/blank.mp4"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://playerthree.online/embed/synden/",
+      "headers": {
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bodyLength": 8789
+    },
+    {
+      "method": "GET",
+      "url": "https://playerthree.online/static/css/app.css?v=1754232065",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/embed/synden/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/css",
+      "bodyLength": 4449
+    },
+    {
+      "method": "GET",
+      "url": "https://playerthree.online/static/js/jwplayer.js?v=1725467574",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/embed/synden/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/javascript",
+      "bodyLength": 115881
+    },
+    {
+      "method": "GET",
+      "url": "https://playerthree.online/static/js/app.js?v=1757386115",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/embed/synden/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/javascript",
+      "bodyLength": 10433
+    },
+    {
+      "method": "GET",
+      "url": "https://vjs.zencdn.net/7.10.2/video-js.css",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "bodyLength": 45313
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "bodyLength": 48228
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "bodyLength": 367
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "bodyLength": 12961
+    },
+    {
+      "method": "GET",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "bodyLength": 89476
+    },
+    {
+      "method": "GET",
+      "url": "https://vjs.zencdn.net/7.10.2/video.min.js",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "bodyLength": 518840
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.plyr.io/3.6.3/plyr.css",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "bodyLength": 37641
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.plyr.io/3.6.3/plyr.js",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "bodyLength": 120626
+    },
+    {
+      "method": "GET",
+      "url": "https://ib.bobafidges.com/rx6Ao292AGv7US/119582",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "bodyLength": 88801
+    },
+    {
+      "method": "GET",
+      "url": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015",
+      "headers": {
+        "origin": "https://playerthree.online",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "text/javascript;charset=UTF-8",
+      "bodyLength": 19948
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2",
+      "headers": {
+        "origin": "https://playerthree.online",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://fonts.googleapis.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "font/woff2",
+      "bodyLength": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://whos.amung.us/swidget/viewplayer.gif",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 307,
+      "contentType": "text/html; charset=UTF-8",
+      "bodyLength": 0
+    },
+    {
+      "method": "POST",
+      "url": "https://buzzers.dromonmilkilymts.cfd/gd/119582?md=eyJhIjo4NzgyLCJzIjoiMTkyMHgxMDgwIiwiYiI6IjE5MjB4MTA4MCIsInIiOiIiLCJxIjoiaHR0cHM6Ly9wbGF5ZXJ0aHJlZS5vbmxpbmUvZW1iZWQvc3luZGVuLyIsImgiOjIxNCwibCI6InB0LUJSIiwidCI6MTgwLCJ6Ijo0MDA0LCJrIjowLCJ1IjoiIiwiZiI6ZmFsc2UsIndoIjoibm90IGluIGlmcmFtZSIsImloIjoiMTkzNngxMTAwIiwiZSI6InpqcmhudHg3cXZ1ZzhteSIsIm8iOnRydWUsIm0iOjE3NjgwNjU0NjcwNjUsInciOiIlN0IlMjJ0aXRsZSUyMiUzQSUyMlRlcnJhJTIwZGUlMjBQZWNhZG9zJTIwLSUyMFN5bmRlbiUyMiUyQyUyMmtleXdvcmRzJTIyJTNBJTVCJTVEJTJDJTIydG9wd29yZHMlMjIlM0ElNUIlMjJ0ZW1wb3JhZGElM0EyJTIyJTJDJTIydGVycmElM0ExJTIyJTJDJTIycGVjYWRvcyUzQTElMjIlMkMlMjJzeW5kZW4lM0ExJTIyJTJDJTIyZHVibGFkbyUzQTElMjIlMkMlMjJ5b3UlRTIlODAlOTl2ZSUzQTElMjIlMkMlMjJiZWVuJTNBMSUyMiUyQyUyMndhcm5lZCUzQTElMjIlMkMlMjJ1bmlkZW50aWZpZWQlM0ExJTIyJTJDJTIybWFuJTNBMSUyMiUyQyUyMmJyb3RoZXJzJTNBMSUyMiUyQyUyMmolQzMlQTRydmVuJTNBMSUyMiUyQyUyMnF1ZWVuJTNBMSUyMiUyQyUyMmJlZSUzQTElMjIlMkMlMjJmaW5hbCUzQTElMjIlMkMlMjJ2b2x0YXIlM0ExJTIyJTVEJTdEIiwidHMiOjAsInByIjoxLCJkbSI6NCwiaGMiOjQsImJsIjoxLCJiYyI6MiwidnYiOiJHb29nbGUgSW5jLiAoQU1EKSIsInZyIjoiQU5HTEUgKEFNRCwgQU1EIFJhZGVvbihUTSkgVmVnYSAzIEdyYXBoaWNzICgweDAwMDAxNUQ4KSBEaXJlY3QzRDExIHZzXzVfMCBwc181XzAsIEQzRDExKSIsImFjIjowLCJjdCI6InVua25vd24iLCJjZXQiOiIzZyIsImNkbG0iOi0xLCJjZGwiOjAuOTUsImNydHQiOjQwMCwidG1zIjoxLCJjZSI6dHJ1ZSwiY2QiOjI0LCJvciI6ImxhbmRzY2FwZS1wcmltYXJ5IiwiZnMiOm51bGwsImZzbyI6bnVsbCwiaW0iOmZhbHNlLCJkdCI6ZmFsc2V9&fc=Oe4gFdA3cZ7KGDF67cLtBA&pr=WMCJWp-LjLfmV0rQ9-lv-g",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "bodyLength": 737
+    },
+    {
+      "method": "POST",
+      "url": "https://entrapsoorki.top/cuid/?f=https%3A%2F%2Fplayerthree.online",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "bodyLength": 32
+    },
+    {
+      "method": "GET",
+      "url": "https://widgets.amung.us/small/01/159.png",
+      "headers": {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "referer": "https://playerthree.online/"
+      },
+      "status": 200,
+      "contentType": "image/png",
+      "bodyLength": 0
+    },
+    {
+      "method": "POST",
+      "url": "https://playerthree.online/cdn-cgi/rum?",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://playerthree.online/embed/synden/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "status": 204,
+      "contentType": "text/plain",
+      "bodyLength": 0
+    }
+  ]
+}

@@ -138,7 +138,7 @@ class MaxSeriesProvider : MainAPI() {
                     trueUrl,
                 ) {
                     this.referer = "$host/"
-                    this.quality = getQualityFromName(quality)
+                    this.quality = Qualities.Unknown.value
                 }
             )
             

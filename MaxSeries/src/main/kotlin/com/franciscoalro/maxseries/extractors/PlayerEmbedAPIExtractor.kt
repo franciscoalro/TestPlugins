@@ -364,16 +364,8 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         if (videoUrl.contains(".m3u8")) {
-            try {
-                M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
-            } catch (e: Exception) {
-                callback(
-                    newExtractorLink(name, "$name HLS", cleanUrl, isM3u8 = true) {
-                        this.referer = effectiveReferer
-                        this.quality = quality
-                    }
-                )
-            }
+            // HLS - usar M3u8Helper para múltiplas qualidades
+            M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
         } else {
             // MP4 direto (GCS)
             callback(

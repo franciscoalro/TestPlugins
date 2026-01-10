@@ -201,7 +201,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                 ),
                 useOkhttp = false,
                 script = captureScript,
-                scriptCallback = { result ->
+                scriptCallback = callback@{ result ->
                     if (result.isNotEmpty() && result != "null" && result != "\"\"" && result != "undefined") {
                         val cleanResult = result.trim('"', '\'', ' ')
                         Log.d(TAG, "Script retornou: $cleanResult")
@@ -215,7 +215,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                             cleanResult.contains(".png", ignoreCase = true) ||
                             cleanResult.contains(".jpg", ignoreCase = true)) {
                             Log.w(TAG, "❌ Rejeitado (não é vídeo): $cleanResult")
-                            return@scriptCallback
+                            return@callback
                         }
                         
                         if (isValidVideoUrl(cleanResult)) {

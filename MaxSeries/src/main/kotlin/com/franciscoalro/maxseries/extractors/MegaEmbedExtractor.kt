@@ -363,15 +363,7 @@ class MegaEmbedExtractor : ExtractorApi() {
             )
         }
     }
-                    this.quality = Qualities.Unknown.value
-                    this.headers = mapOf(
-                        "User-Agent" to USER_AGENT,
-                        "Referer" to referer
-                    )
-                }
-            )
-        }
-    }
+
 
     /**
      * Valida se é uma URL de vídeo válida

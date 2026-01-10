@@ -4,6 +4,8 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
 
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -11,6 +13,9 @@ class MaxSeriesProvider : MainAPI() {
     override val hasMainPage = true
     override var lang = "pt"
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
+
+    private val megaEmbedExtractor = MegaEmbedExtractor()
+    private val playerEmbedExtractor = PlayerEmbedAPIExtractor()
 
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Home",
@@ -149,57 +154,7 @@ class MaxSeriesProvider : MainAPI() {
         }
     }
     
-    // StreamWish-like Extractor (usa JsUnpacker)
-    private suspend fun extractWithUnpack(url: String, callback: (ExtractorLink) -> Unit): Boolean {
-        try {
-            val response = app.get(url)
-            val html = response.text
-            
-            // Tentar desempacotar JavaScript P.A.C.K.E.R.
-            val packed = getPacked(html)
-            val unpacked = if (!packed.isNullOrEmpty()) {
-                JsUnpacker(packed).unpack()
-            } else {
-                html
-            }
-            
-            if (unpacked == null) return false
-            
-            // Procurar URL do vídeo
-            val videoUrl = Regex("""file:\s*["']([^"']+\.m3u8[^"']*)["']""").find(unpacked)?.groupValues?.get(1)
-                ?: Regex("""sources:\s*\[\s*\{\s*file:\s*["']([^"']+)["']""").find(unpacked)?.groupValues?.get(1)
-                ?: Regex("""source:\s*["']([^"']+\.m3u8[^"']*)["']""").find(unpacked)?.groupValues?.get(1)
-            
-            if (videoUrl != null) {
-                val sourceName = when {
-                    url.contains("megaembed") -> "MegaEmbed"
-                    url.contains("playerembedapi") -> "PlayerEmbedAPI"
-                    else -> "Unpacked"
-                }
-                
-                if (videoUrl.contains(".m3u8")) {
-                    M3u8Helper.generateM3u8(
-                        sourceName,
-                        videoUrl,
-                        url
-                    ).forEach(callback)
-                } else {
-                    callback(
-                        newExtractorLink(sourceName, sourceName, videoUrl) {
-                            this.referer = url
-                            this.quality = Qualities.Unknown.value
-                        }
-                    )
-                }
-                return true
-            }
-            
-            return false
-        } catch (e: Exception) {
-            Log.e("MaxSeries", "Unpack erro: ${e.message}")
-            return false
-        }
-    }
+
     
     // WebView Extractor (fallback para players que requerem JS)
     private suspend fun extractWithWebView(url: String, callback: (ExtractorLink) -> Unit): Boolean {
@@ -209,33 +164,24 @@ class MaxSeriesProvider : MainAPI() {
             // Script JS avançado: auto-click no play + captura de múltiplos players
             val captureScript = """
                 (function() {
-                    // Auto-click em botões de play comuns
-                    var playButtons = [
-                        '.vjs-big-play-button',
-                        '.play-button',
-                        '#play-button',
-                        '[class*="play"]',
-                        'button[data-show-player]',
-                        '.jw-icon-playback',
-                        '#overlay'
-                    ];
-                    
+                    // Auto-click em botões de play
+                    var playButtons = ['.vjs-big-play-button', '.play-button', '#play-button', '[class*="play"]', 'button[data-show-player]', '.jw-icon-playback', '#overlay'];
                     for (var i = 0; i < playButtons.length; i++) {
                         var btn = document.querySelector(playButtons[i]);
-                        if (btn) { 
-                            btn.click(); 
-                            break; 
-                        }
+                        if (btn) { btn.click(); break; }
                     }
                     
-                    // Aguardar um pouco para player carregar
                     return new Promise(function(resolve) {
-                        setTimeout(function() {
+                        var attempts = 0;
+                        var maxAttempts = 50; // 5 segundos max
+                        
+                        var interval = setInterval(function() {
+                            attempts++;
                             var result = '';
                             
                             // 1. Video element
                             var video = document.querySelector('video');
-                            if (video && video.src && video.src.length > 10) {
+                            if (video && video.src && video.src.startsWith('http')) {
                                 result = video.src;
                             }
                             
@@ -246,38 +192,11 @@ class MaxSeriesProvider : MainAPI() {
                                     if (jw) {
                                         var item = jw.getPlaylistItem && jw.getPlaylistItem();
                                         if (item && item.file) result = item.file;
-                                        
-                                        if (!result) {
-                                            var playlist = jw.getPlaylist && jw.getPlaylist();
-                                            if (playlist && playlist[0] && playlist[0].file) result = playlist[0].file;
-                                        }
                                     }
                                 } catch(e) {}
                             }
                             
-                            // 3. VideoJS
-                            if (!result && window.videojs) {
-                                try {
-                                    var vjs = document.querySelector('.video-js');
-                                    if (vjs && vjs.player) {
-                                        var src = vjs.player.src();
-                                        if (src) result = src;
-                                    }
-                                } catch(e) {}
-                            }
-                            
-                            // 4. Plyr
-                            if (!result && window.Plyr) {
-                                try {
-                                    var plyr = document.querySelector('.plyr');
-                                    if (plyr && plyr.plyr) {
-                                        var src = plyr.plyr.source;
-                                        if (src) result = src;
-                                    }
-                                } catch(e) {}
-                            }
-                            
-                            // 5. Source elements
+                            // 3. Source elements
                             if (!result) {
                                 var sources = document.querySelectorAll('source[src]');
                                 for (var j = 0; j < sources.length; j++) {
@@ -289,8 +208,14 @@ class MaxSeriesProvider : MainAPI() {
                                 }
                             }
                             
-                            resolve(result);
-                        }, 3000);  // Aguardar 3s para player inicializar
+                            if (result && result.length > 0) {
+                                clearInterval(interval);
+                                resolve(result);
+                            } else if (attempts >= maxAttempts) {
+                                clearInterval(interval);
+                                resolve(''); // Timeout
+                            }
+                        }, 100);
                     });
                 })()
             """.trimIndent()
@@ -436,17 +361,26 @@ class MaxSeriesProvider : MainAPI() {
                 if (isDoodStreamClone(playerUrl)) {
                     if (extractDoodStream(playerUrl, callback)) { found++; continue }
                 }
+
+                // 2. Extratores Dedicados (MegaEmbed / PlayerEmbedAPI)
+                if (MegaEmbedExtractor.canHandle(playerUrl)) {
+                    megaEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
+                    found++
+                    continue
+                }
+
+                if (PlayerEmbedAPIExtractor.canHandle(playerUrl)) {
+                    playerEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
+                    found++
+                    continue
+                }
                 
-                // 2. Extractor padrão do CloudStream
+                // 3. Extractor padrão do CloudStream
                 try {
                     if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { found++; continue }
                 } catch (_: Exception) {}
                 
-                // 3. Tentar desempacotar JavaScript P.A.C.K.E.R.
-                if (extractWithUnpack(playerUrl, callback)) { found++; continue }
-                
                 // 4. WebView como fallback UNIVERSAL para qualquer player restante
-                // Isso cobre playerembedapi.link, megaembed.link, e outros players JS
                 if (extractWithWebView(playerUrl, callback)) { found++; continue }
                 
                 Log.w("MaxSeries", "Nenhum extrator funcionou para: $playerUrl")

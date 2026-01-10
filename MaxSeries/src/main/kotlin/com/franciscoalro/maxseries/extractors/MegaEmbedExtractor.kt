@@ -256,20 +256,38 @@ class MegaEmbedExtractor : ExtractorApi() {
             
             val captureScript = """
                 (function() {
-                    // Tentar capturar do player VidStack
-                    if (window.player && window.player.src) return window.player.src;
-                    
-                    // Tentar capturar de elemento video
-                    var video = document.querySelector('video');
-                    if (video && video.src) return video.src;
-                    
-                    var source = document.querySelector('video source');
-                    if (source && source.src) return source.src;
-                    
-                    // Tentar capturar de HLS.js
-                    if (window.hls && window.hls.url) return window.hls.url;
-                    
-                    return '';
+                    return new Promise(function(resolve) {
+                        var attempts = 0;
+                        var interval = setInterval(function() {
+                            attempts++;
+                            var result = '';
+                            
+                            // Tentar capturar do player VidStack
+                            if (window.player && window.player.src) result = window.player.src;
+                            
+                            // Tentar capturar de elemento video
+                            if (!result) {
+                                var video = document.querySelector('video');
+                                if (video && video.src) result = video.src;
+                            }
+                            
+                            if (!result) {
+                                var source = document.querySelector('video source');
+                                if (source && source.src) result = source.src;
+                            }
+                            
+                            // Tentar capturar de HLS.js
+                            if (!result && window.hls && window.hls.url) result = window.hls.url;
+                            
+                            if (result && result.length > 0) {
+                                clearInterval(interval);
+                                resolve(result);
+                            } else if (attempts > 50) { // 5s timeout
+                                clearInterval(interval);
+                                resolve('');
+                            }
+                        }, 100);
+                    });
                 })()
             """.trimIndent()
             
@@ -334,17 +352,18 @@ class MegaEmbedExtractor : ExtractorApi() {
         } else {
             // MP4 direto
             callback(
-                ExtractorLink(
-                    source = name,
-                    name = name,
-                    url = videoUrl,
-                    referer = referer,
-                    quality = Qualities.Unknown.value,
-                    headers = mapOf(
+                newExtractorLink(
+                    name,
+                    name,
+                    videoUrl
+                ) {
+                    this.referer = referer
+                    this.quality = Qualities.Unknown.value
+                    this.headers = mapOf(
                         "User-Agent" to USER_AGENT,
                         "Referer" to referer
                     )
-                )
+                }
             )
         }
     }

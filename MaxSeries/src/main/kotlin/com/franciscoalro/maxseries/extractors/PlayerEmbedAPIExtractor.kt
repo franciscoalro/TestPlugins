@@ -76,35 +76,55 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             // Script para capturar URL do player - foco no GCS
             val captureScript = """
                 (function() {
-                    // Tentar capturar de elemento video
-                    var video = document.querySelector('video');
-                    if (video) {
-                        // currentSrc é mais confiável
-                        if (video.currentSrc && video.currentSrc.length > 0) return video.currentSrc;
-                        if (video.src && video.src.length > 0) return video.src;
-                        var source = video.querySelector('source');
-                        if (source && source.src) return source.src;
-                    }
-                    
-                    // Procurar em iframes (pode ter player aninhado)
-                    var iframes = document.querySelectorAll('iframe');
-                    for (var iframe of iframes) {
-                        try {
-                            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                            var iframeVideo = iframeDoc.querySelector('video');
-                            if (iframeVideo) {
-                                if (iframeVideo.currentSrc) return iframeVideo.currentSrc;
-                                if (iframeVideo.src) return iframeVideo.src;
+                    return new Promise(function(resolve) {
+                        var attempts = 0;
+                        var interval = setInterval(function() {
+                            attempts++;
+                            var result = '';
+
+                            // Tentar capturar de elemento video
+                            var video = document.querySelector('video');
+                            if (video) {
+                                if (video.currentSrc && video.currentSrc.length > 0) result = video.currentSrc;
+                                else if (video.src && video.src.length > 0) result = video.src;
                             }
-                        } catch(e) {}
-                    }
-                    
-                    // Tentar capturar de variáveis globais
-                    if (window.source) return window.source;
-                    if (window.file) return window.file;
-                    if (window.videoUrl) return window.videoUrl;
-                    
-                    return '';
+                            
+                            if (!result) {
+                                var source = document.querySelector('video source');
+                                if (source && source.src) result = source.src;
+                            }
+                            
+                            // Procurar em iframes
+                            if (!result) {
+                                var iframes = document.querySelectorAll('iframe');
+                                for (var i = 0; i < iframes.length; i++) {
+                                    try {
+                                        var iframeDoc = iframes[i].contentDocument || iframes[i].contentWindow.document;
+                                        var iframeVideo = iframeDoc.querySelector('video');
+                                        if (iframeVideo) {
+                                            if (iframeVideo.currentSrc) { result = iframeVideo.currentSrc; break; }
+                                            if (iframeVideo.src) { result = iframeVideo.src; break; }
+                                        }
+                                    } catch(e) {}
+                                }
+                            }
+                            
+                            // Variáveis globais
+                            if (!result) {
+                                if (window.source) result = window.source;
+                                else if (window.file) result = window.file;
+                                else if (window.videoUrl) result = window.videoUrl;
+                            }
+                            
+                            if (result && result.length > 0) {
+                                clearInterval(interval);
+                                resolve(result);
+                            } else if (attempts > 50) { // 5s timeout
+                                clearInterval(interval);
+                                resolve('');
+                            }
+                        }, 100);
+                    });
                 })()
             """.trimIndent()
             
@@ -344,28 +364,30 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 ).forEach(callback)
             } catch (e: Exception) {
                 callback(
-                    ExtractorLink(
-                        source = name,
-                        name = "$name HLS",
-                        url = cleanUrl,
-                        referer = effectiveReferer,
-                        quality = quality,
-                        isM3u8 = true,
-                        headers = headers
-                    )
+                    newExtractorLink(
+                        name,
+                        "$name HLS",
+                        cleanUrl
+                    ) {
+                        this.referer = effectiveReferer
+                        this.quality = quality
+                        this.isM3u8 = true
+                        this.headers = headers
+                    }
                 )
             }
         } else {
             // MP4 direto (GCS)
             callback(
-                ExtractorLink(
-                    source = name,
-                    name = if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
-                    url = cleanUrl,
-                    referer = effectiveReferer,
-                    quality = quality,
-                    headers = headers
-                )
+                newExtractorLink(
+                    name,
+                    if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
+                    cleanUrl
+                ) {
+                    this.referer = effectiveReferer
+                    this.quality = quality
+                    this.headers = headers
+                }
             )
         }
     }

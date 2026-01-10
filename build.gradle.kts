@@ -44,8 +44,8 @@ subprojects {
         namespace = "recloudstream"
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(35)
-            targetSdk = 35
+            compileSdkVersion(34)
+            targetSdk = 34
         }
 
         compileOptions {

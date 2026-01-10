@@ -2,6 +2,7 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.JsUnpacker
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
 
@@ -297,11 +298,11 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         // Tentar desempacotar JavaScript P.A.C.K.E.R.
-        val packed = getPacked(html)
+        val packed = getPackedCode(html)
         if (!packed.isNullOrEmpty()) {
             try {
-                val unpacked = JsUnpacker(packed).unpack()
-                if (unpacked != null) {
+                val unpacked = JsUnpacker(packed).unpack() ?: ""
+                if (unpacked.isNotEmpty()) {
                     for (pattern in patterns) {
                         val match = pattern.find(unpacked)
                         if (match != null) {
@@ -318,6 +319,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         return null
+    }
+    
+    /**
+     * Extrai código P.A.C.K.E.R. do HTML
+     */
+    private fun getPackedCode(html: String): String? {
+        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
+            .find(html)?.value
     }
 
     /**
@@ -355,37 +364,19 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         if (videoUrl.contains(".m3u8")) {
-            try {
-                M3u8Helper.generateM3u8(
-                    name,
-                    cleanUrl,
-                    effectiveReferer,
-                    headers = headers
-                ).forEach(callback)
-            } catch (e: Exception) {
-                callback(
-                newExtractorLink(
-                    source = name,
-                    name = "$name HLS",
-                    url = cleanUrl,
-                    referer = effectiveReferer,
-                    quality = quality,
-                    isM3u8 = true,
-                    headers = headers
-                )
-                )
-            }
+            // HLS - usar M3u8Helper para múltiplas qualidades
+            M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
         } else {
             // MP4 direto (GCS)
             callback(
                 newExtractorLink(
-                    source = name,
-                    name = if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
-                    url = cleanUrl,
-                    referer = effectiveReferer,
-                    quality = quality,
-                    headers = headers
-                )
+                    name, 
+                    if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name, 
+                    cleanUrl
+                ) {
+                    this.referer = effectiveReferer
+                    this.quality = quality
+                }
             )
         }
     }
@@ -403,13 +394,5 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                url.contains("/hls/") || 
                url.contains("/video/") ||
                url.contains("/stream/")
-    }
-
-    /**
-     * Extrai código P.A.C.K.E.R. do HTML
-     */
-    private fun getPacked(html: String): String? {
-        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
-            .find(html)?.value
     }
 }

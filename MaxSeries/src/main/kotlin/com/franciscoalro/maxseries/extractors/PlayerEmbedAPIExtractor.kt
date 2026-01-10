@@ -364,21 +364,21 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 ).forEach(callback)
             } catch (e: Exception) {
                 callback(
-                    ExtractorLink(
-                        source = name,
-                        name = "$name HLS",
-                        url = cleanUrl,
-                        referer = effectiveReferer,
-                        quality = quality,
-                        isM3u8 = true,
-                        headers = headers
-                    )
+                newExtractorLink(
+                    source = name,
+                    name = "$name HLS",
+                    url = cleanUrl,
+                    referer = effectiveReferer,
+                    quality = quality,
+                    isM3u8 = true,
+                    headers = headers
+                )
                 )
             }
         } else {
             // MP4 direto (GCS)
             callback(
-                ExtractorLink(
+                newExtractorLink(
                     source = name,
                     name = if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
                     url = cleanUrl,

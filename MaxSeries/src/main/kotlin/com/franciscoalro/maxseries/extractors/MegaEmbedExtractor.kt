@@ -3,6 +3,8 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
+import com.lagradost.nicehttp.ResponseParser.getPacked
+import com.lagradost.cloudstream3.utils.JsUnpacker
 import android.util.Log
 import org.json.JSONObject
 
@@ -339,16 +341,7 @@ class MegaEmbedExtractor : ExtractorApi() {
     ) {
         if (videoUrl.contains(".m3u8")) {
             // HLS - usar M3u8Helper para múltiplas qualidades
-            M3u8Helper.generateM3u8(
-                name,
-                videoUrl,
-                referer,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to referer,
-                    "Origin" to mainUrl
-                )
-            ).forEach(callback)
+            M3u8Helper.generateM3u8(name, videoUrl, referer).forEach(callback)
         } else {
             // MP4 direto
             callback(
@@ -373,14 +366,6 @@ class MegaEmbedExtractor : ExtractorApi() {
         return url.startsWith("http") && 
                (url.contains(".m3u8") || url.contains(".mp4") || 
                 url.contains("/hls/") || url.contains("/video/"))
-    }
-
-    /**
-     * Extrai código P.A.C.K.E.R. do HTML
-     */
-    private fun getPacked(html: String): String? {
-        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
-            .find(html)?.value
     }
 
 }

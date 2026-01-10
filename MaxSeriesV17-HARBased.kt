@@ -330,13 +330,14 @@ class MaxSeriesProvider : MainAPI() {
                             
                             callback.invoke(
                                 newExtractorLink(
-                                    source = "MegaEmbed HAR",
-                                    name = "MegaEmbed HAR",
-                                    url = videoSrc,
-                                    referer = referer,
-                                    quality = Qualities.P720.value,
-                                    isM3u8 = videoSrc.contains(".m3u8")
-                                )
+                                    "MegaEmbed HAR",
+                                    "MegaEmbed HAR",
+                                    videoSrc
+                                ) {
+                                    this.referer = referer
+                                    this.quality = Qualities.P720.value
+                                    this.isM3u8 = videoSrc.contains(".m3u8")
+                                }
                             )
                             return true
                         } else {

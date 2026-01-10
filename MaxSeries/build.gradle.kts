@@ -1,7 +1,7 @@
-version = 33
+version = 38
 
 cloudstream {
-    description = "MaxSeries v33 - Qualities Fix + API verified"
+    description = "MaxSeries v38 - Fix Deprecated ExtractorLink Constructor"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

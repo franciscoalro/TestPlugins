@@ -3,6 +3,9 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
+import com.lagradost.nicehttp.Requests.Companion.await
+import com.lagradost.nicehttp.ResponseParser.getPacked
+import com.lagradost.cloudstream3.utils.JsUnpacker
 import android.util.Log
 
 /**
@@ -356,36 +359,29 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         if (videoUrl.contains(".m3u8")) {
             try {
-                M3u8Helper.generateM3u8(
-                    name,
-                    cleanUrl,
-                    effectiveReferer,
-                    headers = headers
-                ).forEach(callback)
+                M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
             } catch (e: Exception) {
                 callback(
-                newExtractorLink(
-                    source = name,
-                    name = "$name HLS",
-                    url = cleanUrl,
-                    referer = effectiveReferer,
-                    quality = quality,
-                    isM3u8 = true,
-                    headers = headers
-                )
+                    newExtractorLink(name, "$name HLS", cleanUrl) {
+                        this.referer = effectiveReferer
+                        this.quality = quality
+                        this.isM3u8 = true
+                        this.headers = headers
+                    }
                 )
             }
         } else {
             // MP4 direto (GCS)
             callback(
                 newExtractorLink(
-                    source = name,
-                    name = if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name,
-                    url = cleanUrl,
-                    referer = effectiveReferer,
-                    quality = quality,
-                    headers = headers
-                )
+                    name, 
+                    if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name, 
+                    cleanUrl
+                ) {
+                    this.referer = effectiveReferer
+                    this.quality = quality
+                    this.headers = headers
+                }
             )
         }
     }
@@ -403,13 +399,5 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                url.contains("/hls/") || 
                url.contains("/video/") ||
                url.contains("/stream/")
-    }
-
-    /**
-     * Extrai código P.A.C.K.E.R. do HTML
-     */
-    private fun getPacked(html: String): String? {
-        return Regex("""eval\(function\(p,a,c,k,e,[dr]\).*?\)\)""", RegexOption.DOT_MATCHES_ALL)
-            .find(html)?.value
     }
 }

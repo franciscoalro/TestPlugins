@@ -368,10 +368,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
             } catch (e: Exception) {
                 callback(
-                    newExtractorLink(name, "$name HLS", cleanUrl) {
+                    newExtractorLink(name, "$name HLS", cleanUrl, isM3u8 = true) {
                         this.referer = effectiveReferer
                         this.quality = quality
-                        this.isM3u8 = true
                     }
                 )
             }

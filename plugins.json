@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v41.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v42.0/MaxSeries.cs3",
         "status": 1,
-        "version": 41,
+        "version": 42,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v41 - Regex Ultra-Específico para Bloquear .js no WebView",
+        "description": "MaxSeries v42 - Regex Negativo para Bloquear .js no WebView",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

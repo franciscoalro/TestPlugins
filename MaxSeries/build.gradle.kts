@@ -1,7 +1,7 @@
-version = 42
+version = 45
 
 cloudstream {
-    description = "MaxSeries v42 - Suporte para Links .txt e Domínios Rotativos (MegaEmbed)"
+    description = "MaxSeries v45 - MegaEmbed WebView Interceptor (Encryption Bypass)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

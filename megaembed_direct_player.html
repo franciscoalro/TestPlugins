@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MegaEmbed Direct Player Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 1rem;
+            background: #121212;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .section {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .section h2 {
+            font-size: 1rem;
+            margin: 0 0 .5rem 0;
+            color: #2196F3;
+        }
+
+        input {
+            padding: .5rem;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            width: 100%;
+            margin-bottom: .5rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: .6rem 1.2rem;
+            border-radius: 4px;
+            border: none;
+            background: #2196F3;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: .5rem;
+        }
+
+        button:hover {
+            background: #1976D2;
+        }
+
+        button.secondary {
+            background: #666;
+        }
+
+        pre {
+            background: #0a0a0a;
+            padding: .5rem;
+            border-radius: 4px;
+            font-size: .75rem;
+            max-height: 150px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .success {
+            color: #66BB6A;
+        }
+
+        .error {
+            color: #EF5350;
+        }
+
+        #videoContainer {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .instructions {
+            background: #1a237e;
+            padding: .8rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: .85rem;
+        }
+
+        .instructions ol {
+            margin: .5rem 0 0 1rem;
+            padding: 0;
+        }
+
+        .instructions li {
+            margin-bottom: .3rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎬 MegaEmbed Direct Player Test</h1>
+
+    <div class="instructions">
+        <strong>📋 Como testar:</strong>
+        <ol>
+            <li>No celular, abra o <strong>Web Video Caster</strong></li>
+            <li>Vá até o episódio no MaxSeries e clique para reproduzir</li>
+            <li>Quando o vídeo começar, copie a URL que aparece (ex: <code>https://...cf-master.xxx.txt</code>)</li>
+            <li>Cole a URL aqui e clique <strong>▶ Reproduzir</strong></li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>URL do Vídeo (cole o link .txt ou .m3u8)</h2>
+        <input id="videoUrl" placeholder="https://stzm.marvellaholdings.sbs/v4/x6b/3wnuij/cf-master.1767386783.txt" />
+        <div style="margin-top:.5rem;">
+            <button id="playBtn">▶ Reproduzir</button>
+            <button id="testBtn" class="secondary">🔍 Testar URL</button>
+            <button id="clearBtn" class="secondary">🗑 Limpar</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎥 Player</h2>
+        <div id="videoContainer">
+            <video id="video" controls></video>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Log</h2>
+        <pre id="log">Aguardando ação...</pre>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const videoUrlInput = document.getElementById('videoUrl');
+        const playBtn = document.getElementById('playBtn');
+        const testBtn = document.getElementById('testBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const video = document.getElementById('video');
+        const logEl = document.getElementById('log');
+
+        let hls = null;
+
+        function log(msg, isError = false) {
+            const time = new Date().toLocaleTimeString();
+            const line = `[${time}] ${msg}`;
+            console.log(line);
+            logEl.textContent += '\n' + line;
+            logEl.scrollTop = logEl.scrollHeight;
+            if (isError) logEl.style.color = '#EF5350';
+        }
+
+        function clearLog() {
+            logEl.textContent = 'Log limpo.';
+            logEl.style.color = '#e0e0e0';
+        }
+
+        async function testUrl() {
+            const url = videoUrlInput.value.trim();
+            if (!url) { alert('Cole uma URL primeiro'); return; }
+
+            log('🔍 Testando URL: ' + url);
+
+            try {
+                // Usar CORS proxy para teste
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+                const response = await fetch(proxyUrl);
+
+                log('📡 Status: ' + response.status);
+
+                if (!response.ok) {
+                    log('❌ Falha: ' + response.statusText, true);
+                    return;
+                }
+
+                const text = await response.text();
+                log('📄 Tamanho: ' + text.length + ' bytes');
+
+                if (text.includes('#EXTM3U')) {
+                    log('✅ Conteúdo é HLS válido!');
+                    log('📋 Primeiras linhas:\n' + text.split('\n').slice(0, 5).join('\n'));
+                } else {
+                    log('⚠️ Não parece ser HLS. Primeiros 200 chars:');
+                    log(text.substring(0, 200));
+                }
+            } catch (e) {
+                log('❌ Erro: ' + e.message, true);
+            }
+        }
+
+        function playVideo() {
+            const url = videoUrlInput.value.trim();
+            if (!url) { alert('Cole uma URL primeiro'); return; }
+
+            log('▶️ Iniciando reprodução...');
+            log('🔗 URL: ' + url);
+
+            // Destruir instância anterior se existir
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+
+            if (Hls.isSupported()) {
+                log('📺 Usando hls.js');
+
+                hls = new Hls({
+                    debug: false,
+                    enableWorker: true,
+                    xhrSetup: function (xhr, hlsUrl) {
+                        // Nota: Navegadores bloqueiam Referer customizado
+                        // No Android/OkHttp isso funciona perfeitamente
+                        log('📡 Requisitando: ' + hlsUrl.substring(0, 80) + '...');
+                    }
+                });
+
+                // Usar proxy para contornar CORS no navegador
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+                hls.loadSource(proxyUrl);
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                    log('✅ Manifest parseado! Níveis: ' + data.levels.length);
+                    video.play().then(() => {
+                        log('▶️ Reprodução iniciada!');
+                    }).catch(e => {
+                        log('⚠️ Autoplay bloqueado, clique no player');
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        log('❌ Erro fatal HLS: ' + data.type + ' - ' + data.details, true);
+                        if (data.response) {
+                            log('Response: ' + JSON.stringify(data.response));
+                        }
+                    } else {
+                        log('⚠️ Erro não-fatal: ' + data.details);
+                    }
+                });
+
+                hls.on(Hls.Events.FRAG_LOADED, function (event, data) {
+                    log('🎞️ Fragmento carregado: ' + data.frag.sn);
+                });
+
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                log('📺 Usando player nativo (Safari)');
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    log('✅ Metadata carregado');
+                    video.play();
+                });
+            } else {
+                log('❌ Navegador não suporta HLS', true);
+            }
+        }
+
+        playBtn.addEventListener('click', playVideo);
+        testBtn.addEventListener('click', testUrl);
+        clearBtn.addEventListener('click', () => {
+            clearLog();
+            videoUrlInput.value = '';
+            if (hls) { hls.destroy(); hls = null; }
+            video.src = '';
+        });
+
+        // Permitir Enter no input
+        videoUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') playVideo();
+        });
+    </script>
+</body>
+
+</html>

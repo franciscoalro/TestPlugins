@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MegaEmbed Test Player</title>
+    <meta name="description" content="Teste rápido de reprodução de links MegaEmbed (HLS)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Google Font – Inter (Design System) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            /* Dark mode background */
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            gap: 1rem;
+            padding-top: 1rem;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        #videoContainer {
+            width: 90%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        input,
+        button {
+            width: 90%;
+            max-width: 600px;
+            padding: .5rem .75rem;
+            margin-top: .5rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-size: .9rem;
+        }
+
+        button {
+            background: #2196F3;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background .2s;
+        }
+
+        button:hover {
+            background: #1976D2;
+        }
+
+        #episodesList {
+            width: 90%;
+            max-width: 800px;
+            margin-top: .5rem;
+        }
+
+        .episodeItem {
+            padding: .4rem .6rem;
+            margin: .3rem 0;
+            background: #2c2c2c;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .episodeItem:hover {
+            background: #3a3a3a;
+        }
+
+        #log {
+            width: 90%;
+            max-width: 800px;
+            background: #111;
+            color: #0f0;
+            padding: 8px;
+            max-height: 200px;
+            overflow: auto;
+            margin-top: .5rem;
+            font-family: monospace;
+            font-size: .8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MegaEmbed HLS Test Player</h1>
+
+    <!-- 1️⃣ INPUT DA SÉRIE -->
+    <input id="seriesInput" placeholder="Cole a URL da página da série (ex.: https://maxseries.com/serie/xyz)" />
+    <button id="loadEpisodesBtn">Carregar episódios</button>
+
+    <!-- 2️⃣ LISTA DE EPISÓDIOS -->
+    <div id="episodesList"></div>
+
+    <!-- 3️⃣ PLAYER -->
+    <div id="videoContainer"><video id="video" controls></video></div>
+    <input type="text" id="urlInput" placeholder="Cole aqui a URL .txt ou .m3u8 do MegaEmbed" />
+    <button id="loadBtn">Carregar Vídeo</button>
+
+    <!-- 4️⃣ LOG DE DEBUG -->
+    <pre id="log"></pre>
+
+    <!-- hls.js from CDN (MIT) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const video = document.getElementById('video');
+        const urlInput = document.getElementById('urlInput');
+        const loadBtn = document.getElementById('loadBtn');
+        const seriesInput = document.getElementById('seriesInput');
+        const loadEpisodesBtn = document.getElementById('loadEpisodesBtn');
+        const episodesList = document.getElementById('episodesList');
+        const logDiv = document.getElementById('log');
+        const LOG_MAX_LINES = 200;
+        function log(msg) {
+            console.log(msg);
+            const lines = logDiv.textContent.split('\n');
+            lines.push(msg);
+            if (lines.length > LOG_MAX_LINES) lines.splice(0, lines.length - LOG_MAX_LINES);
+            logDiv.textContent = lines.join('\n');
+        }
+
+        // ---------- Função para buscar a lista de episódios ----------
+        async function fetchEpisodes(seriesUrl) {
+            log('🟢 Iniciando fetch da série: ' + seriesUrl);
+            try {
+                // Usamos um proxy CORS simples caso o site bloqueie requisições cross‑origin.
+                const proxy = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxy + seriesUrl, { method: 'GET' });
+                log('🔎 Status série: ' + response.status);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                // Busca por links que contenham "megaembed" ou "v4" (padrão das playlists).
+                const anchors = Array.from(doc.querySelectorAll('a')).filter(a => {
+                    const href = a.getAttribute('href') || '';
+                    return href.includes('megaembed') || href.includes('/v4/');
+                });
+                log('📋 Encontrados ' + anchors.length + ' possíveis episódios.');
+                // Limpa lista anterior
+                episodesList.innerHTML = '';
+                anchors.forEach((a, idx) => {
+                    const epDiv = document.createElement('div');
+                    epDiv.className = 'episodeItem';
+                    epDiv.textContent = a.textContent.trim() || ('Episódio ' + (idx + 1));
+                    epDiv.dataset.url = a.href;
+                    epDiv.addEventListener('click', () => {
+                        urlInput.value = a.href;
+                        loadBtn.click();
+                    });
+                    episodesList.appendChild(epDiv);
+                });
+                if (anchors.length === 0) {
+                    log('⚠️ Nenhum link de MegaEmbed encontrado. Verifique se a página realmente contém o player.');
+                }
+            } catch (e) {
+                console.error(e);
+                log('❌ Erro ao buscar a série: ' + e);
+                alert('Falha ao buscar a página da série. Veja o log para detalhes.');
+            }
+        }
+
+        loadEpisodesBtn.addEventListener('click', () => {
+            const url = seriesInput.value.trim();
+            if (!url) { alert('Informe a URL da série.'); return; }
+            fetchEpisodes(url);
+        });
+
+        // ---------- Função de carregamento de vídeo (mantida do exemplo anterior) ----------
+        loadBtn.addEventListener('click', async () => {
+            const src = urlInput.value.trim();
+            if (!src) { alert('Por favor, insira a URL do vídeo.'); return; }
+            try {
+                log('🟢 Iniciando GET → ' + src);
+                const response = await fetch(src, {
+                    method: 'GET',
+                    headers: {
+                        'Referer': 'https://megaembed.link/',
+                        'User-Agent': navigator.userAgent
+                    }
+                });
+                log('🔎 Status: ' + response.status + ' ' + response.statusText);
+                response.headers.forEach((v, k) => log('   Header ' + k + ': ' + v));
+                const body = await response.text();
+                log('📄 Corpo (primeiros 300 chars): ' + body.slice(0, 300) + (body.length > 300 ? '…' : ''));
+                if (!body.includes('#EXTM3U')) {
+                    log('⚠️ Conteúdo não parece ser HLS.');
+                    alert('O arquivo retornado não contém #EXTM3U – talvez não seja a playlist.');
+                    return;
+                }
+                // Reprodução
+                if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = src;
+                    video.play();
+                    log('▶️ Reproduzindo nativamente (Safari).');
+                    return;
+                }
+                if (Hls.isSupported()) {
+                    const hls = new Hls({
+                        xhrSetup: (xhr, url) => {
+                            xhr.setRequestHeader('Referer', 'https://megaembed.link/');
+                        }
+                    });
+                    hls.loadSource(src);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play();
+                        log('▶️ Reproduzindo via hls.js.');
+                    });
+                    hls.on(Hls.Events.ERROR, (e, d) => {
+                        console.error('HLS error', d);
+                        log('❌ Erro HLS: ' + JSON.stringify(d));
+                    });
+                } else {
+                    alert('Este navegador não suporta HLS nem hls.js.');
+                }
+            } catch (e) {
+                console.error(e);
+                log('❌ Falha ao fazer GET: ' + e);
+                alert('Erro ao buscar a URL. Veja o log para detalhes.');
+            }
+        });
+    </script>
+</body>
+
+</html>

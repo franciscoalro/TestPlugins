@@ -1,5 +1,5 @@
 import com.android.build.gradle.BaseExtension
-import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+// import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -26,7 +26,7 @@ allprojects {
     }
 }
 
-fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
+// fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
 fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
 
@@ -35,10 +35,10 @@ subprojects {
     apply(plugin = "kotlin-android")
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
-    cloudstream {
-        // when running through github workflow, GITHUB_REPOSITORY should contain current repository name
-        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "user/repo")
-    }
+//    cloudstream {
+//        // when running through github workflow, GITHUB_REPOSITORY should contain current repository name
+//        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "user/repo")
+//    }
 
     android {
         namespace = "recloudstream"

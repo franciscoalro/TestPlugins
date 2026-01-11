@@ -16,7 +16,7 @@ buildscript {
             exclude(group = "com.github.vidstige", module = "jadb")
         }
         classpath("com.github.vidstige:jadb:v1.2.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
     }
 }
 
@@ -69,7 +69,7 @@ subprojects {
     dependencies {
         val implementation by configurations
 
-        implementation("com.github.recloudstream.cloudstream:library:-SNAPSHOT")
+        implementation("com.github.recloudstream.cloudstream:library:v4.6.0")
         implementation(kotlin("stdlib"))
         implementation("com.github.Blatzar:NiceHttp:0.4.11")
         implementation("org.jsoup:jsoup:1.18.3")

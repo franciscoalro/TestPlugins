@@ -59,9 +59,9 @@ class MegaEmbedExtractor : ExtractorApi() {
                     name,
                     name,
                     playlistUrl,
-                    referer = "https://megaembed.link/",
-                    quality = Qualities.Unknown.value,
-                    isM3u8 = true
+                    "https://megaembed.link/",
+                    Qualities.Unknown.value,
+                    true
                 )
             )
         } else {
@@ -76,9 +76,9 @@ class MegaEmbedExtractor : ExtractorApi() {
                             name,
                             name,
                             manualUrl,
-                            referer = "https://megaembed.link/",
-                            quality = Qualities.Unknown.value,
-                            isM3u8 = true
+                            "https://megaembed.link/",
+                            Qualities.Unknown.value,
+                            true
                         )
                     )
                 }

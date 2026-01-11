@@ -94,7 +94,17 @@ class MaxSeriesProvider : MainAPI() {
     // DoodStream Extractor - HTTP puro (validado via engenharia reversa)
     private suspend fun extractDoodStream(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         try {
-            Log.d("MaxSeries", "DoodStream HTTP: $url")
+            val sourceName = when {
+                url.contains("myvidplay", true) -> "MyVidPlay"
+                url.contains("bysebuho", true) -> "Bysebuho"
+                url.contains("g9r6", true) -> "G9R6"
+                url.contains("vidplay", true) -> "VidPlay"
+                url.contains("doodstream", true) -> "DoodStream"
+                url.contains("dood.", true) -> "Dood"
+                else -> "DoodClone"
+            }
+            
+            Log.d("MaxSeries", "[$sourceName] Iniciando extração: $url")
             val embedUrl = url.replace("/d/", "/e/")
             val req = app.get(embedUrl)
             val host = getBaseUrl(req.url)
@@ -103,17 +113,17 @@ class MaxSeriesProvider : MainAPI() {
             // Regex melhorado para capturar pass_md5 path completo
             val md5Path = Regex("""/pass_md5/[^'"\s]+""").find(html)?.value
             if (md5Path == null) {
-                Log.e("MaxSeries", "DoodStream: pass_md5 não encontrado")
+                Log.e("MaxSeries", "[$sourceName] pass_md5 não encontrado")
                 return false
             }
             
             val md5Url = host + md5Path
-            Log.d("MaxSeries", "DoodStream pass_md5: $md5Url")
+            Log.d("MaxSeries", "[$sourceName] pass_md5: $md5Url")
             
             // Obter URL base do vídeo
             val baseUrl = app.get(md5Url, referer = req.url).text.trim()
             if (baseUrl.isEmpty() || !baseUrl.startsWith("http")) {
-                Log.e("MaxSeries", "DoodStream: baseUrl inválida: $baseUrl")
+                Log.e("MaxSeries", "[$sourceName] baseUrl inválida: $baseUrl")
                 return false
             }
             
@@ -122,19 +132,12 @@ class MaxSeriesProvider : MainAPI() {
             val expiry = System.currentTimeMillis()
             val trueUrl = "$baseUrl${createHashTable()}?token=$token&expiry=$expiry"
             
-            Log.d("MaxSeries", "DoodStream URL final: $trueUrl")
+            Log.d("MaxSeries", "[$sourceName] URL final gerada com sucesso")
             
             // Extrair qualidade do título
             val quality = Regex("""\d{3,4}p""")
                 .find(html.substringAfter("<title>").substringBefore("</title>"))
                 ?.value
-            
-            val sourceName = when {
-                url.contains("myvidplay") -> "MyVidPlay"
-                url.contains("bysebuho") -> "Bysebuho"
-                url.contains("g9r6") -> "G9R6"
-                else -> "DoodStream"
-            }
             
             callback(
                 newExtractorLink(
@@ -147,9 +150,10 @@ class MaxSeriesProvider : MainAPI() {
                 }
             )
             
+            Log.d("MaxSeries", "[$sourceName] Extração bem-sucedida!")
             return true
         } catch (e: Exception) {
-            Log.e("MaxSeries", "DoodStream erro: ${e.message}")
+            Log.e("MaxSeries", "Erro na extração DoodStream: ${e.message}")
             return false
         }
     }
@@ -302,11 +306,21 @@ class MaxSeriesProvider : MainAPI() {
 
     
     private val doodStreamDomains = listOf(
+        // Principais clones ativos no MaxSeries
         "myvidplay.com", "bysebuho.com", "g9r6.com",
+        
+        // DoodStream oficiais
         "doodstream.com", "dood.to", "dood.watch", "dood.pm",
         "dood.wf", "dood.re", "dood.so", "dood.cx",
         "dood.la", "dood.ws", "dood.sh", "doodstream.co",
-        "d0000d.com", "d000d.com", "dooood.com", "ds2play.com"
+        
+        // Variantes e mirrors
+        "d0000d.com", "d000d.com", "dooood.com", "ds2play.com",
+        "dood.yt", "dood.stream", "doodcdn.com", "doodcdn.co",
+        
+        // Novos domínios encontrados (2026)
+        "dood.li", "dood.video", "doodstream.tv", "dood.one",
+        "vidplay.com", "vidplay.site", "vidplay.online"
     )
     
     private val hardHosts = listOf("megaembed.link", "playerembedapi.link")
@@ -354,42 +368,89 @@ class MaxSeriesProvider : MainAPI() {
             // Ordenar: DoodStream primeiro (mais confiável)
             val sortedUrls = playerUrls.sortedByDescending { isDoodStreamClone(it) }
             
+            Log.d("MaxSeries", "=== Iniciando extração de ${sortedUrls.size} fontes ===")
+            sortedUrls.forEachIndexed { index, url ->
+                val sourceType = when {
+                    isDoodStreamClone(url) -> "DoodStream"
+                    isHardHost(url) -> "Hard"
+                    else -> "Other"
+                }
+                Log.d("MaxSeries", "${index + 1}. [$sourceType] $url")
+            }
+            
             for (playerUrl in sortedUrls) {
-                Log.d("MaxSeries", "Processando: $playerUrl")
+                val sourceType = when {
+                    isDoodStreamClone(playerUrl) -> "DoodStream Clone"
+                    MegaEmbedExtractor.canHandle(playerUrl) -> "MegaEmbed"
+                    PlayerEmbedAPIExtractor.canHandle(playerUrl) -> "PlayerEmbedAPI"
+                    else -> "Unknown"
+                }
+                
+                Log.d("MaxSeries", "🎬 Processando [$sourceType]: $playerUrl")
                 
                 // 1. DoodStream clones (HTTP puro - prioridade máxima)
                 if (isDoodStreamClone(playerUrl)) {
-                    if (extractDoodStream(playerUrl, callback)) { found++; continue }
+                    Log.d("MaxSeries", "🔄 Tentando extração DoodStream...")
+                    if (extractDoodStream(playerUrl, callback)) { 
+                        found++
+                        Log.d("MaxSeries", "✅ DoodStream extraído com sucesso!")
+                        continue 
+                    }
+                    Log.d("MaxSeries", "❌ DoodStream falhou")
                 }
-
                 // 2. Extractor padrão do CloudStream (tentar primeiro)
+                Log.d("MaxSeries", "🔄 Tentando extrator padrão CloudStream...")
                 try {
-                    if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { found++; continue }
-                } catch (_: Exception) {}
+                    if (loadExtractor(playerUrl, data, subtitleCallback, callback)) { 
+                        found++
+                        Log.d("MaxSeries", "✅ Extrator padrão funcionou!")
+                        continue 
+                    }
+                    Log.d("MaxSeries", "❌ Extrator padrão falhou")
+                } catch (e: Exception) {
+                    Log.d("MaxSeries", "❌ Extrator padrão erro: ${e.message}")
+                }
 
                 // 3. Extratores Dedicados como fallback (MegaEmbed / PlayerEmbedAPI)
                 try {
                     if (MegaEmbedExtractor.canHandle(playerUrl)) {
+                        Log.d("MaxSeries", "🔄 Tentando MegaEmbed...")
                         megaEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
-                        // Não incrementa found aqui pois não sabemos se funcionou
+                        Log.d("MaxSeries", "⚠️ MegaEmbed executado (sucesso não confirmado)")
                     }
-                } catch (_: Exception) {}
+                } catch (e: Exception) {
+                    Log.d("MaxSeries", "❌ MegaEmbed erro: ${e.message}")
+                }
 
                 try {
                     if (PlayerEmbedAPIExtractor.canHandle(playerUrl)) {
+                        Log.d("MaxSeries", "🔄 Tentando PlayerEmbedAPI...")
                         playerEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
-                        // Não incrementa found aqui pois não sabemos se funcionou
+                        Log.d("MaxSeries", "⚠️ PlayerEmbedAPI executado (sucesso não confirmado)")
                     }
-                } catch (_: Exception) {}
+                } catch (e: Exception) {
+                    Log.d("MaxSeries", "❌ PlayerEmbedAPI erro: ${e.message}")
+                }
                 
                 // 4. WebView como fallback UNIVERSAL para qualquer player restante
-                if (extractWithWebView(playerUrl, callback)) { found++; continue }
+                Log.d("MaxSeries", "🔄 Tentando WebView fallback...")
+                if (extractWithWebView(playerUrl, callback)) { 
+                    found++
+                    Log.d("MaxSeries", "✅ WebView funcionou!")
+                    continue 
+                }
+                Log.d("MaxSeries", "❌ WebView falhou")
                 
-                Log.w("MaxSeries", "Nenhum extrator funcionou para: $playerUrl")
+                Log.w("MaxSeries", "❌ Nenhum extrator funcionou para: $playerUrl")
             }
             
+            Log.d("MaxSeries", "=== RESUMO DA EXTRAÇÃO ===")
+            Log.d("MaxSeries", "📊 Fontes processadas: ${sortedUrls.size}")
+            Log.d("MaxSeries", "✅ Fontes extraídas: $found")
+            Log.d("MaxSeries", "📈 Taxa de sucesso: ${if (sortedUrls.isNotEmpty()) (found * 100 / sortedUrls.size) else 0}%")
+            
         } catch (e: Exception) {
-            Log.e("MaxSeries", "Erro: ${e.message}")
+            Log.e("MaxSeries", "❌ Erro crítico: ${e.message}")
         }
         
         return found > 0

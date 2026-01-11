@@ -7,17 +7,20 @@ import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor para CloudStream
+ * PlayerEmbedAPI Extractor v2 - Enhanced Chain Following
  * 
  * DESCOBERTA (Jan 2026):
  * O vídeo final é servido do Google Cloud Storage!
  * URL: storage.googleapis.com/mediastorage/{timestamp}/{hash}/{id}.mp4
  * 
- * Cadeia de redirecionamentos:
+ * Cadeia de redirecionamentos completa:
  * playerembedapi.link → short.icu → abyss.to → storage.googleapis.com
  * 
- * Este extractor usa WebView para navegar pelos iframes e capturar
- * a URL final do GCS que é um MP4 direto.
+ * MELHORIAS v2:
+ * - Seguimento inteligente de redirecionamentos
+ * - Detecção aprimorada de padrões GCS
+ * - Fallback robusto para múltiplos domínios
+ * - Timeout otimizado para cada etapa
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override val name = "PlayerEmbedAPI"
@@ -28,17 +31,24 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         private const val TAG = "PlayerEmbedAPIExtractor"
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         
-        // Todos os domínios da cadeia
+        // Todos os domínios da cadeia (expandido)
         val DOMAINS = listOf(
             "playerembedapi.link",
             "short.icu",
             "abysscdn.com",
             "abyss.to",
-            "storage.googleapis.com"
+            "storage.googleapis.com",
+            // Variantes descobertas
+            "playerembed.link",
+            "embed-player.com",
+            "shortener.icu",
+            "abyss.cc"
         )
         
-        // Padrão da URL do GCS
-        val GCS_PATTERN = Regex("""https?://storage\.googleapis\.com/mediastorage/[^"'\s]+\.mp4[^"'\s]*""")
+        // Padrões de URL aprimorados
+        val GCS_PATTERN = Regex("""https?://storage\.googleapis\.com/[^"'\s]+\.mp4[^"'\s]*""")
+        val SHORT_ICU_PATTERN = Regex("""https?://(?:short|shortener)\.icu/[^"'\s]+""")
+        val ABYSS_PATTERN = Regex("""https?://(?:abyss\.to|abyss\.cc|abysscdn\.com)/[^"'\s]+""")
         
         fun canHandle(url: String): Boolean {
             return DOMAINS.any { url.contains(it, ignoreCase = true) }
@@ -51,19 +61,212 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "Extraindo: $url")
+        Log.d(TAG, "=== PlayerEmbedAPI Extractor v2 - Enhanced Chain Following ===")
+        Log.d(TAG, "🎬 URL: $url")
+        Log.d(TAG, "🔗 Referer: $referer")
         
-        // Método 1: WebView para capturar URL do GCS (mais confiável)
-        if (tryWebViewExtraction(url, referer, callback)) {
-            return
+        try {
+            // Método 1: Seguimento inteligente de redirecionamentos (principal)
+            Log.d(TAG, "🔄 Tentando seguimento de redirecionamentos...")
+            if (tryEnhancedRedirectChain(url, referer, callback)) {
+                Log.d(TAG, "✅ Redirect chain funcionou!")
+                return
+            }
+            
+            // Método 2: WebView para casos complexos (fallback)
+            Log.d(TAG, "🔄 Tentando WebView extraction...")
+            if (tryWebViewExtraction(url, referer, callback)) {
+                Log.d(TAG, "✅ WebView funcionou!")
+                return
+            }
+            
+            // Método 3: Extração direta do HTML (último recurso)
+            Log.d(TAG, "🔄 Tentando extração direta...")
+            if (tryDirectExtraction(url, referer, callback)) {
+                Log.d(TAG, "✅ Extração direta funcionou!")
+                return
+            }
+            
+            Log.e(TAG, "❌ Todos os métodos falharam para: $url")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro crítico na extração: ${e.message}")
+            e.printStackTrace()
         }
-        
-        // Método 2: Tentar seguir redirecionamentos via HTTP
-        tryRedirectExtraction(url, referer, callback)
     }
 
     /**
-     * Método 1: WebView para capturar URL do Google Cloud Storage
+     * Método 1: Seguimento inteligente de redirecionamentos
+     * Segue a cadeia completa: playerembedapi → short.icu → abyss.to → GCS
+     */
+    private suspend fun tryEnhancedRedirectChain(
+        url: String,
+        referer: String?,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        return try {
+            Log.d(TAG, "🌐 Iniciando seguimento de cadeia de redirecionamentos...")
+            
+            var currentUrl = url
+            var currentReferer = referer ?: mainUrl
+            val visitedUrls = mutableSetOf<String>()
+            val maxRedirects = 10
+            var redirectCount = 0
+            
+            while (redirectCount < maxRedirects && currentUrl !in visitedUrls) {
+                visitedUrls.add(currentUrl)
+                redirectCount++
+                
+                Log.d(TAG, "🔗 Etapa $redirectCount: $currentUrl")
+                
+                // Verificar se já chegamos no GCS
+                if (currentUrl.contains("storage.googleapis.com")) {
+                    Log.d(TAG, "🎯 GCS URL encontrada diretamente: $currentUrl")
+                    emitExtractorLink(currentUrl, currentReferer, callback)
+                    return true
+                }
+                
+                val response = app.get(
+                    currentUrl,
+                    headers = mapOf(
+                        "User-Agent" to USER_AGENT,
+                        "Referer" to currentReferer,
+                        "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                    ),
+                    allowRedirects = false // Controlar redirecionamentos manualmente
+                )
+                
+                val html = response.text
+                val responseUrl = response.url
+                
+                Log.d(TAG, "📄 Response URL: $responseUrl")
+                Log.d(TAG, "📊 Status: ${response.code}")
+                
+                // Verificar redirecionamento HTTP
+                if (response.code in 300..399) {
+                    val location = response.headers["Location"] ?: response.headers["location"]
+                    if (!location.isNullOrEmpty()) {
+                        currentUrl = if (location.startsWith("http")) {
+                            location
+                        } else if (location.startsWith("//")) {
+                            "https:$location"
+                        } else {
+                            "${currentUrl.substringBeforeLast("/")}/$location"
+                        }
+                        currentReferer = responseUrl
+                        Log.d(TAG, "↪️ Redirecionamento HTTP para: $currentUrl")
+                        continue
+                    }
+                }
+                
+                // Procurar GCS no HTML atual
+                val gcsMatch = GCS_PATTERN.find(html)
+                if (gcsMatch != null) {
+                    val gcsUrl = gcsMatch.value
+                    Log.d(TAG, "🎯 GCS URL encontrada no HTML: $gcsUrl")
+                    emitExtractorLink(gcsUrl, responseUrl, callback)
+                    return true
+                }
+                
+                // Procurar próximo link na cadeia
+                val nextUrl = findNextUrlInChain(html, responseUrl)
+                if (nextUrl != null) {
+                    currentReferer = responseUrl
+                    currentUrl = nextUrl
+                    Log.d(TAG, "➡️ Próximo na cadeia: $currentUrl")
+                    continue
+                }
+                
+                // Procurar iframe
+                val iframeUrl = findIframeUrl(html, responseUrl)
+                if (iframeUrl != null) {
+                    currentReferer = responseUrl
+                    currentUrl = iframeUrl
+                    Log.d(TAG, "🖼️ Iframe encontrado: $currentUrl")
+                    continue
+                }
+                
+                // Tentar extrair vídeo diretamente do HTML atual
+                val videoUrl = extractVideoFromHtml(html)
+                if (videoUrl != null && isValidVideoUrl(videoUrl)) {
+                    Log.d(TAG, "🎬 Vídeo extraído do HTML: $videoUrl")
+                    emitExtractorLink(videoUrl, responseUrl, callback)
+                    return true
+                }
+                
+                Log.w(TAG, "⚠️ Nenhum próximo passo encontrado na etapa $redirectCount")
+                break
+            }
+            
+            Log.w(TAG, "❌ Cadeia de redirecionamentos não levou ao vídeo")
+            false
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro no seguimento de redirecionamentos: ${e.message}")
+            false
+        }
+    }
+    
+    /**
+     * Encontra o próximo URL na cadeia de redirecionamentos
+     */
+    private fun findNextUrlInChain(html: String, baseUrl: String): String? {
+        // Padrões específicos para cada etapa da cadeia
+        val patterns = listOf(
+            // Short.icu patterns
+            SHORT_ICU_PATTERN,
+            // Abyss patterns  
+            ABYSS_PATTERN,
+            // Generic redirect patterns
+            Regex("""window\.location\.href\s*=\s*["']([^"']+)["']"""),
+            Regex("""location\.href\s*=\s*["']([^"']+)["']"""),
+            Regex("""window\.open\s*\(\s*["']([^"']+)["']"""),
+            // Meta refresh
+            Regex("""<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"']+)["']""", RegexOption.IGNORE_CASE),
+            // Button/link redirects
+            Regex("""<a[^>]+href=["']([^"']+(?:short\.icu|abyss\.to|abysscdn)[^"']*)["']""", RegexOption.IGNORE_CASE)
+        )
+        
+        for (pattern in patterns) {
+            val match = pattern.find(html)
+            if (match != null) {
+                val url = match.groupValues.getOrNull(1) ?: match.value
+                return normalizeUrl(url, baseUrl)
+            }
+        }
+        
+        return null
+    }
+    
+    /**
+     * Encontra URL de iframe
+     */
+    private fun findIframeUrl(html: String, baseUrl: String): String? {
+        val iframePattern = Regex("""<iframe[^>]+src=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val match = iframePattern.find(html)
+        
+        if (match != null) {
+            val url = match.groupValues[1]
+            return normalizeUrl(url, baseUrl)
+        }
+        
+        return null
+    }
+    
+    /**
+     * Normaliza URL relativa para absoluta
+     */
+    private fun normalizeUrl(url: String, baseUrl: String): String {
+        return when {
+            url.startsWith("http") -> url
+            url.startsWith("//") -> "https:$url"
+            url.startsWith("/") -> "${baseUrl.substringBefore("/", baseUrl.substringAfter("://"))}$url"
+            else -> "${baseUrl.substringBeforeLast("/")}/$url"
+        }
+    }
+
+    /**
+     * Método 2: WebView para capturar URL do Google Cloud Storage
      * O vídeo final é um MP4 direto do GCS
      */
     private suspend fun tryWebViewExtraction(
@@ -182,14 +385,16 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     }
 
     /**
-     * Método 2: Seguir redirecionamentos e tentar extrair do HTML
+     * Método 3: Extração direta do HTML (último recurso)
      */
-    private suspend fun tryRedirectExtraction(
+    private suspend fun tryDirectExtraction(
         url: String,
         referer: String?,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        try {
+        return try {
+            Log.d(TAG, "📄 Tentando extração direta do HTML...")
+            
             val response = app.get(
                 url,
                 headers = mapOf(
@@ -202,96 +407,70 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             val html = response.text
             val finalUrl = response.url
             
-            Log.d(TAG, "URL final após redirect: $finalUrl")
+            Log.d(TAG, "📄 URL final: $finalUrl")
             
             // Procurar URL do GCS no HTML
             val gcsMatch = GCS_PATTERN.find(html)
             if (gcsMatch != null) {
                 val gcsUrl = gcsMatch.value
-                Log.d(TAG, "URL GCS encontrada: $gcsUrl")
-                emitExtractorLink(gcsUrl, url, callback)
+                Log.d(TAG, "🎯 GCS URL encontrada: $gcsUrl")
+                emitExtractorLink(gcsUrl, finalUrl, callback)
                 return true
             }
             
-            // Procurar iframe de short.icu ou abyss.to
-            val iframePattern = Regex("""<iframe[^>]+src=["']([^"']+(?:short\.icu|abyss\.to|abysscdn)[^"']*)["']""", RegexOption.IGNORE_CASE)
-            val iframeMatch = iframePattern.find(html)
-            
-            if (iframeMatch != null) {
-                val iframeSrc = iframeMatch.groupValues[1].let {
-                    if (it.startsWith("//")) "https:$it"
-                    else if (!it.startsWith("http")) "https://$it"
-                    else it
-                }
-                
-                Log.d(TAG, "Iframe encontrado: $iframeSrc")
-                
-                val iframeResponse = app.get(
-                    iframeSrc,
-                    headers = mapOf(
-                        "User-Agent" to USER_AGENT,
-                        "Referer" to finalUrl
-                    ),
-                    allowRedirects = true
-                )
-                
-                val iframeHtml = iframeResponse.text
-                
-                // Procurar GCS no iframe
-                val iframeGcsMatch = GCS_PATTERN.find(iframeHtml)
-                if (iframeGcsMatch != null) {
-                    val gcsUrl = iframeGcsMatch.value
-                    Log.d(TAG, "URL GCS no iframe: $gcsUrl")
-                    emitExtractorLink(gcsUrl, iframeSrc, callback)
-                    return true
-                }
-                
-                val videoUrl = extractVideoFromHtml(iframeHtml)
-                if (videoUrl != null) {
-                    Log.d(TAG, "URL extraída do iframe: $videoUrl")
-                    emitExtractorLink(videoUrl, iframeSrc, callback)
-                    return true
-                }
-            }
-            
-            val directUrl = extractVideoFromHtml(html)
-            if (directUrl != null) {
-                Log.d(TAG, "URL extraída diretamente: $directUrl")
-                emitExtractorLink(directUrl, url, callback)
+            // Procurar qualquer URL de vídeo válida
+            val videoUrl = extractVideoFromHtml(html)
+            if (videoUrl != null && isValidVideoUrl(videoUrl)) {
+                Log.d(TAG, "🎬 URL de vídeo extraída: $videoUrl")
+                emitExtractorLink(videoUrl, finalUrl, callback)
                 return true
             }
+            
+            Log.w(TAG, "⚠️ Nenhuma URL de vídeo encontrada no HTML")
+            false
             
         } catch (e: Exception) {
-            Log.e(TAG, "Erro no redirect extraction: ${e.message}")
+            Log.e(TAG, "❌ Erro na extração direta: ${e.message}")
+            false
         }
-        
-        return false
     }
 
     /**
-     * Extrai URL de vídeo do HTML/JavaScript
+     * Extrai URL de vídeo do HTML/JavaScript (melhorado)
      */
     private fun extractVideoFromHtml(html: String): String? {
         val patterns = listOf(
-            // GCS pattern (prioridade)
+            // GCS pattern (prioridade máxima)
             GCS_PATTERN,
+            // Padrões específicos PlayerEmbedAPI
+            Regex("""["'](https?://storage\.googleapis\.com/[^"']+\.mp4[^"']*)["']"""),
+            Regex("""file:\s*["'](https?://storage\.googleapis\.com/[^"']+\.mp4[^"']*)["']"""),
             // HLS patterns
             Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']"""),
             Regex("""file:\s*["']([^"']+\.m3u8[^"']*)["']"""),
             Regex("""source:\s*["']([^"']+\.m3u8[^"']*)["']"""),
+            Regex("""playlist:\s*["']([^"']+\.m3u8[^"']*)["']"""),
             // MP4 patterns
             Regex("""["'](https?://[^"']+\.mp4[^"']*)["']"""),
             Regex("""file:\s*["']([^"']+\.mp4[^"']*)["']"""),
-            // Generic patterns
+            Regex("""src:\s*["']([^"']+\.mp4[^"']*)["']"""),
+            // Generic video patterns
             Regex("""playUrl:\s*["']([^"']+)["']"""),
-            Regex("""videoUrl:\s*["']([^"']+)["']""")
+            Regex("""videoUrl:\s*["']([^"']+)["']"""),
+            Regex("""video_url:\s*["']([^"']+)["']"""),
+            Regex("""streamUrl:\s*["']([^"']+)["']"""),
+            // Abyss/AbyssCDN specific
+            Regex("""["'](https?://[^"']*abyss[^"']*\.(?:mp4|m3u8)[^"']*)["']"""),
+            Regex("""["'](https?://[^"']*abysscdn[^"']*\.(?:mp4|m3u8)[^"']*)["']""")
         )
         
+        // Primeiro, tentar padrões diretos
         for (pattern in patterns) {
             val match = pattern.find(html)
             if (match != null) {
-                val url = match.groupValues.getOrNull(1) ?: match.value
+                val url = match.groupValues.getOrNull(1) ?: match.value.trim('"', '\'')
                 if (isValidVideoUrl(url)) {
+                    Log.d(TAG, "🎯 Padrão encontrado: ${pattern.pattern}")
                     return url
                 }
             }
@@ -301,23 +480,46 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         val packed = getPackedCode(html)
         if (!packed.isNullOrEmpty()) {
             try {
+                Log.d(TAG, "📦 Tentando desempacotar JavaScript...")
                 val unpacked = JsUnpacker(packed).unpack() ?: ""
                 if (unpacked.isNotEmpty()) {
+                    Log.d(TAG, "📦 JavaScript desempacotado com sucesso")
                     for (pattern in patterns) {
                         val match = pattern.find(unpacked)
                         if (match != null) {
-                            val url = match.groupValues.getOrNull(1) ?: match.value
+                            val url = match.groupValues.getOrNull(1) ?: match.value.trim('"', '\'')
                             if (isValidVideoUrl(url)) {
+                                Log.d(TAG, "🎯 Padrão encontrado no JS desempacotado: ${pattern.pattern}")
                                 return url
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Erro ao desempacotar JS: ${e.message}")
+                Log.e(TAG, "❌ Erro ao desempacotar JS: ${e.message}")
             }
         }
         
+        // Procurar em atributos data-*
+        val dataPatterns = listOf(
+            Regex("""data-src=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']"""),
+            Regex("""data-url=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']"""),
+            Regex("""data-file=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']"""),
+            Regex("""data-video=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']""")
+        )
+        
+        for (pattern in dataPatterns) {
+            val match = pattern.find(html)
+            if (match != null) {
+                val url = match.groupValues[1]
+                if (isValidVideoUrl(url)) {
+                    Log.d(TAG, "🎯 Data attribute encontrado: ${pattern.pattern}")
+                    return url
+                }
+            }
+        }
+        
+        Log.w(TAG, "⚠️ Nenhum padrão de vídeo encontrado no HTML")
         return null
     }
     
@@ -330,69 +532,89 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     }
 
     /**
-     * Emite ExtractorLink para o CloudStream
+     * Emite ExtractorLink para o CloudStream (melhorado)
      */
     private suspend fun emitExtractorLink(
         videoUrl: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
     ) {
-        // Limpar URL (remover fragmentos desnecessários)
-        val cleanUrl = videoUrl.substringBefore("#")
-        
-        // Determinar o referer correto baseado no domínio
-        val effectiveReferer = when {
-            videoUrl.contains("storage.googleapis.com") -> "https://abyss.to/"
-            videoUrl.contains("abyss") -> "https://abyss.to/"
-            videoUrl.contains("abysscdn") -> "https://abysscdn.com/"
-            else -> referer
-        }
-        
-        val headers = mapOf(
-            "User-Agent" to USER_AGENT,
-            "Referer" to effectiveReferer,
-            "Origin" to effectiveReferer.substringBeforeLast("/")
-        )
-        
-        // Extrair qualidade da URL se disponível
-        val quality = when {
-            videoUrl.contains("1080p") -> Qualities.P1080.value
-            videoUrl.contains("720p") -> Qualities.P720.value
-            videoUrl.contains("480p") -> Qualities.P480.value
-            videoUrl.contains("360p") -> Qualities.P360.value
-            else -> Qualities.Unknown.value
-        }
-        
-        if (videoUrl.contains(".m3u8")) {
-            // HLS - usar M3u8Helper para múltiplas qualidades
-            M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
-        } else {
-            // MP4 direto (GCS)
-            callback(
-                newExtractorLink(
-                    name, 
-                    if (videoUrl.contains("storage.googleapis.com")) "$name GCS" else name, 
-                    cleanUrl
-                ) {
-                    this.referer = effectiveReferer
-                    this.quality = quality
-                }
-            )
+        try {
+            // Limpar URL (remover fragmentos desnecessários)
+            val cleanUrl = videoUrl.substringBefore("#").substringBefore("?token=")
+            
+            // Determinar o referer correto baseado no domínio
+            val effectiveReferer = when {
+                videoUrl.contains("storage.googleapis.com") -> "https://abyss.to/"
+                videoUrl.contains("abyss") -> "https://abyss.to/"
+                videoUrl.contains("abysscdn") -> "https://abysscdn.com/"
+                videoUrl.contains("short.icu") -> "https://short.icu/"
+                else -> referer
+            }
+            
+            // Extrair qualidade da URL se disponível
+            val quality = when {
+                videoUrl.contains("1080p") || videoUrl.contains("1080") -> Qualities.P1080.value
+                videoUrl.contains("720p") || videoUrl.contains("720") -> Qualities.P720.value
+                videoUrl.contains("480p") || videoUrl.contains("480") -> Qualities.P480.value
+                videoUrl.contains("360p") || videoUrl.contains("360") -> Qualities.P360.value
+                else -> Qualities.Unknown.value
+            }
+            
+            // Determinar nome da fonte
+            val sourceName = when {
+                videoUrl.contains("storage.googleapis.com") -> "$name GCS"
+                videoUrl.contains("abyss") -> "$name Abyss"
+                videoUrl.contains("abysscdn") -> "$name AbyssCDN"
+                else -> name
+            }
+            
+            val qualityLabel = if (quality != Qualities.Unknown.value) "${quality}p" else "HD"
+            
+            if (videoUrl.contains(".m3u8")) {
+                // HLS - usar M3u8Helper para múltiplas qualidades
+                Log.d(TAG, "📺 Processando como HLS: $cleanUrl")
+                M3u8Helper.generateM3u8(sourceName, cleanUrl, effectiveReferer).forEach(callback)
+            } else {
+                // MP4 direto (GCS ou outros)
+                Log.d(TAG, "📺 Processando como MP4: $cleanUrl")
+                callback(
+                    newExtractorLink(
+                        sourceName,
+                        "$sourceName - $qualityLabel",
+                        cleanUrl
+                    ) {
+                        this.referer = effectiveReferer
+                        this.quality = quality
+                    }
+                )
+            }
+            
+            Log.d(TAG, "✅ ExtractorLink emitido: $sourceName - $qualityLabel")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro ao emitir ExtractorLink: ${e.message}")
         }
     }
 
     /**
-     * Valida se é uma URL de vídeo válida
+     * Valida se é uma URL de vídeo válida (melhorado)
      */
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
+        if (url.length < 10) return false // URLs muito curtas são suspeitas
         
-        return url.contains("storage.googleapis.com") ||
-               url.contains(".m3u8") || 
+        // Priorizar GCS
+        if (url.contains("storage.googleapis.com")) return true
+        
+        // Padrões de vídeo válidos
+        return url.contains(".m3u8") || 
                url.contains(".mp4") || 
                url.contains("/hls/") || 
                url.contains("/video/") ||
-               url.contains("/stream/")
+               url.contains("/stream/") ||
+               url.contains("abyss") ||
+               url.contains("abysscdn")
     }
 }

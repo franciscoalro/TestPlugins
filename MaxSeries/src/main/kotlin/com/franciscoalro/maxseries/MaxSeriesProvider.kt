@@ -137,7 +137,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                     button.attr("data-show-player") 
                 }
                 
-                if (sourceUrl.isNotEmpty()) {
+                if (sourceUrl.isNotEmpty() && !isYouTubeUrl(sourceUrl)) {
                     println("🎬 Processando fonte: $sourceName -> $sourceUrl")
                     
                     when {
@@ -175,6 +175,8 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                             sourcesFound++
                         }
                     }
+                } else if (isYouTubeUrl(sourceUrl)) {
+                    println("🚫 Ignorando link do YouTube: $sourceName -> $sourceUrl")
                 } else {
                     println("⚠️ Botão sem URL: $sourceName")
                 }
@@ -192,7 +194,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
             
             iframes.forEach { iframe ->
                 val iframeUrl = iframe.attr("src")
-                if (iframeUrl.isNotEmpty()) {
+                if (iframeUrl.isNotEmpty() && !isYouTubeUrl(iframeUrl)) {
                     println("📺 Processando iframe: $iframeUrl")
                     
                     // Extrair episode ID do iframe se necessário
@@ -216,6 +218,8 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                         loadExtractor(iframeUrl, subtitleCallback, callback)
                         sourcesFound++
                     }
+                } else if (isYouTubeUrl(iframeUrl)) {
+                    println("🚫 Ignorando iframe do YouTube: $iframeUrl")
                 }
             }
         }
@@ -262,5 +266,11 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         }
         
         return null
+    }
+    
+    private fun isYouTubeUrl(url: String): Boolean {
+        return url.contains("youtube.com", true) || 
+               url.contains("youtu.be", true) ||
+               url.contains("youtube-nocookie.com", true)
     }
 }

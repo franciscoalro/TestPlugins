@@ -1,0 +1,45 @@
+{
+  "tests": [
+    {
+      "url": "https://megaembed.link/#3wnuij",
+      "video_id": "3wnuij",
+      "methods": {
+        "api_v1": {
+          "success": false,
+          "error": "Response não é JSON",
+          "response": "933a30ecdabc15152bfbe068bc27d5342f59759c823e7e206be7a128ff897fc44fd4e82e2a801097e8bf2d3bcd927deecf7dd715b665ab57521809a4f68fe756dda2d6b801482e850f9e193f36cb80c0b2711a4324b8126357dac03e5b572909d7c67ce8"
+        },
+        "alternative_apis": {
+          "success": false,
+          "error": "Todas as APIs alternativas falharam"
+        },
+        "pattern_construction": {
+          "success": true,
+          "url": "https://stzm.marvellaholdings.sbs/v4/x6b/3wnuij/cf-master.1768156661.txt",
+          "method": "pattern_construction"
+        }
+      }
+    },
+    {
+      "url": "https://megaembed.link/#iln1cp",
+      "video_id": "iln1cp",
+      "methods": {
+        "api_v1": {
+          "success": false,
+          "error": "Response não é JSON",
+          "response": "2790f7d2c5debd75aa5c1dcf118bed761b0f453a2f18353e893dcb64e6530f75a0c955ea155002e3eb5302be78f1549b2ebffc763c41f1af100c686d67e25d36609c488230873998552734e6561eb967164626c6b59b4ebcc8d80df0e842cbc1287fdb7c"
+        },
+        "alternative_apis": {
+          "success": false,
+          "error": "Todas as APIs alternativas falharam"
+        },
+        "pattern_construction": {
+          "success": false,
+          "error": "Nenhuma URL construída funcionou"
+        }
+      }
+    }
+  ],
+  "successful_extractions": 1,
+  "total_tests": 2
+}

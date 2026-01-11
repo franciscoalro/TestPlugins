@@ -4,7 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
-import com.franciscoalro.maxseries.extractors.MegaEmbedExtractor
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV3
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
 
 class MaxSeriesProvider : MainAPI() {
@@ -14,7 +14,7 @@ class MaxSeriesProvider : MainAPI() {
     override var lang = "pt"
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
 
-    private val megaEmbedExtractor = MegaEmbedExtractor()
+    private val megaEmbedExtractor = MegaEmbedExtractorV3()
     private val playerEmbedExtractor = PlayerEmbedAPIExtractor()
 
     override val mainPage = mainPageOf(
@@ -446,7 +446,7 @@ class MaxSeriesProvider : MainAPI() {
             for (playerUrl in sortedUrls) {
                 val sourceType = when {
                     isDoodStreamClone(playerUrl) -> "DoodStream Clone"
-                    MegaEmbedExtractor.canHandle(playerUrl) -> "MegaEmbed"
+                    MegaEmbedExtractorV3.canHandle(playerUrl) -> "MegaEmbed"
                     PlayerEmbedAPIExtractor.canHandle(playerUrl) -> "PlayerEmbedAPI"
                     else -> "Unknown"
                 }
@@ -478,13 +478,13 @@ class MaxSeriesProvider : MainAPI() {
 
                 // 3. Extratores Dedicados como fallback (MegaEmbed / PlayerEmbedAPI)
                 try {
-                    if (MegaEmbedExtractor.canHandle(playerUrl)) {
-                        Log.d("MaxSeries", "🔄 Tentando MegaEmbed...")
+                    if (MegaEmbedExtractorV3.canHandle(playerUrl)) {
+                        Log.d("MaxSeries", "🔄 Tentando MegaEmbed v3...")
                         megaEmbedExtractor.getUrl(playerUrl, data, subtitleCallback, callback)
-                        Log.d("MaxSeries", "⚠️ MegaEmbed executado (sucesso não confirmado)")
+                        Log.d("MaxSeries", "⚠️ MegaEmbed v3 executado (sucesso não confirmado)")
                     }
                 } catch (e: Exception) {
-                    Log.d("MaxSeries", "❌ MegaEmbed erro: ${e.message}")
+                    Log.d("MaxSeries", "❌ MegaEmbed v3 erro: ${e.message}")
                 }
 
                 try {

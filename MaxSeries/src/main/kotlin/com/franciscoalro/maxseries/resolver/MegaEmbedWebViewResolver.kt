@@ -90,7 +90,7 @@ class MegaEmbedWebViewResolver(private val context: Context) {
                 cont.resume(null)
             } finally {
                 // Limpeza
-                view.post {
+                webView.post {
                      webView.destroy()
                 }
             }

@@ -2,10 +2,7 @@
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
-import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import org.jsoup.nodes.Element
-import com.franciscoalro.maxseries.extractors.*
 import android.util.Log
 
 class MaxSeriesProvider : MainAPI() {
@@ -14,88 +11,62 @@ class MaxSeriesProvider : MainAPI() {
     override val hasMainPage = true
     override var lang = "pt"
     override val hasDownloadSupport = true
-    override val supportedTypes = setOf(
-        TvType.Movie,
-        TvType.TvSeries
-    )
+    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
-    // URLs corretas baseadas na estrutura real do site
     override val mainPage = mainPageOf(
         "$mainUrl/filmes" to "Filmes",
         "$mainUrl/series" to "Séries"
     )
 
-    override suspend fun getMainPage(
-        page: Int,
-        request: MainPageRequest
-    ): HomePageResponse {
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         return try {
-            // Para páginas com paginação, adicionar /page/X
             val url = if (page > 1) "${request.data}/page/$page" else request.data
             val document = app.get(url).document
             
-            // Estrutura real: cada item está em um div sem classe específica, mas com estrutura consistente
-            val home = document.select("div").filter { div ->
-                // Filtrar divs que contêm título, data e sinopse (estrutura dos items)
-                div.selectFirst("h3") != null && 
-                div.text().matches(".*\\d{4}.*".toRegex()) // Contém ano
-            }.mapNotNull { it.toSearchResult() }
+            // Seletor correto: article.item (estrutura real do site)
+            val home = document.select("article.item").mapNotNull { it.toSearchResult() }
             
-            Log.d("MaxSeries", "✅ ${request.name}: ${home.size} items encontrados (página $page)")
+            Log.d("MaxSeries", "✅ ${request.name}: ${home.size} items (página $page)")
             newHomePageResponse(request.name, home)
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro ao carregar ${request.name} página $page: ${e.message}")
+            Log.e("MaxSeries", "❌ Erro ${request.name}: ${e.message}")
             newHomePageResponse(request.name, emptyList())
         }
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
         return try {
-            // Estrutura real: título está em h3 dentro do div
-            val titleElement = this.selectFirst("h3")
+            // Estrutura real: article.item > .image > a + img + .data > h3.title + span(ano)
+            val titleElement = this.selectFirst("h3.title, .title, h3")
             val title = titleElement?.text()?.trim() ?: return null
             
-            // Link está no h3 > a
-            val linkElement = titleElement.selectFirst("a") ?: this.selectFirst("a")
-            val href = fixUrl(linkElement?.attr("href") ?: return null)
+            // Filtrar items inválidos (login, etc)
+            if (title.contains("Login", true) || 
+                title.contains("Register", true) ||
+                title.contains("Account", true) ||
+                title.length < 2) return null
             
-            // Imagem está antes do h3
-            val img = this.selectFirst("img")
-            val posterUrl = fixUrlNull(
-                img?.attr("src")
-                    ?: img?.attr("data-src")
-                    ?: img?.attr("data-lazy-src")
-            )
+            val href = fixUrl(this.selectFirst("a")?.attr("href") ?: return null)
             
-            // Detectar tipo baseado na URL real
-            val tvType = when {
-                href.contains("/series/") -> TvType.TvSeries
-                href.contains("/filmes/") -> TvType.Movie
-                else -> {
-                    // Fallback: analisar o texto para detectar se é série
-                    val text = this.text().lowercase()
-                    if (text.contains("temporada") || text.contains("episódio") || text.contains("season")) {
-                        TvType.TvSeries
-                    } else {
-                        TvType.Movie
-                    }
-                }
-            }
+            // Filtrar URLs inválidas
+            if (!href.contains("/filmes/") && !href.contains("/series/")) return null
             
-            // Extrair ano se disponível
-            val yearText = this.text()
+            // Imagem: .image img
+            val img = this.selectFirst(".image img, img")
+            val posterUrl = fixUrlNull(img?.attr("src") ?: img?.attr("data-src"))
+            
+            // Ano: .data span
+            val yearText = this.selectFirst(".data span, span")?.text() ?: ""
             val year = "\\b(19|20)\\d{2}\\b".toRegex().find(yearText)?.value?.toIntOrNull()
             
-            // Extrair rating IMDb se disponível
-            val ratingText = this.text()
-            val imdbRating = "IMDb: ([0-9.]+)".toRegex().find(ratingText)?.groupValues?.get(1)?.toFloatOrNull()
+            // Tipo baseado na URL
+            val tvType = if (href.contains("/series/")) TvType.TvSeries else TvType.Movie
 
             newMovieSearchResponse(title, href, tvType) {
                 this.posterUrl = posterUrl
                 this.year = year
             }
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro ao processar item: ${e.message}")
             null
         }
     }
@@ -104,82 +75,50 @@ class MaxSeriesProvider : MainAPI() {
         if (query.isBlank()) return emptyList()
         
         return try {
-            Log.d("MaxSeries", "🔍 Pesquisando: $query")
             val document = app.get("$mainUrl/?s=${query.replace(" ", "+")}").document
-            
-            // Usar a mesma lógica de parsing da página principal
-            val results = document.select("div").filter { div ->
-                div.selectFirst("h3") != null && 
-                div.text().matches(".*\\d{4}.*".toRegex())
-            }.mapNotNull { it.toSearchResult() }
-            
-            Log.d("MaxSeries", "✅ Pesquisa '$query': ${results.size} resultados")
-            results
+            document.select("article.item").mapNotNull { it.toSearchResult() }
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro na pesquisa '$query': ${e.message}")
             emptyList()
         }
     }
 
     override suspend fun load(url: String): LoadResponse? {
         return try {
-            Log.d("MaxSeries", "📖 Carregando: $url")
             val document = app.get(url).document
 
-            // Título principal (h1 ou similar)
-            val title = document.selectFirst("h1, .title")?.text()?.trim()
+            // Título: h1 ou .sheader h1
+            val title = document.selectFirst("h1")?.text()?.trim()
                 ?: document.title().substringBefore(" - ").trim()
             
-            if (title.isBlank()) {
-                Log.e("MaxSeries", "❌ Título não encontrado: $url")
-                return null
-            }
+            if (title.isBlank() || title.contains("Login", true)) return null
 
-            // Título original
-            val originalTitle = document.select("*:contains(Título original)").firstOrNull()
-                ?.text()?.substringAfter(":")?.trim()
-
-            // Poster/imagem
+            // Poster: .poster img
             val poster = fixUrlNull(
-                document.selectFirst("img[src*=tmdb], img[src*=imdb], .poster img, img")?.attr("src")
+                document.selectFirst(".poster img")?.attr("src")
                     ?: document.selectFirst("meta[property=og:image]")?.attr("content")
             )
 
-            // Gêneros
-            val genres = document.select("*:contains(GÊNEROS)").firstOrNull()
-                ?.text()?.substringAfter(":")?.trim()?.split(" ")?.filter { it.isNotBlank() } ?: emptyList()
+            // Gêneros: .sgeneros a
+            val genres = document.select(".sgeneros a").map { it.text().trim() }
 
-            // Ano
-            val yearText = document.select("*:contains(DATA DE LANÇAMENTO), *:contains(LANÇAMENTO)").firstOrNull()
-                ?.text() ?: document.text()
-            val year = "\\b(19|20)\\d{2}\\b".toRegex().find(yearText)?.value?.toIntOrNull()
+            // Ano: extrair do texto da página
+            val pageText = document.text()
+            val year = "DATA DE LANÇAMENTO[:\\s]*([A-Za-z.]+\\s*\\d{1,2},?\\s*)?(\\d{4})".toRegex()
+                .find(pageText)?.groupValues?.lastOrNull()?.toIntOrNull()
+                ?: "\\b(19|20)\\d{2}\\b".toRegex().find(pageText)?.value?.toIntOrNull()
 
-            // Rating
-            val ratingText = document.text()
-            val rating = "IMDb: ([0-9.]+)".toRegex().find(ratingText)?.groupValues?.get(1)?.toFloatOrNull()
+            // Sinopse: texto após SINOPSE até COMPARTILHE ou ELENCO
+            val plot = "SINOPSE\\s*(.+?)(?:COMPARTILHE|ELENCO|TRAILER|$)".toRegex(RegexOption.DOT_MATCHES_ALL)
+                .find(pageText)?.groupValues?.get(1)?.trim()?.take(500)
 
-            // Sinopse
-            val plot = document.select("*:contains(SINOPSE)").firstOrNull()
-                ?.parent()?.text()?.substringAfter("SINOPSE")?.trim()
-                ?: document.selectFirst(".description, .synopsis, .plot")?.text()?.trim()
-
-            // Detectar se é série ou filme
+            // Detectar tipo
             val isSeriesPage = url.contains("/series/") || 
-                              document.text().contains("TEMPORADAS:", true) ||
-                              document.text().contains("episódio", true)
-
-            Log.d("MaxSeries", "✅ Carregado '$title' - Tipo: ${if (isSeriesPage) "Série" else "Filme"}")
+                              pageText.contains("TEMPORADAS:", true)
 
             return if (isSeriesPage) {
-                // Para séries, criar lista de episódios (pode ser expandido futuramente)
-                val episodes = listOf(
-                    newEpisode(url) {
-                        this.name = title
-                        this.episode = 1
-                        this.season = 1
-                    }
-                )
-
+                // Buscar episódios/temporadas
+                val episodes = parseEpisodes(document, url)
+                
                 newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                     this.posterUrl = poster
                     this.year = year
@@ -195,9 +134,47 @@ class MaxSeriesProvider : MainAPI() {
                 }
             }
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro ao carregar $url: ${e.message}")
+            Log.e("MaxSeries", "❌ Erro load: ${e.message}")
             null
         }
+    }
+    
+    private fun parseEpisodes(document: org.jsoup.nodes.Document, baseUrl: String): List<Episode> {
+        val episodes = mutableListOf<Episode>()
+        
+        // Procurar temporadas e episódios
+        val seasonElements = document.select(".se-c, .seasons .se-a, #seasons .se-c")
+        
+        if (seasonElements.isNotEmpty()) {
+            seasonElements.forEachIndexed { seasonIndex, seasonEl ->
+                val seasonNum = seasonIndex + 1
+                val episodeElements = seasonEl.select(".episodios li, .se-a ul li, ul.episodios li")
+                
+                episodeElements.forEachIndexed { epIndex, epEl ->
+                    val epLink = epEl.selectFirst("a")?.attr("href") ?: baseUrl
+                    val epTitle = epEl.selectFirst(".episodiotitle a, .epst")?.text()?.trim() 
+                        ?: "Episódio ${epIndex + 1}"
+                    val epNum = epIndex + 1
+                    
+                    episodes.add(newEpisode(fixUrl(epLink)) {
+                        this.name = epTitle
+                        this.season = seasonNum
+                        this.episode = epNum
+                    })
+                }
+            }
+        }
+        
+        // Se não encontrou episódios, criar um placeholder
+        if (episodes.isEmpty()) {
+            episodes.add(newEpisode(baseUrl) {
+                this.name = "Assistir"
+                this.season = 1
+                this.episode = 1
+            })
+        }
+        
+        return episodes
     }
 
     override suspend fun loadLinks(
@@ -207,47 +184,47 @@ class MaxSeriesProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         return try {
-            Log.d("MaxSeries", "🔗 Carregando links: $data")
             val document = app.get(data).document
-            
             var linksFound = 0
             
-            // Procurar por botões de player ou iframes
-            val playerElements = document.select("button[data-source], iframe[src], a[href*=player]")
+            // Procurar iframes e botões de player
+            val sources = mutableListOf<String>()
             
-            playerElements.forEach { element ->
-                val sourceUrl = element.attr("data-source").ifEmpty { 
-                    element.attr("src").ifEmpty { 
-                        element.attr("href") 
-                    }
-                }
-                
-                if (sourceUrl.isNotEmpty() && !sourceUrl.contains("youtube", true)) {
-                    Log.d("MaxSeries", "🎬 Processando: $sourceUrl")
-                    
-                    when {
-                        sourceUrl.contains("dood", true) ||
-                        sourceUrl.contains("vidplay", true) -> {
-                            loadExtractor(sourceUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        sourceUrl.contains("megaembed", true) -> {
-                            // Usar extrator específico se disponível
-                            loadExtractor(sourceUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        else -> {
-                            loadExtractor(sourceUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                    }
+            // Iframes diretos
+            document.select("iframe[src]").forEach { iframe ->
+                val src = iframe.attr("src")
+                if (src.isNotEmpty() && !src.contains("youtube", true)) {
+                    sources.add(fixUrl(src))
                 }
             }
             
-            Log.d("MaxSeries", "✅ Links processados: $linksFound")
+            // Botões com data-source
+            document.select("[data-source], [data-src]").forEach { btn ->
+                val src = btn.attr("data-source").ifEmpty { btn.attr("data-src") }
+                if (src.isNotEmpty()) sources.add(fixUrl(src))
+            }
+            
+            // Links de player
+            document.select("a[href*=player], a[href*=embed]").forEach { link ->
+                val href = link.attr("href")
+                if (href.isNotEmpty() && !href.contains("youtube", true)) {
+                    sources.add(fixUrl(href))
+                }
+            }
+            
+            // Processar cada source
+            sources.distinct().forEach { sourceUrl ->
+                try {
+                    loadExtractor(sourceUrl, data, subtitleCallback, callback)
+                    linksFound++
+                } catch (e: Exception) {
+                    Log.e("MaxSeries", "Erro extractor: ${e.message}")
+                }
+            }
+            
             linksFound > 0
         } catch (e: Exception) {
-            Log.e("MaxSeries", "❌ Erro ao carregar links: ${e.message}")
+            Log.e("MaxSeries", "❌ Erro loadLinks: ${e.message}")
             false
         }
     }

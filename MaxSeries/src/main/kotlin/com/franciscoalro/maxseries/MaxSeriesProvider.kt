@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element
 import com.franciscoalro.maxseries.extractors.*
 
 class MaxSeriesProvider : MainAPI() { // all providers must be an instance of MainAPI
-    override var mainUrl = "https://maxseries.cc"
+    override var mainUrl = "https://www.maxseries.one"
     override var name = "MaxSeries"
     override val hasMainPage = true
     override var lang = "pt"

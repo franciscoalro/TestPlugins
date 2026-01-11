@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaEmbed Response Decoder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 24px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        #output {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .url-box {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            word-break: break-all;
+        }
+
+        .url-box strong {
+            color: #e65100;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔓 MegaEmbed Response Decoder</h1>
+
+        <label for="hexInput"><strong>Cole a resposta hexadecimal do /api/v1/video:</strong></label>
+        <textarea id="hexInput" placeholder="933a30ecdabc15152bfbe068bc27d5342f59759c..."></textarea>
+
+        <button class="btn" onclick="decode()">🚀 Decodificar</button>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function decode() {
+            const hex = document.getElementById('hexInput').value.trim();
+            const output = document.getElementById('output');
+
+            if (!hex) {
+                output.innerHTML = '<div class="error">❌ Cole a resposta hexadecimal primeiro!</div>';
+                return;
+            }
+
+            try {
+                // Converter hex para string
+                let decoded = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                    decoded += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                }
+
+                output.innerHTML = '<div class="success">✅ Decodificado com sucesso!</div>';
+                output.innerHTML += '<h3>📄 Conteúdo Decodificado:</h3>';
+                output.innerHTML += '<pre>' + escapeHtml(decoded) + '</pre>';
+
+                // Tentar extrair URLs
+                const urlPattern = /https?:\/\/[^\s"'<>]+/g;
+                const urls = decoded.match(urlPattern);
+
+                if (urls && urls.length > 0) {
+                    output.innerHTML += '<h3>🔗 URLs Encontradas:</h3>';
+                    urls.forEach((url, index) => {
+                        output.innerHTML += `<div class="url-box"><strong>URL ${index + 1}:</strong><br>${escapeHtml(url)}</div>`;
+                    });
+                }
+
+                // Tentar parsear como JSON
+                try {
+                    const json = JSON.parse(decoded);
+                    output.innerHTML += '<h3>📋 JSON Parseado:</h3>';
+                    output.innerHTML += '<pre>' + JSON.stringify(json, null, 2) + '</pre>';
+                } catch (e) {
+                    // Não é JSON válido
+                }
+
+            } catch (error) {
+                output.innerHTML = '<div class="error">❌ Erro ao decodificar: ' + error.message + '</div>';
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Auto-preencher com o exemplo
+        document.getElementById('hexInput').value = '933a30ecdabc15152bfbe068bc27d5342f59759c823e7e206be7a128ff897fc44fd4e82e2a801097e8bf2d3bcd927deecf7dd715b665ab57521809a4f68fe756dda2d6b801482e850f9e193f36cb80c0b2711a4324b8126357dac03e5b572909d7c67ce8d8d90cf950986476da2052363f7346b0f3d3e9e26794c05a8fac453c8d153e3c97e9c278d7a841264d234ac3c2844368f3b7071baf34f03e3395e382d57227dac2b465f0bde178164a410ff1b6156d51082fd3e25c7619c01897d61cd455687f75fb4037cd4e2ae1cb1c3529af0214ecba4473e15f5dacea8f19cdf612efef09ddf4bf73effe416ba1af9069ce16a1c954da14a0266e5cc84f9586a059e45cc3da20e0e4ffebbc297ece0a264566bcc83bbf1dc66410a9285db8ae45e458878d74612013ac760a39dd004d3f3305afcf80328c7af8966e127ce61c4022c17188e7f788d64070ac8a9a5a68f7797f2e08fb94ea968fe52bf1e746db5f44bd08d16ca1e42f300c3e59eccce72c42a9b7d90306c5ebbb79a2268a946f2a001fd90d091cdc8f5eeba0270e8ee32bb4fdf1c9d09087d5bb6ddd4c44966dccd0624ab72501e6f46b0052de71d96a9df717423cc9b2b650488ecd1aa23f0340bb8d85f3997195c8ba52aab63ec55b9c9ae7a1ee3e78af920bf517d6d9190fc1994e325d47378ee765f50222ef30c80c92f6e2556a06f49b649899d9a9c2ffe951542c95aca9a8fc26ac7281f91aab65b14ed7076d4c56ef8c59d28bfe47e729bb7aa168aa2292f0721ff92733e5c8e3053cc201d84f75f384eb1e99e92896f0fecf574c67869e9d49d0e82a1b6b04a634773ba1a8b5144a508d92537852cf07bdea2696178c92f613bae6135fa55571f1944c61be96c1a5b0626f246dd09bf04769934348bcb60936e40ff42396d19027504f07c4ec30db8806d01d01d40fa9cce9f042e4fc5541e10a60ba46f4efa2b603967b73c692ec27ad7c4fe37f5abc684693cfcab85b2c8e45300ec928a425fef5582aeada9c9b4e12c9d57d950e4e47e4286654329740312d3d23d1d373c49c325b5ffd7c2e76a3d11e871695aa6064bbb4e3d93e888717be0131db2c03919655522bc6ca159185f89b8f0ea62cd592583dc94eade296948519576ccca73d862919cf9b89515b6724292c731da2f7cc7e3fc1c0fb653f993066826b743dcea27fde1d2b202056398ca6c4a18202bc3133ecb72926039cf2fa92e1285731f9154fb95edefcb92c79e1a92b63ad85cc9adbf18981d9bf768212f287f0f393cb4b19f1497d122bd8c0ef124e5d3df43450cd89cf13bae68e709feb2cc54864d45482181082052d7081f72f06d7bd9f4d58491f40beb3ffe6d6f5d918b2fa3c610dd240c5900661f2141bd384fca5135b0bd03871b76b2a17c00270293cf3abc88fedc6dd310150b8df21c5a28ec2b46fb94095419c410bfe9f0a196e379e2ba6be3d723ee9673c552f89377a83ae8f92f2878176fb5559a0722160ed6444534082f007e3fba50716f7c0de92a977f1356618ab08f3506fc0ebb79212779222ad662ed26f5983262464808be886f1c4292fd6bf52cd60ce6d6bbace5b56b9f43a42a4652647f348a3d60ea1b43d296f60a227d2a7505ee56f681ebca46cc3907f4ed9fa3004975802e61a83ddb1ff98ab446c10920970e022e503d8628ffb4f787512f474a75fc383c744c3e0c52cced933c12d95a5f0516defb10329de47e7588c098957c9f475940e8366c652020ea97979084d7cf666044eebd71ad8a55cd19a70ecd894a3e43d596bad018214adbd6710faf19f2eb706be12aaca3c69d819523c1bd7c55ac178ea75921a14e129d9d2b1b43f11e391b648c63dc75c8e811521eaec73fbe8b2b3b233e66e3e5d6d0d576a05c5fdceb048abc7c86b47f79e9717be5a3febe566ded0581ddff7dc827d0d2ad802eb63e0b0d96241915db35ad1d1dd35413ba768df5907957c382f3495375f0cbcd9d06bd8aaa024290764e65f11137352347bf81b6daeab8b6ef461227ec4cf45f0a197edcc82434baf4e3ce4018085cb43274554aa26e6e9bb362364e6e7230422d7fbd03df95f5c32a10d4dbe01f3f42d4302f4bd13ddaaadcff9357c13fb355418c57786316bc284102e2b3bd305f2bc41324a29f2b3db3656744bb5c7104a289abbe1ed4db01e15da77da82166d53d400c4b2e9d2af6a4dd0fe8146dc4f62ae8caeda6798e9e30ffc9622a8d83af8593c5f01682136b623753652cdf0aca13fb8b67c054ac6cd105c4de822b4eaa345b4c214853380ba14c83f8b7b68afb42ece30c8b740a9896ecf59f9f8976b99e85331c3646ac61606d27875851d977d5a5a2a0b476ace2baff9d99fe2f35592560029cccb8e8da1911bfb1412b3df33737f5f2d9eda2a214fe29c02bf401d46f2a83413c1a3dc2d5ebe90c809e85953739a8e4e37c858cfd5e19f80f5bf2480cb9cd8a03d8e661d31e7b86f3b710b545fb08226996c4a31e37658608820e73dc52295cdab72a6fbc971d6a62a407c93c57a3dbdef122c646af8675371e699d5d72fe578e7d299e1b071342bdaab417abbf17761dec492d581d8bb8ed20f91158eb14141a4aa7e13c8f720cc625dffa7a178abf4a46fff518b76879c948d879a743e47d14232eaeda582dce608065dff4d06db0b52b6df1d2e226d6bbb853f85246f0c02fd495c2f48f7bd822f34fc04353a5a08ed5cd2875b30fd930fe25ffcb7b1ac2c4960fd36653d71e5b831dd57fc642c4e1bf90625580a83f140cb22156a127f90a3a904632d790f093cb70cca48ad961d7468b472918dcda8cbf4383d701b38cb011b3e91b1ba04bc50344d6c38a9b8b32e076fed7a45dfde3ffaff2bd101a9725e4e2dd3ba8fe8f69214835fa24947664258cae6f16c6a4a7efc0cf0ac469ac7cb72e5ab7a5307437a0fde38c90cf2b2f7020fcec36e4f2fd8aa3b2bb8124e1ec0195e2f7a8e0ebf88232d75599174f9e1daab8ca7b646f3c5ba60a110145b8c033be7e7785372cf30862500165155962f8c03ee5b7af217312313ec0e14e5064fc4eb8c144439efdedc5dbed0641a956f51365326ecdbb52722ca4913e614e375973963bce9af1b385d0a84f631367cc81bc4ebf916bb9eb3ec782120ae713fb32f0cd4d3254c37e592664302d1e0bf981c0ce3cf394988d8db475b713543b7437623c82aeb990944ac545bcad2651cef09cc8e094365b74bacef65229679163f52740be5ea394a477a63cf96d7a1831282741037e97ca1c1fca92329b8f616a8651c6c069d01e860b5dcc98797dd86ee463282a638adc5e963b28126b405524a9d0279888ee0464b9e523c778b4afedb71d5baa5f81c88ec29b4de3ef9bdcdbc266c77da5535f0e962899f79b2c67781882eeef6a21bd5e478b2a26f24e32ae5dc16f58391f99656ca5f9fdadf8b9435eda55cff80d3698d534c7a6d993dcf1280888aef8dacc66cd1257704eac053fdab8104796fb0d7ad860c2f691d7ab529382ef69de8d39dbc30ea3b11941425679567cea1b73d8c68a0045546040ed68e30c1ec397577ae4e1766856be164167d7cccf962434a5cc2edb07f7485c91faccc1e5b95a6ed2ac8efde27abb2cb11bf05e7c80ca30ac84b72acfeab18dab379664ef25871e592';
+    </script>
+</body>
+
+</html>

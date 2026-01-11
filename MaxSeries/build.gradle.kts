@@ -1,7 +1,7 @@
-version = 44
+version = 45
 
 cloudstream {
-    description = "MaxSeries v44 - MegaEmbed URL Construction Fix"
+    description = "MaxSeries v45 - MegaEmbed WebView Interceptor (Encryption Bypass)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaEmbed v44 - Teste de URL Manual</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 32px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        #log {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .log-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .log-success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .log-error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .log-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        #player-container {
+            margin-top: 24px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        .url-display {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧪 MegaEmbed v44 - Teste de URL</h1>
+        <p class="subtitle">Testando construção manual da URL da playlist</p>
+
+        <div class="input-group">
+            <label for="videoId">Video ID:</label>
+            <input type="text" id="videoId" placeholder="Ex: 3wnuij" value="3wnuij">
+        </div>
+
+        <div class="input-group">
+            <label for="cdnDomain">Domínio CDN:</label>
+            <input type="text" id="cdnDomain" placeholder="Ex: spo3.marvellaholdings.sbs"
+                value="spo3.marvellaholdings.sbs">
+        </div>
+
+        <div class="input-group">
+            <label for="pathCode">Código do Path:</label>
+            <input type="text" id="pathCode" placeholder="Ex: x6b" value="x6b">
+        </div>
+
+        <button class="btn" onclick="testManualUrl()">🚀 Testar URL Construída</button>
+
+        <div id="constructedUrl" style="display:none;" class="url-display"></div>
+
+        <div id="log"></div>
+
+        <div id="player-container" style="display:none;">
+            <video id="video" controls></video>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function testManualUrl() {
+            const videoId = document.getElementById('videoId').value.trim();
+            const cdnDomain = document.getElementById('cdnDomain').value.trim();
+            const pathCode = document.getElementById('pathCode').value.trim();
+
+            if (!videoId || !cdnDomain || !pathCode) {
+                log('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+
+            // Limpar log anterior
+            document.getElementById('log').innerHTML = '';
+
+            log('🔧 Construindo URL da playlist...', 'info');
+
+            // Construir URL usando o padrão v44
+            const timestamp = Math.floor(Date.now() / 1000);
+            const playlistUrl = `https://${cdnDomain}/v4/${pathCode}/${videoId}/cf-master.${timestamp}.txt`;
+
+            log(`📋 URL construída: ${playlistUrl}`, 'success');
+
+            // Exibir URL
+            const urlDisplay = document.getElementById('constructedUrl');
+            urlDisplay.textContent = playlistUrl;
+            urlDisplay.style.display = 'block';
+
+            // Tentar carregar
+            log('🎬 Tentando carregar vídeo...', 'info');
+            loadVideo(playlistUrl);
+        }
+
+        function loadVideo(url) {
+            const video = document.getElementById('video');
+            const container = document.getElementById('player-container');
+
+            container.style.display = 'block';
+
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    debug: false,
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    xhrSetup: function (xhr, url) {
+                        // Tentar adicionar headers (pode falhar por CORS)
+                        try {
+                            xhr.setRequestHeader('Referer', 'https://megaembed.link/');
+                            xhr.setRequestHeader('Origin', 'https://megaembed.link');
+                        } catch (e) {
+                            log('⚠️ Não foi possível adicionar headers (CORS)', 'warning');
+                        }
+                    }
+                });
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    log('✅ Playlist carregada com sucesso!', 'success');
+                    log('🎥 Iniciando reprodução...', 'info');
+                    video.play();
+                });
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        log(`❌ Erro fatal: ${data.type} - ${data.details}`, 'error');
+
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                log('🔍 Erro de rede. Possíveis causas:', 'warning');
+                                log('  • URL expirada ou inválida', 'warning');
+                                log('  • Domínio CDN incorreto', 'warning');
+                                log('  • CORS bloqueando requisição', 'warning');
+                                log('  • Timestamp fora da janela válida', 'warning');
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                log('🔍 Erro de mídia. Tentando recuperar...', 'warning');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                log('🔍 Erro desconhecido', 'error');
+                                break;
+                        }
+                    }
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(video);
+
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', function () {
+                    log('✅ Vídeo carregado (Safari/iOS)', 'success');
+                    video.play();
+                });
+                video.addEventListener('error', function () {
+                    log('❌ Erro ao carregar vídeo', 'error');
+                });
+            } else {
+                log('❌ Navegador não suporta HLS', 'error');
+            }
+        }
+
+        // Log inicial
+        log('🎯 Pronto para testar!', 'info');
+        log('💡 Preencha os campos e clique em "Testar URL Construída"', 'info');
+    </script>
+</body>
+
+</html>

@@ -44,23 +44,12 @@ class MegaEmbedExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Extractor ===")
+        Log.d(TAG, "=== MegaEmbed Extractor v45 ===")
         Log.d(TAG, "URL: $url")
         
-        // 1. Usar o Resolver com WebView para capturar o token
+        // v45: Interceptação via WebView para bypass de criptografia
+        // A API retorna dados criptografados, o navegador descriptografa e requisita a playlist
         val resolver = com.franciscoalro.maxseries.resolver.MegaEmbedWebViewResolver(App.context)
-        val tokenUrl = resolver.resolveToken(url)
-        
-        if (tokenUrl != null) {
-            Log.d(TAG, "Token capturado: $tokenUrl")
-            
-            // 2. Usar o Fetcher para validar o link e obter a playlist real (se necessário)
-            // Muitos links já são a playlist direta, mas o fetcher garante o header Referer.
-            val playlist = com.franciscoalro.maxseries.extractors.MegaEmbedLinkFetcher.fetch(tokenUrl)
-            
-            if (playlist != null && playlist.contains("#EXTM3U")) {
-                 // 3. Emitir o link para o Cloudstream com os headers corretos
-                 callback(
                     newExtractorLink(
                         name = "MegaEmbed",
                         url = tokenUrl, // O URL com token é o que o player precisa

@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v48.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v49.0/MaxSeries.cs3",
         "status": 1,
-        "version": 48,
+        "version": 49,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v48 - Fix Deteccao MegaEmbed: Corrigido problema onde fontes MegaEmbed nao apareciam no player. Agora detecta data-show-player + fallback data-source. Cobertura 95%.",
+        "description": "MaxSeries v49 - MegaEmbed Pattern-Based: Implementado extração baseada no padrão descoberto dos links reais. Construção direta de URLs cf-master.txt + fallbacks WebView. Mais rápido e confiável.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

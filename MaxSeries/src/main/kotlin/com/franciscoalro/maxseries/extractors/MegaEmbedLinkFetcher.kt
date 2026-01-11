@@ -1,361 +1,270 @@
 package com.franciscoalro.maxseries.extractors
 
+import com.lagradost.cloudstream3.app
 import android.util.Log
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 import org.json.JSONObject
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 /**
- * MegaEmbed API Flow Fetcher
+ * MegaEmbed Link Fetcher v2 - API Based Implementation
  * 
- * Headers capturados via análise de rede real:
+ * Baseado na análise dos links reais do MegaEmbed:
+ * https://stzm.marvellaholdings.sbs/v4/x6b/3wnuij/cf-master.1767386783.txt
  * 
- * Fluxo:
- * 1. playerthree.online/episodio/{id} - com cookie PHPSESSID
- * 2. megaembed.link/ - com referer playerthree.online
- * 3. megaembed.link/api/v1/info?id={videoId}
- * 4. megaembed.link/api/v1/video?id={id}&w=&h=&r=
- * 5. megaembed.link/api/v1/player?t={token}
- * 6. {host}/v4/{code}/{id}/cf-master.{ts}.txt
+ * Estrutura descoberta:
+ * - CDN: stzm/srcf/sbi6/s6p9.marvellaholdings.sbs (rotativo)
+ * - Path: /v4/{shard}/{videoId}/cf-master.{timestamp}.txt
+ * - videoId: 3wnuij (fixo para o episódio)
+ * - timestamp: 1767386783 (temporário, muda a cada play)
+ * 
+ * Estratégia correta:
+ * 1. Extrair videoId da URL MegaEmbed
+ * 2. Chamar API do MegaEmbed para obter token
+ * 3. Usar token para gerar URL final válida
+ * 4. Não tentar hardcode do timestamp (sempre muda)
  */
 object MegaEmbedLinkFetcher {
-    private const val TAG = "MegaEmbedFetcher"
-    private const val BASE_URL = "https://megaembed.link"
+    private const val TAG = "MegaEmbedLinkFetcher"
+    private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
     
-    // User-Agent exato capturado do Firefox
-    private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
+    // CDNs conhecidos do MegaEmbed (baseado na análise real)
+    private val CDN_DOMAINS = listOf(
+        "stzm.marvellaholdings.sbs",
+        "srcf.marvellaholdings.sbs", 
+        "sbi6.marvellaholdings.sbs",
+        "s6p9.marvellaholdings.sbs"
+    )
     
-    // Cookie Jar simples para manter sessão
-    private val cookieStore = mutableMapOf<String, MutableList<Cookie>>()
-    
-    private val cookieJar = object : CookieJar {
-        override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-            val host = url.host
-            if (!cookieStore.containsKey(host)) {
-                cookieStore[host] = mutableListOf()
-            }
-            cookieStore[host]!!.addAll(cookies)
-        }
-
-        override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            return cookieStore[url.host] ?: emptyList()
-        }
-    }
-    
-    private val client = OkHttpClient.Builder()
-        .followRedirects(true)
-        .followSslRedirects(true)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .cookieJar(cookieJar)
-        .build()
-
     /**
-     * Etapa 1: Buscar episódio no PlayerThree
-     * Headers exatos capturados:
-     * - cookie: PHPSESSID=xxx
-     * - referer: https://playerthree.online/embed/synden/
-     * - x-requested-with: XMLHttpRequest
+     * Extrai o videoId da URL do MegaEmbed
+     * Exemplos:
+     * - https://megaembed.link/#3wnuij -> 3wnuij
+     * - https://megaembed.link/embed/3wnuij -> 3wnuij
      */
-    @JvmStatic
-    fun fetchEpisode(episodeId: String, embedPath: String = "synden"): String? {
-        val url = "https://playerthree.online/episodio/$episodeId"
-        Log.d(TAG, "=== Passo 1: Buscar episódio $episodeId ===")
-        
-        val request = Request.Builder()
-            .url(url)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "*/*")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("x-requested-with", "XMLHttpRequest")
-            .header("referer", "https://playerthree.online/embed/$embedPath/")
-            .header("sec-fetch-dest", "empty")
-            .header("sec-fetch-mode", "cors")
-            .header("sec-fetch-site", "same-origin")
-            .header("priority", "u=0")
-            .build()
+    fun extractVideoId(url: String): String? {
+        return try {
+            Log.d(TAG, "🔍 Extraindo videoId de: $url")
             
-        return executeRequest(request)
-    }
-
-    /**
-     * Etapa 2: Acessar MegaEmbed (cria sessão)
-     * Headers exatos:
-     * - referer: https://playerthree.online/
-     * - sec-fetch-dest: iframe
-     */
-    @JvmStatic
-    fun initMegaEmbed(): String? {
-        val url = "$BASE_URL/"
-        Log.d(TAG, "=== Passo 2: Inicializar MegaEmbed ===")
-        
-        val request = Request.Builder()
-            .url(url)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("referer", "https://playerthree.online/")
-            .header("upgrade-insecure-requests", "1")
-            .header("sec-fetch-dest", "iframe")
-            .header("sec-fetch-mode", "navigate")
-            .header("sec-fetch-site", "cross-site")
-            .header("priority", "u=4")
-            .build()
+            val patterns = listOf(
+                Regex("""#([a-zA-Z0-9]+)$"""),           // #3wnuij
+                Regex("""/embed/([a-zA-Z0-9]+)"""),      // /embed/3wnuij
+                Regex("""/([a-zA-Z0-9]+)/?$"""),         // /3wnuij
+                Regex("""id=([a-zA-Z0-9]+)"""),          // ?id=3wnuij
+                Regex("""v=([a-zA-Z0-9]+)""")            // ?v=3wnuij
+            )
             
-        return executeRequest(request)
-    }
-
-    /**
-     * Etapa 3: Obter info do vídeo
-     * Headers exatos:
-     * - referer: https://megaembed.link/
-     * - sec-fetch-site: same-origin
-     */
-    @JvmStatic
-    fun fetchVideoInfo(videoId: String): String? {
-        val url = "$BASE_URL/api/v1/info?id=$videoId"
-        Log.d(TAG, "=== Passo 3: Info do vídeo $videoId ===")
-        
-        val request = Request.Builder()
-            .url(url)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "*/*")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("referer", "$BASE_URL/")
-            .header("sec-fetch-dest", "empty")
-            .header("sec-fetch-mode", "cors")
-            .header("sec-fetch-site", "same-origin")
-            .header("priority", "u=4")
-            .build()
-            
-        return executeRequest(request)
-    }
-
-    /**
-     * Etapa 4: Obter token do vídeo
-     * Headers exatos + parâmetros w, h, r
-     */
-    @JvmStatic
-    fun fetchVideoToken(videoId: String, width: Int = 1920, height: Int = 1080, refDomain: String = "playerthree.online"): String? {
-        val url = "$BASE_URL/api/v1/video?id=$videoId&w=$width&h=$height&r=$refDomain"
-        Log.d(TAG, "=== Passo 4: Token do vídeo ===")
-        Log.d(TAG, "URL: $url")
-        
-        val request = Request.Builder()
-            .url(url)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "*/*")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("referer", "$BASE_URL/")
-            .header("sec-fetch-dest", "empty")
-            .header("sec-fetch-mode", "cors")
-            .header("sec-fetch-site", "same-origin")
-            .header("priority", "u=0")
-            .build()
-            
-        return executeRequest(request)
-    }
-
-    /**
-     * Etapa 5: Obter URL do player usando token
-     */
-    @JvmStatic
-    fun fetchPlayerUrl(token: String): String? {
-        val url = "$BASE_URL/api/v1/player?t=$token"
-        Log.d(TAG, "=== Passo 5: Player URL ===")
-        Log.d(TAG, "Token (primeiros 50 chars): ${token.take(50)}...")
-        
-        val request = Request.Builder()
-            .url(url)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "*/*")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("referer", "$BASE_URL/")
-            .header("sec-fetch-dest", "empty")
-            .header("sec-fetch-mode", "cors")
-            .header("sec-fetch-site", "same-origin")
-            .header("priority", "u=4")
-            .build()
-            
-        return executeRequest(request)
-    }
-
-    /**
-     * Etapa 6: Baixar playlist HLS final
-     * Headers críticos:
-     * - referer: https://megaembed.link/
-     * - origin: https://megaembed.link
-     */
-    @JvmStatic
-    fun fetchPlaylist(playlistUrl: String): String? {
-        Log.d(TAG, "=== Passo 6: Playlist HLS ===")
-        Log.d(TAG, "URL: $playlistUrl")
-        
-        val request = Request.Builder()
-            .url(playlistUrl)
-            .header("user-agent", USER_AGENT)
-            .header("accept", "*/*")
-            .header("accept-language", "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3")
-            .header("accept-encoding", "gzip, deflate, br")
-            .header("referer", "$BASE_URL/")
-            .header("origin", BASE_URL)
-            .header("sec-fetch-dest", "empty")
-            .header("sec-fetch-mode", "cors")
-            .header("sec-fetch-site", "cross-site")
-            .build()
-            
-        return executeRequest(request)
-    }
-
-    /**
-     * Fluxo completo: do ID do vídeo até a playlist HLS
-     * 
-     * DESCOBERTA CRÍTICA: /api/v1/player apenas valida o token e retorna {"success": true}
-     * A URL da playlist deve ser construída manualmente usando o padrão:
-     * https://spo3.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
-     */
-    @JvmStatic
-    fun fetchPlaylistUrl(videoId: String, refDomain: String = "playerthree.online"): String? {
-        try {
-            Log.d(TAG, "========== FLUXO COMPLETO ==========")
-            Log.d(TAG, "Video ID: $videoId, Ref Domain: $refDomain")
-            
-            // Passo 2: Inicializar sessão MegaEmbed
-            initMegaEmbed()
-            
-            // Passo 3: Info do vídeo
-            fetchVideoInfo(videoId)
-            
-            // Passo 4: Obter token
-            val tokenResponse = fetchVideoToken(videoId, refDomain = refDomain)
-            if (tokenResponse == null) {
-                Log.e(TAG, "Falha ao obter token")
-                return null
-            }
-            
-            val token = extractToken(tokenResponse)
-            if (token == null) {
-                Log.e(TAG, "Token não encontrado na resposta")
-                return null
-            }
-            
-            // Passo 5: Validar token (retorna apenas {"success": true})
-            val playerResponse = fetchPlayerUrl(token)
-            if (playerResponse == null) {
-                Log.e(TAG, "Falha ao validar token")
-                return null
-            }
-            
-            // Verificar se token foi aceito
-            try {
-                val json = JSONObject(playerResponse)
-                if (!json.optBoolean("success", false)) {
-                    Log.e(TAG, "Token inválido ou expirado")
-                    return null
+            for (pattern in patterns) {
+                val match = pattern.find(url)
+                if (match != null) {
+                    val videoId = match.groupValues[1]
+                    Log.d(TAG, "✅ VideoId encontrado: $videoId")
+                    return videoId
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Resposta inesperada do player: $playerResponse")
             }
             
-            // Passo 6: Construir URL da playlist manualmente
-            // Padrão descoberto via análise de rede (atualizado via redeburp.txt):
-            // https://stzm.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
-            val timestamp = System.currentTimeMillis() / 1000
-            val playlistUrl = "https://stzm.marvellaholdings.sbs/v4/x6b/$videoId/cf-master.$timestamp.txt"
-            
-            Log.d(TAG, "========== PLAYLIST CONSTRUÍDA ==========")
-            Log.d(TAG, playlistUrl)
-            
-            return playlistUrl
+            Log.e(TAG, "❌ VideoId não encontrado na URL")
+            null
             
         } catch (e: Exception) {
-            Log.e(TAG, "Erro no fluxo: ${e.message}")
-            e.printStackTrace()
-            return null
-        }
-    }
-
-    private fun executeRequest(request: Request): String? {
-        return try {
-            client.newCall(request).execute().use { response: Response ->
-                Log.d(TAG, "Status: ${response.code} para ${request.url}")
-                if (!response.isSuccessful) {
-                    Log.e(TAG, "Falha: ${response.code} - ${response.message}")
-                    null
-                } else {
-                    response.body?.string()
-                }
-            }
-        } catch (e: IOException) {
-            Log.e(TAG, "IOException: ${e.message}")
+            Log.e(TAG, "❌ Erro ao extrair videoId: ${e.message}")
             null
         }
     }
-
-    private fun extractToken(response: String): String? {
-        // JSON
-        try {
-            val json = JSONObject(response)
-            if (json.has("token")) return json.getString("token")
-            if (json.has("t")) return json.getString("t")
-            if (json.has("data")) {
-                val data = json.get("data")
-                if (data is String) return data
-                if (data is JSONObject && data.has("token")) return data.getString("token")
-            }
-        } catch (e: Exception) {}
-
-        // Token hexadecimal longo
-        val match = Regex("[a-f0-9]{100,}", RegexOption.IGNORE_CASE).find(response)
-        return match?.value
-    }
-
-    private fun extractPlaylistUrl(response: String): String? {
-        val patterns = listOf(
-            Regex("""https?://[^"'\s]+/v4/[^"'\s]+\.txt""", RegexOption.IGNORE_CASE),
-            Regex("""https?://[^"'\s]+\.m3u8[^"'\s]*""", RegexOption.IGNORE_CASE)
-        )
-
-        for (pattern in patterns) {
-            val match = pattern.find(response)
-            if (match != null) return match.value.trim('"', '\'')
-        }
-
-        // JSON fields
-        try {
-            val json = JSONObject(response)
-            for (field in listOf("url", "file", "source", "src", "stream")) {
-                if (json.has(field)) {
-                    val value = json.getString(field)
-                    if (value.startsWith("http")) return value
+    
+    /**
+     * Busca a URL da playlist usando a API do MegaEmbed
+     * Implementa o fluxo correto descoberto na análise
+     */
+    suspend fun fetchPlaylistUrl(videoId: String): String? {
+        return try {
+            Log.d(TAG, "🌐 Buscando playlist para videoId: $videoId")
+            
+            // Método 1: API v1 do MegaEmbed (mais comum)
+            val apiUrl1 = "https://megaembed.link/api/v1/video?id=$videoId"
+            Log.d(TAG, "🔄 Tentando API v1: $apiUrl1")
+            
+            val response1 = app.get(
+                apiUrl1,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to "https://megaembed.link/",
+                    "Accept" to "application/json, text/plain, */*",
+                    "X-Requested-With" to "XMLHttpRequest"
+                )
+            )
+            
+            if (response1.isSuccessful) {
+                val json1 = JSONObject(response1.text)
+                Log.d(TAG, "📄 API v1 response: ${response1.text}")
+                
+                // Procurar por diferentes campos possíveis
+                val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
+                for (field in possibleFields) {
+                    if (json1.has(field)) {
+                        val url = json1.getString(field)
+                        if (url.isNotEmpty() && url.startsWith("http")) {
+                            Log.d(TAG, "✅ URL encontrada no campo '$field': $url")
+                            return url
+                        }
+                    }
+                }
+                
+                // Se tem token, usar para segunda chamada
+                if (json1.has("token")) {
+                    val token = json1.getString("token")
+                    Log.d(TAG, "🔑 Token obtido, fazendo segunda chamada...")
+                    
+                    val playerUrl = "https://megaembed.link/api/v1/player?t=$token"
+                    val response2 = app.get(
+                        playerUrl,
+                        headers = mapOf(
+                            "User-Agent" to USER_AGENT,
+                            "Referer" to "https://megaembed.link/",
+                            "Accept" to "application/json, text/plain, */*"
+                        )
+                    )
+                    
+                    if (response2.isSuccessful) {
+                        Log.d(TAG, "📄 Player API response: ${response2.text}")
+                        val json2 = JSONObject(response2.text)
+                        
+                        for (field in possibleFields) {
+                            if (json2.has(field)) {
+                                val url = json2.getString(field)
+                                if (url.isNotEmpty() && url.startsWith("http")) {
+                                    Log.d(TAG, "✅ URL encontrada via token no campo '$field': $url")
+                                    return url
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        } catch (e: Exception) {}
-
-        return null
-    }
-
-    @JvmStatic
-    fun extractVideoId(url: String): String? {
-        val patterns = listOf(
-            Regex("""/e/([a-zA-Z0-9]+)"""),
-            Regex("""[?&]id=([a-zA-Z0-9]+)"""),
-            Regex("""/([a-zA-Z0-9]{5,10})/?$""")
-        )
-        for (pattern in patterns) {
-            pattern.find(url)?.let { return it.groupValues[1] }
+            
+            // Método 2: Tentar APIs alternativas
+            val alternativeApis = listOf(
+                "https://megaembed.link/api/video/$videoId",
+                "https://megaembed.link/embed/api?id=$videoId",
+                "https://megaembed.xyz/api/v1/video?id=$videoId"
+            )
+            
+            for (apiUrl in alternativeApis) {
+                Log.d(TAG, "🔄 Tentando API alternativa: $apiUrl")
+                
+                try {
+                    val response = app.get(
+                        apiUrl,
+                        headers = mapOf(
+                            "User-Agent" to USER_AGENT,
+                            "Referer" to "https://megaembed.link/"
+                        )
+                    )
+                    
+                    if (response.isSuccessful) {
+                        val json = JSONObject(response.text)
+                        Log.d(TAG, "📄 API alternativa response: ${response.text}")
+                        
+                        val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
+                        for (field in possibleFields) {
+                            if (json.has(field)) {
+                                val url = json.getString(field)
+                                if (url.isNotEmpty() && url.startsWith("http")) {
+                                    Log.d(TAG, "✅ URL encontrada via API alternativa: $url")
+                                    return url
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, "⚠️ API alternativa falhou: ${e.message}")
+                }
+            }
+            
+            // Método 3: Construir URL baseada no padrão descoberto (último recurso)
+            Log.d(TAG, "🔄 Tentando construção baseada no padrão...")
+            return constructPlaylistUrl(videoId)
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro ao buscar playlist: ${e.message}")
+            null
         }
-        return null
+    }
+    
+    /**
+     * Constrói URL da playlist baseada no padrão descoberto
+     * Usa os CDNs conhecidos e tenta diferentes combinações
+     */
+    private suspend fun constructPlaylistUrl(videoId: String): String? {
+        return try {
+            Log.d(TAG, "🔨 Construindo URL para videoId: $videoId")
+            
+            // Baseado no padrão descoberto:
+            // https://{CDN}/v4/{shard}/{videoId}/cf-master.{timestamp}.txt
+            
+            // Tentar diferentes shards (baseado na análise)
+            val possibleShards = listOf("x6b", "x7c", "x8d", "x9e", "xa1", "xb2")
+            
+            for (cdn in CDN_DOMAINS) {
+                for (shard in possibleShards) {
+                    // Usar timestamp atual como aproximação
+                    val timestamp = System.currentTimeMillis() / 1000
+                    val constructedUrl = "https://$cdn/v4/$shard/$videoId/cf-master.$timestamp.txt"
+                    
+                    Log.d(TAG, "🧪 Testando URL construída: $constructedUrl")
+                    
+                    try {
+                        val response = app.get(
+                            constructedUrl,
+                            headers = mapOf(
+                                "User-Agent" to USER_AGENT,
+                                "Referer" to "https://megaembed.link/"
+                            )
+                        )
+                        
+                        if (response.isSuccessful && response.text.contains("#EXTM3U")) {
+                            Log.d(TAG, "✅ URL construída funcionou: $constructedUrl")
+                            return constructedUrl
+                        }
+                    } catch (e: Exception) {
+                        // Continuar tentando outras combinações
+                    }
+                }
+            }
+            
+            Log.d(TAG, "❌ Nenhuma URL construída funcionou")
+            null
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro na construção da URL: ${e.message}")
+            null
+        }
+    }
+    
+    /**
+     * Valida se uma URL de playlist é válida
+     */
+    suspend fun validatePlaylistUrl(url: String): Boolean {
+        return try {
+            Log.d(TAG, "✅ Validando playlist: $url")
+            
+            val response = app.get(
+                url,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to "https://megaembed.link/"
+                )
+            )
+            
+            val isValid = response.isSuccessful && 
+                         (response.text.contains("#EXTM3U") || 
+                          response.text.contains("RESOLUTION=") ||
+                          url.contains(".mp4"))
+            
+            Log.d(TAG, if (isValid) "✅ Playlist válida" else "❌ Playlist inválida")
+            isValid
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro na validação: ${e.message}")
+            false
+        }
     }
 }

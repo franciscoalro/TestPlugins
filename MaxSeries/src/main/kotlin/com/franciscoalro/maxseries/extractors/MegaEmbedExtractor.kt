@@ -85,22 +85,4 @@ class MegaEmbedExtractor : ExtractorApi() {
             }
         }
     }
-
-        // Fallback: tentar a extração antiga se o resolver falhar
-        tryWebViewExtraction(url, referer, callback)
-    }
-
-    // Mantém a função antiga como fallback, mas privada/reduzida se desejar.
-    // Para simplificar, vamos manter o tryWebViewExtraction original abaixo como fallback.
-    private suspend fun tryWebViewExtraction(
-        url: String,
-        referer: String?,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        // ... (Lógica existente mantida como fallback) ...
-        // Como o replace_file_content substitui blocos, se quisermos manter o resto, 
-        // precisaríamos reenviar o código todo. 
-        // VOU REESCREVER A CLASSE INTEIRA DE FORMA LIMPA ABAIXO.
-        return false 
-    }
 }

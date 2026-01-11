@@ -574,7 +574,10 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             if (videoUrl.contains(".m3u8")) {
                 // HLS - usar M3u8Helper para múltiplas qualidades
                 Log.d(TAG, "📺 Processando como HLS: $cleanUrl")
-                M3u8Helper.generateM3u8(sourceName, cleanUrl, effectiveReferer).forEach(callback)
+                val m3u8Links = M3u8Helper.generateM3u8(sourceName, cleanUrl, effectiveReferer)
+                for (link in m3u8Links) {
+                    callback(link)
+                }
             } else {
                 // MP4 direto (GCS ou outros)
                 Log.d(TAG, "📺 Processando como MP4: $cleanUrl")

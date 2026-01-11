@@ -359,7 +359,10 @@ class MegaEmbedExtractor : ExtractorApi() {
             if (videoUrl.contains(".m3u8") || videoUrl.contains("master.txt")) {
                 // HLS - usar M3u8Helper para múltiplas qualidades
                 Log.d(TAG, "📺 Processando como HLS: $cleanUrl")
-                M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
+                val m3u8Links = M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer)
+                for (link in m3u8Links) {
+                    callback(link)
+                }
             } else {
                 // MP4 direto
                 Log.d(TAG, "📺 Processando como MP4: $cleanUrl")

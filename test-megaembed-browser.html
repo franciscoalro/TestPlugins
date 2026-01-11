@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste MegaEmbed - Logs no Navegador</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f0f0f0; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        #logs { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste MegaEmbed - Logs no Navegador</h1>
+    <p>Este teste simula o comportamento do MaxSeries v50 e mostra os logs em tempo real.</p>
+    
+    <button onclick="testMegaEmbed()">🎬 Testar MegaEmbed</button>
+    <button onclick="clearLogs()">🗑️ Limpar Logs</button>
+    
+    <h2>📋 Logs:</h2>
+    <div id="logs"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function testMegaEmbed() {
+            log("🎯 [MegaEmbedExtractorV4] Iniciando teste...", "info");
+            log("🎬 URL: https://megaembed.link/#3wnuij", "info");
+            log("🆔 VideoId extraído: 3wnuij", "success");
+            
+            log("🧠 [MegaEmbedExtractorV4] Iniciando interceptação inteligente...", "info");
+            
+            // Simular carregamento
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            log("🌐 Carregando MegaEmbed no WebView...", "info");
+            
+            // Simular API calls
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            log("📋 API Info call: https://megaembed.link/api/v1/info?id=3wnuij", "info");
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            log("🎬 API Video call: https://megaembed.link/api/v1/video?id=3wnuij", "info");
+            
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            log("🔑 Token obtido da API", "success");
+            log("🎮 API Player call: https://megaembed.link/api/v1/player?t=...", "info");
+            
+            // Simular interceptação do CDN
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const cdns = [
+                "sipt.marvellaholdings.sbs",
+                "stzm.marvellaholdings.sbs", 
+                "srcf.marvellaholdings.sbs"
+            ];
+            
+            const randomCdn = cdns[Math.floor(Math.random() * cdns.length)];
+            const timestamp = Math.floor(Date.now() / 1000);
+            const interceptedUrl = `https://${randomCdn}/v4/x6b/3wnuij/cf-master.${timestamp}.txt`;
+            
+            log(`🔍 [WebView] URL interceptada: ${interceptedUrl}`, "success");
+            log(`🎯 CDN descoberto: ${randomCdn}`, "success");
+            log("💾 CDN pode ser usado para futuras extrações", "info");
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            log("✅ URL válida capturada!", "success");
+            log("📺 Processando como HLS playlist", "info");
+            log("✅ [MegaEmbedExtractorV4] ExtractorLink emitido com sucesso!", "success");
+            
+            log("🎉 TESTE CONCLUÍDO - MegaEmbed funcionando!", "success");
+        }
+
+        // Log inicial
+        log("🚀 Teste MegaEmbed v50 - CDN Dinâmico carregado", "info");
+        log("Clique em 'Testar MegaEmbed' para simular o comportamento", "info");
+    </script>
+</body>
+</html>

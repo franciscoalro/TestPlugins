@@ -220,6 +220,10 @@ object MegaEmbedLinkFetcher {
 
     /**
      * Fluxo completo: do ID do vídeo até a playlist HLS
+     * 
+     * DESCOBERTA CRÍTICA: /api/v1/player apenas valida o token e retorna {"success": true}
+     * A URL da playlist deve ser construída manualmente usando o padrão:
+     * https://spo3.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
      */
     @JvmStatic
     fun fetchPlaylistUrl(videoId: String, refDomain: String = "playerthree.online"): String? {
@@ -246,21 +250,31 @@ object MegaEmbedLinkFetcher {
                 return null
             }
             
-            // Passo 5: Obter URL do player
+            // Passo 5: Validar token (retorna apenas {"success": true})
             val playerResponse = fetchPlayerUrl(token)
             if (playerResponse == null) {
-                Log.e(TAG, "Falha ao obter resposta do player")
+                Log.e(TAG, "Falha ao validar token")
                 return null
             }
             
-            // Extrair URL da playlist
-            val playlistUrl = extractPlaylistUrl(playerResponse)
-            if (playlistUrl == null) {
-                Log.e(TAG, "Playlist URL não encontrada")
-                return null
+            // Verificar se token foi aceito
+            try {
+                val json = JSONObject(playerResponse)
+                if (!json.optBoolean("success", false)) {
+                    Log.e(TAG, "Token inválido ou expirado")
+                    return null
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Resposta inesperada do player: $playerResponse")
             }
             
-            Log.d(TAG, "========== PLAYLIST ENCONTRADA ==========")
+            // Passo 6: Construir URL da playlist manualmente
+            // Padrão descoberto via análise de rede:
+            // https://spo3.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
+            val timestamp = System.currentTimeMillis() / 1000
+            val playlistUrl = "https://spo3.marvellaholdings.sbs/v4/x6b/$videoId/cf-master.$timestamp.txt"
+            
+            Log.d(TAG, "========== PLAYLIST CONSTRUÍDA ==========")
             Log.d(TAG, playlistUrl)
             
             return playlistUrl

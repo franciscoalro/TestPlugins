@@ -1,7 +1,7 @@
-version = 43
+version = 44
 
 cloudstream {
-    description = "MaxSeries v43 - MegaEmbed Native Header Fix (OkHttp)"
+    description = "MaxSeries v44 - MegaEmbed URL Construction Fix"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

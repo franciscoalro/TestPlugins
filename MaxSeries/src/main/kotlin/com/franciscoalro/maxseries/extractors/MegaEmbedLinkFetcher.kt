@@ -269,10 +269,10 @@ object MegaEmbedLinkFetcher {
             }
             
             // Passo 6: Construir URL da playlist manualmente
-            // Padrão descoberto via análise de rede:
-            // https://spo3.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
+            // Padrão descoberto via análise de rede (atualizado via redeburp.txt):
+            // https://stzm.marvellaholdings.sbs/v4/x6b/{videoId}/cf-master.{timestamp}.txt
             val timestamp = System.currentTimeMillis() / 1000
-            val playlistUrl = "https://spo3.marvellaholdings.sbs/v4/x6b/$videoId/cf-master.$timestamp.txt"
+            val playlistUrl = "https://stzm.marvellaholdings.sbs/v4/x6b/$videoId/cf-master.$timestamp.txt"
             
             Log.d(TAG, "========== PLAYLIST CONSTRUÍDA ==========")
             Log.d(TAG, playlistUrl)

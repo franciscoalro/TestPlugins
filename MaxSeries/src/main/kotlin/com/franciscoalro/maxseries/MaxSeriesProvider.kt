@@ -42,7 +42,19 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         val posterUrl = this.selectFirst("img")?.attr("src")
         val quality = this.selectFirst(".quality")?.text()
 
-        return newMovieSearchResponse(title, href, TvType.Movie) {
+        // Garantir URL absoluta
+        val absoluteHref = if (href.startsWith("http")) href else "$mainUrl$href"
+        
+        // Detectar tipo baseado na URL ou classe
+        val tvType = when {
+            href.contains("/series/") -> TvType.TvSeries
+            href.contains("/filme/") || href.contains("/movie/") -> TvType.Movie
+            href.contains("/anime/") -> TvType.Anime
+            this.selectFirst(".item_type")?.text()?.contains("SÉRIE", true) == true -> TvType.TvSeries
+            else -> TvType.TvSeries // Default para séries
+        }
+
+        return newMovieSearchResponse(title, absoluteHref, tvType) {
             this.posterUrl = posterUrl
             this.quality = getQualityFromString(quality)
         }

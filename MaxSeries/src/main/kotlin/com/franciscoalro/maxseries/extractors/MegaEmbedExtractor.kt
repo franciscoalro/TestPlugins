@@ -49,18 +49,42 @@ class MegaEmbedExtractor : ExtractorApi() {
         
         // v45: Interceptação via WebView para bypass de criptografia
         // A API retorna dados criptografados, o navegador descriptografa e requisita a playlist
-        val resolver = com.franciscoalro.maxseries.resolver.MegaEmbedWebViewResolver(App.context)
-                    newExtractorLink(
-                        name = "MegaEmbed",
-                        url = tokenUrl, // O URL com token é o que o player precisa
-                        referer = "https://megaembed.link/",
-                        quality = Qualities.Unknown.value,
-                        isM3u8 = true
-                    )
+        val resolver = MegaEmbedWebViewResolver(App.context)
+        val playlistUrl = resolver.resolve(url)
+        
+        if (playlistUrl != null) {
+            Log.d(TAG, "Playlist encontrada via WebView: $playlistUrl")
+            callback.invoke(
+                newExtractorLink(
+                    name,
+                    name,
+                    playlistUrl,
+                    referer = "https://megaembed.link/",
+                    quality = Qualities.Unknown.value,
+                    isM3u8 = true
                 )
-                return
+            )
+        } else {
+            Log.e(TAG, "Falha ao resolver URL via WebView")
+            // Fallback: Tentativa manual (pode falhar devido à criptografia)
+            val videoId = MegaEmbedLinkFetcher.extractVideoId(url)
+            if (videoId != null) {
+                val manualUrl = MegaEmbedLinkFetcher.fetchPlaylistUrl(videoId)
+                if (manualUrl != null) {
+                    callback.invoke(
+                        newExtractorLink(
+                            name,
+                            name,
+                            manualUrl,
+                            referer = "https://megaembed.link/",
+                            quality = Qualities.Unknown.value,
+                            isM3u8 = true
+                        )
+                    )
+                }
             }
         }
+    }
 
         // Fallback: tentar a extração antiga se o resolver falhar
         tryWebViewExtraction(url, referer, callback)

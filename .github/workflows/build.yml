@@ -40,7 +40,7 @@ jobs:
           timeout_minutes: 15
           max_attempts: 5
           retry_wait_seconds: 60
-          command: ./gradlew MaxSeries:make --no-daemon --no-build-cache
+          command: ./gradlew MaxSeries:make AnimesOnlineCC:make --no-daemon --no-build-cache
 
       - name: Get version
         id: get_version
@@ -48,11 +48,13 @@ jobs:
           VERSION=$(grep "version = " MaxSeries/build.gradle.kts | sed 's/version = //' | tr -d ' ')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Upload MaxSeries Plugin
+      - name: Upload Plugins
         uses: actions/upload-artifact@v4
         with:
-          name: MaxSeries-Plugin
-          path: MaxSeries/build/*.cs3
+          name: Cloudstream-Plugins
+          path: |
+            MaxSeries/build/*.cs3
+            AnimesOnlineCC/build/*.cs3
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -60,6 +62,7 @@ jobs:
         with:
           files: |
             MaxSeries/build/*.cs3
+            AnimesOnlineCC/build/*.cs3
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

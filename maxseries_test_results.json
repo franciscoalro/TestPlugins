@@ -1,0 +1,32 @@
+{
+  "filmes": {
+    "items_count": 55,
+    "title": "Teresa de Ávila",
+    "link": "https://www.maxseries.one/filmes/assistir-teresa-de-avila-online",
+    "type": "Movie",
+    "has_image": true
+  },
+  "series": {
+    "items_count": 55,
+    "title": "Garota Sequestrada",
+    "link": "https://www.maxseries.one/series/assistir-garota-sequestrada-online",
+    "type": "TvSeries",
+    "has_image": true
+  },
+  "search": {
+    "items_count": 3,
+    "title": "Políticas",
+    "link": "https://www.maxseries.one",
+    "type": "Unknown",
+    "has_image": false
+  },
+  "series_page": {
+    "title": "Terra de Pecados",
+    "has_seasons": true,
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mistério"
+    ]
+  }
+}

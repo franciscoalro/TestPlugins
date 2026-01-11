@@ -1,17 +1,35 @@
 [
     {
         "name": "AnimesOnlineCC",
-        "description": "Assista animes online grátis em HD",
-        "version": 2,
+        "description": "Assista animes online grátis em HD - v8 Updated",
+        "version": 8,
         "authors": [
             "franciscoalro"
         ],
         "status": 1,
         "language": "pt-BR",
         "tvTypes": [
-            "Anime"
+            "Anime",
+            "OVA",
+            "AnimeMovie"
         ],
         "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v3.0/AnimesOnlineCC.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v46.0/AnimesOnlineCC.cs3"
+    },
+    {
+        "name": "MaxSeries",
+        "description": "MaxSeries v57 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes.",
+        "version": 57,
+        "authors": [
+            "franciscoalro"
+        ],
+        "status": 1,
+        "language": "pt-BR",
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3"
     }
 ]

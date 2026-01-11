@@ -1,0 +1,19 @@
+{
+  "video_id": "3wnuij",
+  "api_calls": [
+    {
+      "step": "video",
+      "url": "https://megaembed.link/api/v1/video?id=3wnuij&w=2144&h=1206&r=playerthree.online",
+      "status": 200,
+      "encrypted": true,
+      "data": "933a30ecdabc15152bfbe068bc27d5342f59759c823e7e206be7a128ff897fc44fd4e82e2a801097e8bf2d3bcd927deecf7dd715b665ab57521809a4f68fe756dda2d6b801482e850f9e193f36cb80c0b2711a4324b8126357dac03e5b572909d7c67ce8"
+    }
+  ],
+  "discovered_cdns": [],
+  "final_playlist": {
+    "url": "https://sipt.marvellaholdings.sbs/v4/x6b/3wnuij/cf-master.1768159085.txt",
+    "cdn": "sipt.marvellaholdings.sbs",
+    "shard": "x6b",
+    "content_preview": "#EXTM3U\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=684169,RESOLUTION=1280x720,FRAME-RATE=24.000,CODECS=\"avc1.64001f,mp4a.40.2\",VIDEO-RANGE=SDR\nindex-f1-v1-a1.txt\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1535665,RESOLUTION=1920x1080,FRAME-RATE=24.000,CODECS=\"avc1.640028,mp4a.40.2\",VIDEO-RANGE=SDR\nindex-f2-v1-a1.txt\n\n"
+  }
+}

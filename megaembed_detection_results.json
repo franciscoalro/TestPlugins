@@ -1,5 +1,5 @@
 {
-  "total_tested": 3,
+  "total_tested": 2,
   "megaembed_found": 1,
   "playerembedapi_found": 1,
   "doodstream_found": 0,
@@ -18,7 +18,6 @@
         "player_text": "Player #2",
         "episode_id": "228933"
       }
-    ],
-    "https://www.maxseries.one/filme/avatar-2009/": []
+    ]
   }
 }

@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v50.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v51.0/MaxSeries.cs3",
         "status": 1,
-        "version": 50,
+        "version": 51,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v50 - CDN Dinâmico: Interceptação inteligente do CDN real gerado automaticamente pelo MegaEmbed. Captura qualquer CDN (sipt/stzm/srcf/sbi6/s6p9.marvellaholdings.sbs) sem precisar adivinhar.",
+        "description": "MaxSeries v51 - Anti-YouTube Filter: Filtro inteligente que ignora automaticamente links do YouTube, focando apenas em players de vídeo válidos (MegaEmbed, PlayerEmbedAPI, DoodStream).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

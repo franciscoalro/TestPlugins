@@ -52,6 +52,11 @@ def test_megaembed_detection():
                 
             print(f"🖼️ Iframe encontrado: {iframe_src}")
             
+            # Verificar se é YouTube (deve ser ignorado)
+            if 'youtube.com' in iframe_src.lower() or 'youtu.be' in iframe_src.lower():
+                print("🚫 Iframe do YouTube detectado - será ignorado pelo MaxSeries v50")
+                continue
+                
             sources_found = []
             
             # 3. NOVO FLUXO - Simular o que o MaxSeries v47 faz

@@ -484,7 +484,10 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             
             if (videoUrl.contains(".m3u8") || videoUrl.contains("cf-master")) {
                 Log.d(TAG, "📺 Processando como HLS: $cleanUrl")
-                M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer).forEach(callback)
+                val m3u8Links = M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer)
+                for (link in m3u8Links) {
+                    callback(link)
+                }
             } else {
                 Log.d(TAG, "📺 Processando como MP4: $cleanUrl")
                 callback.invoke(

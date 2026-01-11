@@ -6,6 +6,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import org.jsoup.nodes.Element
 import com.franciscoalro.maxseries.extractors.*
+import android.util.Log
 
 class MaxSeriesProvider : MainAPI() { // all providers must be an instance of MainAPI
     override var mainUrl = "https://www.maxseries.one"
@@ -29,99 +30,172 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get(request.data + page).document
-        val home = document.select("article.item").mapNotNull {
-            it.toSearchResult()
+        return try {
+            val document = app.get(request.data + page).document
+            val home = document.select("div.items article.item").mapNotNull {
+                it.toSearchResult()
+            }
+            if (home.isEmpty()) {
+                android.util.Log.d("MaxSeries", "⚠️ Nenhum resultado encontrado na página ${request.name} (página $page)")
+            }
+            newHomePageResponse(request.name, home)
+        } catch (e: Exception) {
+            android.util.Log.e("MaxSeries", "❌ Erro ao carregar página principal ${request.name}: ${e.message}")
+            newHomePageResponse(request.name, emptyList())
         }
-        return newHomePageResponse(request.name, home)
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.selectFirst("h3.title")?.text()?.trim() ?: return null
-        val href = this.selectFirst("a")?.attr("href") ?: return null
-        val posterUrl = this.selectFirst("img")?.attr("src")
-        val quality = this.selectFirst(".quality")?.text()
+        return try {
+            val title = this.selectFirst("h3.title, h3")?.text()?.trim() ?: return null
+            val href = fixUrl(this.selectFirst("a")?.attr("href") ?: return null)
+            
+            // Melhor busca de imagem (similar ao AnimesOnlineCC)
+            val img = this.selectFirst("img")
+            val posterUrl = fixUrlNull(
+                img?.attr("src")
+                    ?: img?.attr("data-src")
+                    ?: img?.attr("data-lazy-src")
+                    ?: img?.attr("data-original")
+            )
+            
+            val quality = this.selectFirst(".quality")?.text()
+            
+            // Detectar tipo baseado na URL ou classe
+            val tvType = when {
+                href.contains("/series/") -> TvType.TvSeries
+                href.contains("/filme/") || href.contains("/movie/") -> TvType.Movie
+                href.contains("/anime/") -> TvType.Anime
+                this.selectFirst(".item_type")?.text()?.contains("SÉRIE", true) == true -> TvType.TvSeries
+                else -> TvType.TvSeries // Default para séries
+            }
 
-        // Garantir URL absoluta
-        val absoluteHref = if (href.startsWith("http")) href else "$mainUrl$href"
-        
-        // Detectar tipo baseado na URL ou classe
-        val tvType = when {
-            href.contains("/series/") -> TvType.TvSeries
-            href.contains("/filme/") || href.contains("/movie/") -> TvType.Movie
-            href.contains("/anime/") -> TvType.Anime
-            this.selectFirst(".item_type")?.text()?.contains("SÉRIE", true) == true -> TvType.TvSeries
-            else -> TvType.TvSeries // Default para séries
-        }
-
-        return newMovieSearchResponse(title, absoluteHref, tvType) {
-            this.posterUrl = posterUrl
-            this.quality = getQualityFromString(quality)
+            newMovieSearchResponse(title, href, tvType) {
+                this.posterUrl = posterUrl
+                this.quality = getQualityFromString(quality)
+            }
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro ao processar item: ${e.message}")
+            null
         }
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val document = app.get("$mainUrl/?s=$query").document
-
-        return document.select("article.item").mapNotNull {
-            it.toSearchResult()
+        if (query.isBlank()) {
+            android.util.Log.d("MaxSeries", "⚠️ Pesquisa vazia, retornando lista vazia")
+            return emptyList()
+        }
+        
+        return try {
+            android.util.Log.d("MaxSeries", "🔍 Pesquisando por: $query")
+            val document = app.get("$mainUrl/?s=$query").document
+            
+            val results = document.select("div.items article.item").mapNotNull {
+                it.toSearchResult()
+            }
+            
+            android.util.Log.d("MaxSeries", "✅ Encontrados ${results.size} resultados para '$query'")
+            results
+        } catch (e: Exception) {
+            android.util.Log.e("MaxSeries", "❌ Erro na pesquisa '$query': ${e.message}")
+            emptyList()
         }
     }
 
     override suspend fun load(url: String): LoadResponse? {
-        val document = app.get(url).document
+        return try {
+            Log.d("MaxSeries", "📖 Carregando detalhes: $url")
+            val document = app.get(url).document
 
-        val title = document.selectFirst("h1.entry-title")?.text()?.trim()
-            ?: return null
-        val poster = document.selectFirst(".poster img")?.attr("src")
-        val tags = document.select(".genres a").map { it.text() }
-        val year = document.selectFirst(".year")?.text()?.toIntOrNull()
-        val tvType = if (document.select(".seasons-lst").isNotEmpty()) TvType.TvSeries else TvType.Movie
-        val description = document.selectFirst(".description p")?.text()?.trim()
-        val trailer = document.selectFirst("iframe[src*=youtube]")?.attr("src")
-        val ratingText = document.selectFirst(".rating .value")?.text()
-        val actors = document.select(".cast .person").map {
-            Actor(it.selectFirst(".name")?.text() ?: "", it.selectFirst("img")?.attr("src"))
-        }
+            val title = document.selectFirst("h1.entry-title, h1")?.text()?.trim()
+            if (title.isNullOrBlank()) {
+                Log.e("MaxSeries", "❌ Título não encontrado em: $url")
+                return null
+            }
+            
+            // Melhor busca de poster (similar ao AnimesOnlineCC)
+            val img = document.selectFirst(".poster img, div.poster img, .sheader .poster img")
+            val poster = fixUrlNull(
+                img?.attr("src")
+                    ?: img?.attr("data-src")
+                    ?: img?.attr("data-lazy-src")
+                    ?: img?.attr("data-original")
+                    ?: document.selectFirst("meta[property=og:image]")?.attr("content")
+            )
+            
+            val tags = document.select(".genres a, .sgeneros a").map { it.text() }
+            val year = document.selectFirst(".year, span.date, span.year, .extra span")?.text()
+                ?.replace("\\D".toRegex(), "")?.take(4)?.toIntOrNull()
+            val tvType = if (document.select(".seasons-lst, ul.episodios").isNotEmpty()) TvType.TvSeries else TvType.Movie
+            val description = document.selectFirst(".description p, div.description, div.wp-content")?.text()?.trim()
+            val trailer = document.selectFirst("iframe[src*=youtube]")?.attr("src")
+            val ratingText = document.selectFirst(".rating .value")?.text()
+            val actors = document.select(".cast .person").map {
+                Actor(it.selectFirst(".name")?.text() ?: "", it.selectFirst("img")?.attr("src"))
+            }
 
-        val recommendations = document.select(".related-posts .item").mapNotNull {
-            it.toSearchResult()
-        }
+            val recommendations = document.select(".related-posts .item, .items article.item").mapNotNull {
+                it.toSearchResult()
+            }
 
-        return if (tvType == TvType.TvSeries) {
-            val episodes = document.select(".seasons-lst .season").flatMap { season ->
-                val seasonNumber = season.selectFirst(".season-title")?.text()?.filter { it.isDigit() }?.toIntOrNull() ?: 1
-                season.select(".episode-item").mapNotNull { ep ->
-                    val epNum = ep.selectFirst(".episode-number")?.text()?.toIntOrNull()
-                    val epTitle = ep.selectFirst(".episode-title")?.text()
-                    val epUrl = ep.selectFirst("a")?.attr("href") ?: return@mapNotNull null
-                    
-                    newEpisode(epUrl) {
-                        this.name = epTitle
-                        this.season = seasonNumber
-                        this.episode = epNum
+            Log.d("MaxSeries", "✅ Carregado '$title' como $tvType")
+
+            return if (tvType == TvType.TvSeries) {
+                val episodes = document.select(".seasons-lst .season, ul.episodios li").flatMap { season ->
+                    if (season.tagName() == "li") {
+                        // Formato AnimesOnlineCC
+                        val epTitle = season.selectFirst(".episodiotitle a, a")?.text() ?: return@flatMap emptyList()
+                        val epHref = fixUrl(season.selectFirst("a")?.attr("href") ?: return@flatMap emptyList())
+                        val epNum = epTitle.replace("\\D".toRegex(), "").toIntOrNull()
+                        
+                        listOf(newEpisode(epHref) {
+                            this.name = epTitle
+                            this.episode = epNum
+                        })
+                    } else {
+                        // Formato MaxSeries original
+                        val seasonNumber = season.selectFirst(".season-title")?.text()?.filter { it.isDigit() }?.toIntOrNull() ?: 1
+                        season.select(".episode-item").mapNotNull { ep ->
+                            val epNum = ep.selectFirst(".episode-number")?.text()?.toIntOrNull()
+                            val epTitle = ep.selectFirst(".episode-title")?.text()
+                            val epUrl = ep.selectFirst("a")?.attr("href") ?: return@mapNotNull null
+                            
+                            newEpisode(fixUrl(epUrl)) {
+                                this.name = epTitle
+                                this.season = seasonNumber
+                                this.episode = epNum
+                            }
+                        }
                     }
                 }
+                
+                Log.d("MaxSeries", "✅ Série '$title' com ${episodes.size} episódios")
+                
+                newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+                    this.posterUrl = poster
+                    this.year = year
+                    this.plot = description
+                    this.tags = tags
+                    addActors(actors)
+                    this.recommendations = recommendations
+                    addTrailer(trailer)
+                }
+            } else {
+                Log.d("MaxSeries", "✅ Filme '$title'")
+                
+                newMovieLoadResponse(title, url, TvType.Movie, url) {
+                    this.posterUrl = poster
+                    this.year = year
+                    this.plot = description
+                    this.tags = tags
+                    addActors(actors)
+                    this.recommendations = recommendations
+                    addTrailer(trailer)
+                }
             }
-            newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-                this.posterUrl = poster
-                this.year = year
-                this.plot = description
-                this.tags = tags
-                addActors(actors)
-                this.recommendations = recommendations
-                addTrailer(trailer)
-            }
-        } else {
-            newMovieLoadResponse(title, url, TvType.Movie, url) {
-                this.posterUrl = poster
-                this.year = year
-                this.plot = description
-                this.tags = tags
-                addActors(actors)
-                this.recommendations = recommendations
-                addTrailer(trailer)
-            }
+        } catch (e: Exception) {
+            Log.e("MaxSeries", "❌ Erro ao carregar detalhes de $url: ${e.message}")
+            null
         }
     }
 
@@ -134,11 +208,11 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         val document = app.get(data).document
         
         // Log para debug
-        println("🔍 MaxSeries v50 - Carregando links para: $data")
+        Log.d("MaxSeries", "🔍 MaxSeries v54 - Carregando links para: $data")
         
         // Buscar todos os botões de player (incluindo data-show-player)
         val playerButtons = document.select("button[data-source], button[data-show-player]")
-        println("🎯 Encontrados ${playerButtons.size} botões de player")
+        Log.d("MaxSeries", "🎯 Encontrados ${playerButtons.size} botões de player")
         
         var sourcesFound = 0
         
@@ -150,7 +224,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                 }
                 
                 if (sourceUrl.isNotEmpty() && !isYouTubeUrl(sourceUrl)) {
-                    println("🎬 Processando fonte: $sourceName -> $sourceUrl")
+                    Log.d("MaxSeries", "🎬 Processando fonte: $sourceName -> $sourceUrl")
                     
                     when {
                         // DoodStream e clones (Fase 1 - Expandido)
@@ -159,14 +233,14 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                         sourceUrl.contains("g9r6", true) ||
                         sourceUrl.contains("vidplay", true) ||
                         sourceUrl.contains("myvidplay", true) -> {
-                            println("🟢 Detectado DoodStream/VidPlay: $sourceName")
+                            Log.d("MaxSeries", "🟢 Detectado DoodStream/VidPlay: $sourceName")
                             loadExtractor(sourceUrl, subtitleCallback, callback)
                             sourcesFound++
                         }
                         
                         // MegaEmbed (Fase 2 - WebView V4 com captura dinâmica de CDN)
                         sourceUrl.contains("megaembed", true) -> {
-                            println("🔥 Detectado MegaEmbed: $sourceName")
+                            Log.d("MaxSeries", "🔥 Detectado MegaEmbed: $sourceName")
                             val megaExtractor = MegaEmbedExtractorV4()
                             megaExtractor.getUrl(sourceUrl, data, subtitleCallback, callback)
                             sourcesFound++
@@ -175,48 +249,48 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                         // PlayerEmbedAPI (Fase 3 - Enhanced Chain)
                         sourceUrl.contains("playerembedapi", true) ||
                         sourceUrl.contains("embed", true) -> {
-                            println("🎯 Detectado PlayerEmbedAPI: $sourceName")
+                            Log.d("MaxSeries", "🎯 Detectado PlayerEmbedAPI: $sourceName")
                             val playerExtractor = PlayerEmbedAPIExtractor()
                             playerExtractor.getUrl(sourceUrl, data, subtitleCallback, callback)
                             sourcesFound++
                         }
                         
                         else -> {
-                            println("🔄 Tentando extrator padrão CloudStream para: $sourceName")
+                            Log.d("MaxSeries", "🔄 Tentando extrator padrão CloudStream para: $sourceName")
                             loadExtractor(sourceUrl, subtitleCallback, callback)
                             sourcesFound++
                         }
                     }
                 } else if (isYouTubeUrl(sourceUrl)) {
-                    println("🚫 Ignorando link do YouTube: $sourceName -> $sourceUrl")
+                    Log.d("MaxSeries", "🚫 Ignorando link do YouTube: $sourceName -> $sourceUrl")
                 } else {
-                    println("⚠️ Botão sem URL: $sourceName")
+                    Log.d("MaxSeries", "⚠️ Botão sem URL: $sourceName")
                 }
             } catch (e: Exception) {
-                println("❌ Erro ao processar fonte ${button.text()}: ${e.message}")
+                Log.e("MaxSeries", "❌ Erro ao processar fonte ${button.text()}: ${e.message}")
             }
         }
         
         // Fallback: buscar iframes se não encontrou botões
         if (playerButtons.isEmpty()) {
-            println("🔍 Nenhum botão encontrado, buscando iframes...")
+            Log.d("MaxSeries", "🔍 Nenhum botão encontrado, buscando iframes...")
             
             val iframes = document.select("iframe[src]")
-            println("📺 Encontrados ${iframes.size} iframes")
+            Log.d("MaxSeries", "📺 Encontrados ${iframes.size} iframes")
             
             iframes.forEach { iframe ->
                 val iframeUrl = iframe.attr("src")
                 if (iframeUrl.isNotEmpty() && !isYouTubeUrl(iframeUrl)) {
-                    println("📺 Processando iframe: $iframeUrl")
+                    Log.d("MaxSeries", "📺 Processando iframe: $iframeUrl")
                     
                     // Extrair episode ID do iframe se necessário
                     val episodeId = extractEpisodeIdFromIframe(iframe, data)
                     if (episodeId != null) {
-                        println("🆔 Episode ID extraído: $episodeId")
+                        Log.d("MaxSeries", "🆔 Episode ID extraído: $episodeId")
                         
                         when {
                             iframeUrl.contains("megaembed", true) -> {
-                                println("🔥 Iframe MegaEmbed detectado")
+                                Log.d("MaxSeries", "🔥 Iframe MegaEmbed detectado")
                                 val megaExtractor = MegaEmbedExtractorV4()
                                 megaExtractor.getUrl(iframeUrl, data, subtitleCallback, callback)
                                 sourcesFound++
@@ -231,12 +305,12 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                         sourcesFound++
                     }
                 } else if (isYouTubeUrl(iframeUrl)) {
-                    println("🚫 Ignorando iframe do YouTube: $iframeUrl")
+                    Log.d("MaxSeries", "🚫 Ignorando iframe do YouTube: $iframeUrl")
                 }
             }
         }
         
-        println("✅ MaxSeries processou $sourcesFound fontes")
+        Log.d("MaxSeries", "✅ MaxSeries processou $sourcesFound fontes")
         return sourcesFound > 0
     }
     
@@ -274,7 +348,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
                 }
             }
         } catch (e: Exception) {
-            println("⚠️ Erro ao extrair episode ID do iframe: ${e.message}")
+            Log.e("MaxSeries", "⚠️ Erro ao extrair episode ID do iframe: ${e.message}")
         }
         
         return null

@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v56.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3",
         "status": 1,
-        "version": 56,
+        "version": 57,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v56 - Critical AnimesOnlineCC Fixes: Aplicadas correções críticas baseadas no AnimesOnlineCC funcionando. Melhor tratamento de erro, logs detalhados, busca de imagem robusta e fixUrl consistente. Deve resolver problema de conteúdo não aparecer.",
+        "description": "MaxSeries v57 - Assista filmes e séries online grátis em HD. Melhorias na estabilidade, tratamento de erros aprimorado e correções de compatibilidade. Suporte completo a episódios e temporadas.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

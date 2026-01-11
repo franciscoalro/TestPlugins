@@ -1,4 +1,4 @@
-﻿package com.franciscoalro.maxseries
+package com.franciscoalro.maxseries
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
@@ -93,6 +93,9 @@ class MaxSeriesProvider : MainAPI() {
             newMovieSearchResponse(title, href, tvType) {
                 this.posterUrl = posterUrl
                 this.year = year
+                if (imdbRating != null) {
+                    this.rating = (imdbRating * 1000).toInt() // CloudStream usa rating * 1000
+                }
             }
         } catch (e: Exception) {
             Log.e("MaxSeries", "❌ Erro ao processar item: ${e.message}")
@@ -185,6 +188,7 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
+                    this.rating = rating?.let { (it * 1000).toInt() }
                 }
             } else {
                 newMovieLoadResponse(title, url, TvType.Movie, url) {
@@ -192,6 +196,7 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
+                    this.rating = rating?.let { (it * 1000).toInt() }
                 }
             }
         } catch (e: Exception) {

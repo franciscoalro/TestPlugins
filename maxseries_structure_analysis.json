@@ -1,0 +1,244 @@
+{
+  "site_info": {
+    "base_url": "https://www.maxseries.one",
+    "title": "Max Series - Assistir Filmes e Series Online Gratis",
+    "description": ""
+  },
+  "categories": {
+    "navigation": [
+      {
+        "text": "Início",
+        "href": "https://www.maxseries.one"
+      },
+      {
+        "text": "Filmes",
+        "href": "https://www.maxseries.one/filmes/"
+      },
+      {
+        "text": "Séries",
+        "href": "https://www.maxseries.one/series/"
+      },
+      {
+        "text": "Início",
+        "href": "https://www.maxseries.one"
+      },
+      {
+        "text": "Filmes",
+        "href": "https://www.maxseries.one/filmes/"
+      },
+      {
+        "text": "Séries",
+        "href": "https://www.maxseries.one/series/"
+      },
+      {
+        "text": "Register a new account",
+        "href": "https://www.maxseries.one/account?action=sign-in"
+      },
+      {
+        "text": "Lost your password?",
+        "href": "https://www.maxseries.one/wp-login.php?action=lostpassword"
+      },
+      {
+        "text": "Garota Sequestrada",
+        "href": "https://www.maxseries.one/series/assistir-garota-sequestrada-online"
+      },
+      {
+        "text": "Dele & Dela",
+        "href": "https://www.maxseries.one/series/assistir-dele-dela-online"
+      },
+      {
+        "text": "Chitas de Perto com Bertie Gregory",
+        "href": "https://www.maxseries.one/filmes/assistir-chitas-de-perto-com-bertie-gregory-online"
+      },
+      {
+        "text": "Terra de Pecados",
+        "href": "https://www.maxseries.one/series/assistir-terra-de-pecados-online"
+      },
+      {
+        "text": "Meu Namorado Coreano",
+        "href": "https://www.maxseries.one/series/assistir-meu-namorado-coreano-online"
+      },
+      {
+        "text": "O Tempo das Moscas",
+        "href": "https://www.maxseries.one/series/assistir-o-tempo-das-moscas-online"
+      },
+      {
+        "text": "Custe o que Custar",
+        "href": "https://www.maxseries.one/series/assistir-custe-o-que-custar-online"
+      },
+      {
+        "text": "Amor no Escritório",
+        "href": "https://www.maxseries.one/series/assistir-amor-no-escritorio-online"
+      },
+      {
+        "text": "Ricky Gervais: Mortalidade",
+        "href": "https://www.maxseries.one/filmes/assistir-ricky-gervais-mortalidade-online"
+      },
+      {
+        "text": "Influencer do Mal: A História de Jodi Hildebrandt",
+        "href": "https://www.maxseries.one/filmes/assistir-influencer-do-mal-a-historia-de-jodi-hildebrandt-online"
+      },
+      {
+        "text": "Bob Esponja: Em Busca da Calça Quadrada",
+        "href": "https://www.maxseries.one/filmes/assistir-bob-esponja-em-busca-da-calca-quadrada-online"
+      },
+      {
+        "text": "Anaconda",
+        "href": "https://www.maxseries.one/filmes/assistir-anaconda-2-online"
+      },
+      {
+        "text": "VER TODOS",
+        "href": "https://www.maxseries.one/series"
+      },
+      {
+        "text": "Garota Sequestrada",
+        "href": "https://www.maxseries.one/series/assistir-garota-sequestrada-online"
+      },
+      {
+        "text": "Dele & Dela",
+        "href": "https://www.maxseries.one/series/assistir-dele-dela-online"
+      },
+      {
+        "text": "Projeto Prometheus",
+        "href": "https://www.maxseries.one/series/assistir-projeto-prometheus-online"
+      },
+      {
+        "text": "Meu Pai é um Ídolo",
+        "href": "https://www.maxseries.one/series/assistir-meu-pai-e-um-idolo-online"
+      },
+      {
+        "text": "É Minha Luz",
+        "href": "https://www.maxseries.one/series/assistir-e-minha-luz-online"
+      },
+      {
+        "text": "Cozinha Prática com Rita Lobo",
+        "href": "https://www.maxseries.one/series/assistir-cozinha-pratica-com-rita-lobo-online"
+      },
+      {
+        "text": "Tempero de Família",
+        "href": "https://www.maxseries.one/series/assistir-tempero-de-familia-online"
+      },
+      {
+        "text": "All Her Fault",
+        "href": "https://www.maxseries.one/series/assistir-all-her-fault-online"
+      },
+      {
+        "text": "Terra de Pecados",
+        "href": "https://www.maxseries.one/series/assistir-terra-de-pecados-online"
+      },
+      {
+        "text": "O Batman",
+        "href": "https://www.maxseries.one/series/assistir-o-batman-online"
+      },
+      {
+        "text": "Meu Namorado Coreano",
+        "href": "https://www.maxseries.one/series/assistir-meu-namorado-coreano-online"
+      },
+      {
+        "text": "O Tempo das Moscas",
+        "href": "https://www.maxseries.one/series/assistir-o-tempo-das-moscas-online"
+      },
+      {
+        "text": "VER TODOS",
+        "href": "https://www.maxseries.one/filmes"
+      },
+      {
+        "text": "Teresa de Ávila",
+        "href": "https://www.maxseries.one/filmes/assistir-teresa-de-avila-online"
+      },
+      {
+        "text": "Fascínio Perigoso",
+        "href": "https://www.maxseries.one/filmes/assistir-fascinio-perigoso-online"
+      },
+      {
+        "text": "Operação 49",
+        "href": "https://www.maxseries.one/filmes/assistir-operacao-49-online"
+      },
+      {
+        "text": "Krazy House",
+        "href": "https://www.maxseries.one/filmes/assistir-krazy-house-online"
+      },
+      {
+        "text": "Sombras no Deserto",
+        "href": "https://www.maxseries.one/filmes/assistir-sombras-no-deserto-online"
+      },
+      {
+        "text": "A Rebelião de 1907",
+        "href": "https://www.maxseries.one/filmes/assistir-a-rebeliao-de-1907-online"
+      },
+      {
+        "text": "Policiais da Máfia",
+        "href": "https://www.maxseries.one/filmes/assistir-policiais-da-mafia-online"
+      },
+      {
+        "text": "O Homem que Matou Hitler e Depois o Pé Grande",
+        "href": "https://www.maxseries.one/filmes/assistir-o-homem-que-matou-hitler-e-depois-o-pe-grande-online"
+      },
+      {
+        "text": "O Céu da Meia-Noite",
+        "href": "https://www.maxseries.one/filmes/assistir-o-ceu-da-meia-noite-online"
+      },
+      {
+        "text": "Uma Bela Manhã",
+        "href": "https://www.maxseries.one/filmes/assistir-uma-bela-manha-online"
+      },
+      {
+        "text": "O Enigma de Outro Mundo",
+        "href": "https://www.maxseries.one/filmes/assistir-o-enigma-de-outro-mundo-online"
+      },
+      {
+        "text": "Sob Fogo",
+        "href": "https://www.maxseries.one/filmes/assistir-sob-fogo-online"
+      },
+      {
+        "text": "Início",
+        "href": "https://www.maxseries.one"
+      },
+      {
+        "text": "DMCA",
+        "href": "https://www.maxseries.one/dmca"
+      },
+      {
+        "text": "Contato",
+        "href": "https://www.maxseries.one/contact"
+      },
+      {
+        "text": "Sitemap",
+        "href": "https://www.maxseries.one/sitemap_index.xml"
+      }
+    ]
+  },
+  "content_structure": {
+    "movies": {
+      "selector": ".item",
+      "count": 4,
+      "item_structure": {
+        "title": "Uma Chamada para a Esperança",
+        "link": "https://www.maxseries.one/series/assistir-uma-chamada-para-a-esperanca-online",
+        "image": "https://www.maxseries.one/wp-content/uploads/2023/03/jRqfsCPnOqlhNsxqMBQYQVQjjHf-185x278.jpg",
+        "year": "Aug. 30, 2019",
+        "genre": "Drama",
+        "rating": "IMDb: 9.482"
+      }
+    },
+    "series": {
+      "selector": ".item",
+      "count": 55,
+      "item_structure": {
+        "title": "Garota Sequestrada",
+        "link": "https://www.maxseries.one/series/assistir-garota-sequestrada-online",
+        "image": "https://image.tmdb.org/t/p/w780/1mqzGV6pzZ4Hw0wM5lBfBhfFTtU.jpg",
+        "year": "2026"
+      }
+    },
+    "series_page": {
+      "title": "Terra de Pecados",
+      "original_title": "",
+      "genres": "",
+      "seasons": "",
+      "synopsis": "SINOPSE\n\nDepois que um adolescente desaparece, uma policial com vínculos pessoais ao caso embarca em uma investigação tensa, que revela alianças e antigos conflitos familiares.",
+      "rating": "Your rating: 0\n\n\n6\n 1 vote"
+    }
+  },
+  "selectors": {}
+}

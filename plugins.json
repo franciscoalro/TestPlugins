@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v58.0/MaxSeries.cs3",
         "status": 1,
-        "version": 57,
+        "version": 58,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v57 - Assista filmes e séries online grátis em HD. Melhorias na estabilidade, tratamento de erros aprimorado e correções de compatibilidade. Suporte completo a episódios e temporadas.",
+        "description": "MaxSeries v58 - Seletores corrigidos (article.item), filtro de conteúdo inválido (login/register), imagens e sinopses corretas.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

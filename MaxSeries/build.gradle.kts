@@ -1,4 +1,4 @@
-version = 57
+version = 58
 
 cloudstream {
     description = "MaxSeries v57 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes."

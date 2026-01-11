@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.JsUnpacker
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
+import com.lagradost.cloudstream3.AcraApplication
 
 /**
  * MegaEmbed Extractor para CloudStream
@@ -49,7 +50,7 @@ class MegaEmbedExtractor : ExtractorApi() {
         
         // v45: Interceptação via WebView para bypass de criptografia
         // A API retorna dados criptografados, o navegador descriptografa e requisita a playlist
-        val resolver = MegaEmbedWebViewResolver(App.context)
+        val resolver = MegaEmbedWebViewResolver(AcraApplication.context!!)
         val playlistUrl = resolver.resolve(url)
         
         if (playlistUrl != null) {
@@ -58,11 +59,12 @@ class MegaEmbedExtractor : ExtractorApi() {
                 newExtractorLink(
                     name,
                     name,
-                    playlistUrl,
-                    "https://megaembed.link/",
-                    Qualities.Unknown.value,
-                    true
-                )
+                    playlistUrl
+                ) {
+                    referer = "https://megaembed.link/"
+                    quality = Qualities.Unknown.value
+                    isM3u8 = true
+                }
             )
         } else {
             Log.e(TAG, "Falha ao resolver URL via WebView")
@@ -75,11 +77,12 @@ class MegaEmbedExtractor : ExtractorApi() {
                         newExtractorLink(
                             name,
                             name,
-                            manualUrl,
-                            "https://megaembed.link/",
-                            Qualities.Unknown.value,
-                            true
-                        )
+                            manualUrl
+                        ) {
+                            referer = "https://megaembed.link/"
+                            quality = Qualities.Unknown.value
+                            isM3u8 = true
+                        }
                     )
                 }
             }

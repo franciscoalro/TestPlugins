@@ -30,15 +30,15 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         request: MainPageRequest
     ): HomePageResponse {
         val document = app.get(request.data + page).document
-        val home = document.select("div.item").mapNotNull {
+        val home = document.select("article.item").mapNotNull {
             it.toSearchResult()
         }
         return newHomePageResponse(request.name, home)
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.selectFirst("h3 a")?.text()?.trim() ?: return null
-        val href = this.selectFirst("h3 a")?.attr("href") ?: return null
+        val title = this.selectFirst("h3.title")?.text()?.trim() ?: return null
+        val href = this.selectFirst("a")?.attr("href") ?: return null
         val posterUrl = this.selectFirst("img")?.attr("src")
         val quality = this.selectFirst(".quality")?.text()
 
@@ -51,7 +51,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
     override suspend fun search(query: String): List<SearchResponse> {
         val document = app.get("$mainUrl/?s=$query").document
 
-        return document.select("div.item").mapNotNull {
+        return document.select("article.item").mapNotNull {
             it.toSearchResult()
         }
     }

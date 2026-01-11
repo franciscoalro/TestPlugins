@@ -16,7 +16,7 @@ buildscript {
             exclude(group = "com.github.vidstige", module = "jadb")
         }
         classpath("com.github.vidstige:jadb:v1.2.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
     }
 }
 
@@ -76,6 +76,7 @@ subprojects {
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
         implementation("com.squareup.okhttp3:okhttp:4.12.0")
         implementation("androidx.webkit:webkit:1.8.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     }
 }
 

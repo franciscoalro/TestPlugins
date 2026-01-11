@@ -6,6 +6,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import org.jsoup.nodes.Element
 import com.franciscoalro.maxseries.extractors.*
+import android.util.Log
 
 class MaxSeriesProvider : MainAPI() { // all providers must be an instance of MainAPI
     override var mainUrl = "https://www.maxseries.one"
@@ -29,21 +30,26 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get(request.data + page).document
-        val home = document.select("article.item").mapNotNull {
-            it.toSearchResult()
+        return try {
+            val document = app.get(request.data + page).document
+            val home = document.select("div.items article.item").mapNotNull {
+                it.toSearchResult()
+            }
+            if (home.isEmpty()) {
+                android.util.Log.d("MaxSeries", "⚠️ Nenhum resultado encontrado na página ${request.name} (página $page)")
+            }
+            newHomePageResponse(request.name, home)
+        } catch (e: Exception) {
+            android.util.Log.e("MaxSeries", "❌ Erro ao carregar página principal ${request.name}: ${e.message}")
+            newHomePageResponse(request.name, emptyList())
         }
-        return newHomePageResponse(request.name, home)
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
         val title = this.selectFirst("h3.title")?.text()?.trim() ?: return null
-        val href = this.selectFirst("a")?.attr("href") ?: return null
+        val href = fixUrl(this.selectFirst("a")?.attr("href") ?: return null)
         val posterUrl = this.selectFirst("img")?.attr("src")
         val quality = this.selectFirst(".quality")?.text()
-
-        // Garantir URL absoluta
-        val absoluteHref = if (href.startsWith("http")) href else "$mainUrl$href"
         
         // Detectar tipo baseado na URL ou classe
         val tvType = when {
@@ -54,17 +60,31 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
             else -> TvType.TvSeries // Default para séries
         }
 
-        return newMovieSearchResponse(title, absoluteHref, tvType) {
+        return newMovieSearchResponse(title, href, tvType) {
             this.posterUrl = posterUrl
             this.quality = getQualityFromString(quality)
         }
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val document = app.get("$mainUrl/?s=$query").document
-
-        return document.select("article.item").mapNotNull {
-            it.toSearchResult()
+        if (query.isBlank()) {
+            android.util.Log.d("MaxSeries", "⚠️ Pesquisa vazia, retornando lista vazia")
+            return emptyList()
+        }
+        
+        return try {
+            android.util.Log.d("MaxSeries", "🔍 Pesquisando por: $query")
+            val document = app.get("$mainUrl/?s=$query").document
+            
+            val results = document.select("div.items article.item").mapNotNull {
+                it.toSearchResult()
+            }
+            
+            android.util.Log.d("MaxSeries", "✅ Encontrados ${results.size} resultados para '$query'")
+            results
+        } catch (e: Exception) {
+            android.util.Log.e("MaxSeries", "❌ Erro na pesquisa '$query': ${e.message}")
+            emptyList()
         }
     }
 
@@ -134,11 +154,11 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
         val document = app.get(data).document
         
         // Log para debug
-        println("🔍 MaxSeries v50 - Carregando links para: $data")
+        Log.d("MaxSeries", "🔍 MaxSeries v54 - Carregando links para: $data")
         
         // Buscar todos os botões de player (incluindo data-show-player)
         val playerButtons = document.select("button[data-source], button[data-show-player]")
-        println("🎯 Encontrados ${playerButtons.size} botões de player")
+        Log.d("MaxSeries", "🎯 Encontrados ${playerButtons.size} botões de player")
         
         var sourcesFound = 0
         
@@ -236,7 +256,7 @@ class MaxSeriesProvider : MainAPI() { // all providers must be an instance of Ma
             }
         }
         
-        println("✅ MaxSeries processou $sourcesFound fontes")
+        Log.d("MaxSeries", "✅ MaxSeries processou $sourcesFound fontes")
         return sourcesFound > 0
     }
     

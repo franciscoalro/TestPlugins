@@ -1,0 +1,24 @@
+{
+  "total_tested": 3,
+  "megaembed_found": 1,
+  "playerembedapi_found": 1,
+  "doodstream_found": 0,
+  "sources_by_url": {
+    "https://www.maxseries.one/episodio/breaking-bad-1x1/": [],
+    "https://www.maxseries.one/episodio/the-walking-dead-1x1/": [
+      {
+        "url": "https://playerembedapi.link/?v=teiOZYl1v",
+        "type": "PlayerEmbedAPI",
+        "player_text": "Player #1",
+        "episode_id": "228933"
+      },
+      {
+        "url": "https://megaembed.link/#iln1cp",
+        "type": "MegaEmbed",
+        "player_text": "Player #2",
+        "episode_id": "228933"
+      }
+    ],
+    "https://www.maxseries.one/filme/avatar-2009/": []
+  }
+}

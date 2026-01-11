@@ -342,6 +342,7 @@ class MaxSeriesProvider : MainAPI() {
             val playerUrls = mutableListOf<String>()
             
             if (data.contains("#") && data.contains("playerthree")) {
+                // Formato antigo: #123_456
                 val epId = Regex("#\\d+_(\\d+)").find(data)?.groupValues?.get(1) ?: return false
                 
                 val ajax = app.get(
@@ -350,18 +351,82 @@ class MaxSeriesProvider : MainAPI() {
                 )
                 
                 if (ajax.isSuccessful) {
+                    // Procurar botões com data-source (padrão antigo)
                     ajax.document.select("button[data-source]").forEach { btn ->
                         val src = btn.attr("data-source")
                         if (src.startsWith("http") && !src.contains("youtube", true)) {
                             playerUrls.add(src)
                         }
                     }
+                    
+                    // NOVO: Procurar botões com data-show-player (padrão atual do PlayterThree)
+                    ajax.document.select("button[data-show-player]").forEach { btn ->
+                        val src = btn.attr("data-source")
+                        if (src.startsWith("http") && !src.contains("youtube", true)) {
+                            playerUrls.add(src)
+                            Log.d("MaxSeries", "🎬 Fonte encontrada via data-show-player: $src")
+                        }
+                    }
                 }
             } else {
+                // Carregar página principal para obter iframe
                 val doc = app.get(data).document
                 val iframe = doc.selectFirst("iframe")?.attr("src")
                 if (!iframe.isNullOrEmpty()) {
-                    playerUrls.add(if (iframe.startsWith("//")) "https:$iframe" else iframe)
+                    val iframeSrc = if (iframe.startsWith("//")) "https:$iframe" else iframe
+                    
+                    // Se é playerthree, tentar extrair IDs de episódio do iframe
+                    if (iframeSrc.contains("playerthree")) {
+                        Log.d("MaxSeries", "🔍 Carregando PlayterThree iframe: $iframeSrc")
+                        
+                        try {
+                            val iframeResponse = app.get(iframeSrc, headers = mapOf("Referer" to data))
+                            val iframeHtml = iframeResponse.text
+                            
+                            // Procurar IDs de episódio no iframe
+                            val episodeIds = Regex("data-episode-id[\"\\s]*=[\"\\s]*[\"']?(\\d+)").findAll(iframeHtml)
+                                .map { it.groupValues[1] }
+                                .toList()
+                            
+                            Log.d("MaxSeries", "🆔 Episode IDs encontrados: ${episodeIds.size}")
+                            
+                            // Testar alguns IDs para encontrar fontes
+                            for (epId in episodeIds.take(5)) { // Testar apenas os primeiros 5
+                                Log.d("MaxSeries", "🧪 Testando Episode ID: $epId")
+                                
+                                val ajax = app.get(
+                                    "https://playerthree.online/episodio/$epId",
+                                    headers = mapOf("Referer" to data, "X-Requested-With" to "XMLHttpRequest")
+                                )
+                                
+                                if (ajax.isSuccessful) {
+                                    val buttons = ajax.document.select("button[data-show-player]")
+                                    Log.d("MaxSeries", "🔘 Botões encontrados para ID $epId: ${buttons.size}")
+                                    
+                                    buttons.forEach { btn ->
+                                        val src = btn.attr("data-source")
+                                        if (src.startsWith("http") && !src.contains("youtube", true)) {
+                                            playerUrls.add(src)
+                                            Log.d("MaxSeries", "✅ Fonte adicionada: $src")
+                                        }
+                                    }
+                                    
+                                    // Se encontrou fontes, parar de procurar
+                                    if (buttons.isNotEmpty()) {
+                                        break
+                                    }
+                                }
+                            }
+                            
+                        } catch (e: Exception) {
+                            Log.e("MaxSeries", "❌ Erro ao processar PlayterThree iframe: ${e.message}")
+                        }
+                    }
+                    
+                    // Fallback: adicionar o próprio iframe se não encontrou fontes específicas
+                    if (playerUrls.isEmpty()) {
+                        playerUrls.add(iframeSrc)
+                    }
                 }
             }
             

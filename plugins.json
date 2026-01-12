@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v58.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v60.0/MaxSeries.cs3",
         "status": 1,
-        "version": 58,
+        "version": 60,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v58 - Seletores corrigidos (article.item), filtro de conteúdo inválido (login/register), imagens e sinopses corretas.",
+        "description": "MaxSeries v60 - MegaEmbedExtractorV5: extração direta via CDN sem WebView. Descoberta: CDN aceita qualquer timestamp. Qualidades 720p/1080p.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

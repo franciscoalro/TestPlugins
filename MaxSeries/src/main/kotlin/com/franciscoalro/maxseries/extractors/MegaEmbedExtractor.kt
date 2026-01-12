@@ -35,7 +35,8 @@ class MegaEmbedExtractor : ExtractorApi() {
         val DOMAINS = listOf(
             "megaembed.link",
             "megaembed.xyz", 
-            "megaembed.to"
+            "megaembed.to",
+            "playerthree.online"
         )
         
         fun canHandle(url: String): Boolean {
@@ -99,9 +100,9 @@ class MegaEmbedExtractor : ExtractorApi() {
             
             // Interceptar múltiplos padrões de URL de vídeo
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org"""),
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|cf-master.*\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org"""),
                 additionalUrls = listOf(
-                    Regex("""https?://[^/]+/v4/[^/]+/[^/]+/cf-master\.\d+\.txt"""), // MegaEmbed pattern
+                    Regex("""https?://[^/]+/v4/[^/]+/[^/]+/cf-master.*\.txt"""),
                     Regex("""https?://[^/]+\.m3u8"""),
                     Regex("""https?://[^/]+\.mp4"""),
                     Regex("""cloudatacdn\.com[^"'\s]*"""),

@@ -52,15 +52,16 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         callback: (ExtractorLink) -> Unit
     ) {
         Log.d(TAG, "=== MegaEmbed Extractor v5 ===")
-        Log.d(TAG, "URL: $url")
+        Log.d(TAG, "URL recebida: $url")
+        Log.d(TAG, "Referer: $referer")
         
         val videoId = extractVideoId(url)
         if (videoId == null) {
-            Log.e(TAG, "VideoId não encontrado na URL")
+            Log.e(TAG, "VideoId não encontrado na URL: $url")
             return
         }
         
-        Log.d(TAG, "VideoId: $videoId")
+        Log.d(TAG, "VideoId extraído: $videoId")
         
         // Timestamp atual
         val timestamp = System.currentTimeMillis() / 1000
@@ -69,7 +70,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         for (cdn in CDNS) {
             val m3u8Url = "https://$cdn/v4/$DEFAULT_SHARD/$videoId/cf-master.$timestamp.txt"
             
-            Log.d(TAG, "Testando: $m3u8Url")
+            Log.d(TAG, "Testando CDN: $m3u8Url")
             
             try {
                 val response = app.get(
@@ -79,29 +80,43 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                         "Referer" to mainUrl,
                         "Origin" to mainUrl
                     ),
-                    timeout = 10
+                    timeout = 15
                 )
                 
+                Log.d(TAG, "Resposta CDN $cdn: ${response.code}")
+                
                 if (response.isSuccessful && response.text.contains("#EXTM3U")) {
-                    Log.d(TAG, "CDN funcionando: $cdn")
+                    Log.d(TAG, "✅ CDN funcionando: $cdn")
+                    Log.d(TAG, "Playlist preview: ${response.text.take(200)}")
                     
-                    // Gerar links M3U8 com qualidades
-                    M3u8Helper.generateM3u8(
-                        name,
-                        m3u8Url,
-                        mainUrl
-                    ).forEach(callback)
+                    // Emitir link direto usando newExtractorLink
+                    callback.invoke(
+                        newExtractorLink(
+                            source = name,
+                            name = "$name 1080p",
+                            url = m3u8Url,
+                            type = ExtractorLinkType.M3U8
+                        ) {
+                            this.referer = mainUrl
+                            this.quality = Qualities.P1080.value
+                            this.headers = mapOf(
+                                "User-Agent" to "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
+                                "Referer" to mainUrl,
+                                "Origin" to mainUrl
+                            )
+                        }
+                    )
                     
-                    Log.d(TAG, "Links emitidos com sucesso!")
+                    Log.d(TAG, "✅ ExtractorLink emitido!")
                     return
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "CDN $cdn falhou: ${e.message}")
+                Log.e(TAG, "CDN $cdn falhou: ${e.message}")
                 continue
             }
         }
         
-        Log.e(TAG, "Nenhum CDN funcionou para videoId: $videoId")
+        Log.e(TAG, "❌ Nenhum CDN funcionou para videoId: $videoId")
     }
 
     private fun extractVideoId(url: String): String? {

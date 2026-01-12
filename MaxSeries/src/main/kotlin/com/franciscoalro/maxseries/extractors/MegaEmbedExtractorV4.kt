@@ -33,14 +33,22 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             "megaembed.to"
         )
         
-        // CDNs conhecidos (atualizados com descobertas)
+        // CDNs conhecidos (atualizados com descobertas Jan 2026)
         private val KNOWN_CDN_DOMAINS = listOf(
-            "sipt.marvellaholdings.sbs",  // Descoberto em produção
+            // CDNs luminairemotion (descobertos em produção)
+            "sqtd.luminairemotion.online",
+            "stzm.luminairemotion.online",
+            "srcf.luminairemotion.online",
+            // CDNs marvellaholdings (descobertos anteriormente)
+            "sipt.marvellaholdings.sbs",
             "stzm.marvellaholdings.sbs",
             "srcf.marvellaholdings.sbs", 
             "sbi6.marvellaholdings.sbs",
             "s6p9.marvellaholdings.sbs"
         )
+        
+        // Shards conhecidos
+        private val KNOWN_SHARDS = listOf("is3", "x6b", "x7c", "x8d", "x9e")
         
         fun canHandle(url: String): Boolean {
             return DOMAINS.any { url.contains(it, ignoreCase = true) }
@@ -53,34 +61,35 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Extractor v4 - Dynamic CDN Capture ===")
+        Log.d(TAG, "=== MegaEmbed Extractor v5 - Direct CDN Construction ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
-            // Método 1: WebView com interceptação inteligente (PRINCIPAL)
-            Log.d(TAG, "🔄 Tentando método WebView com interceptação inteligente...")
-            if (extractWithIntelligentInterception(url, referer, callback)) {
-                Log.d(TAG, "✅ WebView interceptação inteligente funcionou!")
+            // Método 1: Construção DIRETA baseada no padrão (MAIS RÁPIDO - TESTADO E FUNCIONA!)
+            // Descoberta: CDN aceita timestamp atual, não precisa do exato do JS
+            Log.d(TAG, "🔄 Tentando construção direta (método principal)...")
+            if (extractWithPatternConstruction(url, referer, callback)) {
+                Log.d(TAG, "✅ Construção direta funcionou!")
                 return
             }
             
-            // Método 2: Construção baseada no padrão (fallback com CDNs conhecidos)
-            Log.d(TAG, "🔄 Tentando método construção por padrão...")
-            if (extractWithPatternConstruction(url, referer, callback)) {
-                Log.d(TAG, "✅ Construção por padrão funcionou!")
+            // Método 2: WebView com interceptação (fallback se CDN mudar)
+            Log.d(TAG, "🔄 Tentando WebView com interceptação...")
+            if (extractWithIntelligentInterception(url, referer, callback)) {
+                Log.d(TAG, "✅ WebView interceptação funcionou!")
                 return
             }
             
             // Método 3: WebView com JavaScript execution (fallback)
-            Log.d(TAG, "🔄 Tentando método WebView com JavaScript...")
+            Log.d(TAG, "🔄 Tentando WebView com JavaScript...")
             if (extractWithWebViewJavaScript(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView JavaScript funcionou!")
                 return
             }
             
             // Método 4: API tradicional (último recurso)
-            Log.d(TAG, "🔄 Tentando método API tradicional...")
+            Log.d(TAG, "🔄 Tentando API tradicional...")
             if (extractWithApiTraditional(url, referer, callback)) {
                 Log.d(TAG, "✅ API tradicional funcionou!")
                 return
@@ -256,14 +265,11 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             
             Log.d(TAG, "🆔 VideoId extraído: $videoId")
             
-            // Shards mais comuns (baseado nas descobertas)
-            val possibleShards = listOf("x6b", "x7c", "x8d", "x9e")
-            
             // Usar timestamp atual
             val timestamp = System.currentTimeMillis() / 1000
             
             for (cdn in KNOWN_CDN_DOMAINS) {
-                for (shard in possibleShards) {
+                for (shard in KNOWN_SHARDS) {
                     val constructedUrl = "https://$cdn/v4/$shard/$videoId/cf-master.$timestamp.txt"
                     
                     Log.d(TAG, "🧪 Testando URL construída: $constructedUrl")

@@ -1,7 +1,7 @@
-version = 63
+version = 64
 
 cloudstream {
-    description = "MaxSeries v63 - Simple Extractor retorna embed para WebView interno do CloudStream."
+    description = "MaxSeries v64 - Fix hash URLs e melhor tratamento de erros."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

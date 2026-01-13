@@ -406,9 +406,16 @@ class MaxSeriesProvider : MainAPI() {
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PRIORIDADE 2: MyVidPlay/Dood (MP4/HLS normal - compatível)
-                        source.contains("myvidplay", ignoreCase = true) || source.contains("dood", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 2] Dood/myvidplay via loadExtractor")
+                        // PRIORIDADE 2: MyVidPlay (MP4 direto do cloudatacdn)
+                        source.contains("myvidplay", ignoreCase = true) -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 2] MyVidPlayExtractor - MP4 direto")
+                            val extractor = com.franciscoalro.maxseries.extractors.MyVidPlayExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 2: Dood (MP4/HLS normal - compatível)
+                        source.contains("dood", ignoreCase = true) -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 2] Dood via loadExtractor")
                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

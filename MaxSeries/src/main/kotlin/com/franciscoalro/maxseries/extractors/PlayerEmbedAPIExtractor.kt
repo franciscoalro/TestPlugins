@@ -5,18 +5,22 @@ import com.lagradost.cloudstream3.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v75 - MP4 direto do Google Cloud Storage
+ * PlayerEmbedAPI Extractor v76 - WebView Required (Jan 2026)
  * 
- * PRIORIDADE 1 - Melhor opção:
- * - MP4 direto sem JavaScript
- * - Compatível com ExoPlayer (Media3 2024+)
- * - Evita erro 3003
- * - Usa NiceHttp (wrapper moderno do OkHttp 4.12)
+ * MUDANÇA IMPORTANTE (Jan 2026):
+ * - PlayerEmbedAPI agora usa criptografia AES-CTR no campo "media"
+ * - A descriptografia acontece via JavaScript (core.bundle.js)
+ * - NÃO é possível extrair via HTTP simples
+ * - Solução: usar WebView interno do CloudStream
  * 
- * Fluxo:
- * 1. GET playerembedapi.link/?v=xxx
- * 2. Resposta JSON com sources[].file
- * 3. URL final: storage.googleapis.com/...mp4
+ * Fluxo atual:
+ * 1. GET playerembedapi.link/?v=xxx → HTML com dados Base64
+ * 2. JavaScript descriptografa campo "media" com AES-CTR
+ * 3. JWPlayer carrega o vídeo (MP4 do Google Cloud Storage)
+ * 
+ * Prioridade mantida como 1 porque:
+ * - Quando funciona, é MP4 direto (melhor qualidade)
+ * - WebView do CloudStream executa o JS automaticamente
  * 
  * Atualizado: Janeiro 2026
  */
@@ -40,19 +44,54 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         Log.d(TAG, "🎬 PlayerEmbedAPI: $url")
         
         try {
+            // Primeiro, tentar extrair via HTTP (caso volte ao formato antigo)
             val response = app.get(
                 url, 
                 referer = referer,
                 headers = mapOf(
                     "User-Agent" to USER_AGENT,
-                    "Accept" to "application/json, text/plain, */*"
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
                 )
             )
             
             val text = response.text
-            Log.d(TAG, "📄 Resposta (${text.length} chars): ${text.take(500)}")
+            Log.d(TAG, "📄 Resposta (${text.length} chars)")
             
-            // Tentar parsear como JSON
+            // Verificar se é o novo formato (HTML com dados criptografados)
+            val isNewFormat = text.contains("SoTrym") || text.contains("iamcdn.net") || text.contains("core.bundle.js")
+            
+            if (isNewFormat) {
+                Log.d(TAG, "🔐 Formato novo detectado (AES-CTR) - usando WebView")
+                
+                // Headers modernos para WebView
+                val extraHeaders = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Sec-Fetch-Dest" to "iframe",
+                    "Sec-Fetch-Mode" to "navigate",
+                    "Sec-Fetch-Site" to "cross-site"
+                )
+                
+                // Retornar link para WebView processar
+                // CloudStream vai executar o JavaScript e capturar o vídeo
+                callback.invoke(
+                    newExtractorLink(
+                        source = this.name,
+                        name = "$name (WebView)",
+                        url = url,
+                        type = ExtractorLinkType.VIDEO
+                    ) {
+                        this.referer = referer ?: mainUrl
+                        this.quality = Qualities.Unknown.value
+                        this.headers = extraHeaders
+                    }
+                )
+                Log.d(TAG, "✅ Link WebView adicionado: $url")
+                return
+            }
+            
+            // Formato antigo: tentar parsear JSON
             try {
                 val json = response.parsedSafe<PlayerEmbedResponse>()
                 if (json != null && json.sources.isNotEmpty()) {
@@ -83,36 +122,32 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     return
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "⚠️ Não é JSON válido, tentando regex...")
+                Log.d(TAG, "⚠️ Não é JSON válido")
             }
             
             // Fallback: extrair URLs via regex
             val filePattern = Regex(""""file"\s*:\s*"([^"]+)"""")
-            val labelPattern = Regex(""""label"\s*:\s*"([^"]+)"""")
-            
             val files = filePattern.findAll(text).map { it.groupValues[1] }.toList()
-            val labels = labelPattern.findAll(text).map { it.groupValues[1] }.toList()
             
             if (files.isNotEmpty()) {
                 Log.d(TAG, "✅ Regex encontrou ${files.size} files")
                 
-                files.forEachIndexed { index, file ->
-                    val label = labels.getOrNull(index) ?: "Auto"
+                files.forEach { file ->
                     val linkType = if (file.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                     
                     callback.invoke(
                         newExtractorLink(
                             source = this.name,
-                            name = "$name $label",
+                            name = "$name",
                             url = file,
                             type = linkType
                         ) {
                             this.referer = referer ?: mainUrl
-                            this.quality = getQualityFromName(label)
+                            this.quality = Qualities.Unknown.value
                             this.headers = mapOf("User-Agent" to USER_AGENT)
                         }
                     )
-                    Log.d(TAG, "✅ Link (regex): $label -> $file")
+                    Log.d(TAG, "✅ Link (regex): $file")
                 }
                 return
             }
@@ -141,7 +176,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
     }
     
-    // Data classes para parsing JSON
+    // Data classes para parsing JSON (formato antigo)
     data class PlayerEmbedResponse(
         val sources: List<Source> = emptyList()
     )

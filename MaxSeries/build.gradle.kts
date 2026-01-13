@@ -1,7 +1,7 @@
-version = 75
+version = 76
 
 cloudstream {
-    description = "MaxSeries v75 - Extractors atualizados (Jan 2026) com APIs modernas"
+    description = "MaxSeries v76 - Extractors corrigidos (Jan 2026): PlayerEmbedAPI WebView + MyVidPlay MP4"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

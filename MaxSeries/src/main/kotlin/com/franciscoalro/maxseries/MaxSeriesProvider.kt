@@ -372,7 +372,9 @@ class MaxSeriesProvider : MainAPI() {
             )
             
             val html = response.text
-            Log.d(TAG, "📄 Resposta do episódio (${html.length} chars): ${html.take(500)}")
+            Log.d(TAG, "📄 Resposta do episódio (${html.length} chars)")
+            Log.d(TAG, "📄 HTML início: ${html.take(1000)}")
+            Log.d(TAG, "📄 HTML fim: ${html.takeLast(500)}")
             
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
@@ -539,48 +541,87 @@ class MaxSeriesProvider : MainAPI() {
 
     /**
      * Extrai URLs de player do HTML (data-source dos botões)
-     * Regex melhorada para pegar TODOS os players conhecidos
+     * Regex SUPER melhorada para pegar TODOS os players conhecidos
      */
     private fun extractPlayerSources(html: String): List<String> {
         val sources = mutableListOf<String>()
         
-        // Padrão 1: data-source="url" (principal)
-        val dataSourcePattern = Regex("""data-source=["']([^"']+)["']""")
+        Log.d(TAG, "🔍 Analisando HTML (${html.length} chars)")
+        
+        // Padrão 1: data-source="url" (principal - botões do playerthree)
+        val dataSourcePattern = Regex("""data-source\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
         dataSourcePattern.findAll(html).forEach { match ->
             val url = match.groupValues[1].trim()
+            Log.d(TAG, "🔹 data-source encontrado: $url")
             if (url.startsWith("http") && !sources.contains(url)) {
                 sources.add(url)
             }
         }
         
         // Padrão 2: data-src="url"
-        val dataSrcPattern = Regex("""data-src=["']([^"']+)["']""")
+        val dataSrcPattern = Regex("""data-src\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
         dataSrcPattern.findAll(html).forEach { match ->
             val url = match.groupValues[1].trim()
+            Log.d(TAG, "🔹 data-src encontrado: $url")
             if (url.startsWith("http") && !sources.contains(url)) {
                 sources.add(url)
             }
         }
         
-        // Padrão 3: URLs específicas do log (playerembedapi, myvidplay, dood, megaembed)
-        val knownPatterns = listOf(
-            Regex("""https?://playerembedapi\.link[^"'\s<>]+"""),
-            Regex("""https?://myvidplay\.com[^"'\s<>]+"""),
-            Regex("""https?://dood[^"'\s<>]*\.[^"'\s<>]+/e/[^"'\s<>]+"""),
-            Regex("""https?://[^"'\s<>]*doodstream[^"'\s<>]+"""),
-            Regex("""https?://megaembed\.link[^"'\s<>]+""")
+        // Padrão 3: href="url" em links de player
+        val hrefPattern = Regex("""href\s*=\s*["'](https?://(?:playerembedapi|myvidplay|dood|megaembed)[^"']+)["']""", RegexOption.IGNORE_CASE)
+        hrefPattern.findAll(html).forEach { match ->
+            val url = match.groupValues[1].trim()
+            Log.d(TAG, "🔹 href player encontrado: $url")
+            if (!sources.contains(url)) {
+                sources.add(url)
+            }
+        }
+        
+        // Padrão 4: src="url" em iframes
+        val srcPattern = Regex("""src\s*=\s*["'](https?://(?:playerembedapi|myvidplay|dood|megaembed)[^"']+)["']""", RegexOption.IGNORE_CASE)
+        srcPattern.findAll(html).forEach { match ->
+            val url = match.groupValues[1].trim()
+            Log.d(TAG, "� src iframe encontrado: $url")
+            if (!sources.contains(url)) {
+                sources.add(url)
+            }
+        }
+        
+        // Padrão 5: URLs diretas no HTML (fallback agressivo)
+        val directUrlPatterns = listOf(
+            Regex("""https?://playerembedapi\.link/?\?[^"'\s<>\)]+"""),
+            Regex("""https?://playerembedapi\.link[^"'\s<>\)]*"""),
+            Regex("""https?://myvidplay\.com/e/[^"'\s<>\)]+"""),
+            Regex("""https?://myvidplay\.com[^"'\s<>\)]*"""),
+            Regex("""https?://dood\.[a-z]+/e/[^"'\s<>\)]+"""),
+            Regex("""https?://doodstream\.[a-z]+/e/[^"'\s<>\)]+"""),
+            Regex("""https?://[a-z0-9]*dood[a-z0-9]*\.[a-z]+/e/[^"'\s<>\)]+"""),
+            Regex("""https?://megaembed\.link/?#[^"'\s<>\)]+"""),
+            Regex("""https?://megaembed\.link[^"'\s<>\)]*""")
         )
         
-        knownPatterns.forEach { pattern ->
+        directUrlPatterns.forEach { pattern ->
             pattern.findAll(html).forEach { match ->
-                val url = match.value.trim()
-                if (!sources.contains(url)) {
+                val url = match.value.trim().trimEnd(')', '"', '\'', '<', '>')
+                if (url.length > 15 && !sources.contains(url)) {
+                    Log.d(TAG, "🔹 URL direta encontrada: $url")
                     sources.add(url)
                 }
             }
         }
         
-        Log.d(TAG, "📋 Sources extraídas (v72): $sources")
+        // Padrão 6: JSON com URLs (caso a resposta seja JSON)
+        val jsonUrlPattern = Regex(""""(?:url|src|file|source|embed)":\s*"(https?://[^"]+)"""")
+        jsonUrlPattern.findAll(html).forEach { match ->
+            val url = match.groupValues[1].trim()
+            Log.d(TAG, "🔹 URL em JSON encontrada: $url")
+            if (!sources.contains(url)) {
+                sources.add(url)
+            }
+        }
+        
+        Log.d(TAG, "📋 Total sources extraídas (v73): ${sources.size} - $sources")
         return sources.distinct()
     }
 }

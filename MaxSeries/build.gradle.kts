@@ -1,7 +1,7 @@
-version = 62
+version = 63
 
 cloudstream {
-    description = "MaxSeries v62 - MegaEmbedExtractorV6 com WebView Interception para capturar HLS dinâmico."
+    description = "MaxSeries v63 - Simple Extractor retorna embed para WebView interno do CloudStream."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

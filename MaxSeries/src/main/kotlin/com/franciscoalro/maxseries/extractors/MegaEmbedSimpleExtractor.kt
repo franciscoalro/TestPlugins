@@ -5,10 +5,10 @@ import com.lagradost.cloudstream3.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Simple Extractor
+ * MegaEmbed Simple Extractor v2
  * 
- * Solução simples: retorna o embed URL para o WebView interno do CloudStream.
- * O CloudStream abre em WebView e extrai o HLS automaticamente.
+ * Solução: retorna o embed URL para o WebView interno do CloudStream.
+ * Corrige problemas com hash (#) e URLs incompletas.
  */
 class MegaEmbedSimpleExtractor : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -25,38 +25,68 @@ class MegaEmbedSimpleExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Simple Extractor ===")
-        Log.d(TAG, "URL: $url")
+        Log.d(TAG, "=== MegaEmbed Simple Extractor v2 ===")
+        Log.d(TAG, "URL recebida: $url")
+        Log.d(TAG, "Referer: $referer")
         
-        // Extrair videoId do hash
-        val videoId = url.substringAfterLast("#", "").ifBlank {
-            // Tentar outros padrões
-            Regex("""/embed/([a-zA-Z0-9]+)""").find(url)?.groupValues?.get(1)
-                ?: Regex("""[?&]v=([a-zA-Z0-9]+)""").find(url)?.groupValues?.get(1)
-        }
-        
-        // Construir URL do embed
-        val embedUrl = if (!videoId.isNullOrBlank() && !url.contains("/embed/")) {
-            "https://megaembed.link/embed/$videoId"
+        // Manter URL original se tiver hash (importante!)
+        val finalUrl = if (url.contains("#")) {
+            // URL já tem hash, usar como está
+            Log.d(TAG, "✅ URL tem hash, mantendo original")
+            url
         } else {
-            url.substringBefore("#")
+            // Tentar extrair videoId de outros padrões
+            val videoId = extractVideoId(url)
+            if (!videoId.isNullOrBlank()) {
+                // Construir URL com hash
+                val constructed = "https://megaembed.link/#$videoId"
+                Log.d(TAG, "🔧 Construindo URL com hash: $constructed")
+                constructed
+            } else {
+                // Usar URL original como fallback
+                Log.d(TAG, "⚠️ Sem videoId, usando URL original")
+                url
+            }
         }
         
-        Log.d(TAG, "VideoId: $videoId")
-        Log.d(TAG, "Embed URL: $embedUrl")
+        Log.d(TAG, "📺 URL final: $finalUrl")
         
         // Retornar embed para o WebView interno do CloudStream
         callback(
             newExtractorLink(
                 source = name,
-                name = "$name (WebView)",
-                url = embedUrl
+                name = "$name Auto",
+                url = finalUrl
             ) {
-                this.referer = referer ?: "https://playerthree.online/"
+                this.referer = "https://megaembed.link/"
                 this.quality = Qualities.Unknown.value
             }
         )
         
-        Log.d(TAG, "✅ Embed retornado para WebView interno")
+        Log.d(TAG, "✅ ExtractorLink emitido!")
+    }
+    
+    /**
+     * Extrai videoId de diferentes formatos de URL
+     */
+    private fun extractVideoId(url: String): String? {
+        val patterns = listOf(
+            Regex("""#([a-zA-Z0-9]+)"""),           // #3wnuij
+            Regex("""/embed/([a-zA-Z0-9]+)"""),     // /embed/3wnuij
+            Regex("""[?&]v=([a-zA-Z0-9]+)"""),      // ?v=3wnuij
+            Regex("""[?&]id=([a-zA-Z0-9]+)"""),     // ?id=3wnuij
+            Regex("""megaembed\.[^/]+/([a-zA-Z0-9]{4,10})/?$""") // /3wnuij
+        )
+        
+        for (pattern in patterns) {
+            val match = pattern.find(url)
+            if (match != null) {
+                val id = match.groupValues[1]
+                Log.d(TAG, "🔍 VideoId extraído: $id (padrão: ${pattern.pattern})")
+                return id
+            }
+        }
+        
+        return null
     }
 }

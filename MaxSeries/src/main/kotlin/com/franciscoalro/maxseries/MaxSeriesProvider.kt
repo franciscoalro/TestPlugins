@@ -372,46 +372,49 @@ class MaxSeriesProvider : MainAPI() {
             )
             
             val html = response.text
-            Log.d(TAG, "📄 Resposta do episódio: ${html.take(500)}")
+            Log.d(TAG, "📄 Resposta do episódio (${html.length} chars): ${html.take(500)}")
             
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
-            Log.d(TAG, "🎯 Sources encontradas: ${sources.size}")
+            Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
             
-            // PRIORIZAÇÃO ATUALIZADA:
-            // 1. PlayerEmbedAPI (MP4 direto - mais compatível)
-            // 2. Dood/myvidplay (MP4/HLS normal - compatível)
-            // 3. MegaEmbed (HLS ofuscado - pode dar erro 3003)
-            val sortedSources = sources.sortedWith(
-                compareByDescending<String> { it.contains("playerembedapi") }
-                    .thenByDescending { it.contains("myvidplay") || it.contains("dood") }
-                    .thenByDescending { !it.contains("megaembed") }
-            )
+            // PRIORIZAÇÃO FORTE por índice:
+            // 0 = playerembedapi (MP4 direto - MELHOR)
+            // 1 = myvidplay (MP4/HLS normal)
+            // 2 = dood (MP4/HLS normal)
+            // 3 = megaembed (HLS ofuscado - EVITAR se possível)
+            // 4+ = outros
+            val priorityOrder = listOf("playerembedapi", "myvidplay", "dood", "megaembed")
             
-            Log.d(TAG, "📋 Sources ordenadas: $sortedSources")
+            val sortedSources = sources.sortedBy { source ->
+                val index = priorityOrder.indexOfFirst { source.contains(it, ignoreCase = true) }
+                if (index >= 0) index else priorityOrder.size
+            }
+            
+            Log.d(TAG, "📋 Sources ordenadas por prioridade: $sortedSources")
             
             for (source in sortedSources) {
-                Log.d(TAG, "🔄 Processando source: $source")
+                Log.d(TAG, "🔄 Processando (prioridade): $source")
                 try {
                     when {
                         // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage)
-                        source.contains("playerembedapi") -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 1] PlayerEmbedAPIExtractor")
-                            val playerExtractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
-                            playerExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                        source.contains("playerembedapi", ignoreCase = true) -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 1] PlayerEmbedAPIExtractor - MP4 direto")
+                            val extractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PRIORIDADE 2: Dood/myvidplay (MP4/HLS normal - compatível)
-                        source.contains("myvidplay") || source.contains("dood") -> {
+                        // PRIORIDADE 2: MyVidPlay/Dood (MP4/HLS normal - compatível)
+                        source.contains("myvidplay", ignoreCase = true) || source.contains("dood", ignoreCase = true) -> {
                             Log.d(TAG, "🎬 [PRIORIDADE 2] Dood/myvidplay via loadExtractor")
                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // PRIORIDADE 3: MegaEmbed (HLS ofuscado - pode dar erro 3003)
-                        source.contains("megaembed") -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 3] MegaEmbedSimpleExtractor")
-                            val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
-                            megaExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                        source.contains("megaembed", ignoreCase = true) -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 3] MegaEmbedSimpleExtractor - HLS ofuscado")
+                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // Fallback: outros players via loadExtractor genérico
@@ -536,16 +539,16 @@ class MaxSeriesProvider : MainAPI() {
 
     /**
      * Extrai URLs de player do HTML (data-source dos botões)
-     * Regex melhorada para pegar todos os players conhecidos
+     * Regex melhorada para pegar TODOS os players conhecidos
      */
     private fun extractPlayerSources(html: String): List<String> {
         val sources = mutableListOf<String>()
         
-        // Padrão 1: data-source="url"
+        // Padrão 1: data-source="url" (principal)
         val dataSourcePattern = Regex("""data-source=["']([^"']+)["']""")
         dataSourcePattern.findAll(html).forEach { match ->
-            val url = match.groupValues[1]
-            if (url.isNotEmpty() && url.startsWith("http")) {
+            val url = match.groupValues[1].trim()
+            if (url.startsWith("http") && !sources.contains(url)) {
                 sources.add(url)
             }
         }
@@ -553,32 +556,31 @@ class MaxSeriesProvider : MainAPI() {
         // Padrão 2: data-src="url"
         val dataSrcPattern = Regex("""data-src=["']([^"']+)["']""")
         dataSrcPattern.findAll(html).forEach { match ->
-            val url = match.groupValues[1]
-            if (url.isNotEmpty() && url.startsWith("http") && !sources.contains(url)) {
+            val url = match.groupValues[1].trim()
+            if (url.startsWith("http") && !sources.contains(url)) {
                 sources.add(url)
             }
         }
         
-        // Padrão 3: URLs conhecidas no HTML (regex melhorada)
+        // Padrão 3: URLs específicas do log (playerembedapi, myvidplay, dood, megaembed)
         val knownPatterns = listOf(
-            Regex("""https?://megaembed\.link[^"'\s<>]+"""),
             Regex("""https?://playerembedapi\.link[^"'\s<>]+"""),
             Regex("""https?://myvidplay\.com[^"'\s<>]+"""),
-            Regex("""https?://[^"'\s<>]*dood[^"'\s<>]+"""),
+            Regex("""https?://dood[^"'\s<>]*\.[^"'\s<>]+/e/[^"'\s<>]+"""),
             Regex("""https?://[^"'\s<>]*doodstream[^"'\s<>]+"""),
-            Regex("""https?://[^"'\s<>]*embed[^"'\s<>]*\?[^"'\s<>]+""")
+            Regex("""https?://megaembed\.link[^"'\s<>]+""")
         )
         
-        for (pattern in knownPatterns) {
+        knownPatterns.forEach { pattern ->
             pattern.findAll(html).forEach { match ->
                 val url = match.value.trim()
-                if (url.isNotEmpty() && !sources.contains(url)) {
+                if (!sources.contains(url)) {
                     sources.add(url)
                 }
             }
         }
         
-        Log.d(TAG, "📋 Sources extraídas: $sources")
+        Log.d(TAG, "📋 Sources extraídas (v72): $sources")
         return sources.distinct()
     }
 }

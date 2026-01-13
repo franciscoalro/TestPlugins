@@ -1,7 +1,7 @@
-version = 71
+version = 72
 
 cloudstream {
-    description = "MaxSeries v71 - Multi-player: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed."
+    description = "MaxSeries v72 - Priorização forte: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

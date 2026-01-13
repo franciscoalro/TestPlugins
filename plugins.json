@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v71.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v72.0/MaxSeries.cs3",
         "status": 1,
-        "version": 71,
+        "version": 72,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v71 - Multi-player: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed.",
+        "description": "MaxSeries v72 - Priorização forte: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

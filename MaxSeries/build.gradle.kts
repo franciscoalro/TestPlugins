@@ -1,7 +1,7 @@
-version = 64
+version = 65
 
 cloudstream {
-    description = "MaxSeries v64 - Fix hash URLs e melhor tratamento de erros."
+    description = "MaxSeries v65 - Headers corretos e delay para WebView processar JS/token."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

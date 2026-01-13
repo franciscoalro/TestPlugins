@@ -7,18 +7,25 @@ import org.jsoup.nodes.Document
 import android.util.Log
 
 /**
- * MaxSeries Provider v4 - Multi-Player Support (Jan 2026)
+ * MaxSeries Provider v77 - Multi-Extractor Support (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
  * 2. playerthree.online/episodio/{id} → botões data-source
- * 3. Sources disponíveis:
+ * 3. Sources disponíveis (10 extractors suportados):
  *    - playerembedapi.link (MP4 direto - PRIORIDADE 1)
- *    - myvidplay.com / dood (MP4/HLS - PRIORIDADE 2)
- *    - megaembed.link (HLS ofuscado - PRIORIDADE 3)
+ *    - myvidplay.com (MP4 direto - PRIORIDADE 2)
+ *    - streamtape.com (MP4 direto - PRIORIDADE 3)
+ *    - dood/doodstream (MP4/HLS - PRIORIDADE 4)
+ *    - mixdrop (MP4/HLS - PRIORIDADE 5)
+ *    - filemoon (MP4 - PRIORIDADE 6)
+ *    - uqload (MP4 - PRIORIDADE 7)
+ *    - vidcloud (HLS - PRIORIDADE 8)
+ *    - upstream (MP4 - PRIORIDADE 9)
+ *    - megaembed.link (HLS ofuscado - PRIORIDADE 10)
  * 
- * Priorização: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed
- * (evita erro 3003 se tiver player compatível)
+ * Priorização: MP4 direto > HLS normal > HLS ofuscado
+ * (evita erro 3003 priorizando MP4)
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -380,53 +387,87 @@ class MaxSeriesProvider : MainAPI() {
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
             
-            // PRIORIZAÇÃO FORTE por índice:
-            // 0 = playerembedapi (MP4 direto - MELHOR)
-            // 1 = myvidplay (MP4/HLS normal)
-            // 2 = dood (MP4/HLS normal)
-            // 3 = megaembed (HLS ofuscado - EVITAR se possível)
-            // 4+ = outros
-            val priorityOrder = listOf("playerembedapi", "myvidplay", "dood", "megaembed")
+            // PRIORIZAÇÃO FORTE por índice (v77 - Todos os extractors funcionais)
+            // 1 = playerembedapi (MP4 direto - Google Cloud Storage)
+            // 2 = myvidplay (MP4 direto - cloudatacdn)
+            // 3 = streamtape (MP4 direto - built-in)
+            // 4 = dood/doodstream (MP4/HLS - built-in)
+            // 5 = mixdrop (MP4/HLS - built-in)
+            // 6 = filemoon (MP4 - built-in)
+            // 7 = uqload (MP4 - built-in)
+            // 8 = vidcloud (HLS - built-in)
+            // 9 = upstream (MP4 - built-in)
+            // 10 = megaembed (HLS ofuscado - último recurso)
+            val priorityOrder = listOf(
+                "playerembedapi",
+                "myvidplay",
+                "streamtape", "strtape",
+                "dood",
+                "mixdrop",
+                "filemoon",
+                "uqload",
+                "vidcloud",
+                "upstream",
+                "megaembed"
+            )
             
             val sortedSources = sources.sortedBy { source ->
                 val index = priorityOrder.indexOfFirst { source.contains(it, ignoreCase = true) }
                 if (index >= 0) index else priorityOrder.size
             }
             
-            Log.d(TAG, "📋 Sources ordenadas por prioridade: $sortedSources")
+            Log.d(TAG, "📋 Sources ordenadas por prioridade (v77): $sortedSources")
             
             for (source in sortedSources) {
-                Log.d(TAG, "🔄 Processando (prioridade): $source")
+                Log.d(TAG, "🔄 Processando: $source")
                 try {
                     when {
-                        // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage)
+                        // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage - WebView)
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 1] PlayerEmbedAPIExtractor - MP4 direto")
+                            Log.d(TAG, "🎬 [P1] PlayerEmbedAPIExtractor - MP4 direto (WebView)")
                             val extractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // PRIORIDADE 2: MyVidPlay (MP4 direto do cloudatacdn)
                         source.contains("myvidplay", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 2] MyVidPlayExtractor - MP4 direto")
+                            Log.d(TAG, "🎬 [P2] MyVidPlayExtractor - MP4 direto")
                             val extractor = com.franciscoalro.maxseries.extractors.MyVidPlayExtractor()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PRIORIDADE 2: Dood (MP4/HLS normal - compatível)
-                        source.contains("dood", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 2] Dood via loadExtractor")
+                        // PRIORIDADE 3-9: Built-in extractors (CloudStream nativo)
+                        source.contains("streamtape", ignoreCase = true) ||
+                        source.contains("strtape", ignoreCase = true) ||
+                        source.contains("dood", ignoreCase = true) ||
+                        source.contains("mixdrop", ignoreCase = true) ||
+                        source.contains("filemoon", ignoreCase = true) ||
+                        source.contains("uqload", ignoreCase = true) ||
+                        source.contains("vidcloud", ignoreCase = true) ||
+                        source.contains("upstream", ignoreCase = true) -> {
+                            val extractorName = when {
+                                source.contains("streamtape", ignoreCase = true) || 
+                                source.contains("strtape", ignoreCase = true) -> "StreamTape [P3]"
+                                source.contains("dood", ignoreCase = true) -> "DoodStream [P4]"
+                                source.contains("mixdrop", ignoreCase = true) -> "Mixdrop [P5]"
+                                source.contains("filemoon", ignoreCase = true) -> "FileMoon [P6]"
+                                source.contains("uqload", ignoreCase = true) -> "Uqload [P7]"
+                                source.contains("vidcloud", ignoreCase = true) -> "VidCloud [P8]"
+                                source.contains("upstream", ignoreCase = true) -> "UpStream [P9]"
+                                else -> "Built-in"
+                            }
+                            Log.d(TAG, "🎬 $extractorName via loadExtractor")
                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PRIORIDADE 3: MegaEmbed (HLS ofuscado - pode dar erro 3003)
+                        // PRIORIDADE 10: MegaEmbed (HLS ofuscado - último recurso)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [PRIORIDADE 3] MegaEmbedSimpleExtractor - HLS ofuscado")
+                            Log.d(TAG, "🎬 [P10] MegaEmbedSimpleExtractor - HLS ofuscado")
                             val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // Fallback: outros players via loadExtractor genérico
+                        // Fallback: tentar loadExtractor genérico para outros players
                         else -> {
                             Log.d(TAG, "🎬 [FALLBACK] loadExtractor genérico")
                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)

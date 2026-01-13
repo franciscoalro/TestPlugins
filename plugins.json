@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v76.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v77.0/MaxSeries.cs3",
         "status": 1,
-        "version": 76,
+        "version": 77,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v76 - Extractors corrigidos (Jan 2026): PlayerEmbedAPI WebView + MyVidPlay MP4",
+        "description": "MaxSeries v77 - 10 extractors suportados (Jan 2026): PlayerEmbedAPI, MyVidPlay, StreamTape, Dood, Mixdrop, FileMoon, Uqload, VidCloud, UpStream, MegaEmbed",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

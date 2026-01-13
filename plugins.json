@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v73.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v74.0/MaxSeries.cs3",
         "status": 1,
-        "version": 73,
+        "version": 74,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v73 - Regex SUPER melhorada para extrair TODAS as sources.",
+        "description": "MaxSeries v74 - WebView para MegaEmbed + PlayerEmbedAPI melhorado",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

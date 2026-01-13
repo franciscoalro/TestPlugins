@@ -1,7 +1,7 @@
-version = 73
+version = 74
 
 cloudstream {
-    description = "MaxSeries v73 - Regex SUPER melhorada para extrair TODAS as sources."
+    description = "MaxSeries v74 - WebView para MegaEmbed + PlayerEmbedAPI melhorado"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

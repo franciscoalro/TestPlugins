@@ -1,7 +1,7 @@
-version = 66
+version = 67
 
 cloudstream {
-    description = "MaxSeries v66 - Prioriza PlayerEmbedAPI (MP4 compatível) sobre MegaEmbed (HLS ofuscado)."
+    description = "MaxSeries v67 - Extractors simplificados: PlayerEmbedAPI (MP4 direto) + MegaEmbed (WebView)."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

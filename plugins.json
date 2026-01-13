@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v62.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v63.0/MaxSeries.cs3",
         "status": 1,
-        "version": 62,
+        "version": 63,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v62 - WebView Interception para capturar HLS dinâmico do MegaEmbed.",
+        "description": "MaxSeries v63 - Simple Extractor retorna embed para WebView interno do CloudStream.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

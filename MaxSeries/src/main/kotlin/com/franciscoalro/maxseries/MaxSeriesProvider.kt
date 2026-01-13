@@ -385,8 +385,8 @@ class MaxSeriesProvider : MainAPI() {
                 try {
                     // Chamar extractor diretamente para MegaEmbed (URLs com #)
                     if (source.contains("megaembed")) {
-                        Log.d(TAG, "🎬 Chamando MegaEmbedExtractorV6 diretamente")
-                        val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV6()
+                        Log.d(TAG, "🎬 Chamando MegaEmbedSimpleExtractor")
+                        val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
                         megaExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                         linksFound++
                     }

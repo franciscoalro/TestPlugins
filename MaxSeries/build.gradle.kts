@@ -1,7 +1,7 @@
-version = 76
+version = 77
 
 cloudstream {
-    description = "MaxSeries v76 - Extractors corrigidos (Jan 2026): PlayerEmbedAPI WebView + MyVidPlay MP4"
+    description = "MaxSeries v77 - 10 extractors suportados (Jan 2026): PlayerEmbedAPI, MyVidPlay, StreamTape, Dood, Mixdrop, FileMoon, Uqload, VidCloud, UpStream, MegaEmbed"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

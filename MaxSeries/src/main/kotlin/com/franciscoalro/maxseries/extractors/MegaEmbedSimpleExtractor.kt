@@ -4,16 +4,17 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 
 /**
- * MegaEmbed Simple Extractor - Com Headers HAR (Jan 2026)
+ * MegaEmbed Simple Extractor - PreRelease (Jan 2026)
  *
- * Melhorias:
- * - Headers do HAR (mais compatível)
- * - Corrige hash (#videoId)
- * - Força WebView interna com type=VIDEO
- * - Headers completos para capturar .txt camuflado (M3U8)
+ * Para funcionar 100%, use CloudStream pre-release (jan/2026+)
+ * que tem parser atualizado para HLS ofuscado (.woff2)
+ * 
+ * - Headers HAR completos
+ * - type=VIDEO força WebView interna
+ * - Compatível com .txt camuflado (M3U8)
  */
 class MegaEmbedSimpleExtractor : ExtractorApi() {
-    override var name = "MegaEmbed Simple (Interno)"
+    override var name = "MegaEmbed Simple (PreRelease)"
     override var mainUrl = "https://megaembed.link"
     override val requiresReferer = true
 
@@ -25,27 +26,27 @@ class MegaEmbedSimpleExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        // Corrige URL com hash se perdido
         val finalUrl = if (url.contains("#")) url else url
 
-        // Headers do HAR para imitar navegador real e capturar .txt camuflado
+        // Headers HAR completos para imitar navegador real
         val extraHeaders = mapOf(
             "User-Agent" to userAgent,
             "Accept" to "*/*",
             "Accept-Language" to "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
+            "Accept-Encoding" to "gzip, deflate, br, zstd",
             "X-Requested-With" to "XMLHttpRequest",
             "Sec-Fetch-Dest" to "empty",
             "Sec-Fetch-Mode" to "cors",
             "Sec-Fetch-Site" to "same-origin"
         )
 
-        // Retorna embed para WebView interna capturar HLS
+        // type=VIDEO força WebView interna (player interno do CloudStream)
         callback.invoke(
             newExtractorLink(
                 source = this.name,
                 name = "MegaEmbed HLS (Player Interno)",
                 url = finalUrl,
-                type = ExtractorLinkType.VIDEO  // Força WebView interna
+                type = ExtractorLinkType.VIDEO
             ) {
                 this.referer = referer ?: mainUrl
                 this.quality = Qualities.Unknown.value

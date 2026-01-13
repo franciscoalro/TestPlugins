@@ -1,7 +1,7 @@
-version = 69
+version = 70
 
 cloudstream {
-    description = "MaxSeries v69 - MegaEmbed com newExtractorLink e type=VIDEO para WebView interna."
+    description = "MaxSeries v70 - MegaEmbed PreRelease com headers HAR e type=VIDEO."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

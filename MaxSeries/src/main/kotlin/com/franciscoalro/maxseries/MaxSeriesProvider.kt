@@ -380,21 +380,24 @@ class MaxSeriesProvider : MainAPI() {
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size}")
             
-            for (source in sources) {
+            // Ordenar sources: PlayerEmbedAPI primeiro (MP4 compatível), MegaEmbed depois
+            val sortedSources = sources.sortedByDescending { it.contains("playerembedapi") }
+            
+            for (source in sortedSources) {
                 Log.d(TAG, "🔄 Processando source: $source")
                 try {
-                    // Chamar extractor diretamente para MegaEmbed (URLs com #)
-                    if (source.contains("megaembed")) {
+                    // PRIORIDADE 1: PlayerEmbedAPI (retorna MP4 do Google Cloud Storage - mais compatível)
+                    if (source.contains("playerembedapi")) {
+                        Log.d(TAG, "🎬 [PRIORIDADE] Chamando PlayerEmbedAPIExtractor")
+                        val playerExtractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
+                        playerExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                        linksFound++
+                    }
+                    // PRIORIDADE 2: MegaEmbed (HLS ofuscado - pode dar erro 3003)
+                    else if (source.contains("megaembed")) {
                         Log.d(TAG, "🎬 Chamando MegaEmbedSimpleExtractor")
                         val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
                         megaExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                        linksFound++
-                    }
-                    // Chamar extractor diretamente para PlayerEmbedAPI
-                    else if (source.contains("playerembedapi")) {
-                        Log.d(TAG, "🎬 Chamando PlayerEmbedAPIExtractor diretamente")
-                        val playerExtractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
-                        playerExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                         linksFound++
                     }
                     // Fallback para loadExtractor genérico

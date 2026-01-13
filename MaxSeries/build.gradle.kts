@@ -1,7 +1,7 @@
-version = 65
+version = 66
 
 cloudstream {
-    description = "MaxSeries v65 - Headers corretos e delay para WebView processar JS/token."
+    description = "MaxSeries v66 - Prioriza PlayerEmbedAPI (MP4 compatível) sobre MegaEmbed (HLS ofuscado)."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

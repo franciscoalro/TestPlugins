@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v65.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v66.0/MaxSeries.cs3",
         "status": 1,
-        "version": 65,
+        "version": 66,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v65 - Headers corretos e delay para WebView processar JS/token.",
+        "description": "MaxSeries v66 - Prioriza PlayerEmbedAPI (MP4) sobre MegaEmbed (HLS ofuscado).",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

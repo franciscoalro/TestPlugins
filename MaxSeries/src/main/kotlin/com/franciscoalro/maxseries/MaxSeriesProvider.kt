@@ -7,22 +7,18 @@ import org.jsoup.nodes.Document
 import android.util.Log
 
 /**
- * MaxSeries Provider v3 - PlayerthreeExtraction
+ * MaxSeries Provider v4 - Multi-Player Support (Jan 2026)
  * 
- * Fluxo de extração descoberto (Jan 2026):
+ * Fluxo de extração:
+ * 1. maxseries.one/series/... → iframe playerthree.online
+ * 2. playerthree.online/episodio/{id} → botões data-source
+ * 3. Sources disponíveis:
+ *    - playerembedapi.link (MP4 direto - PRIORIDADE 1)
+ *    - myvidplay.com / dood (MP4/HLS - PRIORIDADE 2)
+ *    - megaembed.link (HLS ofuscado - PRIORIDADE 3)
  * 
- * 1. maxseries.one/series/... 
- *    └─ iframe src="playerthree.online/embed/synden/"
- * 
- * 2. playerthree.online/embed/{slug}/
- *    └─ Lista de episódios com data-episode-id
- *    └─ AJAX: /episodio/{episodeId}
- * 
- * 3. /episodio/{id} retorna HTML com botões:
- *    └─ data-source="https://playerembedapi.link/?v=xxx"
- *    └─ data-source="https://megaembed.link/#xxx"
- * 
- * 4. Extractors processam cada source
+ * Priorização: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed
+ * (evita erro 3003 se tiver player compatível)
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -34,7 +30,8 @@ class MaxSeriesProvider : MainAPI() {
 
     companion object {
         private const val TAG = "MaxSeriesProvider"
-        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        // User-Agent do Firefox (HAR real)
+        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
     }
 
     override val mainPage = mainPageOf(
@@ -369,7 +366,8 @@ class MaxSeriesProvider : MainAPI() {
                     "User-Agent" to USER_AGENT,
                     "Referer" to playerthreeUrl,
                     "X-Requested-With" to "XMLHttpRequest",
-                    "Accept" to "*/*"
+                    "Accept" to "*/*",
+                    "Accept-Language" to "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
                 )
             )
             
@@ -380,30 +378,48 @@ class MaxSeriesProvider : MainAPI() {
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size}")
             
-            // Ordenar sources: PlayerEmbedAPI primeiro (MP4 compatível), MegaEmbed depois
-            val sortedSources = sources.sortedByDescending { it.contains("playerembedapi") }
+            // PRIORIZAÇÃO ATUALIZADA:
+            // 1. PlayerEmbedAPI (MP4 direto - mais compatível)
+            // 2. Dood/myvidplay (MP4/HLS normal - compatível)
+            // 3. MegaEmbed (HLS ofuscado - pode dar erro 3003)
+            val sortedSources = sources.sortedWith(
+                compareByDescending<String> { it.contains("playerembedapi") }
+                    .thenByDescending { it.contains("myvidplay") || it.contains("dood") }
+                    .thenByDescending { !it.contains("megaembed") }
+            )
+            
+            Log.d(TAG, "📋 Sources ordenadas: $sortedSources")
             
             for (source in sortedSources) {
                 Log.d(TAG, "🔄 Processando source: $source")
                 try {
-                    // PRIORIDADE 1: PlayerEmbedAPI (retorna MP4 do Google Cloud Storage - mais compatível)
-                    if (source.contains("playerembedapi")) {
-                        Log.d(TAG, "🎬 [PRIORIDADE] Chamando PlayerEmbedAPIExtractor")
-                        val playerExtractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
-                        playerExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                        linksFound++
-                    }
-                    // PRIORIDADE 2: MegaEmbed (HLS ofuscado - pode dar erro 3003)
-                    else if (source.contains("megaembed")) {
-                        Log.d(TAG, "🎬 Chamando MegaEmbedSimpleExtractor")
-                        val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
-                        megaExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                        linksFound++
-                    }
-                    // Fallback para loadExtractor genérico
-                    else {
-                        loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
-                        linksFound++
+                    when {
+                        // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage)
+                        source.contains("playerembedapi") -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 1] PlayerEmbedAPIExtractor")
+                            val playerExtractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
+                            playerExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 2: Dood/myvidplay (MP4/HLS normal - compatível)
+                        source.contains("myvidplay") || source.contains("dood") -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 2] Dood/myvidplay via loadExtractor")
+                            loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 3: MegaEmbed (HLS ofuscado - pode dar erro 3003)
+                        source.contains("megaembed") -> {
+                            Log.d(TAG, "🎬 [PRIORIDADE 3] MegaEmbedSimpleExtractor")
+                            val megaExtractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
+                            megaExtractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // Fallback: outros players via loadExtractor genérico
+                        else -> {
+                            Log.d(TAG, "🎬 [FALLBACK] loadExtractor genérico")
+                            loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "⚠️ Erro no extractor para $source: ${e.message}")
@@ -520,6 +536,7 @@ class MaxSeriesProvider : MainAPI() {
 
     /**
      * Extrai URLs de player do HTML (data-source dos botões)
+     * Regex melhorada para pegar todos os players conhecidos
      */
     private fun extractPlayerSources(html: String): List<String> {
         val sources = mutableListOf<String>()
@@ -542,17 +559,20 @@ class MaxSeriesProvider : MainAPI() {
             }
         }
         
-        // Padrão 3: URLs conhecidas no HTML
+        // Padrão 3: URLs conhecidas no HTML (regex melhorada)
         val knownPatterns = listOf(
-            Regex("""https?://megaembed\.link[^"'\s]+"""),
-            Regex("""https?://playerembedapi\.link[^"'\s]+"""),
-            Regex("""https?://[^"'\s]*embed[^"'\s]*\?[^"'\s]+""")
+            Regex("""https?://megaembed\.link[^"'\s<>]+"""),
+            Regex("""https?://playerembedapi\.link[^"'\s<>]+"""),
+            Regex("""https?://myvidplay\.com[^"'\s<>]+"""),
+            Regex("""https?://[^"'\s<>]*dood[^"'\s<>]+"""),
+            Regex("""https?://[^"'\s<>]*doodstream[^"'\s<>]+"""),
+            Regex("""https?://[^"'\s<>]*embed[^"'\s<>]*\?[^"'\s<>]+""")
         )
         
         for (pattern in knownPatterns) {
             pattern.findAll(html).forEach { match ->
-                val url = match.value
-                if (!sources.contains(url)) {
+                val url = match.value.trim()
+                if (url.isNotEmpty() && !sources.contains(url)) {
                     sources.add(url)
                 }
             }

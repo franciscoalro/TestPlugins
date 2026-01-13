@@ -1,7 +1,7 @@
-version = 70
+version = 71
 
 cloudstream {
-    description = "MaxSeries v70 - MegaEmbed PreRelease com headers HAR e type=VIDEO."
+    description = "MaxSeries v71 - Multi-player: PlayerEmbedAPI > Dood/myvidplay > MegaEmbed."
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

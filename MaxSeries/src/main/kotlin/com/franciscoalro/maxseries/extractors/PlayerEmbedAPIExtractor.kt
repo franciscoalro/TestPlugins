@@ -5,17 +5,20 @@ import com.lagradost.cloudstream3.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v74 - MP4 direto do Google Cloud Storage
+ * PlayerEmbedAPI Extractor v75 - MP4 direto do Google Cloud Storage
  * 
  * PRIORIDADE 1 - Melhor opção:
  * - MP4 direto sem JavaScript
- * - Compatível com ExoPlayer
+ * - Compatível com ExoPlayer (Media3 2024+)
  * - Evita erro 3003
+ * - Usa NiceHttp (wrapper moderno do OkHttp 4.12)
  * 
  * Fluxo:
  * 1. GET playerembedapi.link/?v=xxx
  * 2. Resposta JSON com sources[].file
  * 3. URL final: storage.googleapis.com/...mp4
+ * 
+ * Atualizado: Janeiro 2026
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -24,6 +27,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
 
     companion object {
         private const val TAG = "PlayerEmbedAPI"
+        // User-Agent Firefox 146 (Jan 2026)
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
     }
 

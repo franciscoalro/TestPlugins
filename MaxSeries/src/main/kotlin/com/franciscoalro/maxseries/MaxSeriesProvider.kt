@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document
 import android.util.Log
 
 /**
- * MaxSeries Provider v77 - Multi-Extractor Support (Jan 2026)
+ * MaxSeries Provider v78 - Search Fixed + Multi-Extractor Support (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
@@ -23,6 +23,11 @@ import android.util.Log
  *    - vidcloud (HLS - PRIORIDADE 8)
  *    - upstream (MP4 - PRIORIDADE 9)
  *    - megaembed.link (HLS ofuscado - PRIORIDADE 10)
+ * 
+ * v78 Changes:
+ * - Busca corrigida: suporte a .result-item (página de busca)
+ * - Fallback para article.item se necessário
+ * - Logs melhorados para debug
  * 
  * Priorização: MP4 direto > HLS normal > HLS ofuscado
  * (evita erro 3003 priorizando MP4)
@@ -101,10 +106,71 @@ class MaxSeriesProvider : MainAPI() {
     override suspend fun search(query: String): List<SearchResponse> {
         if (query.isBlank()) return emptyList()
         return try {
+            Log.d(TAG, "🔍 Buscando: $query")
             val document = app.get("$mainUrl/?s=${query.replace(" ", "+")}").document
-            document.select("article.item").mapNotNull { it.toSearchResult() }
+            
+            // Página de busca usa .result-item em vez de article.item
+            val searchResults = document.select(".result-item article").mapNotNull { 
+                it.toSearchResultFromSearch() 
+            }
+            
+            // Fallback: tentar seletor normal se não encontrar nada
+            val normalResults = if (searchResults.isEmpty()) {
+                document.select("article.item").mapNotNull { it.toSearchResult() }
+            } else emptyList()
+            
+            val results = searchResults + normalResults
+            Log.d(TAG, "✅ Busca '$query': ${results.size} resultados")
+            results
         } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro busca: ${e.message}")
             emptyList()
+        }
+    }
+    
+    /**
+     * Converte result-item da página de busca para SearchResponse
+     */
+    private fun Element.toSearchResultFromSearch(): SearchResponse? {
+        return try {
+            // Na busca, o link está dentro de .thumbnail
+            val linkElement = this.selectFirst(".thumbnail a") ?: this.selectFirst("a") ?: return null
+            val href = fixUrl(linkElement.attr("href"))
+            
+            if (!href.contains("/filmes/") && !href.contains("/series/")) return null
+            
+            // Título pode estar no alt da imagem ou em h3
+            val img = this.selectFirst("img")
+            val title = img?.attr("alt")?.trim() 
+                ?: this.selectFirst("h3, .title")?.text()?.trim() 
+                ?: return null
+            
+            if (title.contains("Login", true) || title.length < 2) return null
+            
+            // Poster
+            val rawPoster = img?.attr("src") ?: img?.attr("data-src")
+            val posterUrl = upgradeImageQuality(fixUrlNull(rawPoster))
+            
+            // Ano
+            val yearText = this.text()
+            val year = "\\b(19|20)\\d{2}\\b".toRegex().find(yearText)?.value?.toIntOrNull()
+            
+            // Tipo (TV ou Movie)
+            val tvType = if (href.contains("/series/") || this.selectFirst(".tvshows") != null) {
+                TvType.TvSeries
+            } else {
+                TvType.Movie
+            }
+            
+            Log.d(TAG, "  📌 $title ($year) - $tvType")
+
+            newMovieSearchResponse(title, href, tvType) {
+                this.posterUrl = posterUrl
+                this.year = year
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro toSearchResultFromSearch: ${e.message}")
+            null
         }
     }
 

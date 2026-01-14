@@ -1,0 +1,928 @@
+{
+  "timestamp": "2026-01-13T20:43:38.550221",
+  "series_analyzed": [
+    {
+      "url": "https://www.maxseries.one/series/assistir-o-gerente-da-noite-online",
+      "title": "O Gerente da Noite",
+      "year": "2025",
+      "genres": [
+        "Crime",
+        "Drama",
+        "Mistério"
+      ],
+      "plot": null,
+      "poster": "https://image.tmdb.org/t/p/w780/lJoaiZcYMc8RkmPLROcdS2WQxn9.jpg\r",
+      "seasons": [],
+      "iframe_url": "https://playerthree.online/embed/the-night-manager/",
+      "playerthree_url": "https://playerthree.online/embed/the-night-manager/",
+      "episodes_found": 0,
+      "raw_html_size": 49221,
+      "playerthree_structure": {
+        "url": "https://playerthree.online/embed/the-night-manager/",
+        "seasons": [
+          {
+            "id": "13122",
+            "number": 1,
+            "episodes": [
+              {
+                "id": "259176",
+                "number": 1,
+                "title": "1 - Episódio",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259176"
+              },
+              {
+                "id": "259177",
+                "number": 2,
+                "title": "2 - Episódio",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259177"
+              },
+              {
+                "id": "259178",
+                "number": 3,
+                "title": "3 - Episódio",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259178"
+              },
+              {
+                "id": "259179",
+                "number": 4,
+                "title": "4 - Episódio",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259179"
+              },
+              {
+                "id": "259180",
+                "number": 5,
+                "title": "5 - Episódio",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259180"
+              },
+              {
+                "id": "259181",
+                "number": 6,
+                "title": "6 - Episódio - Final de Temporada",
+                "season_id": "13122",
+                "ajax_url": "https://playerthree.online/episodio/259181"
+              }
+            ]
+          },
+          {
+            "id": "13123",
+            "number": 2,
+            "episodes": [
+              {
+                "id": "259182",
+                "number": 1,
+                "title": "1 - Episódio",
+                "season_id": "13123",
+                "ajax_url": "https://playerthree.online/episodio/259182"
+              },
+              {
+                "id": "259183",
+                "number": 2,
+                "title": "2 - Episódio",
+                "season_id": "13123",
+                "ajax_url": "https://playerthree.online/episodio/259183"
+              },
+              {
+                "id": "259184",
+                "number": 3,
+                "title": "3 - Episódio (NOVO)",
+                "season_id": "13123",
+                "ajax_url": "https://playerthree.online/episodio/259184"
+              },
+              {
+                "id": "259185",
+                "number": null,
+                "title": "Próximo ep: 18/01/2026",
+                "season_id": "13123",
+                "ajax_url": "https://playerthree.online/episodio/259185"
+              }
+            ]
+          }
+        ],
+        "total_episodes": 10,
+        "cards_found": 1
+      }
+    },
+    {
+      "url": "https://www.maxseries.one/series/assistir-mil-golpes-online",
+      "title": "Mil Golpes",
+      "year": "2025",
+      "genres": [
+        "Drama"
+      ],
+      "plot": null,
+      "poster": "https://image.tmdb.org/t/p/w780/sDMS86jMXfh2QaiwrqhtDYuN0KA.jpg\r",
+      "seasons": [],
+      "iframe_url": "https://playerthree.online/embed/a-thousand-blows/",
+      "playerthree_url": "https://playerthree.online/embed/a-thousand-blows/",
+      "episodes_found": 0,
+      "raw_html_size": 48578,
+      "playerthree_structure": {
+        "url": "https://playerthree.online/embed/a-thousand-blows/",
+        "seasons": [
+          {
+            "id": "13096",
+            "number": 1,
+            "episodes": [
+              {
+                "id": "258814",
+                "number": 1,
+                "title": "1 - Episódio",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258814"
+              },
+              {
+                "id": "258815",
+                "number": 2,
+                "title": "2 - Episódio",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258815"
+              },
+              {
+                "id": "258816",
+                "number": 3,
+                "title": "3 - Episódio",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258816"
+              },
+              {
+                "id": "258817",
+                "number": 4,
+                "title": "4 - Episódio",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258817"
+              },
+              {
+                "id": "258818",
+                "number": 5,
+                "title": "5 - Episódio",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258818"
+              },
+              {
+                "id": "258819",
+                "number": 6,
+                "title": "6 - Episódio - Final de Temporada",
+                "season_id": "13096",
+                "ajax_url": "https://playerthree.online/episodio/258819"
+              }
+            ]
+          },
+          {
+            "id": "13097",
+            "number": 2,
+            "episodes": [
+              {
+                "id": "258820",
+                "number": 1,
+                "title": "1 - Episódio",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258820"
+              },
+              {
+                "id": "258821",
+                "number": 2,
+                "title": "2 - Episódio",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258821"
+              },
+              {
+                "id": "258822",
+                "number": 3,
+                "title": "3 - Episódio",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258822"
+              },
+              {
+                "id": "258823",
+                "number": 4,
+                "title": "4 - Episódio",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258823"
+              },
+              {
+                "id": "258824",
+                "number": 5,
+                "title": "5 - Episódio",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258824"
+              },
+              {
+                "id": "258825",
+                "number": 6,
+                "title": "6 - Episódio - Final de Temporada",
+                "season_id": "13097",
+                "ajax_url": "https://playerthree.online/episodio/258825"
+              }
+            ]
+          }
+        ],
+        "total_episodes": 12,
+        "cards_found": 1
+      }
+    },
+    {
+      "url": "https://www.maxseries.one/series/assistir-chapolin-e-os-colorados-online",
+      "title": "Chapolin e Os Colorados",
+      "year": "2025",
+      "genres": [
+        "Animação",
+        "Comédia"
+      ],
+      "plot": null,
+      "poster": "https://image.tmdb.org/t/p/w780/ldG4BHBYToWMN6OoUH0DXC2x6dB.jpg\r",
+      "seasons": [],
+      "iframe_url": "https://playerthree.online/embed/los-colorado/",
+      "playerthree_url": "https://playerthree.online/embed/los-colorado/",
+      "episodes_found": 0,
+      "raw_html_size": 48588,
+      "playerthree_structure": {
+        "url": "https://playerthree.online/embed/los-colorado/",
+        "seasons": [
+          {
+            "id": "13086",
+            "number": 1,
+            "episodes": [
+              {
+                "id": "258675",
+                "number": 1,
+                "title": "1 - A Familia do Chapolin Colorado",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258675"
+              },
+              {
+                "id": "258676",
+                "number": 2,
+                "title": "2 - Piratas Não Jogam Futebol",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258676"
+              },
+              {
+                "id": "258677",
+                "number": 3,
+                "title": "3 - O Homem Das Cavernas Escondido No Armário!",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258677"
+              },
+              {
+                "id": "258678",
+                "number": 4,
+                "title": "4 - Tem uma Pinhata Viva!⁩",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258678"
+              },
+              {
+                "id": "258679",
+                "number": 5,
+                "title": "5 - ⁨Lina Fica Grandona, Lina Fica Pequenininha",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258679"
+              },
+              {
+                "id": "258680",
+                "number": 6,
+                "title": "6 - No Mar a Vida É Mais Gostosa... Até o Tubarão Aparecer!",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258680"
+              },
+              {
+                "id": "258681",
+                "number": 7,
+                "title": "7 - Um Conto Encantado do Chapolin Colorado",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258681"
+              },
+              {
+                "id": "258682",
+                "number": 8,
+                "title": "8 - Procura-se a Mãe do Bebê Jupiteriano",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258682"
+              },
+              {
+                "id": "258683",
+                "number": 9,
+                "title": "9 - Mais Barriga que Juízo: a Saga dos Gordicholas",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258683"
+              },
+              {
+                "id": "258684",
+                "number": 10,
+                "title": "10 - Não Há Clone que Não Venha para o Bem - Final de Temporada",
+                "season_id": "13086",
+                "ajax_url": "https://playerthree.online/episodio/258684"
+              }
+            ]
+          }
+        ],
+        "total_episodes": 10,
+        "cards_found": 1
+      }
+    },
+    {
+      "url": "https://www.maxseries.one/series/assistir-garota-sequestrada-online",
+      "title": "Garota Sequestrada",
+      "year": "2025",
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
+      "plot": null,
+      "poster": "https://image.tmdb.org/t/p/w780/1mqzGV6pzZ4Hw0wM5lBfBhfFTtU.jpg\r",
+      "seasons": [],
+      "iframe_url": "https://playerthree.online/embed/girl-taken/",
+      "playerthree_url": "https://playerthree.online/embed/girl-taken/",
+      "episodes_found": 0,
+      "raw_html_size": 48299,
+      "playerthree_structure": {
+        "url": "https://playerthree.online/embed/girl-taken/",
+        "seasons": [
+          {
+            "id": "13069",
+            "number": 1,
+            "episodes": [
+              {
+                "id": "258444",
+                "number": 1,
+                "title": "1 - Snatched",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258444"
+              },
+              {
+                "id": "258445",
+                "number": 2,
+                "title": "2 - Trapped",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258445"
+              },
+              {
+                "id": "258446",
+                "number": 3,
+                "title": "3 - Escape",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258446"
+              },
+              {
+                "id": "258447",
+                "number": 4,
+                "title": "4 - Showdown",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258447"
+              },
+              {
+                "id": "258448",
+                "number": 5,
+                "title": "5 - Crisis",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258448"
+              },
+              {
+                "id": "258449",
+                "number": 6,
+                "title": "6 - Manhunt - Final de Temporada",
+                "season_id": "13069",
+                "ajax_url": "https://playerthree.online/episodio/258449"
+              }
+            ]
+          }
+        ],
+        "total_episodes": 6,
+        "cards_found": 1
+      }
+    },
+    {
+      "url": "https://www.maxseries.one/series/assistir-dele-dela-online",
+      "title": "Dele & Dela",
+      "year": "2025",
+      "genres": [
+        "Crime",
+        "Drama",
+        "Mistério"
+      ],
+      "plot": null,
+      "poster": "https://image.tmdb.org/t/p/w780/n4hJLZmBG8kZccNn7bNgBDsVQ6a.jpg\r",
+      "seasons": [],
+      "iframe_url": "https://playerthree.online/embed/his-hers/",
+      "playerthree_url": "https://playerthree.online/embed/his-hers/",
+      "episodes_found": 0,
+      "raw_html_size": 48772,
+      "playerthree_structure": {
+        "url": "https://playerthree.online/embed/his-hers/",
+        "seasons": [
+          {
+            "id": "13066",
+            "number": 1,
+            "episodes": [
+              {
+                "id": "258422",
+                "number": 1,
+                "title": "1 - Episódio",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258422"
+              },
+              {
+                "id": "258423",
+                "number": 2,
+                "title": "2 - Episódio",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258423"
+              },
+              {
+                "id": "258424",
+                "number": 3,
+                "title": "3 - Episódio",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258424"
+              },
+              {
+                "id": "258425",
+                "number": 4,
+                "title": "4 - Episódio",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258425"
+              },
+              {
+                "id": "258426",
+                "number": 5,
+                "title": "5 - Episódio",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258426"
+              },
+              {
+                "id": "258427",
+                "number": 6,
+                "title": "6 - Episódio - Final de Temporada",
+                "season_id": "13066",
+                "ajax_url": "https://playerthree.online/episodio/258427"
+              }
+            ]
+          }
+        ],
+        "total_episodes": 6,
+        "cards_found": 1
+      }
+    }
+  ],
+  "movies_analyzed": [],
+  "episodes_structure": [
+    {
+      "url": "https://playerthree.online/embed/the-night-manager/",
+      "seasons": [
+        {
+          "id": "13122",
+          "number": 1,
+          "episodes": [
+            {
+              "id": "259176",
+              "number": 1,
+              "title": "1 - Episódio",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259176"
+            },
+            {
+              "id": "259177",
+              "number": 2,
+              "title": "2 - Episódio",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259177"
+            },
+            {
+              "id": "259178",
+              "number": 3,
+              "title": "3 - Episódio",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259178"
+            },
+            {
+              "id": "259179",
+              "number": 4,
+              "title": "4 - Episódio",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259179"
+            },
+            {
+              "id": "259180",
+              "number": 5,
+              "title": "5 - Episódio",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259180"
+            },
+            {
+              "id": "259181",
+              "number": 6,
+              "title": "6 - Episódio - Final de Temporada",
+              "season_id": "13122",
+              "ajax_url": "https://playerthree.online/episodio/259181"
+            }
+          ]
+        },
+        {
+          "id": "13123",
+          "number": 2,
+          "episodes": [
+            {
+              "id": "259182",
+              "number": 1,
+              "title": "1 - Episódio",
+              "season_id": "13123",
+              "ajax_url": "https://playerthree.online/episodio/259182"
+            },
+            {
+              "id": "259183",
+              "number": 2,
+              "title": "2 - Episódio",
+              "season_id": "13123",
+              "ajax_url": "https://playerthree.online/episodio/259183"
+            },
+            {
+              "id": "259184",
+              "number": 3,
+              "title": "3 - Episódio (NOVO)",
+              "season_id": "13123",
+              "ajax_url": "https://playerthree.online/episodio/259184"
+            },
+            {
+              "id": "259185",
+              "number": null,
+              "title": "Próximo ep: 18/01/2026",
+              "season_id": "13123",
+              "ajax_url": "https://playerthree.online/episodio/259185"
+            }
+          ]
+        }
+      ],
+      "total_episodes": 10,
+      "cards_found": 1
+    },
+    {
+      "url": "https://playerthree.online/embed/a-thousand-blows/",
+      "seasons": [
+        {
+          "id": "13096",
+          "number": 1,
+          "episodes": [
+            {
+              "id": "258814",
+              "number": 1,
+              "title": "1 - Episódio",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258814"
+            },
+            {
+              "id": "258815",
+              "number": 2,
+              "title": "2 - Episódio",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258815"
+            },
+            {
+              "id": "258816",
+              "number": 3,
+              "title": "3 - Episódio",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258816"
+            },
+            {
+              "id": "258817",
+              "number": 4,
+              "title": "4 - Episódio",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258817"
+            },
+            {
+              "id": "258818",
+              "number": 5,
+              "title": "5 - Episódio",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258818"
+            },
+            {
+              "id": "258819",
+              "number": 6,
+              "title": "6 - Episódio - Final de Temporada",
+              "season_id": "13096",
+              "ajax_url": "https://playerthree.online/episodio/258819"
+            }
+          ]
+        },
+        {
+          "id": "13097",
+          "number": 2,
+          "episodes": [
+            {
+              "id": "258820",
+              "number": 1,
+              "title": "1 - Episódio",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258820"
+            },
+            {
+              "id": "258821",
+              "number": 2,
+              "title": "2 - Episódio",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258821"
+            },
+            {
+              "id": "258822",
+              "number": 3,
+              "title": "3 - Episódio",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258822"
+            },
+            {
+              "id": "258823",
+              "number": 4,
+              "title": "4 - Episódio",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258823"
+            },
+            {
+              "id": "258824",
+              "number": 5,
+              "title": "5 - Episódio",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258824"
+            },
+            {
+              "id": "258825",
+              "number": 6,
+              "title": "6 - Episódio - Final de Temporada",
+              "season_id": "13097",
+              "ajax_url": "https://playerthree.online/episodio/258825"
+            }
+          ]
+        }
+      ],
+      "total_episodes": 12,
+      "cards_found": 1
+    },
+    {
+      "url": "https://playerthree.online/embed/los-colorado/",
+      "seasons": [
+        {
+          "id": "13086",
+          "number": 1,
+          "episodes": [
+            {
+              "id": "258675",
+              "number": 1,
+              "title": "1 - A Familia do Chapolin Colorado",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258675"
+            },
+            {
+              "id": "258676",
+              "number": 2,
+              "title": "2 - Piratas Não Jogam Futebol",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258676"
+            },
+            {
+              "id": "258677",
+              "number": 3,
+              "title": "3 - O Homem Das Cavernas Escondido No Armário!",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258677"
+            },
+            {
+              "id": "258678",
+              "number": 4,
+              "title": "4 - Tem uma Pinhata Viva!⁩",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258678"
+            },
+            {
+              "id": "258679",
+              "number": 5,
+              "title": "5 - ⁨Lina Fica Grandona, Lina Fica Pequenininha",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258679"
+            },
+            {
+              "id": "258680",
+              "number": 6,
+              "title": "6 - No Mar a Vida É Mais Gostosa... Até o Tubarão Aparecer!",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258680"
+            },
+            {
+              "id": "258681",
+              "number": 7,
+              "title": "7 - Um Conto Encantado do Chapolin Colorado",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258681"
+            },
+            {
+              "id": "258682",
+              "number": 8,
+              "title": "8 - Procura-se a Mãe do Bebê Jupiteriano",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258682"
+            },
+            {
+              "id": "258683",
+              "number": 9,
+              "title": "9 - Mais Barriga que Juízo: a Saga dos Gordicholas",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258683"
+            },
+            {
+              "id": "258684",
+              "number": 10,
+              "title": "10 - Não Há Clone que Não Venha para o Bem - Final de Temporada",
+              "season_id": "13086",
+              "ajax_url": "https://playerthree.online/episodio/258684"
+            }
+          ]
+        }
+      ],
+      "total_episodes": 10,
+      "cards_found": 1
+    },
+    {
+      "url": "https://playerthree.online/embed/girl-taken/",
+      "seasons": [
+        {
+          "id": "13069",
+          "number": 1,
+          "episodes": [
+            {
+              "id": "258444",
+              "number": 1,
+              "title": "1 - Snatched",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258444"
+            },
+            {
+              "id": "258445",
+              "number": 2,
+              "title": "2 - Trapped",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258445"
+            },
+            {
+              "id": "258446",
+              "number": 3,
+              "title": "3 - Escape",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258446"
+            },
+            {
+              "id": "258447",
+              "number": 4,
+              "title": "4 - Showdown",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258447"
+            },
+            {
+              "id": "258448",
+              "number": 5,
+              "title": "5 - Crisis",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258448"
+            },
+            {
+              "id": "258449",
+              "number": 6,
+              "title": "6 - Manhunt - Final de Temporada",
+              "season_id": "13069",
+              "ajax_url": "https://playerthree.online/episodio/258449"
+            }
+          ]
+        }
+      ],
+      "total_episodes": 6,
+      "cards_found": 1
+    },
+    {
+      "url": "https://playerthree.online/embed/his-hers/",
+      "seasons": [
+        {
+          "id": "13066",
+          "number": 1,
+          "episodes": [
+            {
+              "id": "258422",
+              "number": 1,
+              "title": "1 - Episódio",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258422"
+            },
+            {
+              "id": "258423",
+              "number": 2,
+              "title": "2 - Episódio",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258423"
+            },
+            {
+              "id": "258424",
+              "number": 3,
+              "title": "3 - Episódio",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258424"
+            },
+            {
+              "id": "258425",
+              "number": 4,
+              "title": "4 - Episódio",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258425"
+            },
+            {
+              "id": "258426",
+              "number": 5,
+              "title": "5 - Episódio",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258426"
+            },
+            {
+              "id": "258427",
+              "number": 6,
+              "title": "6 - Episódio - Final de Temporada",
+              "season_id": "13066",
+              "ajax_url": "https://playerthree.online/episodio/258427"
+            }
+          ]
+        }
+      ],
+      "total_episodes": 6,
+      "cards_found": 1
+    }
+  ],
+  "player_patterns": {
+    "PlayerEmbedAPI": {
+      "count": 10,
+      "episodes": [
+        "259176",
+        "259181",
+        "258814",
+        "258819",
+        "258675",
+        "258684",
+        "258444",
+        "258449",
+        "258422",
+        "258427"
+      ]
+    },
+    "MegaEmbed": {
+      "count": 10,
+      "episodes": [
+        "259176",
+        "259181",
+        "258814",
+        "258819",
+        "258675",
+        "258684",
+        "258444",
+        "258449",
+        "258422",
+        "258427"
+      ]
+    },
+    "MyVidPlay": {
+      "count": 10,
+      "episodes": [
+        "259176",
+        "259181",
+        "258814",
+        "258819",
+        "258675",
+        "258684",
+        "258444",
+        "258449",
+        "258422",
+        "258427"
+      ]
+    }
+  },
+  "url_patterns": {},
+  "api_calls": [
+    {
+      "endpoint": "https://www.maxseries.one/wp-admin/admin-ajax.php",
+      "method": "POST",
+      "status": 400,
+      "content_type": "text/html; charset=UTF-8"
+    },
+    {
+      "endpoint": "https://www.maxseries.one/wp-json/dooplayer/v2/",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=UTF-8"
+    },
+    {
+      "endpoint": "https://www.maxseries.one/wp-json/dooplay/search/",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=UTF-8"
+    }
+  ],
+  "network_requests": []
+}

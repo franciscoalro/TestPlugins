@@ -2,27 +2,14 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v76 - WebView Required (Jan 2026)
+ * PlayerEmbedAPI Extractor - Robust WebView Implementation
  * 
- * MUDANÇA IMPORTANTE (Jan 2026):
- * - PlayerEmbedAPI agora usa criptografia AES-CTR no campo "media"
- * - A descriptografia acontece via JavaScript (core.bundle.js)
- * - NÃO é possível extrair via HTTP simples
- * - Solução: usar WebView interno do CloudStream
- * 
- * Fluxo atual:
- * 1. GET playerembedapi.link/?v=xxx → HTML com dados Base64
- * 2. JavaScript descriptografa campo "media" com AES-CTR
- * 3. JWPlayer carrega o vídeo (MP4 do Google Cloud Storage)
- * 
- * Prioridade mantida como 1 porque:
- * - Quando funciona, é MP4 direto (melhor qualidade)
- * - WebView do CloudStream executa o JS automaticamente
- * 
- * Atualizado: Janeiro 2026
+ * Handles AES-CTR encrypted sources ("core.bundle.js") by running the actual Page logic
+ * and intercepting the final video request.
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -31,7 +18,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
 
     companion object {
         private const val TAG = "PlayerEmbedAPI"
-        // User-Agent Firefox 146 (Jan 2026)
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
     }
 
@@ -43,147 +29,121 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     ) {
         Log.d(TAG, "🎬 PlayerEmbedAPI: $url")
         
+        // 1. Script para forçar reprodução e extração
+        // (Reutilizando a lógica robusta criada para o MegaEmbed)
+        val captureScript = """
+            (function() {
+                return new Promise(function(resolve) {
+                    var attempts = 0;
+                    var maxAttempts = 100; // 10 segundos
+                    
+                    function tryPlayVideo() {
+                        var vids = document.getElementsByTagName('video');
+                        for(var i=0; i<vids.length; i++){
+                            var v = vids[i];
+                            if(v.paused) {
+                                v.muted = true;
+                                v.play().catch(function(e){});
+                            }
+                        }
+                        var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, [class*="play"]');
+                        for(var j=0; j<overlays.length; j++) { try { overlays[j].click(); } catch(e) {} }
+                    }
+
+                    var interval = setInterval(function() {
+                        attempts++;
+                        tryPlayVideo();
+                        
+                        var result = '';
+                        
+                        // Busca em tags video
+                        var videos = document.querySelectorAll('video');
+                        for (var i = 0; i < videos.length; i++) {
+                            var video = videos[i];
+                            if (video.src && video.src.startsWith('http')) {
+                                result = video.src;
+                                break;
+                            }
+                        }
+                        
+                        // Busca em sources
+                        if (!result) {
+                            var sources = document.querySelectorAll('source[src]');
+                            for (var j = 0; j < sources.length; j++) {
+                                var src = sources[j].src;
+                                if (src && (src.includes('.m3u8') || src.includes('.mp4'))) {
+                                    result = src;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Busca variáveis globais típicas
+                        if (!result) {
+                            if(window.sources && window.sources.length > 0) {
+                                result = window.sources[0].file;
+                            }
+                        }
+
+                        if (result && result.length > 0) {
+                            clearInterval(interval);
+                            resolve(result);
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            resolve('');
+                        }
+                    }, 100);
+                });
+            })()
+        """.trimIndent()
+
+        // 2. Configurar Resolver
+        val resolver = WebViewResolver(
+            // Intercepta qualquer coisa que pareça video
+            interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com"""),
+            script = captureScript,
+            scriptCallback = { result ->
+                if (result.isNotEmpty() && result.startsWith("http")) {
+                    Log.d(TAG, "✅ JS Capture: $result")
+                }
+            },
+            timeout = 30_000L
+        )
+
+        // 3. Executar Request
         try {
-            // Primeiro, tentar extrair via HTTP (caso volte ao formato antigo)
+            val headers = mapOf(
+                "User-Agent" to USER_AGENT,
+                "Referer" to (referer ?: mainUrl)
+            )
+
+            // WebViewResolver vai lidar com a interceptação e chamar o callback
             val response = app.get(
                 url, 
-                referer = referer,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-                )
+                headers = headers, 
+                interceptor = resolver
             )
             
-            val text = response.text
-            Log.d(TAG, "📄 Resposta (${text.length} chars)")
-            
-            // Verificar se é o novo formato (HTML com dados criptografados)
-            val isNewFormat = text.contains("SoTrym") || text.contains("iamcdn.net") || text.contains("core.bundle.js")
-            
-            if (isNewFormat) {
-                Log.d(TAG, "🔐 Formato novo detectado (AES-CTR) - usando WebView")
+            // Se o Resolver pegou algo, ele retorna a URL no response.url
+            val captured = response.url
+            if (captured.contains(".mp4") || captured.contains(".m3u8") || captured.contains("googleapis")) {
+                Log.d(TAG, "✅ URL Interceptada: $captured")
                 
-                // Headers modernos para WebView
-                val extraHeaders = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "Sec-Fetch-Dest" to "iframe",
-                    "Sec-Fetch-Mode" to "navigate",
-                    "Sec-Fetch-Site" to "cross-site"
-                )
-                
-                // Retornar link para WebView processar
-                // CloudStream vai executar o JavaScript e capturar o vídeo
                 callback.invoke(
-                    newExtractorLink(
-                        source = this.name,
-                        name = "$name (WebView)",
-                        url = url,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = referer ?: mainUrl
-                        this.quality = Qualities.Unknown.value
-                        this.headers = extraHeaders
-                    }
-                )
-                Log.d(TAG, "✅ Link WebView adicionado: $url")
-                return
-            }
-            
-            // Formato antigo: tentar parsear JSON
-            try {
-                val json = response.parsedSafe<PlayerEmbedResponse>()
-                if (json != null && json.sources.isNotEmpty()) {
-                    Log.d(TAG, "✅ JSON parseado: ${json.sources.size} sources")
-                    
-                    json.sources.forEach { source ->
-                        val file = source.file
-                        val label = source.label ?: "Auto"
-                        
-                        if (file.isNotEmpty()) {
-                            val linkType = if (file.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-                            
-                            callback.invoke(
-                                newExtractorLink(
-                                    source = this.name,
-                                    name = "$name $label",
-                                    url = file,
-                                    type = linkType
-                                ) {
-                                    this.referer = referer ?: mainUrl
-                                    this.quality = getQualityFromName(label)
-                                    this.headers = mapOf("User-Agent" to USER_AGENT)
-                                }
-                            )
-                            Log.d(TAG, "✅ Link adicionado: $label -> $file")
-                        }
-                    }
-                    return
-                }
-            } catch (e: Exception) {
-                Log.d(TAG, "⚠️ Não é JSON válido")
-            }
-            
-            // Fallback: extrair URLs via regex
-            val filePattern = Regex(""""file"\s*:\s*"([^"]+)"""")
-            val files = filePattern.findAll(text).map { it.groupValues[1] }.toList()
-            
-            if (files.isNotEmpty()) {
-                Log.d(TAG, "✅ Regex encontrou ${files.size} files")
-                
-                files.forEach { file ->
-                    val linkType = if (file.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-                    
-                    callback.invoke(
-                        newExtractorLink(
-                            source = this.name,
-                            name = "$name",
-                            url = file,
-                            type = linkType
-                        ) {
-                            this.referer = referer ?: mainUrl
-                            this.quality = Qualities.Unknown.value
-                            this.headers = mapOf("User-Agent" to USER_AGENT)
-                        }
+                     newExtractorLink(
+                        this.name,
+                        this.name,
+                        captured,
+                        referer = url,
+                        quality = Qualities.Unknown.value
                     )
-                    Log.d(TAG, "✅ Link (regex): $file")
-                }
-                return
-            }
-            
-            // Último fallback: URL direta de storage.googleapis.com
-            val gcsPattern = Regex("""https?://storage\.googleapis\.com/[^"'\s]+\.mp4""")
-            gcsPattern.findAll(text).forEach { match ->
-                val gcsUrl = match.value
-                callback.invoke(
-                    newExtractorLink(
-                        source = this.name,
-                        name = "$name (GCS Direct)",
-                        url = gcsUrl,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = referer ?: mainUrl
-                        this.quality = Qualities.Unknown.value
-                        this.headers = mapOf("User-Agent" to USER_AGENT)
-                    }
                 )
-                Log.d(TAG, "✅ Link (GCS): $gcsUrl")
+            } else {
+                Log.w(TAG, "⚠️ Falha ao interceptar URL de vídeo. URL final: $captured")
             }
-            
+
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro: ${e.message}")
+            Log.e(TAG, "❌ Erro WebView: ${e.message}")
         }
     }
-    
-    // Data classes para parsing JSON (formato antigo)
-    data class PlayerEmbedResponse(
-        val sources: List<Source> = emptyList()
-    )
-    
-    data class Source(
-        val file: String = "",
-        val label: String? = null,
-        val type: String? = null
-    )
 }

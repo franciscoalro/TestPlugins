@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document
 import android.util.Log
 
 /**
- * MaxSeries Provider v78 - Search Fixed + Multi-Extractor Support (Jan 2026)
+ * MaxSeries Provider v79 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
@@ -528,8 +528,8 @@ class MaxSeriesProvider : MainAPI() {
                         }
                         // PRIORIDADE 10: MegaEmbed (HLS ofuscado - último recurso)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P10] MegaEmbedSimpleExtractor - HLS ofuscado")
-                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedSimpleExtractor()
+                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractor - HLS ofuscado (Interception)")
+                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractor()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

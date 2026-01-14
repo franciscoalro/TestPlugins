@@ -1,0 +1,1476 @@
+{
+  "timestamp": "2026-01-13T20:30:40.272262",
+  "base_url": "https://www.maxseries.one",
+  "pages_analyzed": [
+    {
+      "url": "https://www.maxseries.one/series",
+      "type": "series",
+      "status_code": 200,
+      "size": 86903,
+      "title": "Assistir Series Online Grátis - Max Séries",
+      "sections": [
+        {
+          "name": "Header 1",
+          "selector": "header",
+          "classes": [
+            "main"
+          ],
+          "id": "header",
+          "children_count": 21,
+          "text_length": 18
+        },
+        {
+          "name": "Header 2",
+          "selector": "header",
+          "classes": [
+            "responsive"
+          ],
+          "id": null,
+          "children_count": 7,
+          "text_length": 0
+        },
+        {
+          "name": "Header 3",
+          "selector": "header",
+          "classes": [],
+          "id": null,
+          "children_count": 6,
+          "text_length": 18
+        },
+        {
+          "name": "Header 4",
+          "selector": "header",
+          "classes": [],
+          "id": null,
+          "children_count": 2,
+          "text_length": 29
+        },
+        {
+          "name": "Article 1",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9875",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Article 2",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9869",
+          "children_count": 8,
+          "text_length": 19
+        },
+        {
+          "name": "Article 3",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9868",
+          "children_count": 8,
+          "text_length": 32
+        },
+        {
+          "name": "Article 4",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9849",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Article 5",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9848",
+          "children_count": 8,
+          "text_length": 20
+        },
+        {
+          "name": "Article 6",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9838",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Article 7",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9837",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Article 8",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9836",
+          "children_count": 8,
+          "text_length": 20
+        },
+        {
+          "name": "Article 9",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9831",
+          "children_count": 8,
+          "text_length": 38
+        },
+        {
+          "name": "Article 10",
+          "selector": "article",
+          "classes": [
+            "item"
+          ],
+          "id": "post-9830",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Article 11",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9868",
+          "children_count": 10,
+          "text_length": 37
+        },
+        {
+          "name": "Article 12",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9849",
+          "children_count": 10,
+          "text_length": 32
+        },
+        {
+          "name": "Article 13",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9848",
+          "children_count": 10,
+          "text_length": 26
+        },
+        {
+          "name": "Article 14",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9820",
+          "children_count": 10,
+          "text_length": 30
+        },
+        {
+          "name": "Article 15",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9818",
+          "children_count": 10,
+          "text_length": 35
+        },
+        {
+          "name": "Article 16",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9808",
+          "children_count": 10,
+          "text_length": 32
+        },
+        {
+          "name": "Article 17",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9807",
+          "children_count": 10,
+          "text_length": 36
+        },
+        {
+          "name": "Article 18",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9806",
+          "children_count": 10,
+          "text_length": 35
+        },
+        {
+          "name": "Article 19",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-2321",
+          "children_count": 10,
+          "text_length": 31
+        },
+        {
+          "name": "Article 20",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9746",
+          "children_count": 10,
+          "text_length": 30
+        },
+        {
+          "name": "Article 21",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9720",
+          "children_count": 10,
+          "text_length": 44
+        },
+        {
+          "name": "Article 22",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-featured-9712",
+          "children_count": 10,
+          "text_length": 31
+        },
+        {
+          "name": "Article 23",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9875",
+          "children_count": 21,
+          "text_length": 231
+        },
+        {
+          "name": "Article 24",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9869",
+          "children_count": 19,
+          "text_length": 197
+        },
+        {
+          "name": "Article 25",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9868",
+          "children_count": 20,
+          "text_length": 234
+        },
+        {
+          "name": "Article 26",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9849",
+          "children_count": 21,
+          "text_length": 220
+        },
+        {
+          "name": "Article 27",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9848",
+          "children_count": 22,
+          "text_length": 208
+        },
+        {
+          "name": "Article 28",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9838",
+          "children_count": 21,
+          "text_length": 240
+        },
+        {
+          "name": "Article 29",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9837",
+          "children_count": 20,
+          "text_length": 223
+        },
+        {
+          "name": "Article 30",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9836",
+          "children_count": 20,
+          "text_length": 203
+        },
+        {
+          "name": "Article 31",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9831",
+          "children_count": 19,
+          "text_length": 237
+        },
+        {
+          "name": "Article 32",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9830",
+          "children_count": 20,
+          "text_length": 216
+        },
+        {
+          "name": "Article 33",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9821",
+          "children_count": 22,
+          "text_length": 219
+        },
+        {
+          "name": "Article 34",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9820",
+          "children_count": 22,
+          "text_length": 231
+        },
+        {
+          "name": "Article 35",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9819",
+          "children_count": 23,
+          "text_length": 247
+        },
+        {
+          "name": "Article 36",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9818",
+          "children_count": 20,
+          "text_length": 229
+        },
+        {
+          "name": "Article 37",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9808",
+          "children_count": 20,
+          "text_length": 222
+        },
+        {
+          "name": "Article 38",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9807",
+          "children_count": 21,
+          "text_length": 233
+        },
+        {
+          "name": "Article 39",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9806",
+          "children_count": 20,
+          "text_length": 222
+        },
+        {
+          "name": "Article 40",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9800",
+          "children_count": 21,
+          "text_length": 227
+        },
+        {
+          "name": "Article 41",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9799",
+          "children_count": 22,
+          "text_length": 250
+        },
+        {
+          "name": "Article 42",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9785",
+          "children_count": 22,
+          "text_length": 228
+        },
+        {
+          "name": "Article 43",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9784",
+          "children_count": 21,
+          "text_length": 256
+        },
+        {
+          "name": "Article 44",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9783",
+          "children_count": 16,
+          "text_length": 216
+        },
+        {
+          "name": "Article 45",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9782",
+          "children_count": 21,
+          "text_length": 227
+        },
+        {
+          "name": "Article 46",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9781",
+          "children_count": 21,
+          "text_length": 229
+        },
+        {
+          "name": "Article 47",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9748",
+          "children_count": 22,
+          "text_length": 280
+        },
+        {
+          "name": "Article 48",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9746",
+          "children_count": 20,
+          "text_length": 211
+        },
+        {
+          "name": "Article 49",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9723",
+          "children_count": 21,
+          "text_length": 280
+        },
+        {
+          "name": "Article 50",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9721",
+          "children_count": 20,
+          "text_length": 217
+        },
+        {
+          "name": "Article 51",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9720",
+          "children_count": 21,
+          "text_length": 258
+        },
+        {
+          "name": "Article 52",
+          "selector": "article",
+          "classes": [
+            "item",
+            "tvshows"
+          ],
+          "id": "post-9712",
+          "children_count": 21,
+          "text_length": 217
+        },
+        {
+          "name": "Article 53",
+          "selector": "article",
+          "classes": [
+            "w_item_b"
+          ],
+          "id": "post-9874",
+          "children_count": 8,
+          "text_length": 13
+        },
+        {
+          "name": "Article 54",
+          "selector": "article",
+          "classes": [
+            "w_item_b"
+          ],
+          "id": "post-9873",
+          "children_count": 8,
+          "text_length": 12
+        },
+        {
+          "name": "Article 55",
+          "selector": "article",
+          "classes": [
+            "w_item_b"
+          ],
+          "id": "post-9872",
+          "children_count": 8,
+          "text_length": 59
+        },
+        {
+          "name": "Article 56",
+          "selector": "article",
+          "classes": [
+            "w_item_b"
+          ],
+          "id": "post-9871",
+          "children_count": 8,
+          "text_length": 24
+        },
+        {
+          "name": "Article 57",
+          "selector": "article",
+          "classes": [
+            "w_item_b"
+          ],
+          "id": "post-9870",
+          "children_count": 8,
+          "text_length": 27
+        },
+        {
+          "name": "Content",
+          "selector": ".content",
+          "classes": [
+            "content",
+            "right",
+            "normal"
+          ],
+          "id": null,
+          "children_count": 897,
+          "text_length": 7649
+        },
+        {
+          "name": "Footer",
+          "selector": "footer",
+          "classes": [
+            "main"
+          ],
+          "id": null,
+          "children_count": 37,
+          "text_length": 273
+        }
+      ],
+      "iframes": [],
+      "scripts": [
+        {
+          "src": null,
+          "type": "application/ld+json",
+          "inline": true,
+          "size": 1265,
+          "variables": [],
+          "urls": [
+            "https://www.maxseries.one/",
+            "https://www.maxseries.one/?s={search_term_string}",
+            "https://www.maxseries.one/series",
+            "https://www.maxseries.one/series#breadcrumb",
+            "https://www.maxseries.one/#website",
+            "https://schema.org"
+          ]
+        },
+        {
+          "src": "https://www.maxseries.one/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/lazyload.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/lazyload.js?ver=2.5.8"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/pwsscrollbar.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/pwsscrollbar.js?ver=2.5.8"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/owlcarousel.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/owlcarousel.js?ver=2.5.8"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/idtabs.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/idtabs.js?ver=2.5.8"
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/isrepeater.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/isrepeater.js?ver=2.5.8"
+        },
+        {
+          "src": null,
+          "type": "text/javascript",
+          "inline": true,
+          "size": 760,
+          "variables": [
+            "dtAjax"
+          ],
+          "urls": [
+            "https://www.maxseries.one/wp-json/dooplayer/v2/"
+          ]
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8"
+        },
+        {
+          "src": null,
+          "type": "text/javascript",
+          "inline": true,
+          "size": 251,
+          "variables": [],
+          "urls": []
+        },
+        {
+          "src": "//ib.bobafidges.com/rx6Ao292AGv7US/119582",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://ib.bobafidges.com/rx6Ao292AGv7US/119582"
+        },
+        {
+          "src": null,
+          "type": "speculationrules",
+          "inline": true,
+          "size": 377,
+          "variables": [],
+          "urls": []
+        },
+        {
+          "src": null,
+          "type": "text/javascript",
+          "inline": true,
+          "size": 1909,
+          "variables": [],
+          "urls": []
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.scripts.min.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.scripts.min.js?ver=2.5.8"
+        },
+        {
+          "src": null,
+          "type": "text/javascript",
+          "inline": true,
+          "size": 579,
+          "variables": [
+            "dtGonza"
+          ],
+          "urls": [
+            "https://www.maxseries.one/wp-json/dooplay/search/",
+            "https://www.maxseries.one/wp-json/dooplay/glossary/"
+          ]
+        },
+        {
+          "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.livesearch.min.js?ver=2.5.8",
+          "type": "text/javascript",
+          "inline": false,
+          "size": 0,
+          "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.livesearch.min.js?ver=2.5.8"
+        },
+        {
+          "src": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015",
+          "type": null,
+          "inline": false,
+          "size": 0,
+          "full_url": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+        }
+      ],
+      "forms": [
+        {
+          "action": "https://www.maxseries.one",
+          "method": "GET",
+          "id": "searchform",
+          "class": null,
+          "inputs": [
+            {
+              "type": "text",
+              "name": "s",
+              "id": "s",
+              "value": "",
+              "required": false
+            }
+          ]
+        },
+        {
+          "action": "https://www.maxseries.one",
+          "method": "GET",
+          "id": "form-search-resp",
+          "class": [
+            "form-resp-ab"
+          ],
+          "inputs": [
+            {
+              "type": "text",
+              "name": "s",
+              "id": "ms",
+              "value": "",
+              "required": false
+            }
+          ]
+        },
+        {
+          "action": null,
+          "method": "POST",
+          "id": "dooplay_login_user",
+          "class": null,
+          "inputs": [
+            {
+              "type": "text",
+              "name": "log",
+              "id": null,
+              "value": null,
+              "required": false
+            },
+            {
+              "type": "password",
+              "name": "pwd",
+              "id": null,
+              "value": null,
+              "required": false
+            },
+            {
+              "type": "checkbox",
+              "name": "rmb",
+              "id": "rememberme",
+              "value": "forever",
+              "required": false
+            },
+            {
+              "type": "submit",
+              "name": null,
+              "id": "dooplay_login_btn",
+              "value": "Log in",
+              "required": false
+            },
+            {
+              "type": "hidden",
+              "name": "red",
+              "id": null,
+              "value": "https://www.maxseries.one/series",
+              "required": false
+            },
+            {
+              "type": "hidden",
+              "name": "action",
+              "id": null,
+              "value": "dooplay_login",
+              "required": false
+            }
+          ]
+        }
+      ],
+      "data_attributes": [
+        {
+          "tag": "script",
+          "id": null,
+          "class": null,
+          "data_attributes": {
+            "data-cfasync": "false"
+          }
+        },
+        {
+          "tag": "input",
+          "id": "dooplay_login_btn",
+          "class": null,
+          "data_attributes": {
+            "data-btntext": "Log in"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "09"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "a"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "b"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "c"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "d"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "e"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "f"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "g"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "h"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "i"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "j"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "k"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "l"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "m"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "n"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "o"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "p"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "q"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "r"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "s"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "t"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "u"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "v"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "w"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "x"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "y"
+          }
+        },
+        {
+          "tag": "a",
+          "id": null,
+          "class": [
+            "lglossary"
+          ],
+          "data_attributes": {
+            "data-type": "tvshows",
+            "data-glossary": "z"
+          }
+        },
+        {
+          "tag": "script",
+          "id": null,
+          "class": null,
+          "data_attributes": {
+            "data-cf-beacon": "{\"version\":\"2024.11.0\",\"token\":\"7c4a7aead3ba4d03bf6f71861562b47e\",\"r\":1,\"server_timing\":{\"name\":{\"cfCacheStatus\":true,\"cfEdge\":true,\"cfExtPri\":true,\"cfL4\":true,\"cfOrigin\":true,\"cfSpeedBrain\":true},\"location_startswith\":null}}"
+          }
+        }
+      ],
+      "ajax_endpoints": [
+        {
+          "url": "https://www.maxseries.one/series",
+          "type": "ajax"
+        },
+        {
+          "url": "https://www.maxseries.one/",
+          "type": "ajax"
+        },
+        {
+          "url": "/wp-admin/admin-ajax.php",
+          "type": "ajax"
+        },
+        {
+          "url": "https://www.maxseries.one/wp-json/dooplayer/v2/",
+          "type": "ajax"
+        },
+        {
+          "url": "https://www.maxseries.one/wp-json/dooplay/search/",
+          "type": "ajax"
+        }
+      ],
+      "player_urls": [],
+      "tokens": [
+        {
+          "type": "token",
+          "value": "7c4a7aead3ba4d03bf6f71861562b47e",
+          "length": 32
+        }
+      ],
+      "meta_info": {
+        "apple-mobile-web-app-capable": "yes",
+        "apple-mobile-web-app-status-bar-style": "black",
+        "mobile-web-app-capable": "yes",
+        "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
+        "theme-color": "#000000",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "description": "Assistir series online gratis em HD, sem travamentos e sem pagar nada. Venha conferir nosso site!",
+        "og:locale": "pt_BR",
+        "og:type": "website",
+        "og:title": "Assistir Series Online Grátis - Max Séries",
+        "og:description": "Assistir series online gratis em HD, sem travamentos e sem pagar nada. Venha conferir nosso site!",
+        "og:url": "https://www.maxseries.one/series",
+        "og:site_name": "Max Series - Assistir Filmes e Series Online Gratis",
+        "twitter:card": "summary_large_image",
+        "msapplication-TileImage": "https://www.maxseries.one/wp-content/uploads/2025/09/unnamed.webp"
+      }
+    }
+  ],
+  "tokens_found": [
+    {
+      "type": "token",
+      "value": "7c4a7aead3ba4d03bf6f71861562b47e",
+      "length": 32
+    }
+  ],
+  "frames_found": [],
+  "players_found": [],
+  "api_endpoints": [
+    {
+      "url": "https://www.maxseries.one/series",
+      "type": "ajax"
+    },
+    {
+      "url": "https://www.maxseries.one/",
+      "type": "ajax"
+    },
+    {
+      "url": "/wp-admin/admin-ajax.php",
+      "type": "ajax"
+    },
+    {
+      "url": "https://www.maxseries.one/wp-json/dooplayer/v2/",
+      "type": "ajax"
+    },
+    {
+      "url": "https://www.maxseries.one/wp-json/dooplay/search/",
+      "type": "ajax"
+    }
+  ],
+  "scripts": [
+    {
+      "src": null,
+      "type": "application/ld+json",
+      "inline": true,
+      "size": 1265,
+      "variables": [],
+      "urls": [
+        "https://www.maxseries.one/",
+        "https://www.maxseries.one/?s={search_term_string}",
+        "https://www.maxseries.one/series",
+        "https://www.maxseries.one/series#breadcrumb",
+        "https://www.maxseries.one/#website",
+        "https://schema.org"
+      ]
+    },
+    {
+      "src": "https://www.maxseries.one/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/lazyload.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/lazyload.js?ver=2.5.8"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/pwsscrollbar.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/pwsscrollbar.js?ver=2.5.8"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/owlcarousel.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/owlcarousel.js?ver=2.5.8"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/idtabs.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/idtabs.js?ver=2.5.8"
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/isrepeater.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/lib/isrepeater.js?ver=2.5.8"
+    },
+    {
+      "src": null,
+      "type": "text/javascript",
+      "inline": true,
+      "size": 760,
+      "variables": [
+        "dtAjax"
+      ],
+      "urls": [
+        "https://www.maxseries.one/wp-json/dooplayer/v2/"
+      ]
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.ajax.min.js?ver=2.5.8"
+    },
+    {
+      "src": null,
+      "type": "text/javascript",
+      "inline": true,
+      "size": 251,
+      "variables": [],
+      "urls": []
+    },
+    {
+      "src": "//ib.bobafidges.com/rx6Ao292AGv7US/119582",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://ib.bobafidges.com/rx6Ao292AGv7US/119582"
+    },
+    {
+      "src": null,
+      "type": "speculationrules",
+      "inline": true,
+      "size": 377,
+      "variables": [],
+      "urls": []
+    },
+    {
+      "src": null,
+      "type": "text/javascript",
+      "inline": true,
+      "size": 1909,
+      "variables": [],
+      "urls": []
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.scripts.min.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.scripts.min.js?ver=2.5.8"
+    },
+    {
+      "src": null,
+      "type": "text/javascript",
+      "inline": true,
+      "size": 579,
+      "variables": [
+        "dtGonza"
+      ],
+      "urls": [
+        "https://www.maxseries.one/wp-json/dooplay/search/",
+        "https://www.maxseries.one/wp-json/dooplay/glossary/"
+      ]
+    },
+    {
+      "src": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.livesearch.min.js?ver=2.5.8",
+      "type": "text/javascript",
+      "inline": false,
+      "size": 0,
+      "full_url": "https://www.maxseries.one/wp-content/themes/dooplay/assets/js/front.livesearch.min.js?ver=2.5.8"
+    },
+    {
+      "src": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015",
+      "type": null,
+      "inline": false,
+      "size": 0,
+      "full_url": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+    }
+  ],
+  "forms": [],
+  "cookies": [],
+  "meta_tags": {},
+  "css_selectors": {},
+  "ajax_calls": []
+}

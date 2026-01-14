@@ -162,8 +162,28 @@ class MegaEmbedExtractor : ExtractorApi() {
                         var attempts = 0;
                         var maxAttempts = 100; // 10 segundos
                         
+                        // Função para tentar dar play em videos
+                        function tryPlayVideo() {
+                            var vids = document.getElementsByTagName('video');
+                            for(var i=0; i<vids.length; i++){
+                                var v = vids[i];
+                                if(v.paused) {
+                                    v.muted = true; // Necessário para autoplay sem interação
+                                    v.play().catch(function(e){ console.log("Erro play: " + e); });
+                                }
+                            }
+                            
+                            // Tentar clicar em overlays de play
+                            var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, .jw-display-icon-container, [class*="play"]');
+                            for(var j=0; j<overlays.length; j++) {
+                                try { overlays[j].click(); } catch(e) {}
+                            }
+                        }
+
                         var interval = setInterval(function() {
                             attempts++;
+                            tryPlayVideo(); // Forçar interação
+                            
                             var result = '';
                             
                             // 1. Procurar em elementos video
@@ -194,17 +214,25 @@ class MegaEmbedExtractor : ExtractorApi() {
                             
                             // 3. Variáveis globais comuns do MegaEmbed
                             if (!result) {
-                                var globals = ['videoUrl', 'playlistUrl', 'source', 'file', 'src', 'url'];
+                                var globals = ['videoUrl', 'playlistUrl', 'source', 'file', 'src', 'url', 'config', 'playerConfig'];
                                 for (var k = 0; k < globals.length; k++) {
                                     var varName = globals[k];
-                                    if (window[varName] && typeof window[varName] === 'string' && window[varName].startsWith('http')) {
-                                        result = window[varName];
-                                        break;
+                                    if (window[varName]) {
+                                        var val = window[varName];
+                                        if (typeof val === 'string' && val.startsWith('http')) {
+                                            result = val;
+                                            break;
+                                        }
+                                        // Verificar objetos de config
+                                        if (typeof val === 'object' && val.file) {
+                                            result = val.file;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                             
-                            // 4. Procurar em objetos de configuração
+                            // 4. Procurar em objetos de configuração (JWPlayer, etc)
                             if (!result) {
                                 if (window.jwplayer) {
                                     try {
@@ -240,9 +268,10 @@ class MegaEmbedExtractor : ExtractorApi() {
                                 resolve(result);
                             } else if (attempts >= maxAttempts) {
                                 clearInterval(interval);
-                                resolve(''); // Timeout
+                                // Retornar estado final para debug se falhar
+                                resolve('TIMEOUT: ' + videos.length + ' videos found'); 
                             }
-                        }, 100);
+                        }, 200);
                     });
                 })()
             """.trimIndent()
@@ -253,9 +282,12 @@ class MegaEmbedExtractor : ExtractorApi() {
                 interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org"""),
                 script = captureScript,
                 scriptCallback = { result ->
+                    Log.d(TAG, "📜 JS Result Raw: $result")
                     if (result.isNotEmpty() && result != "null" && result != "\"\"" && result.startsWith("http")) {
                         capturedUrl = result.trim('"')
-                        Log.d(TAG, "📜 JavaScript capturou: $capturedUrl")
+                        Log.d(TAG, "✅ JavaScript capturou URL válida: $capturedUrl")
+                    } else if (result.startsWith("TIMEOUT")) {
+                        Log.w(TAG, "⚠️ JavaScript Timeout/Debug: $result")
                     }
                 },
                 timeout = 30_000L

@@ -528,8 +528,8 @@ class MaxSeriesProvider : MainAPI() {
                         }
                         // PRIORIDADE 10: MegaEmbed (HLS ofuscado - último recurso)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractor - HLS ofuscado (Interception)")
-                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractor()
+                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractorV4 - HLS ofuscado (WebView + JS)")
+                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV4()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

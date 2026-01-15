@@ -2,7 +2,7 @@ name: Build MaxSeries Plugin (Pre-Release)
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, feat/maxseries-prerelease ]
     paths:
       - 'MaxSeries/**'
       - '.github/workflows/build-maxseries-prerelease.yml'

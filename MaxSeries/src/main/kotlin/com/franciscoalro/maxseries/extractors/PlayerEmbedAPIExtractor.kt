@@ -130,13 +130,15 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 Log.d(TAG, "✅ URL Interceptada: $captured")
                 
                 callback.invoke(
-                     newExtractorLink(
-                        this.name,
-                        this.name,
-                        captured,
-                        referer = url,
-                        quality = Qualities.Unknown.value
-                    )
+                    newExtractorLink(
+                        source = this.name,
+                        name = this.name,
+                        url = captured,
+                        type = ExtractorLinkType.VIDEO
+                    ) {
+                        this.referer = url
+                        this.quality = Qualities.Unknown.value
+                    }
                 )
             } else {
                 Log.w(TAG, "⚠️ Falha ao interceptar URL de vídeo. URL final: $captured")

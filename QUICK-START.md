@@ -1,6 +1,11 @@
-# 🚀 QUICK START - MaxSeries Pre-Release Build
+# 🚀 QUICK START - MaxSeries Pre-Release (v80)
 
-## ⚡ Execução Rápida (2 comandos)
+## ⚠️ Atenção: Requer Internet
+O build depende do **Android SDK 36** ou do **GitHub Actions**. Como sua SDK local está desatualizada (sem API 36) e estamos sem internet, o build falha.
+
+**ASSIM QUE A INTERNET VOLTAR:**
+
+## ⚡ 1. Build via GitHub (Recomendado)
 
 ```powershell
 # 1. Ir para o diretório
@@ -10,32 +15,23 @@ cd C:\Users\KYTHOURS\Desktop\cloudstream-pre-release
 .\setup-github.ps1
 ```
 
-O script vai fazer **TUDO automaticamente**:
-- ✅ Configurar Git
-- ✅ Adicionar arquivos
-- ✅ Criar commit
-- ✅ Fazer push para GitHub
+Isso fará o push do código e o GitHub Actions vai compilar tudo (ele já tem o SDK 36).
 
-## 📋 Depois do Push
+## 📥 2. Baixar o Plugin Compilado
 
 1. Vá para: **https://github.com/SEU_USUARIO/SEU_REPO/actions**
-2. Clique em: **"Build MaxSeries Plugin (Pre-Release)"**
-3. Clique em: **"Run workflow"** → **"Run workflow"**
-4. Aguarde **3-5 minutos**
-5. Baixe o artifact: **maxseries-v80-aar**
-
-## 🎯 Pronto!
-
-Você terá o arquivo `MaxSeries-release.aar` compilado e pronto para usar no Cloudstream Pre-Release.
+2. Baixe o artifact: **maxseries-v80-aar**
+3. Instale no Cloudstream Pre-Release
 
 ---
 
-## 📚 Documentação Completa
+## 🛠️ Alternativa: Build Local (Dá trabalho)
+Se quiser compilar localmente, você precisará baixar o **Android SDK Platform 36**:
+1. Abra o Android Studio
+2. SDK Manager > Android SDK > SDK Tools
+3. Marque "Show Package Details"
+4. Instale **Android 36 (VanillaIceCream)**
+5. Tente rodar o build novamente: `.\gradlew.bat :MaxSeries:assembleRelease`
 
-- **Guia Detalhado**: `README-MAXSERIES-BUILD.md`
-- **Plano de Migração**: `d:\TestPlugins-master\CLOUDSTREAM_PRERELEASE_MIGRATION_PLAN.md`
-- **GitHub Actions Plan**: `d:\TestPlugins-master\GITHUB_ACTIONS_PRERELEASE_BUILD.md`
-
-## 🆘 Problemas?
-
-Leia o arquivo `README-MAXSERIES-BUILD.md` seção "Troubleshooting"
+## 📚 Documentação
+- Detalhes Completos: `README-MAXSERIES-BUILD.md`

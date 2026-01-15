@@ -1,7 +1,7 @@
-version = 80
+version = 81
 
 cloudstream {
-    description = "MaxSeries v80 - Enhanced stability and performance (Jan 2026)"
+    description = "MaxSeries v81 - PlayerEmbedAPI extraction improved (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

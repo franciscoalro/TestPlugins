@@ -1,7 +1,7 @@
-version = 85
+version = 86
 
 cloudstream {
-    description = "MaxSeries v85 - CRITICAL FIX: MegaEmbed WebView (Jan 2026)"
+    description = "MaxSeries v86 - ExoPlayer M3U8 headers fix (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

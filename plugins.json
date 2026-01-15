@@ -23,14 +23,14 @@
     {
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
-        "version": 85,
+        "version": 86,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v85 - CRITICAL FIX: MegaEmbed WebView (Jan 2026)",
+        "description": "MaxSeries v86 - ExoPlayer M3U8 headers fix (Jan 2026)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

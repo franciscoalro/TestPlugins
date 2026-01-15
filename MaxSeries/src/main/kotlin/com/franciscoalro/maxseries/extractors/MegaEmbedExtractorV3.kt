@@ -187,7 +187,7 @@ class MegaEmbedExtractorV3 : ExtractorApi() {
                     Regex("""https?://[^/]+\.mp4""")
                 ),
                 useOkhttp = false, // Importante para bypass Cloudflare
-                timeout = 30_000L
+                timeout = 15_000L // Otimizado v82
             )
             
             val response = app.get(
@@ -306,7 +306,7 @@ class MegaEmbedExtractorV3 : ExtractorApi() {
                         Log.d(TAG, "📜 JavaScript capturou: $capturedUrl")
                     }
                 },
-                timeout = 25_000L
+                timeout = 12_000L // Otimizado v82
             )
             
             app.get(
@@ -405,6 +405,13 @@ class MegaEmbedExtractorV3 : ExtractorApi() {
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
+        
+        // CRÍTICO: Excluir arquivos JavaScript e outros recursos
+        val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
+        if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
+            Log.d(TAG, "⚠️ URL rejeitada (arquivo não-vídeo): $url")
+            return false
+        }
         
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 

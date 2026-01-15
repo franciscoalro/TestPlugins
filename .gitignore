@@ -20,3 +20,8 @@ log.txt
 *.bat
 !push-to-github.bat
 cloudstream-4.6.0/
+*.log
+*.ps1
+upload-to-github.ps1
+**/hs_err_*.log
+**/replay_*.log

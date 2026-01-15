@@ -29,15 +29,15 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     ) {
         Log.d(TAG, "🎬 PlayerEmbedAPI: $url")
         
-        // 1. Script para forçar reprodução e extração
-        // (Reutilizando a lógica robusta criada para o MegaEmbed)
+        // 1. Script MELHORADO para captura de vídeo (v81)
         val captureScript = """
             (function() {
                 return new Promise(function(resolve) {
                     var attempts = 0;
-                    var maxAttempts = 100; // 10 segundos
+                    var maxAttempts = 150; // 15 segundos (aumentado)
                     
                     function tryPlayVideo() {
+                        // Tentar reproduzir vídeos existentes
                         var vids = document.getElementsByTagName('video');
                         for(var i=0; i<vids.length; i++){
                             var v = vids[i];
@@ -46,8 +46,29 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                 v.play().catch(function(e){});
                             }
                         }
+                        
+                        // Clicar em botões de play
                         var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, [class*="play"]');
-                        for(var j=0; j<overlays.length; j++) { try { overlays[j].click(); } catch(e) {} }
+                        for(var j=0; j<overlays.length; j++) { 
+                            try { overlays[j].click(); } catch(e) {} 
+                        }
+                        
+                        // Tentar iniciar JWPlayer se existir
+                        if (window.jwplayer && typeof window.jwplayer === 'function') {
+                            try {
+                                var players = document.querySelectorAll('[id*="player"]');
+                                for(var k=0; k<players.length; k++) {
+                                    var playerId = players[k].id;
+                                    if(playerId) {
+                                        var player = window.jwplayer(playerId);
+                                        if(player && player.play) {
+                                            player.setMute(true);
+                                            player.play();
+                                        }
+                                    }
+                                }
+                            } catch(e) {}
+                        }
                     }
 
                     var interval = setInterval(function() {
@@ -56,7 +77,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                         
                         var result = '';
                         
-                        // Busca em tags video
+                        // 1. Busca em tags video
                         var videos = document.querySelectorAll('video');
                         for (var i = 0; i < videos.length; i++) {
                             var video = videos[i];
@@ -64,28 +85,57 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                 result = video.src;
                                 break;
                             }
+                            // Verificar currentSrc também
+                            if (video.currentSrc && video.currentSrc.startsWith('http')) {
+                                result = video.currentSrc;
+                                break;
+                            }
                         }
                         
-                        // Busca em sources
+                        // 2. Busca em sources
                         if (!result) {
                             var sources = document.querySelectorAll('source[src]');
                             for (var j = 0; j < sources.length; j++) {
                                 var src = sources[j].src;
-                                if (src && (src.includes('.m3u8') || src.includes('.mp4'))) {
+                                if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis'))) {
                                     result = src;
                                     break;
                                 }
                             }
                         }
                         
-                        // Busca variáveis globais típicas
+                        // 3. Busca em JWPlayer
+                        if (!result && window.jwplayer) {
+                            try {
+                                var players = document.querySelectorAll('[id*="player"]');
+                                for(var k=0; k<players.length; k++) {
+                                    var playerId = players[k].id;
+                                    if(playerId) {
+                                        var player = window.jwplayer(playerId);
+                                        if(player && player.getPlaylistItem) {
+                                            var item = player.getPlaylistItem();
+                                            if(item && item.file) {
+                                                result = item.file;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch(e) {}
+                        }
+                        
+                        // 4. Busca variáveis globais
                         if (!result) {
                             if(window.sources && window.sources.length > 0) {
-                                result = window.sources[0].file;
+                                result = window.sources[0].file || window.sources[0].src;
+                            } else if(window.playerConfig && window.playerConfig.file) {
+                                result = window.playerConfig.file;
+                            } else if(window.videoUrl) {
+                                result = window.videoUrl;
                             }
                         }
 
-                        if (result && result.length > 0) {
+                        if (result && result.length > 0 && result.startsWith('http')) {
                             clearInterval(interval);
                             resolve(result);
                         } else if (attempts >= maxAttempts) {
@@ -97,17 +147,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             })()
         """.trimIndent()
 
-        // 2. Configurar Resolver
+        // 2. Configurar Resolver com timeout aumentado
         val resolver = WebViewResolver(
-            // Intercepta qualquer coisa que pareça video
-            interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com"""),
+            // Intercepta MP4, M3U8, e Google Cloud Storage
+            interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com"""),
             script = captureScript,
             scriptCallback = { result ->
                 if (result.isNotEmpty() && result.startsWith("http")) {
                     Log.d(TAG, "✅ JS Capture: $result")
                 }
             },
-            timeout = 30_000L
+            timeout = 45_000L // 45 segundos (aumentado de 30s)
         )
 
         // 3. Executar Request

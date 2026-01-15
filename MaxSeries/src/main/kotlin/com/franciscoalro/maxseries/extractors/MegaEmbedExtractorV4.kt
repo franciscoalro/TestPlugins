@@ -540,8 +540,24 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             
             if (videoUrl.contains(".m3u8") || videoUrl.contains("cf-master")) {
                 Log.d(TAG, "📺 Processando como HLS: $cleanUrl")
-                val m3u8Links = M3u8Helper.generateM3u8(name, cleanUrl, effectiveReferer)
+                Log.d(TAG, "🔗 Referer: $effectiveReferer")
+                
+                // CRÍTICO: M3u8Helper precisa de headers corretos para ExoPlayer
+                val m3u8Links = M3u8Helper.generateM3u8(
+                    name, 
+                    cleanUrl, 
+                    effectiveReferer,
+                    headers = mapOf(
+                        "User-Agent" to "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36",
+                        "Referer" to effectiveReferer,
+                        "Accept" to "*/*",
+                        "Origin" to effectiveReferer.substringBefore("/", "https://megaembed.link")
+                    )
+                )
+                
+                Log.d(TAG, "🎬 M3u8Links gerados: ${m3u8Links.size}")
                 for (link in m3u8Links) {
+                    Log.d(TAG, "  📌 Link: ${link.name} - ${link.url}")
                     callback(link)
                 }
             } else {
@@ -558,6 +574,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro ao emitir ExtractorLink: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

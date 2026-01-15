@@ -23,14 +23,14 @@
     {
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
-        "version": 79,
+        "version": 80,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v79 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026) - WebView Interception logic updated",
+        "description": "MaxSeries v80 - Enhanced stability and performance (Jan 2026)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

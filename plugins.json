@@ -24,7 +24,7 @@
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
         "version": 80,
-        "apiVersion": 1,
+        "apiVersion": 2,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [

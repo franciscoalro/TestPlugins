@@ -1,7 +1,7 @@
-version = 84
+version = 85
 
 cloudstream {
-    description = "MaxSeries v84 - Captura rápida + Novo CDN (Jan 2026)"
+    description = "MaxSeries v85 - CRITICAL FIX: MegaEmbed WebView (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

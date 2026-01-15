@@ -109,7 +109,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                     Regex("""sssrr\.org[^"'\s]*\.m3u8""")
                 ),
                 useOkhttp = false, // Importante para bypass Cloudflare
-                timeout = 15_000L // Otimizado v82
+                timeout = 45_000L
             )
             
             val response = app.get(
@@ -160,7 +160,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                 (function() {
                     return new Promise(function(resolve) {
                         var attempts = 0;
-                        var maxAttempts = 50; // 5 segundos (otimizado v82)
+                        var maxAttempts = 100; // 10 segundos
                         
                         // Função para tentar dar play em videos
                         function tryPlayVideo() {
@@ -271,7 +271,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                                 // Retornar estado final para debug se falhar
                                 resolve('TIMEOUT: ' + videos.length + ' videos found'); 
                             }
-                        }, 150); // Intervalo otimizado v82
+                        }, 200);
                     });
                 })()
             """.trimIndent()
@@ -290,7 +290,7 @@ class MegaEmbedExtractor : ExtractorApi() {
                         Log.w(TAG, "⚠️ JavaScript Timeout/Debug: $result")
                     }
                 },
-                timeout = 12_000L // Otimizado v82
+                timeout = 30_000L
             )
             
             app.get(
@@ -356,13 +356,6 @@ class MegaEmbedExtractor : ExtractorApi() {
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
-        
-        // CRÍTICO: Excluir arquivos JavaScript e outros recursos
-        val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
-        if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
-            Log.d(TAG, "⚠️ URL rejeitada (arquivo não-vídeo): $url")
-            return false
-        }
         
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 

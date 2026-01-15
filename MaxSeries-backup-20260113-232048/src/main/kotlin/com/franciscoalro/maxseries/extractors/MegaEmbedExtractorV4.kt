@@ -139,7 +139,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                     Regex("""\.mp4""")
                 ),
                 useOkhttp = false,
-                timeout = 15_000L, // Otimizado v82
+                timeout = 35_000L,
                 // Script para aguardar o carregamento completo
                 script = """
                     (function() {
@@ -385,7 +385,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                         Log.d(TAG, "📜 JavaScript capturou: $capturedUrl")
                     }
                 },
-                timeout = 12_000L // Otimizado v82
+                timeout = 25_000L
             )
             
             app.get(
@@ -472,13 +472,6 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
-        
-        // CRÍTICO: Excluir arquivos JavaScript e outros recursos
-        val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
-        if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
-            Log.d(TAG, "⚠️ URL rejeitada (arquivo não-vídeo): $url")
-            return false
-        }
         
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 

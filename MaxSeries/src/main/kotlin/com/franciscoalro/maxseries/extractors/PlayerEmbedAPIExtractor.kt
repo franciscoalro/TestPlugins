@@ -34,7 +34,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             (function() {
                 return new Promise(function(resolve) {
                     var attempts = 0;
-                    var maxAttempts = 80; // 8 segundos (otimizado para performance)
+                    var maxAttempts = 60; // 6 segundos (otimizado v84 - captura rápida)
                     
                     function tryPlayVideo() {
                         // Tentar reproduzir vídeos existentes
@@ -157,7 +157,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     Log.d(TAG, "✅ JS Capture: $result")
                 }
             },
-            timeout = 15_000L // 15 segundos (otimizado v82)
+            timeout = 10_000L // 10 segundos (otimizado v84 - captura rápida)
         )
 
         // 3. Executar Request

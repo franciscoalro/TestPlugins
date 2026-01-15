@@ -44,11 +44,13 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             "stzm.marvellaholdings.sbs",
             "srcf.marvellaholdings.sbs", 
             "sbi6.marvellaholdings.sbs",
-            "s6p9.marvellaholdings.sbs"
+            "s6p9.marvellaholdings.sbs",
+            // CDNs virelodesignagency (descoberto Jan 15, 2026)
+            "sr81.virelodesignagency.cyou"
         )
         
         // Shards conhecidos
-        private val KNOWN_SHARDS = listOf("is3", "x6b", "x7c", "x8d", "x9e")
+        private val KNOWN_SHARDS = listOf("is3", "x6b", "x7c", "x8d", "x9e", "5w3")
         
         fun canHandle(url: String): Boolean {
             return DOMAINS.any { url.contains(it, ignoreCase = true) }
@@ -139,13 +141,13 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                     Regex("""\.mp4""")
                 ),
                 useOkhttp = false,
-                timeout = 15_000L, // Otimizado v82
+                timeout = 10_000L, // Otimizado v84 - Captura rápida
                 // Script para aguardar o carregamento completo
                 script = """
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 100; // 10 segundos
+                            var maxAttempts = 60; // 6 segundos (otimizado v84)
                             
                             var interval = setInterval(function() {
                                 attempts++;
@@ -281,7 +283,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                                 "User-Agent" to USER_AGENT,
                                 "Referer" to (referer ?: mainUrl)
                             ),
-                            timeout = 8
+                            timeout = 5
                         )
                         
                         if (response.isSuccessful && response.text.contains("#EXTM3U")) {
@@ -385,7 +387,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                         Log.d(TAG, "📜 JavaScript capturou: $capturedUrl")
                     }
                 },
-                timeout = 12_000L // Otimizado v82
+                timeout = 10_000L // Otimizado v84 - Captura rápida
             )
             
             app.get(
@@ -473,6 +475,37 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
         if (url.isNullOrEmpty()) return false
         if (!url.startsWith("http")) return false
         
+        // CRÍTICO: Blacklist de domínios de analytics e tracking
+        val blacklistedDomains = listOf(
+            "google-analytics.com",
+            "googletagmanager.com",
+            "doubleclick.net",
+            "facebook.com/tr",
+            "analytics.google.com",
+            "stats.g.doubleclick.net",
+            "www.google-analytics.com",
+            "pagead2.googlesyndication.com",
+            "adservice.google.com",
+            "googlesyndication.com",
+            "googleadservices.com",
+            // Tracking adicional (descoberto Jan 15, 2026)
+            "morphify.net",
+            "attirecideryeah.com",
+            "hupdzirazt.com"
+        )
+        
+        if (blacklistedDomains.any { url.contains(it, ignoreCase = true) }) {
+            Log.d(TAG, "⚠️ URL rejeitada (analytics/tracking): $url")
+            return false
+        }
+        
+        // CRÍTICO: Rejeitar URLs com parâmetros típicos de analytics
+        val analyticsParams = listOf("&tid=", "&gtm=", "&_ga=", "&utm_", "/g/collect", "?v=2&tid=")
+        if (analyticsParams.any { url.contains(it, ignoreCase = true) }) {
+            Log.d(TAG, "⚠️ URL rejeitada (analytics params): $url")
+            return false
+        }
+        
         // CRÍTICO: Excluir arquivos JavaScript e outros recursos
         val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
         if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
@@ -480,10 +513,20 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
             return false
         }
         
-        return url.contains(".m3u8") || 
-               url.contains(".mp4") || 
-               url.contains("cf-master") ||
-               url.contains("marvellaholdings.sbs")
+        // CRÍTICO: Validação positiva - deve conter padrões de vídeo
+        val hasVideoPattern = url.contains(".m3u8") || 
+                              url.contains(".mp4") || 
+                              url.contains("cf-master") ||
+                              url.contains("marvellaholdings.sbs") ||
+                              url.contains("luminairemotion.online") ||
+                              url.contains("virelodesignagency.cyou")
+        
+        if (!hasVideoPattern) {
+            Log.d(TAG, "⚠️ URL rejeitada (sem padrão de vídeo): $url")
+            return false
+        }
+        
+        return true
     }
 
     private suspend fun emitExtractorLink(

@@ -17,7 +17,7 @@ import kotlin.coroutines.resume
 class MegaEmbedWebViewResolver(private val context: Context) {
     companion object {
         private const val TAG = "MegaEmbedResolver"
-        private const val TIMEOUT_MS = 15_000L
+        private const val TIMEOUT_MS = 10_000L // Otimizado v84
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -44,6 +44,11 @@ class MegaEmbedWebViewResolver(private val context: Context) {
                         request: WebResourceRequest
                     ): WebResourceResponse? {
                         val url = request.url.toString()
+                        
+                        // NOVO: Filtrar analytics e tracking ANTES da interceptação
+                        if (isAnalyticsUrl(url)) {
+                            return super.shouldInterceptRequest(view, request)
+                        }
                         
                         // Padrão descoberto: /v4/{code}/{id}/cf-master.{ts}.txt
                         // Ou qualquer URL .m3u8 que não seja blob
@@ -80,6 +85,26 @@ class MegaEmbedWebViewResolver(private val context: Context) {
                 }
             }, TIMEOUT_MS)
         }
+    }
+
+    /**
+     * Verifica se a URL é de analytics ou tracking
+     */
+    private fun isAnalyticsUrl(url: String): Boolean {
+        val blacklist = listOf(
+            "google-analytics.com",
+            "googletagmanager.com",
+            "doubleclick.net",
+            "facebook.com/tr",
+            "/g/collect",
+            "analytics.google.com",
+            "googlesyndication.com",
+            // Tracking adicional (descoberto Jan 15, 2026)
+            "morphify.net",
+            "attirecideryeah.com",
+            "hupdzirazt.com"
+        )
+        return blacklist.any { url.contains(it, ignoreCase = true) }
     }
 
     private fun cleanup(webView: WebView) {

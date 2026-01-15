@@ -1,7 +1,7 @@
-version = 82
+version = 84
 
 cloudstream {
-    description = "MaxSeries v82 - Performance optimization (Jan 2026)"
+    description = "MaxSeries v84 - Captura rápida + Novo CDN (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

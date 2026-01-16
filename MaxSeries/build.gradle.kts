@@ -1,7 +1,7 @@
-version = 87
+version = 88
 
 cloudstream {
-    description = "MaxSeries v87 - Timeout fix para multi-episódios (Jan 2026)"
+    description = "MaxSeries v88 - Prioridade WebView Live Capture (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -112,7 +112,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             
             val resolver = WebViewResolver(
                 // Regex genérico para qualquer domínio marvellaholdings/luminairemotion
-                interceptUrl = Regex(""".*cf-master.*\.txt"""),
+                interceptUrl = Regex(""".*(?:cf-master|index-).*?\.txt"""),
                 additionalUrls = listOf(
                     Regex("""\.m3u8"""),
                     Regex("""\.mp4""")
@@ -243,6 +243,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                url.contains(".mp4") || 
                url.contains("cf-master") ||
                url.contains("valenium.shop") || // NOVO
+               url.contains(".txt") || // Permitir playlists ofuscadas em .txt
                url.contains("marvellaholdings.sbs") ||
                url.contains("luminairemotion.online") ||
                url.contains("virelodesignagency.cyou")
@@ -256,7 +257,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         val cleanUrl = videoUrl.substringBefore("#")
         val effectiveReferer = referer.takeIf { !it.isNullOrEmpty() } ?: mainUrl
         
-        if (videoUrl.contains(".m3u8") || videoUrl.contains("cf-master")) {
+        if (videoUrl.contains(".m3u8") || videoUrl.contains(".txt") || videoUrl.contains("cf-master")) {
             val m3u8Links = M3u8Helper.generateM3u8(
                 name, 
                 cleanUrl, 

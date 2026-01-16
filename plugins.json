@@ -23,14 +23,14 @@
     {
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
-        "version": 89,
+        "version": 90,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v89 - FORCE UPDATE: WebView Live Capture (Jan 2026)",
+        "description": "MaxSeries v90 - FORCE CLASS UPDATE: V5 Live Capture (Jan 2026)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

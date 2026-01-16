@@ -112,7 +112,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             
             val resolver = WebViewResolver(
                 // Regex genérico para qualquer domínio marvellaholdings/luminairemotion
-                interceptUrl = Regex(""".*cf-master\.\d+\.txt"""),
+                interceptUrl = Regex(""".*cf-master.*\.txt"""),
                 additionalUrls = listOf(
                     Regex("""\.m3u8"""),
                     Regex("""\.mp4""")

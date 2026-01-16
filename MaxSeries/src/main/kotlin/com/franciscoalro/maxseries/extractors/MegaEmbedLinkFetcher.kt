@@ -28,6 +28,7 @@ object MegaEmbedLinkFetcher {
     
     // CDNs conhecidos do MegaEmbed (baseado na análise real)
     private val CDN_DOMAINS = listOf(
+        "valenium.shop",
         "stzm.marvellaholdings.sbs",
         "srcf.marvellaholdings.sbs", 
         "sbi6.marvellaholdings.sbs",

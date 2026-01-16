@@ -1,4 +1,4 @@
-package com.franciscoalro.maxseries.extractors
+package com.franciscoalro.maxseries.extractors.v5
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*

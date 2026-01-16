@@ -283,7 +283,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
                                 "User-Agent" to USER_AGENT,
                                 "Referer" to (referer ?: mainUrl)
                             ),
-                            timeout = 5
+                            timeout = 10
                         )
                         
                         if (response.isSuccessful && response.text.contains("#EXTM3U")) {

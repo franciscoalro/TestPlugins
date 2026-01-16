@@ -84,4 +84,38 @@ object HeadersBuilder {
             "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
         )
     }
+
+    /**
+     * Headers específicos para PlayerEmbedAPI (v100)
+     * Focado em evitar o redirecionamento para abyss.to por falta de headers
+     * @param referer URL de referência (limpa)
+     */
+    fun playerEmbed(referer: String): Map<String, String> {
+        val domain = "https://playerembedapi.link"
+        val origin = try {
+            val part = referer.substringBefore("|").substringBefore("#")
+            if (part.startsWith("http")) {
+                val uri = java.net.URI(part)
+                "${uri.scheme}://${uri.host}"
+            } else "https://playerthree.online"
+        } catch (e: Exception) {
+            "https://playerthree.online"
+        }
+
+        return mapOf(
+            "User-Agent" to DEFAULT_USER_AGENT,
+            "Referer" to referer.substringBefore("|").substringBefore("#"),
+            "Origin" to origin,
+            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Sec-Fetch-Dest" to "iframe",
+            "Sec-Fetch-Mode" to "navigate",
+            "Sec-Fetch-Site" to "cross-site",
+            "Upgrade-Insecure-Requests" to "1",
+            "DNT" to "1",
+            "Sec-Ch-Ua" to "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\", \"Google Chrome\";v=\"132\"",
+            "Sec-Ch-Ua-Mobile" to "?0",
+            "Sec-Ch-Ua-Platform" to "\"Windows\""
+        )
+    }
 }

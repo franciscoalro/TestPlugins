@@ -1,7 +1,7 @@
-version = 86
+version = 87
 
 cloudstream {
-    description = "MaxSeries v86 - ExoPlayer M3U8 headers fix (Jan 2026)"
+    description = "MaxSeries v87 - Timeout fix para multi-episódios (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,7 +1,7 @@
-version = 100
+version = 101
 
 cloudstream {
-    description = "MaxSeries v100 - Header Fix (Anti-Redirection for PlayerEmbedAPI)"
+    description = "MaxSeries v101 - Precise Headers & sssrr.org support"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

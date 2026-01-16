@@ -1,7 +1,7 @@
-version = 90
+version = 91
 
 cloudstream {
-    description = "MaxSeries v90 - FORCE CLASS UPDATE: V5 Live Capture (Jan 2026)"
+    description = "MaxSeries v91 - FINAL LIVE CAPTURE FIX (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
+import com.franciscoalro.maxseries.extractors.MegaEmbedLinkFetcher
 
 /**
  * MegaEmbed Extractor v5 - LIVE CAPTURE (WebView Only)
@@ -31,6 +32,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         
         // CDNs conhecidos (backup apenas)
         private val KNOWN_CDN_DOMAINS = listOf(
+            "valenium.shop", // NOVO (v94)
             "sqtd.luminairemotion.online",
             "stzm.luminairemotion.online",
             "srcf.luminairemotion.online",
@@ -236,10 +238,11 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         // Anti-Analytics
         if (url.contains("google-analytics") || url.contains("googletagmanager")) return false
         
-        // Validação positiva
+        // Validação positiva (v94: Mais permissiva)
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 
                url.contains("cf-master") ||
+               url.contains("valenium.shop") || // NOVO
                url.contains("marvellaholdings.sbs") ||
                url.contains("luminairemotion.online") ||
                url.contains("virelodesignagency.cyou")

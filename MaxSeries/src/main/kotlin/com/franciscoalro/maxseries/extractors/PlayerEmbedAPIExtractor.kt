@@ -184,10 +184,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // Configurar Resolver (v99 - Patterns baseados em logs reais do usuário)
+                // URL Interception - v101: Adicionado sssrr.org e padrões robustos
                 val resolver = WebViewResolver(
-                    // Lista expandida para incluir CDNs brasileiros comuns encontrados nos logs (iamcdn, sssrr)
-                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com|abyss\\.to|iamcdn\\.net|sssrr\\.org|master\\.txt|/hls/|/video/"""),
+                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|/hls/|/video/"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
@@ -197,17 +196,16 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     timeout = 15_000L // Aumentado para 15s para garantir redirecionamentos lentos
                 )
 
-                // Configurar headers robustos (v100)
-                val safeReferer = referer ?: mainUrl
-                val headers = HeadersBuilder.playerEmbed(safeReferer)
+                // Configurar headers robustos (v101) - MATCH EXATO COM LOGS
+                val headers = HeadersBuilder.playerEmbed(url)
                 
-                ErrorLogger.d(TAG, "Configurando headers anti-bot", mapOf(
-                    "Referer" to (headers["Referer"] ?: ""),
-                    "Origin" to (headers["Origin"] ?: ""),
-                    "Sec-Fetch-Site" to (headers["Sec-Fetch-Site"] ?: "")
+                ErrorLogger.d(TAG, "Iniciando captura WebView (v101)", mapOf(
+                    "Target" to url,
+                    "UA" to (headers["User-Agent"] ?: "N/A"),
+                    "Referer" to (headers["Referer"] ?: "N/A")
                 ))
 
-                // Executar WebView request com headers v100
+                // Executar WebView request com headers v101
                 val response = app.get(
                     url, 
                     headers = headers, 

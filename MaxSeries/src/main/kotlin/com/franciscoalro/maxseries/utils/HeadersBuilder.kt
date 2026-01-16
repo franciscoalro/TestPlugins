@@ -6,7 +6,7 @@ package com.franciscoalro.maxseries.utils
  */
 object HeadersBuilder {
     private const val DEFAULT_USER_AGENT = 
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0"
     
     /**
      * Headers para requisições AJAX (padrão FilmesOn/OverFlix)
@@ -86,36 +86,41 @@ object HeadersBuilder {
     }
 
     /**
-     * Headers específicos para PlayerEmbedAPI (v100)
-     * Focado em evitar o redirecionamento para abyss.to por falta de headers
-     * @param referer URL de referência (limpa)
+     * Headers específicos para PlayerEmbedAPI (v101)
+     * MATCH EXATO com os logs do usuário (Firefox 147)
      */
     fun playerEmbed(referer: String): Map<String, String> {
-        val domain = "https://playerembedapi.link"
-        val origin = try {
-            val part = referer.substringBefore("|").substringBefore("#")
-            if (part.startsWith("http")) {
-                val uri = java.net.URI(part)
-                "${uri.scheme}://${uri.host}"
-            } else "https://playerthree.online"
-        } catch (e: Exception) {
-            "https://playerthree.online"
-        }
-
         return mapOf(
             "User-Agent" to DEFAULT_USER_AGENT,
-            "Referer" to referer.substringBefore("|").substringBefore("#"),
-            "Origin" to origin,
-            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Accept-Encoding" to "gzip, deflate, br",
+            "Referer" to "https://playerthree.online/", // Root como nos logs
+            "Upgrade-Insecure-Requests" to "1",
             "Sec-Fetch-Dest" to "iframe",
             "Sec-Fetch-Mode" to "navigate",
             "Sec-Fetch-Site" to "cross-site",
-            "Upgrade-Insecure-Requests" to "1",
-            "DNT" to "1",
-            "Sec-Ch-Ua" to "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\", \"Google Chrome\";v=\"132\"",
-            "Sec-Ch-Ua-Mobile" to "?0",
-            "Sec-Ch-Ua-Platform" to "\"Windows\""
+            "Priority" to "u=4",
+            "Te" to "trailers"
+        )
+    }
+
+    /**
+     * Headers para CDN sssrr.org (v101)
+     */
+    fun sssrrCDN(): Map<String, String> {
+        return mapOf(
+            "User-Agent" to DEFAULT_USER_AGENT,
+            "Accept" to "*/*",
+            "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Accept-Encoding" to "gzip, deflate, br",
+            "Referer" to "https://playerembedapi.link/",
+            "Origin" to "https://playerembedapi.link",
+            "Sec-Fetch-Dest" to "empty",
+            "Sec-Fetch-Mode" to "cors",
+            "Sec-Fetch-Site" to "cross-site",
+            "Priority" to "u=4",
+            "Te" to "trailers"
         )
     }
 }

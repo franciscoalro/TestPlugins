@@ -68,16 +68,18 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
-            // Método 1: Construção DIRETA baseada no padrão (MAIS RÁPIDO - TESTADO E FUNCIONA!)
-            // Descoberta: CDN aceita timestamp atual, não precisa do exato do JS
+            /*
+            // Método 1: Construção DIRETA baseada no padrão (Bruteforce)
+            // DESATIVADO v88: Causa timeouts e loading infinito
             Log.d(TAG, "🔄 Tentando construção direta (método principal)...")
             if (extractWithPatternConstruction(url, referer, callback)) {
                 Log.d(TAG, "✅ Construção direta funcionou!")
                 return
             }
+            */
             
-            // Método 2: WebView com interceptação (fallback se CDN mudar)
-            Log.d(TAG, "🔄 Tentando WebView com interceptação...")
+            // Método 2: WebView com interceptação (LIVE CAPTURE - Agora PRINCIPAL)
+            Log.d(TAG, "🔄 Tentando WebView com interceptação (LIVE CAPTURE)...")
             if (extractWithIntelligentInterception(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView interceptação funcionou!")
                 return

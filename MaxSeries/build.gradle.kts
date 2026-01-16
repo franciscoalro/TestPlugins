@@ -1,7 +1,7 @@
-version = 94
+version = 93
 
 cloudstream {
-    description = "MaxSeries v94 - ADDED VALENIUM.SHOP CDN (Jan 2026)"
+    description = "MaxSeries v93 - ADDED VALENIUM.SHOP CDN (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

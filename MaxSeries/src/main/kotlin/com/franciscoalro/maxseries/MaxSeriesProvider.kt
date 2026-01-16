@@ -528,8 +528,8 @@ class MaxSeriesProvider : MainAPI() {
                         }
                         // PRIORIDADE 10: MegaEmbed
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractorV5 - LIVE CAPTURE (New Class)")
-                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV5()
+                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractorV5 - NEW PACKAGE (Force Cache Clear)")
+                            val extractor = com.franciscoalro.maxseries.extractors.v5.MegaEmbedExtractorV5()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

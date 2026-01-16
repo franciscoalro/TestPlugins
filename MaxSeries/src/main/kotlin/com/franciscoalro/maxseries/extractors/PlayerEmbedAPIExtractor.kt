@@ -68,14 +68,15 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     "Attempt" to "$attempt/2"
                 ))
                 
-                // Script de captura de vídeo
+                // Script de captura de vídeo avançado (v99)
                 val captureScript = """
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 60; // 6 segundos
+                            var maxAttempts = 80; // 8 segundos
                             
                             function tryPlayVideo() {
+                                // 1. Forçar play em elementos video
                                 var vids = document.getElementsByTagName('video');
                                 for(var i=0; i<vids.length; i++){
                                     var v = vids[i];
@@ -85,11 +86,13 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
-                                var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, [class*="play"]');
+                                // 2. Clicar em botões de play/overlays
+                                var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, .jw-display-icon-container, [class*="play"]');
                                 for(var j=0; j<overlays.length; j++) { 
                                     try { overlays[j].click(); } catch(e) {} 
                                 }
                                 
+                                // 3. Forçar JWPlayer se existir
                                 if (window.jwplayer && typeof window.jwplayer === 'function') {
                                     try {
                                         var players = document.querySelectorAll('[id*="player"]');
@@ -99,7 +102,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                                 var player = window.jwplayer(playerId);
                                                 if(player && player.play) {
                                                     player.setMute(true);
-                                                    player.play();
+                                                    player.play().catch(function(e){});
                                                 }
                                             }
                                         }
@@ -113,6 +116,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                 
                                 var result = '';
                                 
+                                // A. Procurar em elementos video
                                 var videos = document.querySelectorAll('video');
                                 for (var i = 0; i < videos.length; i++) {
                                     var video = videos[i];
@@ -126,44 +130,46 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
+                                // B. Procurar em elementos source
                                 if (!result) {
                                     var sources = document.querySelectorAll('source[src]');
                                     for (var j = 0; j < sources.length; j++) {
                                         var src = sources[j].src;
-                                        if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis'))) {
+                                        if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis') || src.includes('sssrr.org') || src.includes('iamcdn.net'))) {
                                             result = src;
                                             break;
                                         }
                                     }
                                 }
                                 
-                                if (!result && window.jwplayer) {
-                                    try {
-                                        var players = document.querySelectorAll('[id*="player"]');
-                                        for(var k=0; k<players.length; k++) {
-                                            var playerId = players[k].id;
-                                            if(playerId) {
-                                                var player = window.jwplayer(playerId);
-                                                if(player && player.getPlaylistItem) {
-                                                    var item = player.getPlaylistItem();
-                                                    if(item && item.file) {
-                                                        result = item.file;
-                                                        break;
-                                                    }
+                                // C. Procurar variáveis globais comuns
+                                if (!result) {
+                                    var globals = ['videoUrl', 'playlistUrl', 'source', 'file', 'src', 'url', 'config', 'playerConfig', 'sources'];
+                                    for (var k = 0; k < globals.length; k++) {
+                                        var val = window[globals[k]];
+                                        if (val) {
+                                            if (typeof val === 'string' && val.startsWith('http')) {
+                                                result = val; break;
+                                            } else if (typeof val === 'object') {
+                                                if (val.file) { result = val.file; break; }
+                                                if (Array.isArray(val) && val.length > 0) {
+                                                    result = val[0].file || val[0].src || val[0].url;
+                                                    if (result) break;
                                                 }
                                             }
                                         }
-                                    } catch(e) {}
+                                    }
                                 }
                                 
-                                if (!result) {
-                                    if(window.sources && window.sources.length > 0) {
-                                        result = window.sources[0].file || window.sources[0].src;
-                                    } else if(window.playerConfig && window.playerConfig.file) {
-                                        result = window.playerConfig.file;
-                                    } else if(window.videoUrl) {
-                                        result = window.videoUrl;
-                                    }
+                                // D. Procurar em jwplayer diretamente
+                                if (!result && window.jwplayer) {
+                                    try {
+                                        var jw = window.jwplayer();
+                                        if (jw && jw.getPlaylistItem) {
+                                            var item = jw.getPlaylistItem();
+                                            if (item && item.file) result = item.file;
+                                        }
+                                    } catch(e) {}
                                 }
 
                                 if (result && result.length > 0 && result.startsWith('http')) {
@@ -178,22 +184,24 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // Configurar Resolver
+                // Configurar Resolver (v99 - Patterns baseados em logs reais do usuário)
                 val resolver = WebViewResolver(
-                    // Intercepta MP4, M3U8, Google Cloud Storage E abyss.to (novo domínio)
-                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com|abyss\\.to"""),
+                    // Lista expandida para incluir CDNs brasileiros comuns encontrados nos logs (iamcdn, sssrr)
+                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com|abyss\\.to|iamcdn\\.net|sssrr\\.org|master\\.txt|/hls/|/video/"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
-                            ErrorLogger.d(TAG, "JS Capture", mapOf("URL" to result))
+                            ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 10_000L
+                    timeout = 15_000L // Aumentado para 15s para garantir redirecionamentos lentos
                 )
 
                 val headers = mapOf(
                     "User-Agent" to USER_AGENT,
-                    "Referer" to (referer ?: mainUrl)
+                    "Referer" to (referer ?: mainUrl),
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language" to "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
                 )
 
                 // Executar WebView request
@@ -205,9 +213,15 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 
                 val captured = response.url
                 
-                // Aceitar MP4, M3U8, googleapis OU abyss.to
-                if (captured.contains(".mp4") || captured.contains(".m3u8") || 
-                    captured.contains("googleapis") || captured.contains("abyss.to")) {
+                // Sucesso se capturou um vídeo ou chegou em um host final válido
+                val isVideo = captured.contains(".mp4") || captured.contains(".m3u8") || 
+                             captured.contains("googleapis") || captured.contains("cloudatacdn") ||
+                             captured.contains("iamcdn.net") || captured.contains("sssrr.org") ||
+                             captured.contains("master.txt")
+                             
+                val isHost = captured.contains("abyss.to")
+
+                if (isVideo || isHost) {
                     // 3. DETECTAR QUALIDADE
                     val quality = QualityDetector.detectFromUrl(captured)
                     ErrorLogger.logQualityDetection(captured, quality, "URL")

@@ -123,7 +123,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 100; // 10s
+                            var maxAttempts = 200; // 20s
                             
                             var interval = setInterval(function() {
                                 attempts++;

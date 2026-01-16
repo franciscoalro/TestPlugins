@@ -6,6 +6,15 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Document
 import android.util.Log
 
+// Utilitários brasileiros
+import com.franciscoalro.maxseries.utils.ServerPriority
+import com.franciscoalro.maxseries.utils.HeadersBuilder
+import com.franciscoalro.maxseries.utils.LinkDecryptor
+import com.franciscoalro.maxseries.utils.RegexPatterns
+
+// Extractors adicionais
+import com.franciscoalro.maxseries.extractors.MediaFireExtractor
+
 /**
  * MaxSeries Provider v79 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026)
  * 
@@ -433,16 +442,10 @@ class MaxSeriesProvider : MainAPI() {
             val episodeUrl = "$baseUrl/episodio/$episodeId"
             Log.d(TAG, "🎬 Buscando episódio: $episodeUrl")
             
-            val response = app.get(
-                episodeUrl,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to playerthreeUrl,
-                    "X-Requested-With" to "XMLHttpRequest",
-                    "Accept" to "*/*",
-                    "Accept-Language" to "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
-                )
-            )
+            // Headers customizados usando HeadersBuilder
+            val headers = HeadersBuilder.standard(playerthreeUrl)
+            
+            val response = app.get(episodeUrl, headers = headers)
             
             val html = response.text
             Log.d(TAG, "📄 Resposta do episódio (${html.length} chars)")
@@ -453,41 +456,25 @@ class MaxSeriesProvider : MainAPI() {
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
             
-            // PRIORIZAÇÃO FORTE por índice (v77 - Todos os extractors funcionais)
-            // 1 = playerembedapi (MP4 direto - Google Cloud Storage)
-            // 2 = myvidplay (MP4 direto - cloudatacdn)
-            // 3 = streamtape (MP4 direto - built-in)
-            // 4 = dood/doodstream (MP4/HLS - built-in)
-            // 5 = mixdrop (MP4/HLS - built-in)
-            // 6 = filemoon (MP4 - built-in)
-            // 7 = uqload (MP4 - built-in)
-            // 8 = vidcloud (HLS - built-in)
-            // 9 = upstream (MP4 - built-in)
-            // 10 = megaembed (HLS ofuscado - último recurso)
-            val priorityOrder = listOf(
-                "playerembedapi",
-                "myvidplay",
-                "streamtape", "strtape",
-                "dood",
-                "mixdrop",
-                "filemoon",
-                "uqload",
-                "vidcloud",
-                "upstream",
-                "megaembed"
-            )
-            
-            val sortedSources = sources.sortedBy { source ->
-                val index = priorityOrder.indexOfFirst { source.contains(it, ignoreCase = true) }
-                if (index >= 0) index else priorityOrder.size
+            // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority (v97)
+            // Ordena automaticamente: Streamtape > Filemoon > Doodstream > Mixdrop > etc.
+            val sortedSources = ServerPriority.sortByPriority(sources) { source ->
+                ServerPriority.detectServer(source)
             }
             
-            Log.d(TAG, "📋 Sources ordenadas por prioridade (v77): $sortedSources")
+            Log.d(TAG, "📋 Sources ordenadas por prioridade (v97 - ServerPriority): $sortedSources")
             
             for (source in sortedSources) {
                 Log.d(TAG, "🔄 Processando: $source")
                 try {
                     when {
+                        // PRIORIDADE 0: MediaFire (se aplicável)
+                        MediaFireExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P0] MediaFireExtractor - Download direto")
+                            val extractor = MediaFireExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
                         // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage - WebView)
                         source.contains("playerembedapi", ignoreCase = true) -> {
                             Log.d(TAG, "🎬 [P1] PlayerEmbedAPIExtractor - MP4 direto (WebView)")

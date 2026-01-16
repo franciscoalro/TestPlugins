@@ -5,11 +5,14 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.*
 import com.franciscoalro.maxseries.utils.*
 import org.jsoup.nodes.Element
-import android.util.Log
 
 /**
- * AJAX Player Extractor Helper
+ * AJAX Player Extractor Helper v2 - OPTIMIZED (FASE 4)
  * Inspirado nos padrões FilmesOn e OverFlix
+ * 
+ * Melhorias v2:
+ * - ✅ Logs estruturados com ErrorLogger
+ * - ✅ Já usa ServerPriority, RateLimiter, HeadersBuilder
  * 
  * Classe auxiliar para extrair links de players que usam requisições AJAX
  * Não é um ExtractorApi, mas sim um helper usado por outros extractors
@@ -87,7 +90,7 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
             ).text
             
             if (response == "0" || response.isBlank()) {
-                Log.w(TAG, "⚠️ Resposta AJAX vazia")
+                ErrorLogger.w(TAG, "Resposta AJAX vazia")
                 return null
             }
             
@@ -97,12 +100,12 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
                 ?.let { LinkDecryptor.cleanUrl(it) }
             
             if (embedUrl != null) {
-                Log.d(TAG, "✅ Embed URL extraída: $embedUrl")
+                ErrorLogger.d(TAG, "Embed URL extraída", mapOf("URL" to embedUrl))
             }
             
             embedUrl
         }.getOrElse { error ->
-            Log.e(TAG, "❌ Erro ao requisitar embed URL: ${error.message}")
+            ErrorLogger.e(TAG, "Erro ao requisitar embed URL", error = error)
             null
         }
     }
@@ -129,7 +132,7 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
                 }
             }
         }.getOrElse { error ->
-            Log.e(TAG, "❌ Erro ao processar embed page: ${error.message}")
+            ErrorLogger.e(TAG, "Erro ao processar embed page", error = error)
         }
     }
     
@@ -149,7 +152,7 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
             // Buscar iframe com player_2.php
             val iframeSrc = RegexPatterns.IFRAME_SRC.find(html)?.groupValues?.get(1)
             if (iframeSrc == null) {
-                Log.w(TAG, "⚠️ Iframe não encontrado")
+                ErrorLogger.w(TAG, "Iframe não encontrado")
                 return
             }
             
@@ -163,7 +166,7 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
             handleFinalStep(fullIframeSrc, playerUrl, prefix, callback)
             
         }.getOrElse { error ->
-            Log.e(TAG, "❌ Erro ao processar player data: ${error.message}")
+            ErrorLogger.e(TAG, "Erro ao processar player data", error = error)
         }
     }
     
@@ -183,14 +186,14 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
             // Extrair apiUrl do JavaScript
             val apiUrl = RegexPatterns.API_URL_JS.find(html)?.groupValues?.get(1)
             if (apiUrl == null) {
-                Log.w(TAG, "⚠️ apiUrl não encontrada")
+                ErrorLogger.w(TAG, "apiUrl não encontrada")
                 return
             }
             
             // Extrair URL do MediaFire
             val mediafireUrl = LinkDecryptor.decryptMediaFireUrl(apiUrl)
             if (mediafireUrl == null) {
-                Log.w(TAG, "⚠️ MediaFire URL não encontrada")
+                ErrorLogger.w(TAG, "MediaFire URL não encontrada")
                 return
             }
             
@@ -199,7 +202,11 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
                 .select("a#downloadButton").attr("href")
             
             if (direct.isNotEmpty() && LinkDecryptor.isVideoUrl(direct)) {
-                Log.d(TAG, "✅ Link final extraído: $direct")
+                val quality = QualityDetector.detectFromUrl(direct)
+                ErrorLogger.d(TAG, "Link final extraído", mapOf(
+                    "URL" to direct,
+                    "Quality" to QualityDetector.getQualityLabel(quality)
+                ))
                 
                 callback.invoke(
                     newExtractorLink(
@@ -209,14 +216,14 @@ class AjaxPlayerExtractor(private val mainUrl: String) {
                         type = ExtractorLinkType.VIDEO
                     ) {
                         this.referer = mainUrl
-                        this.quality = Qualities.P1080.value
+                        this.quality = quality
                         this.headers = HeadersBuilder.mediaFire(mediafireUrl)
                     }
                 )
             }
             
         }.getOrElse { error ->
-            Log.e(TAG, "❌ Erro no passo final: ${error.message}")
+            ErrorLogger.e(TAG, "Erro no passo final", error = error)
         }
     }
 }

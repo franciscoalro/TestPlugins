@@ -3,13 +3,20 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
-import android.util.Log
+import com.franciscoalro.maxseries.utils.*
 
 /**
- * PlayerEmbedAPI Extractor - Robust WebView Implementation
+ * PlayerEmbedAPI Extractor v2 - OPTIMIZED (FASE 4)
  * 
  * Handles AES-CTR encrypted sources ("core.bundle.js") by running the actual Page logic
  * and intercepting the final video request.
+ * 
+ * Melhorias v2:
+ * - ✅ Cache de URLs extraídas (5min)
+ * - ✅ Retry logic (3 tentativas)
+ * - ✅ Quality detection automática
+ * - ✅ Logs estruturados com ErrorLogger
+ * - ✅ Performance tracking
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -27,175 +34,240 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "🎬 PlayerEmbedAPI: $url")
+        val startTime = System.currentTimeMillis()
         
-        // 1. Script MELHORADO para captura de vídeo (v81)
-        val captureScript = """
-            (function() {
-                return new Promise(function(resolve) {
-                    var attempts = 0;
-                    var maxAttempts = 60; // 6 segundos (otimizado v84 - captura rápida)
-                    
-                    function tryPlayVideo() {
-                        // Tentar reproduzir vídeos existentes
-                        var vids = document.getElementsByTagName('video');
-                        for(var i=0; i<vids.length; i++){
-                            var v = vids[i];
-                            if(v.paused) {
-                                v.muted = true;
-                                v.play().catch(function(e){});
-                            }
-                        }
-                        
-                        // Clicar em botões de play
-                        var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, [class*="play"]');
-                        for(var j=0; j<overlays.length; j++) { 
-                            try { overlays[j].click(); } catch(e) {} 
-                        }
-                        
-                        // Tentar iniciar JWPlayer se existir
-                        if (window.jwplayer && typeof window.jwplayer === 'function') {
-                            try {
-                                var players = document.querySelectorAll('[id*="player"]');
-                                for(var k=0; k<players.length; k++) {
-                                    var playerId = players[k].id;
-                                    if(playerId) {
-                                        var player = window.jwplayer(playerId);
-                                        if(player && player.play) {
-                                            player.setMute(true);
-                                            player.play();
-                                        }
-                                    }
-                                }
-                            } catch(e) {}
-                        }
-                    }
-
-                    var interval = setInterval(function() {
-                        attempts++;
-                        tryPlayVideo();
-                        
-                        var result = '';
-                        
-                        // 1. Busca em tags video
-                        var videos = document.querySelectorAll('video');
-                        for (var i = 0; i < videos.length; i++) {
-                            var video = videos[i];
-                            if (video.src && video.src.startsWith('http')) {
-                                result = video.src;
-                                break;
-                            }
-                            // Verificar currentSrc também
-                            if (video.currentSrc && video.currentSrc.startsWith('http')) {
-                                result = video.currentSrc;
-                                break;
-                            }
-                        }
-                        
-                        // 2. Busca em sources
-                        if (!result) {
-                            var sources = document.querySelectorAll('source[src]');
-                            for (var j = 0; j < sources.length; j++) {
-                                var src = sources[j].src;
-                                if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis'))) {
-                                    result = src;
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        // 3. Busca em JWPlayer
-                        if (!result && window.jwplayer) {
-                            try {
-                                var players = document.querySelectorAll('[id*="player"]');
-                                for(var k=0; k<players.length; k++) {
-                                    var playerId = players[k].id;
-                                    if(playerId) {
-                                        var player = window.jwplayer(playerId);
-                                        if(player && player.getPlaylistItem) {
-                                            var item = player.getPlaylistItem();
-                                            if(item && item.file) {
-                                                result = item.file;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch(e) {}
-                        }
-                        
-                        // 4. Busca variáveis globais
-                        if (!result) {
-                            if(window.sources && window.sources.length > 0) {
-                                result = window.sources[0].file || window.sources[0].src;
-                            } else if(window.playerConfig && window.playerConfig.file) {
-                                result = window.playerConfig.file;
-                            } else if(window.videoUrl) {
-                                result = window.videoUrl;
-                            }
-                        }
-
-                        if (result && result.length > 0 && result.startsWith('http')) {
-                            clearInterval(interval);
-                            resolve(result);
-                        } else if (attempts >= maxAttempts) {
-                            clearInterval(interval);
-                            resolve('');
-                        }
-                    }, 100);
-                });
-            })()
-        """.trimIndent()
-
-        // 2. Configurar Resolver com timeout aumentado
-        val resolver = WebViewResolver(
-            // Intercepta MP4, M3U8, e Google Cloud Storage
-            interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com"""),
-            script = captureScript,
-            scriptCallback = { result ->
-                if (result.isNotEmpty() && result.startsWith("http")) {
-                    Log.d(TAG, "✅ JS Capture: $result")
+        // 1. VERIFICAR CACHE
+        val cached = VideoUrlCache.get(url)
+        if (cached != null) {
+            ErrorLogger.logCache(url, hit = true, VideoUrlCache.getStats())
+            
+            callback.invoke(
+                newExtractorLink(
+                    source = name,
+                    name = "$name ${QualityDetector.getQualityLabel(cached.quality)}",
+                    url = cached.url,
+                    type = ExtractorLinkType.VIDEO
+                ) {
+                    this.referer = url
+                    this.quality = cached.quality
                 }
-            },
-            timeout = 10_000L // 10 segundos (otimizado v84 - captura rápida)
-        )
-
-        // 3. Executar Request
-        try {
-            val headers = mapOf(
-                "User-Agent" to USER_AGENT,
-                "Referer" to (referer ?: mainUrl)
-            )
-
-            // WebViewResolver vai lidar com a interceptação e chamar o callback
-            val response = app.get(
-                url, 
-                headers = headers, 
-                interceptor = resolver
             )
             
-            // Se o Resolver pegou algo, ele retorna a URL no response.url
-            val captured = response.url
-            if (captured.contains(".mp4") || captured.contains(".m3u8") || captured.contains("googleapis")) {
-                Log.d(TAG, "✅ URL Interceptada: $captured")
+            ErrorLogger.logPerformance("PlayerEmbedAPI Extraction (Cached)", 
+                System.currentTimeMillis() - startTime)
+            return
+        }
+        
+        ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
+        
+        // 2. EXTRAIR COM RETRY LOGIC
+        RetryHelper.withRetry(maxAttempts = 2) { attempt -> // 2 tentativas para WebView (mais lento)
+            runCatching {
+                ErrorLogger.d(TAG, "Iniciando extração PlayerEmbedAPI", mapOf(
+                    "URL" to url,
+                    "Attempt" to "$attempt/2"
+                ))
                 
-                callback.invoke(
-                    newExtractorLink(
-                        source = this.name,
-                        name = this.name,
-                        url = captured,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = url
-                        this.quality = Qualities.Unknown.value
-                    }
-                )
-            } else {
-                Log.w(TAG, "⚠️ Falha ao interceptar URL de vídeo. URL final: $captured")
-            }
+                // Script de captura de vídeo
+                val captureScript = """
+                    (function() {
+                        return new Promise(function(resolve) {
+                            var attempts = 0;
+                            var maxAttempts = 60; // 6 segundos
+                            
+                            function tryPlayVideo() {
+                                var vids = document.getElementsByTagName('video');
+                                for(var i=0; i<vids.length; i++){
+                                    var v = vids[i];
+                                    if(v.paused) {
+                                        v.muted = true;
+                                        v.play().catch(function(e){});
+                                    }
+                                }
+                                
+                                var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, [class*="play"]');
+                                for(var j=0; j<overlays.length; j++) { 
+                                    try { overlays[j].click(); } catch(e) {} 
+                                }
+                                
+                                if (window.jwplayer && typeof window.jwplayer === 'function') {
+                                    try {
+                                        var players = document.querySelectorAll('[id*="player"]');
+                                        for(var k=0; k<players.length; k++) {
+                                            var playerId = players[k].id;
+                                            if(playerId) {
+                                                var player = window.jwplayer(playerId);
+                                                if(player && player.play) {
+                                                    player.setMute(true);
+                                                    player.play();
+                                                }
+                                            }
+                                        }
+                                    } catch(e) {}
+                                }
+                            }
 
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro WebView: ${e.message}")
+                            var interval = setInterval(function() {
+                                attempts++;
+                                tryPlayVideo();
+                                
+                                var result = '';
+                                
+                                var videos = document.querySelectorAll('video');
+                                for (var i = 0; i < videos.length; i++) {
+                                    var video = videos[i];
+                                    if (video.src && video.src.startsWith('http')) {
+                                        result = video.src;
+                                        break;
+                                    }
+                                    if (video.currentSrc && video.currentSrc.startsWith('http')) {
+                                        result = video.currentSrc;
+                                        break;
+                                    }
+                                }
+                                
+                                if (!result) {
+                                    var sources = document.querySelectorAll('source[src]');
+                                    for (var j = 0; j < sources.length; j++) {
+                                        var src = sources[j].src;
+                                        if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis'))) {
+                                            result = src;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (!result && window.jwplayer) {
+                                    try {
+                                        var players = document.querySelectorAll('[id*="player"]');
+                                        for(var k=0; k<players.length; k++) {
+                                            var playerId = players[k].id;
+                                            if(playerId) {
+                                                var player = window.jwplayer(playerId);
+                                                if(player && player.getPlaylistItem) {
+                                                    var item = player.getPlaylistItem();
+                                                    if(item && item.file) {
+                                                        result = item.file;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } catch(e) {}
+                                }
+                                
+                                if (!result) {
+                                    if(window.sources && window.sources.length > 0) {
+                                        result = window.sources[0].file || window.sources[0].src;
+                                    } else if(window.playerConfig && window.playerConfig.file) {
+                                        result = window.playerConfig.file;
+                                    } else if(window.videoUrl) {
+                                        result = window.videoUrl;
+                                    }
+                                }
+
+                                if (result && result.length > 0 && result.startsWith('http')) {
+                                    clearInterval(interval);
+                                    resolve(result);
+                                } else if (attempts >= maxAttempts) {
+                                    clearInterval(interval);
+                                    resolve('');
+                                }
+                            }, 100);
+                        });
+                    })()
+                """.trimIndent()
+
+                // Configurar Resolver
+                val resolver = WebViewResolver(
+                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com"""),
+                    script = captureScript,
+                    scriptCallback = { result ->
+                        if (result.isNotEmpty() && result.startsWith("http")) {
+                            ErrorLogger.d(TAG, "JS Capture", mapOf("URL" to result))
+                        }
+                    },
+                    timeout = 10_000L
+                )
+
+                val headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to (referer ?: mainUrl)
+                )
+
+                // Executar WebView request
+                val response = app.get(
+                    url, 
+                    headers = headers, 
+                    interceptor = resolver
+                )
+                
+                val captured = response.url
+                
+                if (captured.contains(".mp4") || captured.contains(".m3u8") || captured.contains("googleapis")) {
+                    // 3. DETECTAR QUALIDADE
+                    val quality = QualityDetector.detectFromUrl(captured)
+                    ErrorLogger.logQualityDetection(captured, quality, "URL")
+                    
+                    // 4. SALVAR NO CACHE
+                    VideoUrlCache.put(url, captured, quality, name)
+                    
+                    // 5. INVOCAR CALLBACK
+                    callback.invoke(
+                        newExtractorLink(
+                            source = name,
+                            name = "$name ${QualityDetector.getQualityLabel(quality)}",
+                            url = captured,
+                            type = ExtractorLinkType.VIDEO
+                        ) {
+                            this.referer = url
+                            this.quality = quality
+                        }
+                    )
+                    
+                    // Log de sucesso
+                    ErrorLogger.logExtraction(
+                        extractor = name,
+                        url = url,
+                        success = true,
+                        videoUrl = captured,
+                        quality = quality
+                    )
+                    
+                    ErrorLogger.logPerformance("PlayerEmbedAPI Extraction", 
+                        System.currentTimeMillis() - startTime,
+                        mapOf("Quality" to QualityDetector.getQualityLabel(quality))
+                    )
+                } else {
+                    val error = Exception("Falha ao interceptar URL de vídeo. Final: $captured")
+                    ErrorLogger.logExtraction(
+                        extractor = name,
+                        url = url,
+                        success = false,
+                        error = error
+                    )
+                    throw error
+                }
+
+            }.getOrElse { error ->
+                if (attempt < 2) {
+                    ErrorLogger.logRetry(
+                        operation = "PlayerEmbedAPI Extraction",
+                        attempt = attempt,
+                        maxAttempts = 2,
+                        nextDelayMs = RetryHelper.calculateDelay(attempt),
+                        error = error
+                    )
+                } else {
+                    ErrorLogger.logExtraction(
+                        extractor = name,
+                        url = url,
+                        success = false,
+                        error = error
+                    )
+                }
+                throw error
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
-version = 96
+version = 97
 
 cloudstream {
-    description = "MaxSeries v96 - SUPPORT ALL TXT PLAYLISTS (Jan 2026)"
+    description = "MaxSeries v97 - FASE 4: Otimizações (Cache, Retry, Quality Detection, ErrorLogger)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

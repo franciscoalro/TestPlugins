@@ -180,7 +180,8 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
 
                 // Configurar Resolver
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com"""),
+                    // Intercepta MP4, M3U8, Google Cloud Storage E abyss.to (novo domínio)
+                    interceptUrl = Regex("""\\.mp4|\\.m3u8|storage\\.googleapis\\.com|googlevideo\\.com|cloudatacdn\\.com|abyss\\.to"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
@@ -204,7 +205,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 
                 val captured = response.url
                 
-                if (captured.contains(".mp4") || captured.contains(".m3u8") || captured.contains("googleapis")) {
+                // Aceitar MP4, M3U8, googleapis OU abyss.to
+                if (captured.contains(".mp4") || captured.contains(".m3u8") || 
+                    captured.contains("googleapis") || captured.contains("abyss.to")) {
                     // 3. DETECTAR QUALIDADE
                     val quality = QualityDetector.detectFromUrl(captured)
                     ErrorLogger.logQualityDetection(captured, quality, "URL")

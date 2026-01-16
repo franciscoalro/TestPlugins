@@ -1,7 +1,7 @@
-version = 98
+version = 99
 
 cloudstream {
-    description = "MaxSeries v98 - Hot fix: abyss.to support (PlayerEmbedAPI redirect)"
+    description = "MaxSeries v99 - Enhanced Extraction (iamcdn.net, sssrr.org support)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -30,7 +30,7 @@
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v97 - Brazilian Providers Patterns (Jan 2026)",
+        "description": "MaxSeries v97 - Otimizações: Cache, Retry, Quality Detection, Structured Logs",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

@@ -197,14 +197,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     timeout = 15_000L // Aumentado para 15s para garantir redirecionamentos lentos
                 )
 
-                val headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to (referer ?: mainUrl),
-                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "Accept-Language" to "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
-                )
+                // Configurar headers robustos (v100)
+                val safeReferer = referer ?: mainUrl
+                val headers = HeadersBuilder.playerEmbed(safeReferer)
+                
+                ErrorLogger.d(TAG, "Configurando headers anti-bot", mapOf(
+                    "Referer" to (headers["Referer"] ?: ""),
+                    "Origin" to (headers["Origin"] ?: ""),
+                    "Sec-Fetch-Site" to (headers["Sec-Fetch-Site"] ?: "")
+                ))
 
-                // Executar WebView request
+                // Executar WebView request com headers v100
                 val response = app.get(
                     url, 
                     headers = headers, 

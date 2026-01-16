@@ -1,7 +1,7 @@
-version = 88
+version = 89
 
 cloudstream {
-    description = "MaxSeries v88 - Prioridade WebView Live Capture (Jan 2026)"
+    description = "MaxSeries v89 - FORCE UPDATE: WebView Live Capture (Jan 2026)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

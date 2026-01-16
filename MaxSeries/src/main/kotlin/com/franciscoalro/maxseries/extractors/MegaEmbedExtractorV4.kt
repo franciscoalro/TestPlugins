@@ -63,7 +63,7 @@ class MegaEmbedExtractorV4 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Extractor v5 - Direct CDN Construction ===")
+        Log.d(TAG, "=== MEGAEMBED LIVE CAPTURE v89 (WebView Only) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         

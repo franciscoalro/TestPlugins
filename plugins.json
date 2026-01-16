@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=95",
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=96",
         "status": 1,
-        "version": 95,
+        "version": 96,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v95 - FORCE UPDATE (Jan 2026)",
+        "description": "MaxSeries v96 - SUPPORT ALL TXT PLAYLISTS (Jan 2026)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

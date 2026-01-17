@@ -123,4 +123,21 @@ object HeadersBuilder {
             "Te" to "trailers"
         )
     }
+
+    /**
+     * Headers específicos para MegaEmbed (v102)
+     */
+    fun megaEmbed(referer: String): Map<String, String> {
+        return mapOf(
+            "User-Agent" to DEFAULT_USER_AGENT,
+            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Referer" to referer,
+            "Origin" to "https://megaembed.link",
+            "Upgrade-Insecure-Requests" to "1",
+            "Sec-Fetch-Dest" to "iframe",
+            "Sec-Fetch-Mode" to "navigate",
+            "Sec-Fetch-Site" to "cross-site"
+        )
+    }
 }

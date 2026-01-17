@@ -16,7 +16,7 @@ import com.franciscoalro.maxseries.utils.RegexPatterns
 import com.franciscoalro.maxseries.extractors.MediaFireExtractor
 
 /**
- * MaxSeries Provider v79 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026)
+ * MaxSeries Provider v103 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
@@ -270,10 +270,7 @@ class MaxSeriesProvider : MainAPI() {
             
             val response = app.get(
                 playerthreeUrl,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to baseUrl
-                )
+                headers = HeadersBuilder.standard(baseUrl)
             )
             
             val document = response.document

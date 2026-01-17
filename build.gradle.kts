@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.2.1")
+        classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:cce1b8d84d") {
             exclude(group = "com.github.vidstige", module = "jadb")
         }
@@ -45,8 +45,8 @@ subprojects {
         namespace = "com.recloudstream"
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(34)
-            targetSdk = 34
+            compileSdkVersion(35)
+            targetSdk = 35
         }
 
         compileOptions {
@@ -71,12 +71,20 @@ subprojects {
 
         implementation("com.github.recloudstream.cloudstream:library:-SNAPSHOT")
         implementation(kotlin("stdlib"))
-        implementation("com.github.Blatzar:NiceHttp:0.4.11")
-        implementation("org.jsoup:jsoup:1.18.3")
-        implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+        implementation("com.github.Blatzar:NiceHttp:0.4.13")
+        implementation("org.jsoup:jsoup:1.19.1")
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.16.0")
         implementation("com.squareup.okhttp3:okhttp:4.12.0")
         implementation("androidx.webkit:webkit:1.8.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+        
+        // Novas ferramentas sincronizadas do saimuelrepo-main
+        implementation("org.mozilla:rhino:1.8.0")
+        implementation("app.cash.quickjs:quickjs-android:0.9.2")
+        implementation("me.xdrop:fuzzywuzzy:1.4.0")
+        implementation("com.google.code.gson:gson:2.11.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     }
 }
 

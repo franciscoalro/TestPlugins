@@ -4,6 +4,8 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
+import com.franciscoalro.maxseries.utils.*
+import com.franciscoalro.maxseries.utils.JsUnpackerUtil
 
 /**
  * MegaEmbed Extractor v2 - WebView Real Implementation
@@ -50,11 +52,18 @@ class MegaEmbedExtractor : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Extractor v2 - WebView Implementation ===")
+        Log.d(TAG, "=== MegaEmbed Extractor v102 - Stealth & WebView ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
+            // Método 0: Stealth Extraction (v102 - FASTEST)
+            Log.d(TAG, "🔄 Tentando método Stealth (JsUnpacker)...")
+            if (extractWithStealthJs(url, referer, callback)) {
+                Log.d(TAG, "🚀 Stealth Extraction funcionou!")
+                return
+            }
+
             // Método 1: WebView com interceptação de rede (principal)
             Log.d(TAG, "🔄 Tentando método WebView com interceptação...")
             if (extractWithWebViewInterception(url, referer, callback)) {
@@ -85,6 +94,59 @@ class MegaEmbedExtractor : ExtractorApi() {
     }
 
     /**
+     * Método 0: Stealth Extraction (HTTP + JsUnpacker)
+     * Rápido, seguro e não depende de WebView.
+     */
+    private suspend fun extractWithStealthJs(
+        url: String,
+        referer: String?,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        return try {
+            Log.d(TAG, "🕵️ Iniciando Stealth Extraction (JsUnpacker)...")
+            val html = app.get(url, headers = HeadersBuilder.megaEmbed(referer ?: mainUrl)).text
+            
+            // 1. Procurar por scripts packed (Dean Edwards)
+            val packedRegex = Regex("""eval\s*\(\s*function\s*\(p\s*,\s*a\s*,\s*c\s*,\s*k\s*,\s*e\s*,\s*[rd]\s*\).+?\}\s*\(\s*(.+?)\s*\)\s*\)\s*;?""", RegexOption.DOT_MATCHES_ALL)
+            val matches = packedRegex.findAll(html)
+            
+            for (match in matches) {
+                val packedCode = match.value
+                val unpacked: String? = JsUnpackerUtil.unpack(packedCode)
+                if (!unpacked.isNullOrEmpty()) {
+                    Log.d(TAG, "🔓 Script descompactado com sucesso! (${unpacked.length} chars)")
+                    
+                    // Procurar links de vídeo no script descompactado
+                    val videoRegex = Regex("""https?://[^"'\s]+\.(?:m3u8|mp4|txt|sbs|online|cyou)[^"'\s]*""")
+                    val videoMatch = videoRegex.find(unpacked)
+                    if (videoMatch != null && isValidVideoUrl(videoMatch.value)) {
+                        Log.d(TAG, "🎯 Stealth capturou URL: ${videoMatch.value}")
+                        emitExtractorLink(videoMatch.value, url, callback)
+                        return true
+                    }
+                }
+            }
+            
+            // 2. Se não achou packed, procurar por variáveis em texto puro no HTML (fallback rápido)
+            val directMatch = Regex("""(?:sources|file|src|url|playlist)\s*[:=]\s*["'](https?://[^"']+)["']""").find(html)
+            if (directMatch != null) {
+                val directUrl = directMatch.groupValues[1]
+                if (isValidVideoUrl(directUrl)) {
+                    Log.d(TAG, "🎯 Stealth capturou URL direta: $directUrl")
+                    emitExtractorLink(directUrl, url, callback)
+                    return true
+                }
+            }
+
+            Log.d(TAG, "⚠️ Stealth não encontrou nada.")
+            false
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro no Stealth: ${e.message}")
+            false
+        }
+    }
+
+    /**
      * Método 1: WebView com interceptação de rede
      * Intercepta requisições HTTP para capturar URLs de vídeo
      */
@@ -100,13 +162,14 @@ class MegaEmbedExtractor : ExtractorApi() {
             
             // Interceptar múltiplos padrões de URL de vídeo
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|cf-master.*\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org"""),
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|cf-master.*\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org|valenium\.shop"""),
                 additionalUrls = listOf(
                     Regex("""https?://[^/]+/v4/[^/]+/[^/]+/cf-master.*\.txt"""),
                     Regex("""https?://[^/]+\.m3u8"""),
                     Regex("""https?://[^/]+\.mp4"""),
                     Regex("""cloudatacdn\.com[^"'\s]*"""),
-                    Regex("""sssrr\.org[^"'\s]*\.m3u8""")
+                    Regex("""sssrr\.org[^"'\s]*\.m3u8"""),
+                    Regex("""valenium\.shop[^"'\s]*\.(?:txt|woff2)""")
                 ),
                 useOkhttp = false, // Importante para bypass Cloudflare
                 timeout = 15_000L // Otimizado v82
@@ -279,7 +342,7 @@ class MegaEmbedExtractor : ExtractorApi() {
             var capturedUrl: String? = null
             
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org"""),
+                interceptUrl = Regex("""\.m3u8|\.mp4|master\.txt|/hls/|/video/|/v4/.*\.txt|cloudatacdn|sssrr\.org|valenium\.shop"""),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "📜 JS Result Raw: $result")
@@ -358,10 +421,15 @@ class MegaEmbedExtractor : ExtractorApi() {
         if (!url.startsWith("http")) return false
         
         // CRÍTICO: Excluir arquivos JavaScript e outros recursos
-        val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
-        if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
-            Log.d(TAG, "⚠️ URL rejeitada (arquivo não-vídeo): $url")
-            return false
+        // IGNORAR verificação de extensão se for um domínio conhecido que usa disfarces (valenium, txt)
+        val isDisguised = url.contains("valenium.shop") || url.contains("master.txt") || url.contains("sssrr.org")
+        
+        if (!isDisguised) {
+            val invalidExtensions = listOf(".js", ".css", ".woff", ".woff2", ".ttf", ".eot", ".svg", ".png", ".jpg", ".gif", ".ico")
+            if (invalidExtensions.any { url.contains(it, ignoreCase = true) }) {
+                Log.d(TAG, "⚠️ URL rejeitada (arquivo não-vídeo): $url")
+                return false
+            }
         }
         
         return url.contains(".m3u8") || 
@@ -371,7 +439,8 @@ class MegaEmbedExtractor : ExtractorApi() {
                url.contains("/v4/") ||
                url.contains("master.txt") ||
                url.contains("cloudatacdn") ||
-               url.contains("sssrr.org")
+               url.contains("sssrr.org") ||
+               url.contains("valenium.shop")
     }
 
     /**

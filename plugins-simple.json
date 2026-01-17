@@ -1,15 +1,20 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3?v=103",
         "status": 1,
-        "version": 57,
+        "version": 103,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "authors": ["franciscoalro"],
-        "description": "MaxSeries v57 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes. Compatível com CloudStream v9.0.",
+        "authors": [
+            "franciscoalro"
+        ],
+        "description": "MaxSeries v103 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes. Compatível com CloudStream v9.0.",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": ["TvSeries", "Movie"],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
         "language": "pt-BR",
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
         "isAdult": false
@@ -21,10 +26,16 @@
         "apiVersion": 1,
         "name": "AnimesOnlineCC",
         "internalName": "AnimesOnlineCC",
-        "authors": ["franciscoalro"],
+        "authors": [
+            "franciscoalro"
+        ],
         "description": "Assista animes online grátis em HD - v8 Updated",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": ["Anime", "OVA", "AnimeMovie"],
+        "tvTypes": [
+            "Anime",
+            "OVA",
+            "AnimeMovie"
+        ],
         "language": "pt-BR",
         "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
         "isAdult": false

@@ -1,7 +1,7 @@
-version = 8
+version = 9
 
 cloudstream {
-    description = "Assista animes online grátis em HD - v8 Updated"
+    description = "Assista animes online grátis em HD - v9 Updated"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("Anime")

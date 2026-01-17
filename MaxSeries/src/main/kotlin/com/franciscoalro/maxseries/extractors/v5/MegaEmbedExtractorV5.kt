@@ -30,9 +30,10 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             "megaembed.to"
         )
         
-        // CDNs conhecidos (backup apenas)
+        // CDNs conhecidos (backup apenas) - v107 updated from network logs
         private val KNOWN_CDN_DOMAINS = listOf(
-            "valenium.shop", // NOVO (v94)
+            "valenium.shop",
+            "spo3.marvellaholdings.sbs", // NOVO (v107) - de logs de rede
             "sqtd.luminairemotion.online",
             "stzm.luminairemotion.online",
             "srcf.luminairemotion.online",
@@ -111,14 +112,17 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             var capturedPlaylistUrl: String? = null
             
             val resolver = WebViewResolver(
-                // Regex genérico para qualquer domínio marvellaholdings/luminairemotion
-                interceptUrl = Regex(""".*(?:cf-master|index-).*?\.txt"""),
+                // v108: Regex baseado em PATH, não domínio (domínios são dinâmicos)
+                // Pattern: /v4/{shard}/{video_id}/cf-master.*.txt ou index-*.txt
+                // Domínios mudam: marvellaholdings, vivonaengineering, travianastudios, etc
+                interceptUrl = Regex("""/v4/[a-z0-9]+/[a-z0-9]+/(?:cf-master|index-).*?\.txt"""),
                 additionalUrls = listOf(
-                    Regex("""\.m3u8"""),
-                    Regex("""\.mp4""")
+                    Regex("""/v4/.*?\.woff2?$"""), // Segmentos disfarçados
+                    Regex("""\\.m3u8"""),
+                    Regex("""\\.mp4""")
                 ),
                 useOkhttp = false,
-                timeout = 15_000L, // 15s para garantir carregamento completo
+                timeout = 25_000L, // v108: 25s
                 script = """
                     (function() {
                         return new Promise(function(resolve) {

@@ -161,6 +161,58 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
 
+        // 3.5 HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
+        runCatching {
+            ErrorLogger.d(TAG, "Tentando HTML Regex Fallback...", mapOf("URL" to url))
+            
+            // Padrões para extrair URLs diretas do HTML
+            val directUrlPatterns = listOf(
+                Regex(""""(https?://[^"]+\.m3u8[^"]*)""""),
+                Regex(""""(https?://[^"]+\.mp4[^"]*)""""),
+                Regex(""""(https?://storage\.googleapis\.com[^"]+)""""),
+                Regex(""""(https?://[^"]*sssrr\.org[^"]+)""""),
+                Regex(""""(https?://[^"]*iamcdn\.net[^"]+)""""),
+                Regex(""""(https?://[^"]*cloudatacdn\.com[^"]+)""""),
+                Regex(""""(https?://[^"]*valenium\.shop[^"]+)""""),
+                Regex("""file\s*:\s*["']([^"']+\.m3u8[^"']*)["']"""),
+                Regex("""source\s*:\s*["']([^"']+\.m3u8[^"']*)["']"""),
+                Regex("""src\s*:\s*["']([^"']+\.(?:m3u8|mp4)[^"']*)["']""")
+            )
+            
+            for (pattern in directUrlPatterns) {
+                val match = pattern.find(html)
+                if (match != null) {
+                    val videoUrl = match.groupValues[1].replace("\\/", "/")
+                    // Filtrar URLs de analytics e scripts
+                    if (!videoUrl.contains("google-analytics") && 
+                        !videoUrl.contains("googletagmanager") &&
+                        !videoUrl.contains(".js") &&
+                        !videoUrl.contains("jwplayer") &&
+                        videoUrl.startsWith("http")) {
+                        
+                        Log.d(TAG, "🎯 HTML Regex capturou URL: $videoUrl")
+                        
+                        val quality = QualityDetector.detectFromUrl(videoUrl)
+                        VideoUrlCache.put(url, videoUrl, quality, name)
+                        
+                        callback.invoke(
+                            newExtractorLink(
+                                source = name,
+                                name = "$name ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                url = videoUrl,
+                                type = ExtractorLinkType.VIDEO
+                            ) {
+                                this.referer = url
+                                this.quality = quality
+                            }
+                        )
+                        return
+                    }
+                }
+            }
+            Log.d(TAG, "⚠️ HTML Regex: Nenhuma URL válida encontrada")
+        }
+
         // 4. EXTRAIR COM RETRY LOGIC (WebView Fallback)
         RetryHelper.withRetry(maxAttempts = 2) { attempt ->
             runCatching {
@@ -285,16 +337,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v101: Adicionado sssrr.org e padrões robustos
+                // URL Interception - v106: Padrões melhorados baseados em Playwright
+                // Playwright capturou: storage.googleapis.com/mediastorage/.../81347747.mp4
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|valenium\.shop|/hls/|/video/"""),
+                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|mediastorage|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|valenium\.shop|/hls/|/video/|\.txt$"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
                             ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 15_000L // Aumentado para 15s para garantir redirecionamentos lentos
+                    timeout = 20_000L // v106: Aumentado para 20s - Playwright precisou de ~10s
                 )
 
                 // Configurar headers robustos (v101) - MATCH EXATO COM LOGS

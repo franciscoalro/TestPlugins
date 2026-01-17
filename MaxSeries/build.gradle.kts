@@ -1,7 +1,7 @@
-version = 104
+version = 108
 
 cloudstream {
-    description = "MaxSeries v104 - Brazilian Extractors (saimuelrepo patterns: Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)"
+    description = "MaxSeries v108 - MegaEmbed Path Regex (/v4/{shard}/{id}/cf-master.txt)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

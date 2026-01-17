@@ -1,7 +1,7 @@
-version = 104
+version = 105
 
 cloudstream {
-    description = "MaxSeries v104 - Brazilian Extractors (saimuelrepo patterns: Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)"
+    description = "MaxSeries v105 - HTML Regex Fallback + Brazilian Extractors (saimuelrepo patterns)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

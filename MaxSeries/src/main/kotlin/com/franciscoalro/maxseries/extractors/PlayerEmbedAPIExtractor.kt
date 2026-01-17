@@ -161,6 +161,58 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
 
+        // 3.5 HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
+        runCatching {
+            ErrorLogger.d(TAG, "Tentando HTML Regex Fallback...", mapOf("URL" to url))
+            
+            // Padrões para extrair URLs diretas do HTML
+            val directUrlPatterns = listOf(
+                Regex(""""(https?://[^"]+\.m3u8[^"]*)""""),
+                Regex(""""(https?://[^"]+\.mp4[^"]*)""""),
+                Regex(""""(https?://storage\.googleapis\.com[^"]+)""""),
+                Regex(""""(https?://[^"]*sssrr\.org[^"]+)""""),
+                Regex(""""(https?://[^"]*iamcdn\.net[^"]+)""""),
+                Regex(""""(https?://[^"]*cloudatacdn\.com[^"]+)""""),
+                Regex(""""(https?://[^"]*valenium\.shop[^"]+)""""),
+                Regex("""file\s*:\s*["']([^"']+\.m3u8[^"']*)["']"""),
+                Regex("""source\s*:\s*["']([^"']+\.m3u8[^"']*)["']"""),
+                Regex("""src\s*:\s*["']([^"']+\.(?:m3u8|mp4)[^"']*)["']""")
+            )
+            
+            for (pattern in directUrlPatterns) {
+                val match = pattern.find(html)
+                if (match != null) {
+                    val videoUrl = match.groupValues[1].replace("\\/", "/")
+                    // Filtrar URLs de analytics e scripts
+                    if (!videoUrl.contains("google-analytics") && 
+                        !videoUrl.contains("googletagmanager") &&
+                        !videoUrl.contains(".js") &&
+                        !videoUrl.contains("jwplayer") &&
+                        videoUrl.startsWith("http")) {
+                        
+                        Log.d(TAG, "🎯 HTML Regex capturou URL: $videoUrl")
+                        
+                        val quality = QualityDetector.detectFromUrl(videoUrl)
+                        VideoUrlCache.put(url, videoUrl, quality, name)
+                        
+                        callback.invoke(
+                            newExtractorLink(
+                                source = name,
+                                name = "$name ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                url = videoUrl,
+                                type = ExtractorLinkType.VIDEO
+                            ) {
+                                this.referer = url
+                                this.quality = quality
+                            }
+                        )
+                        return
+                    }
+                }
+            }
+            Log.d(TAG, "⚠️ HTML Regex: Nenhuma URL válida encontrada")
+        }
+
         // 4. EXTRAIR COM RETRY LOGIC (WebView Fallback)
         RetryHelper.withRetry(maxAttempts = 2) { attempt ->
             runCatching {

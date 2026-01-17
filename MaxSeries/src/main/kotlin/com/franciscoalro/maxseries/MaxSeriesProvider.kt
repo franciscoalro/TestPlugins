@@ -55,8 +55,12 @@ class MaxSeriesProvider : MainAPI() {
     override val hasDownloadSupport = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
-    override fun getExtractorApis(): List<ExtractorApi> {
-        return listOf(
+    companion object {
+        private const val TAG = "MaxSeriesProvider"
+        // User-Agent do Firefox (HAR real)
+        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
+
+        val customExtractors = listOf(
             MediaFireExtractor(),
             StreamtapeExtractor(),
             FilemoonExtractor(),
@@ -64,12 +68,6 @@ class MaxSeriesProvider : MainAPI() {
             MixdropExtractor(),
             VidStackExtractor()
         )
-    }
-
-    companion object {
-        private const val TAG = "MaxSeriesProvider"
-        // User-Agent do Firefox (HAR real)
-        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
     }
 
     override val mainPage = mainPageOf(

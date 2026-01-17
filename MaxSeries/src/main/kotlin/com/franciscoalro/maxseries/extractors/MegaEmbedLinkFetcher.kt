@@ -3,6 +3,8 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.app
 import com.franciscoalro.maxseries.utils.*
 import android.util.Log
+import com.fasterxml.jackson.databind.JsonNode
+import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 
 /**
  * MegaEmbed Link Fetcher v2 - API Based Implementation
@@ -78,24 +80,35 @@ object MegaEmbedLinkFetcher {
         return try {
             Log.d(TAG, "🌐 Buscando playlist para videoId: $videoId")
             
-            // Método 1: API v1 do MegaEmbed (usando novo HeadersBuilder)
+            // Método 1: API v1 do MegaEmbed
             val apiUrl1 = "https://megaembed.link/api/v1/video?id=$videoId"
-            val headers = HeadersBuilder.megaEmbed("https://megaembed.link/")
+            
+            // Headers customizados para MegaEmbed
+            val headers = mapOf(
+                "User-Agent" to USER_AGENT,
+                "Referer" to "https://megaembed.link/",
+                "Accept" to "application/json, text/plain, */*",
+                "Origin" to "https://megaembed.link"
+            )
             
             val response1 = app.get(apiUrl1, headers = headers)
             
-            if (response1.isSuccessful) {
-                // Usar JsonHelper.mapper para maior robustez (ignorar unknown properties)
-                val json1 = JsonHelper.mapper.readTree(response1.text)
+            if (response1.code in 200..299) {
+                // Usar parseJson do CloudStream (nativo)
+                val json1 = parseJson<JsonNode>(response1.text)
                 Log.d(TAG, "📄 API v1 response: ${response1.text}")
                 
                 // Procurar por diferentes campos possíveis
                 val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
                 for (field in possibleFields) {
-                    val fieldValue = json1.get(field)?.asText()
-                    if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
-                        Log.d(TAG, "✅ URL encontrada no campo '$field': $fieldValue")
-                        return fieldValue
+                    try {
+                        val fieldValue = json1.get(field)?.asText()
+                        if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                            Log.d(TAG, "✅ URL encontrada no campo '$field': $fieldValue")
+                            return fieldValue
+                        }
+                    } catch (e: Exception) {
+                        Log.d(TAG, "⚠️ Erro ao ler campo '$field': ${e.message}")
                     }
                 }
                 
@@ -107,15 +120,19 @@ object MegaEmbedLinkFetcher {
                     val playerUrl = "https://megaembed.link/api/v1/player?t=$token"
                     val response2 = app.get(playerUrl, headers = headers)
                     
-                    if (response2.isSuccessful) {
+                    if (response2.code in 200..299) {
                         Log.d(TAG, "📄 Player API response: ${response2.text}")
-                        val json2 = JsonHelper.mapper.readTree(response2.text)
+                        val json2 = parseJson<JsonNode>(response2.text)
                         
                         for (field in possibleFields) {
-                            val fieldValue = json2.get(field)?.asText()
-                            if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
-                                Log.d(TAG, "✅ URL encontrada via token no campo '$field': $fieldValue")
-                                return fieldValue
+                            try {
+                                val fieldValue = json2.get(field)?.asText()
+                                if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                                    Log.d(TAG, "✅ URL encontrada via token no campo '$field': $fieldValue")
+                                    return fieldValue
+                                }
+                            } catch (e: Exception) {
+                                Log.d(TAG, "⚠️ Erro ao ler campo '$field': ${e.message}")
                             }
                         }
                     }
@@ -135,16 +152,20 @@ object MegaEmbedLinkFetcher {
                 try {
                     val response = app.get(apiUrl, headers = headers)
                     
-                    if (response.isSuccessful) {
-                        val json = JsonHelper.mapper.readTree(response.text)
+                    if (response.code in 200..299) {
+                        val json = parseJson<JsonNode>(response.text)
                         Log.d(TAG, "📄 API alternativa response: ${response.text}")
                         
                         val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
                         for (field in possibleFields) {
-                            val fieldValue = json.get(field)?.asText()
-                            if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
-                                Log.d(TAG, "✅ URL encontrada via API alternativa: $fieldValue")
-                                return fieldValue
+                            try {
+                                val fieldValue = json.get(field)?.asText()
+                                if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                                    Log.d(TAG, "✅ URL encontrada via API alternativa: $fieldValue")
+                                    return fieldValue
+                                }
+                            } catch (e: Exception) {
+                                Log.d(TAG, "⚠️ Erro ao ler campo '$field': ${e.message}")
                             }
                         }
                     }
@@ -194,7 +215,7 @@ object MegaEmbedLinkFetcher {
                             )
                         )
                         
-                        if (response.isSuccessful && response.text.contains("#EXTM3U")) {
+                        if (response.code in 200..299 && response.text.contains("#EXTM3U")) {
                             Log.d(TAG, "✅ URL construída funcionou: $constructedUrl")
                             return constructedUrl
                         }
@@ -228,7 +249,7 @@ object MegaEmbedLinkFetcher {
                 )
             )
             
-            val isValid = response.isSuccessful && 
+            val isValid = response.code in 200..299 && 
                          (response.text.contains("#EXTM3U") || 
                           response.text.contains("RESOLUTION=") ||
                           url.contains(".mp4"))

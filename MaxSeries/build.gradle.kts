@@ -1,7 +1,7 @@
-version = 108
+version = 109
 
 cloudstream {
-    description = "MaxSeries v108 - MegaEmbed Path Regex (/v4/{shard}/{id}/cf-master.txt)"
+    description = "MaxSeries v109 - Robust Regex for MegaEmbed & PlayerEmbedAPI"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

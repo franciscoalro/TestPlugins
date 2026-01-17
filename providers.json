@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v113 - MegaEmbed Headers Fix (Origin/Firefox UA)",
-        "version": 113,
+        "description": "MaxSeries v114 - MegaEmbed HEX decoding + expanded CDN/shard lists",
+        "version": 114,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=113"
+        "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/MaxSeries.cs3"
     }
 ]

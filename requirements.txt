@@ -1,0 +1,2 @@
+# Dependências Python para testes do MegaEmbed
+requests>=2.31.0

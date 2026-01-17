@@ -1,7 +1,7 @@
-version = 10
+version = 114
 
 cloudstream {
-    description = "MaxSeries v10 - Fixed extractors registration"
+    description = "MaxSeries v114 - MegaEmbed HEX decoding + expanded CDN/shard lists"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

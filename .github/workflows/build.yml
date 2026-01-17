@@ -34,13 +34,13 @@ jobs:
       - name: Clean build cache
         run: rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.recloudstream
 
-      - name: Build All Providers (with retry)
+      - name: Build Plugins (with retry)
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 15
           max_attempts: 5
           retry_wait_seconds: 60
-          command: ./gradlew MaxSeries:make AnimesOnlineCC:make PobreFlix:make OverFlix:make Vizer:make MegaFlix:make NetCine:make --no-daemon --no-build-cache
+          command: ./gradlew MaxSeries:make AnimesOnlineCC:make --no-daemon --no-build-cache
 
       - name: Get version
         id: get_version
@@ -55,11 +55,6 @@ jobs:
           path: |
             MaxSeries/build/*.cs3
             AnimesOnlineCC/build/*.cs3
-            PobreFlix/build/*.cs3
-            OverFlix/build/*.cs3
-            Vizer/build/*.cs3
-            MegaFlix/build/*.cs3
-            NetCine/build/*.cs3
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -68,11 +63,6 @@ jobs:
           files: |
             MaxSeries/build/*.cs3
             AnimesOnlineCC/build/*.cs3
-            PobreFlix/build/*.cs3
-            OverFlix/build/*.cs3
-            Vizer/build/*.cs3
-            MegaFlix/build/*.cs3
-            NetCine/build/*.cs3
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

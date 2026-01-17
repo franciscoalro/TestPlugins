@@ -1,7 +1,7 @@
-version = 105
+version = 106
 
 cloudstream {
-    description = "MaxSeries v105 - HTML Regex Fallback + Brazilian Extractors (saimuelrepo patterns)"
+    description = "MaxSeries v106 - PlayerEmbedAPI WebView Improved (googleapis/mediastorage + 20s timeout)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

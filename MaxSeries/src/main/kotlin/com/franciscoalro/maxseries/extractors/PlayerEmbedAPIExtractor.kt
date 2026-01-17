@@ -337,16 +337,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v101: Adicionado sssrr.org e padrões robustos
+                // URL Interception - v106: Padrões melhorados baseados em Playwright
+                // Playwright capturou: storage.googleapis.com/mediastorage/.../81347747.mp4
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|valenium\.shop|/hls/|/video/"""),
+                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|mediastorage|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|valenium\.shop|/hls/|/video/|\.txt$"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
                             ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 15_000L // Aumentado para 15s para garantir redirecionamentos lentos
+                    timeout = 20_000L // v106: Aumentado para 20s - Playwright precisou de ~10s
                 )
 
                 // Configurar headers robustos (v101) - MATCH EXATO COM LOGS

@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/builds/MaxSeries.cs3?v=104",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/builds/MaxSeries.cs3?v=108",
         "status": 1,
-        "version": 104,
+        "version": 108,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v104 - Brazilian Extractors (Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)",
+        "description": "MaxSeries v108 - MegaEmbed Path Regex + PlayerEmbedAPI (googleapis)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

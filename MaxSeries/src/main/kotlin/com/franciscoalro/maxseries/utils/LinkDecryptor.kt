@@ -2,27 +2,21 @@ package com.franciscoalro.maxseries.utils
 
 import com.lagradost.cloudstream3.base64Decode
 import java.net.URLDecoder
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import java.security.MessageDigest
+import android.util.Base64
+import com.fasterxml.jackson.module.kotlin.readValue
 
 /**
  * Utilitário para decriptação de links
- * Implementa padrões de decriptação dos providers brasileiros (especialmente Vizer)
+ * Implementa padrões de decriptação dos providers brasileiros (especialmente Vizer, PlayerThree)
  */
 object LinkDecryptor {
     
     /**
      * Decripta links usando Base64 + reversão (padrão Vizer)
-     * 
-     * Algoritmo:
-     * 1. Remove prefixo "redirect/"
-     * 2. Decodifica Base64
-     * 3. Remove espaços
-     * 4. Reverte string
-     * 5. Pega últimos 5 caracteres e reverte
-     * 6. Remove últimos 5 da string principal
-     * 7. Concatena
-     * 
-     * @param encrypted String encriptada
-     * @return String decriptada ou vazia se falhar
      */
     fun decryptBase64Reversed(encrypted: String): String {
         if (encrypted.isEmpty()) return ""
@@ -39,25 +33,62 @@ object LinkDecryptor {
     
     /**
      * Extrai URL de parâmetro MediaFire (padrão FilmesOn)
-     * 
-     * Exemplo: "?url=https%3A%2F%2Fmediafire.com%2Ffile.mp4" 
-     *       -> "https://mediafire.com/file.mp4"
-     * 
-     * @param apiUrl URL com parâmetro encriptado
-     * @return URL decriptada ou null se não encontrar
      */
     fun decryptMediaFireUrl(apiUrl: String): String? {
         return RegexPatterns.urlParam("url")
             .find(apiUrl)?.groupValues?.get(1)
             ?.let { URLDecoder.decode(it, "UTF-8") }
     }
+
+    /**
+     * Descriptografa o campo 'media' do PlayerEmbedAPI/PlayerThree v2 (AES-CTR)
+     * 
+     * Lógica Reversa do 'lite.bundle.js':
+     * 1. PreKey = userId + ":" + slug + ":" + md5Id
+     * 2. Hash = MD5(PreKey) (hex string, 32 chars)
+     * 3. KeyBytes = Hash.toByteArray(UTF-8) (32 bytes)
+     * 4. IV = KeyBytes[0..15] (primeiros 16 bytes)
+     * 5. Ciphertext = String.chars (não é base64, é raw bytes charCodeAt)
+     * 6. AES/CTR/NoPadding
+     */
+    fun decryptPlayerEmbedMedia(mediaEncrypted: String, userId: String, slug: String, md5Id: String): PlayerEmbedMedia? {
+        return try {
+            val preKey = "$userId:$slug:$md5Id"
+            val md5Hash = md5(preKey)
+            val keyBytes = md5Hash.toByteArray(Charsets.UTF_8)
+            val ivBytes = keyBytes.copyOfRange(0, 16)
+
+            // Converter a string criptografada em bytes (charCodeAt logic)
+            val encryptedBytes = ByteArray(mediaEncrypted.length)
+            for (i in mediaEncrypted.indices) {
+                encryptedBytes[i] = mediaEncrypted[i].code.toByte()
+            }
+
+            val algorithm = "AES/CTR/NoPadding"
+            val secretKeySpec = SecretKeySpec(keyBytes, "AES")
+            val ivParameterSpec = IvParameterSpec(ivBytes)
+
+            val cipher = Cipher.getInstance(algorithm)
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
+
+            val decryptedBytes = cipher.doFinal(encryptedBytes)
+            val decryptedString = String(decryptedBytes, Charsets.UTF_8)
+
+            JsonHelper.mapper.readValue<PlayerEmbedMedia>(decryptedString)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun md5(input: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { "%02x".format(it) }
+    }
     
     /**
      * Extrai parâmetro de URL genérico
-     * 
-     * @param url URL completa
-     * @param paramName Nome do parâmetro
-     * @return Valor do parâmetro decodificado ou null
      */
     fun extractUrlParam(url: String, paramName: String): String? {
         return RegexPatterns.urlParam(paramName)
@@ -66,32 +97,35 @@ object LinkDecryptor {
     }
     
     /**
-     * Limpa URL removendo escape de barras
-     * 
-     * @param url URL com escapes
-     * @return URL limpa
-     */
-    fun cleanUrl(url: String): String {
-        return url.replace("\\/", "/")
-    }
-    
-    /**
      * Valida se string é uma URL válida
-     * 
-     * @param text Texto para validar
-     * @return true se for URL válida
      */
     fun isUrl(text: String): Boolean {
         return RegexPatterns.IS_URL.matches(text)
     }
-    
+
     /**
-     * Valida se URL é de vídeo
-     * 
-     * @param url URL para validar
-     * @return true se for URL de vídeo
+     * Limpa URL removendo backslashes (JSON string escapada)
+     */
+    fun cleanUrl(url: String): String {
+        return url.replace("\\", "")
+    }
+
+    /**
+     * Verifica se URL aponta para um vídeo comum
      */
     fun isVideoUrl(url: String): Boolean {
-        return RegexPatterns.IS_VIDEO_URL.containsMatchIn(url)
+        return url.contains(".mp4") || url.contains(".m3u8") || url.contains(".mkv")
     }
 }
+
+data class PlayerEmbedMedia(
+    val hls: String? = null,
+    val mp4: String? = null,
+    val sources: List<PlayerEmbedSource>? = null
+)
+
+data class PlayerEmbedSource(
+    val file: String,
+    val label: String?,
+    val type: String?
+)

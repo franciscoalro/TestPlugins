@@ -1,8 +1,8 @@
 package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.app
+import com.franciscoalro.maxseries.utils.*
 import android.util.Log
-import org.json.JSONObject
 
 /**
  * MegaEmbed Link Fetcher v2 - API Based Implementation
@@ -73,68 +73,49 @@ object MegaEmbedLinkFetcher {
     
     /**
      * Busca a URL da playlist usando a API do MegaEmbed
-     * Implementa o fluxo correto descoberto na análise
      */
     suspend fun fetchPlaylistUrl(videoId: String): String? {
         return try {
             Log.d(TAG, "🌐 Buscando playlist para videoId: $videoId")
             
-            // Método 1: API v1 do MegaEmbed (mais comum)
+            // Método 1: API v1 do MegaEmbed (usando novo HeadersBuilder)
             val apiUrl1 = "https://megaembed.link/api/v1/video?id=$videoId"
-            Log.d(TAG, "🔄 Tentando API v1: $apiUrl1")
+            val headers = HeadersBuilder.megaEmbed("https://megaembed.link/")
             
-            val response1 = app.get(
-                apiUrl1,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to "https://megaembed.link/",
-                    "Accept" to "application/json, text/plain, */*",
-                    "X-Requested-With" to "XMLHttpRequest"
-                )
-            )
+            val response1 = app.get(apiUrl1, headers = headers)
             
             if (response1.isSuccessful) {
-                val json1 = JSONObject(response1.text)
+                // Usar JsonHelper.mapper para maior robustez (ignorar unknown properties)
+                val json1 = JsonHelper.mapper.readTree(response1.text)
                 Log.d(TAG, "📄 API v1 response: ${response1.text}")
                 
                 // Procurar por diferentes campos possíveis
                 val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
                 for (field in possibleFields) {
-                    if (json1.has(field)) {
-                        val url = json1.getString(field)
-                        if (url.isNotEmpty() && url.startsWith("http")) {
-                            Log.d(TAG, "✅ URL encontrada no campo '$field': $url")
-                            return url
-                        }
+                    val fieldValue = json1.get(field)?.asText()
+                    if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                        Log.d(TAG, "✅ URL encontrada no campo '$field': $fieldValue")
+                        return fieldValue
                     }
                 }
                 
                 // Se tem token, usar para segunda chamada
                 if (json1.has("token")) {
-                    val token = json1.getString("token")
+                    val token = json1.get("token").asText()
                     Log.d(TAG, "🔑 Token obtido, fazendo segunda chamada...")
                     
                     val playerUrl = "https://megaembed.link/api/v1/player?t=$token"
-                    val response2 = app.get(
-                        playerUrl,
-                        headers = mapOf(
-                            "User-Agent" to USER_AGENT,
-                            "Referer" to "https://megaembed.link/",
-                            "Accept" to "application/json, text/plain, */*"
-                        )
-                    )
+                    val response2 = app.get(playerUrl, headers = headers)
                     
                     if (response2.isSuccessful) {
                         Log.d(TAG, "📄 Player API response: ${response2.text}")
-                        val json2 = JSONObject(response2.text)
+                        val json2 = JsonHelper.mapper.readTree(response2.text)
                         
                         for (field in possibleFields) {
-                            if (json2.has(field)) {
-                                val url = json2.getString(field)
-                                if (url.isNotEmpty() && url.startsWith("http")) {
-                                    Log.d(TAG, "✅ URL encontrada via token no campo '$field': $url")
-                                    return url
-                                }
+                            val fieldValue = json2.get(field)?.asText()
+                            if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                                Log.d(TAG, "✅ URL encontrada via token no campo '$field': $fieldValue")
+                                return fieldValue
                             }
                         }
                     }
@@ -152,26 +133,18 @@ object MegaEmbedLinkFetcher {
                 Log.d(TAG, "🔄 Tentando API alternativa: $apiUrl")
                 
                 try {
-                    val response = app.get(
-                        apiUrl,
-                        headers = mapOf(
-                            "User-Agent" to USER_AGENT,
-                            "Referer" to "https://megaembed.link/"
-                        )
-                    )
+                    val response = app.get(apiUrl, headers = headers)
                     
                     if (response.isSuccessful) {
-                        val json = JSONObject(response.text)
+                        val json = JsonHelper.mapper.readTree(response.text)
                         Log.d(TAG, "📄 API alternativa response: ${response.text}")
                         
                         val possibleFields = listOf("url", "file", "source", "playlist", "stream", "video")
                         for (field in possibleFields) {
-                            if (json.has(field)) {
-                                val url = json.getString(field)
-                                if (url.isNotEmpty() && url.startsWith("http")) {
-                                    Log.d(TAG, "✅ URL encontrada via API alternativa: $url")
-                                    return url
-                                }
+                            val fieldValue = json.get(field)?.asText()
+                            if (!fieldValue.isNullOrEmpty() && fieldValue.startsWith("http")) {
+                                Log.d(TAG, "✅ URL encontrada via API alternativa: $fieldValue")
+                                return fieldValue
                             }
                         }
                     }

@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import com.franciscoalro.maxseries.utils.*
+import android.util.Log
 
 /**
  * PlayerEmbedAPI Extractor v2 - OPTIMIZED (FASE 4)
@@ -60,10 +61,110 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
-        // 2. EXTRAIR COM RETRY LOGIC
-        RetryHelper.withRetry(maxAttempts = 2) { attempt -> // 2 tentativas para WebView (mais lento)
+        // 0. FETCH HTML (Shared)
+        val html = try {
+            app.get(url, headers = HeadersBuilder.playerEmbed(url)).text
+        } catch (e: Exception) {
+            ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
+            return
+        }
+
+        // 2. NATIVE DECRYPTION (v103 - AES-CTR)
+        runCatching {
+            ErrorLogger.d(TAG, "Tentando Decriptação Nativa (AES-CTR)...", mapOf("URL" to url))
+            
+            // 2. Extrair o objeto 'datas' ou buscar via API /info/
+            val datasRegex = Regex("""datas\s*=\s*(\{.*?\})\s*;""", RegexOption.DOT_MATCHES_ALL)
+            var datasJson = datasRegex.find(html)?.groupValues?.get(1)
+            
+            if (datasJson != null) {
+                 Log.d(TAG, "📦 Objeto 'datas' encontrado!")
+                 val mapper = JsonHelper.mapper
+                 val datasNode = mapper.readTree(datasJson)
+                 
+                 val mediaEncrypted = datasNode.get("media")?.asText()
+                 // user_id ou res_id
+                 val userId = datasNode.get("user_id")?.asText() ?: datasNode.get("res_id")?.asText()
+                 val slug = datasNode.get("slug")?.asText()
+                 val md5Id = datasNode.get("md5_id")?.asText()
+                 
+                 if (!mediaEncrypted.isNullOrEmpty() && !userId.isNullOrEmpty() && !slug.isNullOrEmpty() && !md5Id.isNullOrEmpty()) {
+                     Log.d(TAG, "🔑 Decriptando media... UserID: $userId, Slug: $slug")
+                     val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted, userId, slug, md5Id)
+                     
+                     if (decrypted != null) {
+                         var found = false
+                         
+                         decrypted.hls?.let { hlsUrl ->
+                             Log.d(TAG, "🎯 AES-CTR capturou HLS: $hlsUrl")
+                             VideoUrlCache.put(url, hlsUrl, Qualities.Unknown.value, name)
+                             callback.invoke(
+                                newExtractorLink(name, "$name Auto (AES)", hlsUrl, ExtractorLinkType.VIDEO) {
+                                    this.referer = url
+                                }
+                             )
+                             found = true
+                         }
+                         
+                         decrypted.mp4?.let { mp4Url ->
+                              Log.d(TAG, "🎯 AES-CTR capturou MP4: $mp4Url")
+                              callback.invoke(
+                                newExtractorLink(name, "$name MP4 (AES)", mp4Url, ExtractorLinkType.VIDEO) {
+                                    this.referer = url
+                                }
+                              )
+                              found = true
+                         }
+                         
+                         if (found) return
+                     }
+                 }
+            }
+        }
+        
+        // 3. STEALTH FALLBACK (JsUnpacker)
+        runCatching {
+            ErrorLogger.d(TAG, "Tentando Stealth Extraction (JsUnpackerUtil)...", mapOf("URL" to url))
+            
+            val packedRegex = Regex("""eval\s*\(\s*function\s*\(p\s*,\s*a\s*,\s*c\s*,\s*k\s*,\s*e\s*,\s*[rd]\s*\).+?\}\s*\(\s*(.+?)\s*\)\s*\)\s*;?""", RegexOption.DOT_MATCHES_ALL)
+            val packedMatch = packedRegex.find(html)
+            
+            if (packedMatch != null) {
+                val unpacked = JsUnpackerUtil.unpack(packedMatch.value)
+                if (!unpacked.isNullOrEmpty()) {
+                    Log.d(TAG, "🔓 Stealth descompactou script (${unpacked.length} chars)")
+                    
+                    val videoRegex = Regex("""https?://[^"'\s]+\.(?:m3u8|mp4|txt|sbs|online|cyou|googleapis|cloudatacdn|iamcdn|sssrr)[^"'\s]*""")
+                    val videoMatch = videoRegex.find(unpacked)
+                    
+                    if (videoMatch != null) {
+                        val videoUrl = videoMatch.value
+                        Log.d(TAG, "🎯 Stealth capturou URL: $videoUrl")
+                        
+                        val quality = QualityDetector.detectFromUrl(videoUrl)
+                        VideoUrlCache.put(url, videoUrl, quality, name)
+                        
+                        callback.invoke(
+                            newExtractorLink(
+                                source = name,
+                                name = "$name ${QualityDetector.getQualityLabel(quality)} (Stealth)",
+                                url = videoUrl,
+                                type = ExtractorLinkType.VIDEO
+                            ) {
+                                this.referer = url
+                                this.quality = quality
+                            }
+                        )
+                        return
+                    }
+                }
+            }
+        }
+
+        // 4. EXTRAIR COM RETRY LOGIC (WebView Fallback)
+        RetryHelper.withRetry(maxAttempts = 2) { attempt ->
             runCatching {
-                ErrorLogger.d(TAG, "Iniciando extração PlayerEmbedAPI", mapOf(
+                ErrorLogger.d(TAG, "Iniciando extração PlayerEmbedAPI (WebView)...", mapOf(
                     "URL" to url,
                     "Attempt" to "$attempt/2"
                 ))
@@ -135,7 +236,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     var sources = document.querySelectorAll('source[src]');
                                     for (var j = 0; j < sources.length; j++) {
                                         var src = sources[j].src;
-                                        if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis') || src.includes('sssrr.org') || src.includes('iamcdn.net'))) {
+                                        if (src && (src.includes('.m3u8') || src.includes('.mp4') || src.includes('googleapis') || src.includes('sssrr.org') || src.includes('iamcdn.net') || src.includes('valenium.shop'))) {
                                             result = src;
                                             break;
                                         }
@@ -186,7 +287,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
 
                 // URL Interception - v101: Adicionado sssrr.org e padrões robustos
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|/hls/|/video/"""),
+                    interceptUrl = Regex("""\.mp4|\.m3u8|storage\.googleapis\.com|googlevideo\.com|cloudatacdn\.com|abyss\.to|sssrr\.org|iamcdn\.net|valenium\.shop|/hls/|/video/"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
@@ -218,6 +319,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 val isVideo = captured.contains(".mp4") || captured.contains(".m3u8") || 
                              captured.contains("googleapis") || captured.contains("cloudatacdn") ||
                              captured.contains("iamcdn.net") || captured.contains("sssrr.org") ||
+                             captured.contains("valenium.shop") ||
                              captured.contains("master.txt")
                              
                 val isHost = captured.contains("abyss.to")

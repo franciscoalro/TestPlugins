@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3?v=103",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/builds/MaxSeries.cs3?v=104",
         "status": 1,
-        "version": 103,
+        "version": 104,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v103 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes. Compatível com CloudStream v9.0.",
+        "description": "MaxSeries v104 - Brazilian Extractors (Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

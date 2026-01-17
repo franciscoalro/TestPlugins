@@ -11,9 +11,15 @@ import com.franciscoalro.maxseries.utils.ServerPriority
 import com.franciscoalro.maxseries.utils.HeadersBuilder
 import com.franciscoalro.maxseries.utils.LinkDecryptor
 import com.franciscoalro.maxseries.utils.RegexPatterns
+import com.franciscoalro.maxseries.utils.BRExtractorUtils
 
-// Extractors adicionais
+// Extractors adicionais (saimuelrepo patterns)
 import com.franciscoalro.maxseries.extractors.MediaFireExtractor
+import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
+import com.franciscoalro.maxseries.extractors.FilemoonExtractor
+import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
+import com.franciscoalro.maxseries.extractors.MixdropExtractor
+import com.franciscoalro.maxseries.extractors.VidStackExtractor
 
 /**
  * MaxSeries Provider v103 - MegaEmbed & PlayerEmbedAPI FIXED (Jan 2026)
@@ -486,27 +492,52 @@ class MaxSeriesProvider : MainAPI() {
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PRIORIDADE 3-9: Built-in extractors (CloudStream nativo)
-                        source.contains("streamtape", ignoreCase = true) ||
-                        source.contains("strtape", ignoreCase = true) ||
-                        source.contains("dood", ignoreCase = true) ||
-                        source.contains("mixdrop", ignoreCase = true) ||
-                        source.contains("filemoon", ignoreCase = true) ||
+                        // PRIORIDADE 3: Streamtape (Custom Extractor - saimuelrepo)
+                        StreamtapeExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P3] StreamtapeExtractor - Custom (saimuelrepo)")
+                            val extractor = StreamtapeExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 4: Filemoon (Custom Extractor + JsUnpacker)
+                        FilemoonExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P4] FilemoonExtractor - Custom (JsUnpacker)")
+                            val extractor = FilemoonExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 5: DoodStream (Custom Extractor - all variants)
+                        DoodStreamExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P5] DoodStreamExtractor - Custom (all domains)")
+                            val extractor = DoodStreamExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 6: Mixdrop (Custom Extractor + JsUnpacker)
+                        MixdropExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P6] MixdropExtractor - Custom (JsUnpacker)")
+                            val extractor = MixdropExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 7: VidStack/EmbedPlay
+                        VidStackExtractor.canHandle(source) -> {
+                            Log.d(TAG, "🎬 [P7] VidStackExtractor - Custom (EmbedPlay)")
+                            val extractor = VidStackExtractor()
+                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // PRIORIDADE 8-9: Built-in extractors (CloudStream nativo)
                         source.contains("uqload", ignoreCase = true) ||
                         source.contains("vidcloud", ignoreCase = true) ||
                         source.contains("upstream", ignoreCase = true) -> {
                             val extractorName = when {
-                                source.contains("streamtape", ignoreCase = true) || 
-                                source.contains("strtape", ignoreCase = true) -> "StreamTape [P3]"
-                                source.contains("dood", ignoreCase = true) -> "DoodStream [P4]"
-                                source.contains("mixdrop", ignoreCase = true) -> "Mixdrop [P5]"
-                                source.contains("filemoon", ignoreCase = true) -> "FileMoon [P6]"
-                                source.contains("uqload", ignoreCase = true) -> "Uqload [P7]"
-                                source.contains("vidcloud", ignoreCase = true) -> "VidCloud [P8]"
-                                source.contains("upstream", ignoreCase = true) -> "UpStream [P9]"
+                                source.contains("uqload", ignoreCase = true) -> "Uqload [P8]"
+                                source.contains("vidcloud", ignoreCase = true) -> "VidCloud [P9]"
+                                source.contains("upstream", ignoreCase = true) -> "UpStream [P10]"
                                 else -> "Built-in"
                             }
-                            Log.d(TAG, "🎬 $extractorName via loadExtractor")
+                            Log.d(TAG, "🎬 $extractorName via loadExtractor (built-in)")
                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

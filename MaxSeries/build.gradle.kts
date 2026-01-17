@@ -1,7 +1,7 @@
-version = 103
+version = 104
 
 cloudstream {
-    description = "MaxSeries v103 - Stealth Evolution (JsUnpacker) in PlayerEmbedAPI & MegaEmbed"
+    description = "MaxSeries v104 - Brazilian Extractors (saimuelrepo patterns: Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

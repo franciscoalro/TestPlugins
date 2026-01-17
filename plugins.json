@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=103",
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=104",
         "status": 1,
-        "version": 103,
+        "version": 104,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v103 - Stealth Evolution (JsUnpacker) in PlayerEmbedAPI & MegaEmbed",
+        "description": "MaxSeries v104 - Brazilian Extractors (Streamtape, Filemoon, DoodStream, Mixdrop, VidStack + JsUnpacker)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

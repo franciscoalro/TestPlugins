@@ -1,10 +1,10 @@
-version = 113
+version = 9
 
 cloudstream {
-    description = "MaxSeries v113 - MegaEmbed Headers Fix (Origin/Firefox UA)"
+    description = "Assista animes online grátis em HD - v9 Updated"
     authors = listOf("franciscoalro")
     status = 1
-    tvTypes = listOf("TvSeries", "Movie")
+    tvTypes = listOf("Anime")
     language = "pt-BR"
-    iconUrl = "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
+    iconUrl = "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png"
 }

@@ -1,10 +1,10 @@
-version = 9
+version = 10
 
 cloudstream {
-    description = "Assista animes online grátis em HD - v9 Updated"
+    description = "MaxSeries v10 - Fixed extractors registration"
     authors = listOf("franciscoalro")
     status = 1
-    tvTypes = listOf("Anime")
+    tvTypes = listOf("TvSeries", "Movie")
     language = "pt-BR"
-    iconUrl = "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png"
+    iconUrl = "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
 }

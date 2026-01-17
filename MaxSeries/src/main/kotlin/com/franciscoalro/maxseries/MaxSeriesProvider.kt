@@ -1,4 +1,4 @@
-﻿package com.franciscoalro.maxseries
+package com.franciscoalro.maxseries
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
@@ -54,6 +54,17 @@ class MaxSeriesProvider : MainAPI() {
     override var lang = "pt"
     override val hasDownloadSupport = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
+
+    override fun getExtractorApis(): List<ExtractorApi> {
+        return listOf(
+            MediaFireExtractor(),
+            StreamtapeExtractor(),
+            FilemoonExtractor(),
+            DoodStreamExtractor(),
+            MixdropExtractor(),
+            VidStackExtractor()
+        )
+    }
 
     companion object {
         private const val TAG = "MaxSeriesProvider"

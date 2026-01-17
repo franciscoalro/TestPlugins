@@ -98,6 +98,11 @@
         "episode_id": "258444",
         "sources": [
           {
+            "url": "https://myvidplay.com/e/tilgznkxayrx",
+            "type": "DoodStream",
+            "likely_works": true
+          },
+          {
             "url": "https://playerembedapi.link/?v=4PHWs34H0",
             "type": "PlayerEmbedAPI",
             "likely_works": false
@@ -106,17 +111,17 @@
             "url": "https://megaembed.link/#xef8u6",
             "type": "MegaEmbed",
             "likely_works": false
-          },
-          {
-            "url": "https://myvidplay.com/e/tilgznkxayrx",
-            "type": "DoodStream",
-            "likely_works": true
           }
         ]
       },
       {
         "episode_id": "258445",
         "sources": [
+          {
+            "url": "https://myvidplay.com/e/6kqh22c8a1zx",
+            "type": "DoodStream",
+            "likely_works": true
+          },
           {
             "url": "https://playerembedapi.link/?v=6oqqMtQvL",
             "type": "PlayerEmbedAPI",
@@ -126,17 +131,17 @@
             "url": "https://megaembed.link/#ujlbvv",
             "type": "MegaEmbed",
             "likely_works": false
-          },
-          {
-            "url": "https://myvidplay.com/e/6kqh22c8a1zx",
-            "type": "DoodStream",
-            "likely_works": true
           }
         ]
       },
       {
         "episode_id": "258446",
         "sources": [
+          {
+            "url": "https://myvidplay.com/e/jkmof562et6a",
+            "type": "DoodStream",
+            "likely_works": true
+          },
           {
             "url": "https://playerembedapi.link/?v=K-WWkW30ks",
             "type": "PlayerEmbedAPI",
@@ -146,16 +151,16 @@
             "url": "https://megaembed.link/#hk6a8o",
             "type": "MegaEmbed",
             "likely_works": false
-          },
-          {
-            "url": "https://myvidplay.com/e/jkmof562et6a",
-            "type": "DoodStream",
-            "likely_works": true
           }
         ]
       }
     ],
     "all_sources": [
+      {
+        "url": "https://myvidplay.com/e/tilgznkxayrx",
+        "type": "DoodStream",
+        "likely_works": true
+      },
       {
         "url": "https://playerembedapi.link/?v=4PHWs34H0",
         "type": "PlayerEmbedAPI",
@@ -167,7 +172,7 @@
         "likely_works": false
       },
       {
-        "url": "https://myvidplay.com/e/tilgznkxayrx",
+        "url": "https://myvidplay.com/e/6kqh22c8a1zx",
         "type": "DoodStream",
         "likely_works": true
       },
@@ -182,7 +187,7 @@
         "likely_works": false
       },
       {
-        "url": "https://myvidplay.com/e/6kqh22c8a1zx",
+        "url": "https://myvidplay.com/e/jkmof562et6a",
         "type": "DoodStream",
         "likely_works": true
       },
@@ -195,11 +200,6 @@
         "url": "https://megaembed.link/#hk6a8o",
         "type": "MegaEmbed",
         "likely_works": false
-      },
-      {
-        "url": "https://myvidplay.com/e/jkmof562et6a",
-        "type": "DoodStream",
-        "likely_works": true
       }
     ],
     "working_sources": [

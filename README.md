@@ -21,6 +21,41 @@ Repositório de desenvolvimento de extensões para CloudStream 3.
 - **Tipos**: Anime, OVA, AnimeMovie
 - **Última atualização**: Estável
 
+### PobreFlix v1 🆕
+- **Descrição**: Assista filmes e séries grátis no PobreFlix
+- **Status**: 🆕 Integrado do saimuelrepo-main
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Autor**: saimuelbr
+
+### OverFlix v1 🆕
+- **Descrição**: Filmes e séries em alta qualidade no OverFlix
+- **Status**: 🆕 Integrado do saimuelrepo-main
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Autor**: saimuelbr
+
+### Vizer v1 🆕
+- **Descrição**: Streaming de filmes e séries no Vizer
+- **Status**: 🆕 Integrado do saimuelrepo-main
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Autor**: saimuelbr
+
+### MegaFlix v1 🆕
+- **Descrição**: Filmes e séries online no MegaFlix
+- **Status**: 🆕 Integrado do saimuelrepo-main
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Autor**: saimuelbr
+
+### NetCine v1 🆕
+- **Descrição**: Cinema online no NetCine
+- **Status**: 🆕 Integrado do saimuelrepo-main
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Autor**: saimuelbr
+
 ## 📦 Instalação
 
 ### Método 1: Repositório Oficial
@@ -52,6 +87,11 @@ cd TestPlugins
 # Build plugin específico
 ./gradlew MaxSeries:make
 ./gradlew AnimesOnlineCC:make
+./gradlew PobreFlix:make
+./gradlew OverFlix:make
+./gradlew Vizer:make
+./gradlew MegaFlix:make
+./gradlew NetCine:make
 ```
 
 ### Estrutura do Projeto
@@ -61,6 +101,21 @@ TestPlugins/
 │   ├── src/main/kotlin/      # Código fonte
 │   └── build.gradle.kts      # Configuração do build
 ├── AnimesOnlineCC/           # Plugin AnimesOnlineCC
+│   ├── src/main/kotlin/      # Código fonte
+│   └── build.gradle.kts      # Configuração do build
+├── PobreFlix/                # Plugin PobreFlix (saimuelrepo-main)
+│   ├── src/main/kotlin/      # Código fonte
+│   └── build.gradle.kts      # Configuração do build
+├── OverFlix/                 # Plugin OverFlix (saimuelrepo-main)
+│   ├── src/main/kotlin/      # Código fonte
+│   └── build.gradle.kts      # Configuração do build
+├── Vizer/                    # Plugin Vizer (saimuelrepo-main)
+│   ├── src/main/kotlin/      # Código fonte
+│   └── build.gradle.kts      # Configuração do build
+├── MegaFlix/                 # Plugin MegaFlix (saimuelrepo-main)
+│   ├── src/main/kotlin/      # Código fonte
+│   └── build.gradle.kts      # Configuração do build
+├── NetCine/                  # Plugin NetCine (saimuelrepo-main)
 │   ├── src/main/kotlin/      # Código fonte
 │   └── build.gradle.kts      # Configuração do build
 ├── .github/workflows/        # GitHub Actions

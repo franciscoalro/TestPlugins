@@ -38,7 +38,7 @@ subprojects {
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {
-        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "user/repo")
+        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "franciscoalro/TestPlugins")
     }
 
     android {
@@ -79,12 +79,13 @@ subprojects {
         implementation("androidx.webkit:webkit:1.8.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
         
-        // Novas ferramentas sincronizadas do saimuelrepo-main
+        // Ferramentas do saimuelrepo-main
         implementation("org.mozilla:rhino:1.8.0")
         implementation("app.cash.quickjs:quickjs-android:0.9.2")
         implementation("me.xdrop:fuzzywuzzy:1.4.0")
         implementation("com.google.code.gson:gson:2.11.0")
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+        implementation("com.github.vidstige:jadb:v1.2.1")
     }
 }
 

@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=111",
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=113",
         "status": 1,
-        "version": 111,
+        "version": 113,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v111 - MegaEmbed Fix (Removed Origin Header)",
+        "description": "MaxSeries v113 - MegaEmbed Headers Fix (Origin/Firefox UA)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

@@ -1,7 +1,7 @@
-version = 109
+version = 113
 
 cloudstream {
-    description = "MaxSeries v109 - Robust Regex for MegaEmbed & PlayerEmbedAPI"
+    description = "MaxSeries v113 - MegaEmbed Headers Fix (Origin/Firefox UA)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

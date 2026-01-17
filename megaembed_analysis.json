@@ -1,0 +1,12 @@
+{
+  "megaembed_url": "https://megaembed.link/#3wnuij",
+  "cdn_domains": [],
+  "playlists": [],
+  "segments_count": 0,
+  "api_responses": [
+    {
+      "url": "https://megaembed.link/api/v1/info?id=3wnuij",
+      "body": "ba9409b5ad4c59495936d40b34ab901ea2ae961728d518ff5226b0af9eb8c34db6cf9136cb083a9e71841045c1969056bcab006bb617380bf36fc8e539875e2170a8162d06767c2aedc155c8102b7a4f638a6af3179f5fa84bf79dbf39e265248890da27cbe63452d13603dd9ae5edecfa3b2af03535833afc2f5d1e1c43b7b8e56c55165f832362040f8289a931615d5663983c34ea0bd6fa6adaad9f01ce8fae3e4d5344f65e080c2fadf2414019a42c6c49f540511e9583a34e3bce72aeebf08014a7be6b0a62a7a68a60e63a501ccb8693a66e97f2313ef7ccf8f84934483b5df99f138bcb220a02aa2f7ceafaaeea5ad11f2ff86ed00038"
+    }
+  ]
+}

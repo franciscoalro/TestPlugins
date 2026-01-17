@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v103 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes.",
-        "version": 103,
+        "description": "MaxSeries v113 - MegaEmbed Headers Fix (Origin/Firefox UA)",
+        "version": 113,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3?v=103"
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3?v=113"
     }
 ]

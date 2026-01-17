@@ -262,17 +262,32 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         val effectiveReferer = referer.takeIf { !it.isNullOrEmpty() } ?: mainUrl
         
         if (videoUrl.contains(".m3u8") || videoUrl.contains(".txt") || videoUrl.contains("cf-master")) {
-            val m3u8Links = M3u8Helper.generateM3u8(
-                name, 
-                cleanUrl, 
-                effectiveReferer,
-                headers = mapOf(
-                    "User-Agent" to "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36",
-                    "Referer" to effectiveReferer,
-                    "Origin" to effectiveReferer.substringBefore("/", "https://megaembed.link")
-                )
+            callback.invoke(
+                newExtractorLink(
+                    source = name,
+                    name = "$name - Auto",
+                    url = cleanUrl,
+                    type = ExtractorLinkType.M3U8
+                ) {
+                    this.referer = "https://megaembed.link/"
+                    this.quality = Qualities.Unknown.value
+                    this.headers = mapOf(
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0",
+                        "Referer" to "https://megaembed.link/",
+                        "Origin" to "https://megaembed.link",
+                        "Accept" to "*/*",
+                        "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Connection" to "keep-alive",
+                        "Sec-Fetch-Dest" to "empty",
+                        "Sec-Fetch-Mode" to "cors",
+                        "Sec-Fetch-Site" to "cross-site",
+                        "Te" to "trailers"
+                    )
+                }
             )
-            m3u8Links.forEach { callback(it) }
+
+            // M3u8Helper removido temporariamente para garantir build (v113)
         } else {
             callback.invoke(
                 newExtractorLink(name, "$name - HD", cleanUrl) {

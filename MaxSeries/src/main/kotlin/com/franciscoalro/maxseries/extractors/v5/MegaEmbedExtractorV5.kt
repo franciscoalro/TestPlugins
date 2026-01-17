@@ -112,17 +112,17 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             var capturedPlaylistUrl: String? = null
             
             val resolver = WebViewResolver(
-                // v107: Regex atualizado para capturar marvellaholdings.sbs e padrões de rede
-                // De logs: spo3.marvellaholdings.sbs/v4/x6b/3wnuij/cf-master.1767386783.txt
-                interceptUrl = Regex("""marvellaholdings\.sbs|luminairemotion\.online|valenium\.shop|cf-master.*?\.txt|index-.*?\.txt"""),
+                // v108: Regex baseado em PATH, não domínio (domínios são dinâmicos)
+                // Pattern: /v4/{shard}/{video_id}/cf-master.*.txt ou index-*.txt
+                // Domínios mudam: marvellaholdings, vivonaengineering, travianastudios, etc
+                interceptUrl = Regex("""/v4/[a-z0-9]+/[a-z0-9]+/(?:cf-master|index-).*?\.txt"""),
                 additionalUrls = listOf(
-                    Regex("""\.m3u8"""),
-                    Regex("""\.mp4"""),
-                    Regex("""\.woff$"""), // init segments
-                    Regex("""\.woff2$""") // video segments (disfarçados)
+                    Regex("""/v4/.*?\.woff2?$"""), // Segmentos disfarçados
+                    Regex("""\\.m3u8"""),
+                    Regex("""\\.mp4""")
                 ),
                 useOkhttp = false,
-                timeout = 20_000L, // v107: Aumentado para 20s
+                timeout = 25_000L, // v108: 25s
                 script = """
                     (function() {
                         return new Promise(function(resolve) {

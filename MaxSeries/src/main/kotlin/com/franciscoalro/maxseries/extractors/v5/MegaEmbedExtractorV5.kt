@@ -21,7 +21,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
 
     companion object {
         // TAG ÚNICA para confirmar que a V5 (Live Capture) está rodando
-        private const val TAG = "MegaEmbedExtractorV5_LIVE"
+        private const val TAG = "MegaEmbedExtractorV5_v116"
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
         val DOMAINS = listOf(
@@ -59,34 +59,37 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 LIVE CAPTURE (v91) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 WEBVIEW-ONLY (v116) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
-            // Método 1: WebView com interceptação (LIVE CAPTURE)
-            // ÚNICO método principal para evitar delays
+            // v116: API Tradicional DESABILITADA - Só WebView funciona
+            // Motivo: MegaEmbedLinkFetcher testa 30 hosts e todos falham (9s perdidos)
+            
+            // Método 1: WebView com interceptação (ÚNICO MÉTODO)
             Log.d(TAG, "🚀 Iniciando WebView Interception (Modo Exclusivo)...")
             if (extractWithIntelligentInterception(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView interceptou com sucesso!")
                 return
             }
             
-            // Método 2: WebView com JavaScript (Fallback secundário)
+            // Método 2: WebView com JavaScript (Fallback)
             Log.d(TAG, "⚠️ Interceptação direta falhou, tentando injeção JS...")
             if (extractWithWebViewJavaScript(url, referer, callback)) {
                 Log.d(TAG, "✅ JS funcionou!")
                 return
             }
             
-            // Método 3: API Tradicional (Último recurso)
-            Log.d(TAG, "⚠️ JS falhou, tentando API legacy...")
-            if (extractWithApiTraditional(url, referer, callback)) {
-                Log.d(TAG, "✅ API Legacy salvou!")
-                return
-            }
+            // Método 3: API Tradicional DESABILITADO (v116)
+            // Motivo: Hosts dinâmicos mudam constantemente, bruteforce não funciona
+            // Log.d(TAG, "⚠️ JS falhou, tentando API legacy...")
+            // if (extractWithApiTraditional(url, referer, callback)) {
+            //     Log.d(TAG, "✅ API Legacy salvou!")
+            //     return
+            // }
             
-            Log.e(TAG, "❌ FALHA TOTAL: Nenhum método conseguiu capturar o vídeo.")
+            Log.e(TAG, "❌ FALHA TOTAL: WebView não conseguiu capturar o vídeo.")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro crítico V5: ${e.message}")

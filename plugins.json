@@ -23,15 +23,15 @@
     {
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
-        "version": 115,
+        "version": 116,
         "apiVersion": 1,
-        "fileSize": 140492,
+        "fileSize": 140411,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v115 - MegaEmbed .txt capture + PlayerEmbedAPI 404 detection + 10 extractors",
+        "description": "MaxSeries v116 - MegaEmbed WebView-only (API tradicional desabilitada)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

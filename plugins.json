@@ -23,15 +23,15 @@
     {
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
         "status": 1,
-        "version": 119,
+        "version": 120,
         "apiVersion": 1,
-        "fileSize": 142911,
+        "fileSize": 142876,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v119 - MegaEmbed ALL STRATEGIES (HTML Regex + JsUnpacker + WebView JS + Interceptação)",
+        "description": "MaxSeries v120 - FIX: MegaEmbed URL regex (exigir #videoId)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

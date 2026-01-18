@@ -735,8 +735,7 @@ class MaxSeriesProvider : MainAPI() {
             Regex("""https?://dood\.[a-z]+/e/[^"'\s<>\)]+"""),
             Regex("""https?://doodstream\.[a-z]+/e/[^"'\s<>\)]+"""),
             Regex("""https?://[a-z0-9]*dood[a-z0-9]*\.[a-z]+/e/[^"'\s<>\)]+"""),
-            Regex("""https?://megaembed\.link/?#[^"'\s<>\)]+"""),
-            Regex("""https?://megaembed\.link[^"'\s<>\)]*""")
+            Regex("""https?://megaembed\.link/?#[a-zA-Z0-9]+""")  // v120: APENAS com #videoId
         )
         
         directUrlPatterns.forEach { pattern ->

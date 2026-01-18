@@ -21,7 +21,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
 
     companion object {
         // TAG ÚNICA para confirmar que a V5 (Live Capture) está rodando
-        private const val TAG = "MegaEmbedExtractorV5_v116"
+        private const val TAG = "MegaEmbedExtractorV5_v117"
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
         val DOMAINS = listOf(
@@ -59,29 +59,37 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 WEBVIEW-ONLY (v116) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 API-INTERCEPT (v117) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
-            // v116: API Tradicional DESABILITADA - Só WebView funciona
-            // Motivo: MegaEmbedLinkFetcher testa 30 hosts e todos falham (9s perdidos)
+            // v117: NOVA ESTRATÉGIA - Interceptar API call primeiro
+            // API: https://megaembed.link/api/v1/info?id={videoId}
+            // Retorna JSON com URL do vídeo
             
-            // Método 1: WebView com interceptação (ÚNICO MÉTODO)
-            Log.d(TAG, "🚀 Iniciando WebView Interception (Modo Exclusivo)...")
+            // Método 1: API Call Direto (NOVO v117)
+            Log.d(TAG, "🔍 Tentando API call direta...")
+            if (extractWithApiCall(url, referer, callback)) {
+                Log.d(TAG, "✅ API call funcionou!")
+                return
+            }
+            
+            // Método 2: WebView com interceptação (Fallback)
+            Log.d(TAG, "🚀 API falhou, tentando WebView Interception...")
             if (extractWithIntelligentInterception(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView interceptou com sucesso!")
                 return
             }
             
-            // Método 2: WebView com JavaScript (Fallback)
+            // Método 3: WebView com JavaScript (Fallback secundário)
             Log.d(TAG, "⚠️ Interceptação direta falhou, tentando injeção JS...")
             if (extractWithWebViewJavaScript(url, referer, callback)) {
                 Log.d(TAG, "✅ JS funcionou!")
                 return
             }
             
-            // Método 3: API Tradicional DESABILITADO (v116)
+            // Método 4: API Tradicional DESABILITADO (v116)
             // Motivo: Hosts dinâmicos mudam constantemente, bruteforce não funciona
             // Log.d(TAG, "⚠️ JS falhou, tentando API legacy...")
             // if (extractWithApiTraditional(url, referer, callback)) {
@@ -89,11 +97,73 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             //     return
             // }
             
-            Log.e(TAG, "❌ FALHA TOTAL: WebView não conseguiu capturar o vídeo.")
+            Log.e(TAG, "❌ FALHA TOTAL: Nenhum método conseguiu capturar o vídeo.")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro crítico V5: ${e.message}")
             e.printStackTrace()
+        }
+    }
+
+    /**
+     * Método Novo v117: API Call Direto
+     * Intercepta https://megaembed.link/api/v1/info?id={videoId}
+     * e parseia o JSON para extrair a URL do vídeo
+     */
+    private suspend fun extractWithApiCall(
+        url: String,
+        referer: String?,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        return try {
+            val videoId = extractVideoId(url)
+            if (videoId == null) {
+                Log.d(TAG, "❌ VideoId não encontrado")
+                return false
+            }
+            
+            Log.d(TAG, "🆔 VideoId: $videoId")
+            
+            // Fazer request para a API
+            val apiUrl = "https://megaembed.link/api/v1/info?id=$videoId"
+            Log.d(TAG, "📡 API URL: $apiUrl")
+            
+            val response = app.get(
+                apiUrl,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to "https://megaembed.link/",
+                    "Accept" to "application/json, text/plain, */*",
+                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Origin" to "https://megaembed.link"
+                )
+            )
+            
+            val jsonText = response.text
+            Log.d(TAG, "📄 API Response (${jsonText.length} chars): ${jsonText.take(500)}")
+            
+            // Parsear JSON manualmente (sem biblioteca)
+            // Procurar por URLs .txt ou .m3u8
+            val urlPattern = Regex("""https?://[^"'\s]+\.(?:txt|m3u8)""")
+            val matches = urlPattern.findAll(jsonText)
+            
+            for (match in matches) {
+                val videoUrl = match.value
+                Log.d(TAG, "🎯 URL encontrada no JSON: $videoUrl")
+                
+                if (isValidVideoUrl(videoUrl)) {
+                    Log.d(TAG, "✅ URL válida! Emitindo link...")
+                    emitExtractorLink(videoUrl, url, callback)
+                    return true
+                }
+            }
+            
+            Log.d(TAG, "⚠️ Nenhuma URL válida encontrada no JSON")
+            false
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro na API call: ${e.message}")
+            false
         }
     }
 

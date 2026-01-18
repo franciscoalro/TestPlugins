@@ -1,7 +1,7 @@
-version = 118
+version = 119
 
 cloudstream {
-    description = "MaxSeries v118 - MegaEmbed WebView-Only com interceptação de rede real"
+    description = "MaxSeries v119 - MegaEmbed ALL STRATEGIES (HTML Regex + JsUnpacker + WebView JS + Interceptação)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

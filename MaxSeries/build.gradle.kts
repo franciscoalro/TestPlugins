@@ -1,7 +1,7 @@
-version = 124
+version = 125
 
 cloudstream {
-    description = "MaxSeries v124 - PlayerEmbedAPI v3.3 (SSSRR.ORG CDN Fix) - Regex corrigido"
+    description = "MaxSeries v125 - Direct API Extraction (Bypass WebView) - Baseado em analise Postman"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

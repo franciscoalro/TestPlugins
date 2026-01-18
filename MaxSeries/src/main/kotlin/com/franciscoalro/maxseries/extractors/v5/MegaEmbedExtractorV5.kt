@@ -43,7 +43,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 ALL STRATEGIES (v119) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 ALL STRATEGIES (v125) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
@@ -56,39 +56,112 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             
             Log.d(TAG, "🆔 VideoId: $videoId")
             
+            // ESTRATÉGIA 0: DIRECT API (v125 - NOVO - MAIS RÁPIDO)
+            Log.d(TAG, "🔍 [0/5] Tentando Direct API...")
+            if (extractWithDirectAPI(videoId, referer, callback)) {
+                Log.d(TAG, "✅ Direct API funcionou!")
+                return
+            }
+            
             // ESTRATÉGIA 1: HTML REGEX (mais rápido)
-            Log.d(TAG, "🔍 [1/4] Tentando HTML Regex...")
+            Log.d(TAG, "🔍 [1/5] Tentando HTML Regex...")
             if (extractWithHtmlRegex(url, referer, callback)) {
                 Log.d(TAG, "✅ HTML Regex funcionou!")
                 return
             }
             
             // ESTRATÉGIA 2: JS UNPACKER
-            Log.d(TAG, "🔍 [2/4] Tentando JsUnpacker...")
+            Log.d(TAG, "🔍 [2/5] Tentando JsUnpacker...")
             if (extractWithJsUnpacker(url, referer, callback)) {
                 Log.d(TAG, "✅ JsUnpacker funcionou!")
                 return
             }
             
             // ESTRATÉGIA 3: WEBVIEW JAVASCRIPT-ONLY
-            Log.d(TAG, "🔍 [3/4] Tentando WebView JavaScript-Only...")
+            Log.d(TAG, "🔍 [3/5] Tentando WebView JavaScript-Only...")
             if (extractWithWebViewJavaScript(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView JavaScript funcionou!")
                 return
             }
             
             // ESTRATÉGIA 4: WEBVIEW COM INTERCEPTAÇÃO
-            Log.d(TAG, "🔍 [4/4] Tentando WebView com Interceptação...")
+            Log.d(TAG, "🔍 [4/5] Tentando WebView com Interceptação...")
             if (extractWithWebViewInterception(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView Interceptação funcionou!")
                 return
             }
             
-            Log.e(TAG, "❌ FALHA: Todas as 4 estratégias falharam")
+            Log.e(TAG, "❌ FALHA: Todas as 5 estratégias falharam")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro crítico V5: ${e.message}")
             e.printStackTrace()
+        }
+    }
+
+    /**
+     * ESTRATÉGIA 0: Direct API (v125 - NOVO)
+     * Faz requisição direta para API sem WebView
+     * Baseado nos logs ADB que mostram: /api/v1/info?id=3wnuij
+     */
+    private suspend fun extractWithDirectAPI(
+        videoId: String,
+        referer: String?,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        return try {
+            val apiUrl = "https://megaembed.link/api/v1/info?id=$videoId"
+            Log.d(TAG, "📡 Direct API: $apiUrl")
+            
+            val response = app.get(
+                apiUrl,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to "https://megaembed.link/",
+                    "Origin" to "https://megaembed.link",
+                    "Accept" to "application/json, text/plain, */*"
+                )
+            )
+            
+            val json = response.text
+            Log.d(TAG, "📄 API Response: ${json.take(200)}...")
+            
+            // Tentar parsear JSON
+            val urlRegex = Regex("""https?://[^"'\s]+\.(?:txt|m3u8|mp4)""")
+            val urlMatch = urlRegex.find(json)
+            
+            if (urlMatch != null) {
+                val videoUrl = urlMatch.value
+                Log.d(TAG, "🎯 Direct API capturou: $videoUrl")
+                emitExtractorLink(videoUrl, "https://megaembed.link/", callback)
+                return true
+            }
+            
+            // Tentar padrões específicos no JSON
+            val patterns = listOf(
+                Regex(""""url"\s*:\s*"([^"]+)""""),
+                Regex(""""file"\s*:\s*"([^"]+)""""),
+                Regex(""""source"\s*:\s*"([^"]+)""""),
+                Regex(""""playlist"\s*:\s*"([^"]+)"""")
+            )
+            
+            for (pattern in patterns) {
+                val match = pattern.find(json)
+                if (match != null) {
+                    val videoUrl = match.groupValues[1].replace("\\/", "/")
+                    if (isValidVideoUrl(videoUrl)) {
+                        Log.d(TAG, "🎯 Direct API capturou (pattern): $videoUrl")
+                        emitExtractorLink(videoUrl, "https://megaembed.link/", callback)
+                        return true
+                    }
+                }
+            }
+            
+            Log.d(TAG, "⚠️ Direct API: Nenhuma URL encontrada no JSON")
+            false
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Direct API falhou: ${e.message}")
+            false
         }
     }
 

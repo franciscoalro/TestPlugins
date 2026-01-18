@@ -7,29 +7,28 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.2 - TIMEOUT FIX (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.3 - SSSRR.ORG CDN FIX (Jan 2026)
  * 
- * Baseado em análise completa com Playwright + Burp Suite.
+ * Baseado em análise Burp Suite (18/01/2026).
  * 
  * Descobertas:
- * - Vídeos hospedados no Google Cloud Storage
- * - URL pattern: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
- * - Encriptação AES-CTR (key derivation complexa)
- * - Solução: WebView intercepta requisição final do vídeo
+ * - ERRO ANTERIOR: Procurava googleapis.com (ERRADO!)
+ * - CDN REAL: sssrr.org
+ * - URL patterns: sora API, direct file, future endpoint
+ * - Scripts: statics.sssrr.org/player/jwplayer.min.js
+ * - Solucao: WebView intercepta requisicoes sssrr.org
  * 
- * Melhorias v3.2:
- * - ✅ TIMEOUT AUMENTADO: 15s → 30s (player precisa de mais tempo)
- * - ✅ REGEX MELHORADO: Removido negative lookahead complexo
- * - ✅ FILTRO .JS: Validação após captura (mais confiável)
- * - ✅ Interceptação otimizada para Google Cloud Storage
- * - ✅ Padrões de URL baseados em análise real
- * - ✅ Cache de URLs extraídas (5min)
- * - ✅ Retry logic (2 tentativas)
- * - ✅ Quality detection automática
- * - ✅ Logs estruturados com ErrorLogger
- * - ✅ Performance tracking
+ * Melhorias v3.3:
+ * - REGEX CORRIGIDO: googleapis.com para sssrr.org
+ * - TIMEOUT: 30s (mantido de v3.2)
+ * - FILTRO .JS: Validacao apos captura
+ * - Padroes baseados em captura Burp Suite real
+ * - Cache de URLs extraidas (5min)
+ * - Retry logic (2 tentativas)
+ * - Quality detection automatica
+ * - Logs estruturados com ErrorLogger
  * 
- * Análise completa: brcloudstream/PLAYEREMBEDAPI_FINAL_SUMMARY.md
+ * Analise completa: brcloudstream/PLAYEREMBEDAPI_BURP_ANALYSIS_V123.md
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -104,7 +103,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             var datasJson = datasRegex.find(html)?.groupValues?.get(1)
             
             if (datasJson != null) {
-                 Log.d(TAG, "📦 Objeto 'datas' encontrado!")
+                 Log.d(TAG, "Objeto 'datas' encontrado!")
                  val mapper = JsonHelper.mapper
                  val datasNode = mapper.readTree(datasJson)
                  
@@ -115,14 +114,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                  val md5Id = datasNode.get("md5_id")?.asText()
                  
                  if (!mediaEncrypted.isNullOrEmpty() && !userId.isNullOrEmpty() && !slug.isNullOrEmpty() && !md5Id.isNullOrEmpty()) {
-                     Log.d(TAG, "🔑 Decriptando media... UserID: $userId, Slug: $slug")
+                     Log.d(TAG, "Decriptando media... UserID: $userId, Slug: $slug")
                      val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted, userId, slug, md5Id)
                      
                      if (decrypted != null) {
                          var found = false
                          
                          decrypted.hls?.let { hlsUrl ->
-                             Log.d(TAG, "🎯 AES-CTR capturou HLS: $hlsUrl")
+                             Log.d(TAG, "AES-CTR capturou HLS: $hlsUrl")
                              VideoUrlCache.put(url, hlsUrl, Qualities.Unknown.value, name)
                              callback.invoke(
                                 newExtractorLink(name, "$name Auto (AES)", hlsUrl, ExtractorLinkType.VIDEO) {
@@ -133,7 +132,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                          }
                          
                          decrypted.mp4?.let { mp4Url ->
-                              Log.d(TAG, "🎯 AES-CTR capturou MP4: $mp4Url")
+                              Log.d(TAG, "AES-CTR capturou MP4: $mp4Url")
                               callback.invoke(
                                 newExtractorLink(name, "$name MP4 (AES)", mp4Url, ExtractorLinkType.VIDEO) {
                                     this.referer = url
@@ -158,14 +157,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             if (packedMatch != null) {
                 val unpacked = JsUnpackerUtil.unpack(packedMatch.value)
                 if (!unpacked.isNullOrEmpty()) {
-                    Log.d(TAG, "🔓 Stealth descompactou script (${unpacked.length} chars)")
+                    Log.d(TAG, "Stealth descompactou script (${unpacked.length} chars)")
                     
                     val videoRegex = Regex("""https?://[^"'\s]+\.(?:m3u8|mp4|txt|sbs|online|cyou|googleapis|cloudatacdn|iamcdn|sssrr)[^"'\s]*""")
                     val videoMatch = videoRegex.find(unpacked)
                     
                     if (videoMatch != null) {
                         val videoUrl = videoMatch.value
-                        Log.d(TAG, "🎯 Stealth capturou URL: $videoUrl")
+                        Log.d(TAG, "Stealth capturou URL: $videoUrl")
                         
                         val quality = QualityDetector.detectFromUrl(videoUrl)
                         VideoUrlCache.put(url, videoUrl, quality, name)
@@ -216,7 +215,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                         !videoUrl.contains("jwplayer") &&
                         videoUrl.startsWith("http")) {
                         
-                        Log.d(TAG, "🎯 HTML Regex capturou URL: $videoUrl")
+                        Log.d(TAG, "HTML Regex capturou URL: $videoUrl")
                         
                         val quality = QualityDetector.detectFromUrl(videoUrl)
                         VideoUrlCache.put(url, videoUrl, quality, name)
@@ -236,7 +235,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     }
                 }
             }
-            Log.d(TAG, "⚠️ HTML Regex: Nenhuma URL válida encontrada")
+            Log.d(TAG, "HTML Regex: Nenhuma URL valida encontrada")
         }
 
         // 4. EXTRAIR COM RETRY LOGIC (WebView Fallback)
@@ -252,10 +251,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 80; // 8 segundos
+                            var maxAttempts = 80;
                             
                             function tryPlayVideo() {
-                                // 1. Forçar play em elementos video
                                 var vids = document.getElementsByTagName('video');
                                 for(var i=0; i<vids.length; i++){
                                     var v = vids[i];
@@ -265,13 +263,11 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
-                                // 2. Clicar em botões de play/overlays
                                 var overlays = document.querySelectorAll('.play-button, .vjs-big-play-button, .jw-display-icon-container, [class*="play"]');
                                 for(var j=0; j<overlays.length; j++) { 
                                     try { overlays[j].click(); } catch(e) {} 
                                 }
                                 
-                                // 3. Forçar JWPlayer se existir
                                 if (window.jwplayer && typeof window.jwplayer === 'function') {
                                     try {
                                         var players = document.querySelectorAll('[id*="player"]');
@@ -295,7 +291,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                 
                                 var result = '';
                                 
-                                // A. Procurar em elementos video
                                 var videos = document.querySelectorAll('video');
                                 for (var i = 0; i < videos.length; i++) {
                                     var video = videos[i];
@@ -309,7 +304,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
-                                // B. Procurar em elementos source
                                 if (!result) {
                                     var sources = document.querySelectorAll('source[src]');
                                     for (var j = 0; j < sources.length; j++) {
@@ -321,7 +315,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
-                                // C. Procurar variáveis globais comuns
                                 if (!result) {
                                     var globals = ['videoUrl', 'playlistUrl', 'source', 'file', 'src', 'url', 'config', 'playerConfig', 'sources'];
                                     for (var k = 0; k < globals.length; k++) {
@@ -340,7 +333,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                                     }
                                 }
                                 
-                                // D. Procurar em jwplayer diretamente
                                 if (!result && window.jwplayer) {
                                     try {
                                         var jw = window.jwplayer();
@@ -363,19 +355,19 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v123: TIMEOUT AUMENTADO + REGEX MELHORADO
-                // Baseado em análise real: vídeos vêm do Google Cloud Storage
-                // Pattern descoberto: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
-                // v123: Timeout 30s + Regex mais abrangente (sem negative lookahead que pode falhar)
+                // URL Interception - v124: REGEX CORRIGIDO PARA SSSRR.ORG
+                // Analise Burp Suite (18/01/2026) revelou que PlayerEmbedAPI usa sssrr.org, NAO googleapis.com!
+                // Padroes descobertos: sora API, direct file, future endpoint
+                // v124: Regex atualizado para capturar sssrr.org (CDN real)
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""(?i)(?:storage\.googleapis\.com/mediastorage/.*\.mp4|.*\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/.*|/video/.*|master\.txt)"""),
+                    interceptUrl = Regex("""(?i)sssrr\.org/(?:sora/|future|\d+/[a-f0-9])"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
                             ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 30_000L // 30s - v123: Aumentado de 15s para dar mais tempo ao player carregar
+                    timeout = 30_000L // 30s - v123: Aumentado de 15s
                 )
 
                 // Configurar headers robustos (v101) - MATCH EXATO COM LOGS
@@ -397,16 +389,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 val captured = response.url
                 
                 // Sucesso se capturou um vídeo ou chegou em um host final válido
-                // v122: Priorizar Google Cloud Storage + FILTRO .JS
+                // v124: Priorizar sssrr.org + FILTRO .JS
                 val isJsFile = captured.endsWith(".js") || captured.contains(".js?") || 
                               captured.contains("core.bundle") || captured.contains("jwplayer")
                               
                 val isVideo = !isJsFile && (
-                             captured.contains("storage.googleapis.com/mediastorage") || // PRIORIDADE 1
+                             captured.contains("sssrr.org/sora/") || // PRIORIDADE 1 - v124
+                             captured.contains("sssrr.org/future") || // PRIORIDADE 2 - v124
+                             captured.contains(".sssrr.org/") && captured.contains(".fd") || // PRIORIDADE 3 - v124
                              captured.contains(".mp4") || captured.contains(".m3u8") || 
                              captured.contains("googleapis") || captured.contains("cloudatacdn") ||
-                             captured.contains("iamcdn.net") || captured.contains("sssrr.org") ||
-                             captured.contains("valenium.shop") ||
+                             captured.contains("iamcdn.net") || captured.contains("valenium.shop") ||
                              captured.contains("master.txt")
                 )
                              

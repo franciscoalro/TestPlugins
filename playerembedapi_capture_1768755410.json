@@ -1,0 +1,48 @@
+{
+  "player_url": "https://playerembedapi.link/?v=kBJLtxCD3",
+  "video_urls": [
+    "https://storage.googleapis.com/mediastorage/1768755384966/az8sfdbewst/81347747.mp4"
+  ],
+  "network_requests": [
+    {
+      "url": "https://statics.sssrr.org/player/jwplayer.min.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://statics.sssrr.org/player/jwpsrv.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://statics.sssrr.org/player/jwplayer.core.controls.html5.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://statics.sssrr.org/player/jwplayer.min.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://statics.sssrr.org/player/jwpsrv.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://statics.sssrr.org/player/jwplayer.core.controls.html5.js",
+      "method": "GET",
+      "resource_type": "script"
+    },
+    {
+      "url": "https://storage.googleapis.com/mediastorage/1768755384966/az8sfdbewst/81347747.mp4",
+      "method": "GET",
+      "resource_type": "media"
+    }
+  ],
+  "jwplayer_config": null,
+  "errors": [
+    "JWPlayer config not found"
+  ],
+  "screenshot": "playerembedapi_screenshot_1768755406.png"
+}

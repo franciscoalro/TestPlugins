@@ -4,15 +4,15 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.WebViewResolver
 import android.util.Log
-import com.franciscoalro.maxseries.extractors.MegaEmbedLinkFetcher
 
 /**
- * MegaEmbed Extractor v5 - LIVE CAPTURE (WebView Only)
+ * MegaEmbed Extractor v5 - WEBVIEW-ONLY (v118)
  * 
- * ESTRATÉGIA V5 (v90+):
- * - Bruteforce removido completamente (causava timeouts)
- * - WebView Interception é o ÚNICO método principal
- * - Classe renomeada para forçar limpeza de cache no Cloudstream
+ * ESTRATÉGIA V118:
+ * - API retorna dados criptografados (não funciona)
+ * - WebView Headless com interceptação de REDE real
+ * - Intercepta: cf-master*.txt, index-*.txt, index-f*.txt
+ * - Headers corretos, cookies do WebView, bypass do erro 30002
  */
 class MegaEmbedExtractorV5 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -21,7 +21,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
 
     companion object {
         // TAG ÚNICA para confirmar que a V5 (Live Capture) está rodando
-        private const val TAG = "MegaEmbedExtractorV5_v117"
+        private const val TAG = "MegaEmbedExtractorV5_v118"
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
         val DOMAINS = listOf(
@@ -29,24 +29,6 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             "megaembed.xyz", 
             "megaembed.to"
         )
-        
-        // CDNs conhecidos (backup apenas) - v107 updated from network logs
-        private val KNOWN_CDN_DOMAINS = listOf(
-            "valenium.shop",
-            "spo3.marvellaholdings.sbs", // NOVO (v107) - de logs de rede
-            "sqtd.luminairemotion.online",
-            "stzm.luminairemotion.online",
-            "srcf.luminairemotion.online",
-            "sipt.marvellaholdings.sbs",
-            "stzm.marvellaholdings.sbs",
-            "srcf.marvellaholdings.sbs", 
-            "sbi6.marvellaholdings.sbs",
-            "s6p9.marvellaholdings.sbs",
-            "sr81.virelodesignagency.cyou"
-        )
-        
-        // Shards conhecidos
-        private val KNOWN_SHARDS = listOf("is3", "x6b", "x7c", "x8d", "x9e", "5w3")
         
         fun canHandle(url: String): Boolean {
             return DOMAINS.any { url.contains(it, ignoreCase = true) }
@@ -59,45 +41,22 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 API-INTERCEPT (v117) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 WEBVIEW-ONLY (v118) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
         try {
-            // v117: NOVA ESTRATÉGIA - Interceptar API call primeiro
-            // API: https://megaembed.link/api/v1/info?id={videoId}
-            // Retorna JSON com URL do vídeo
+            // v118: WEBVIEW-ONLY com interceptação de rede REAL
+            // API retorna dados criptografados, então só WebView funciona
+            // Intercepta: cf-master*.txt, index-*.txt, index-f*.txt
             
-            // Método 1: API Call Direto (NOVO v117)
-            Log.d(TAG, "🔍 Tentando API call direta...")
-            if (extractWithApiCall(url, referer, callback)) {
-                Log.d(TAG, "✅ API call funcionou!")
-                return
-            }
-            
-            // Método 2: WebView com interceptação (Fallback)
-            Log.d(TAG, "🚀 API falhou, tentando WebView Interception...")
+            Log.d(TAG, "🚀 Iniciando WebView com interceptação de rede...")
             if (extractWithIntelligentInterception(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView interceptou com sucesso!")
                 return
             }
             
-            // Método 3: WebView com JavaScript (Fallback secundário)
-            Log.d(TAG, "⚠️ Interceptação direta falhou, tentando injeção JS...")
-            if (extractWithWebViewJavaScript(url, referer, callback)) {
-                Log.d(TAG, "✅ JS funcionou!")
-                return
-            }
-            
-            // Método 4: API Tradicional DESABILITADO (v116)
-            // Motivo: Hosts dinâmicos mudam constantemente, bruteforce não funciona
-            // Log.d(TAG, "⚠️ JS falhou, tentando API legacy...")
-            // if (extractWithApiTraditional(url, referer, callback)) {
-            //     Log.d(TAG, "✅ API Legacy salvou!")
-            //     return
-            // }
-            
-            Log.e(TAG, "❌ FALHA TOTAL: Nenhum método conseguiu capturar o vídeo.")
+            Log.e(TAG, "❌ FALHA: WebView não conseguiu capturar o vídeo.")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro crítico V5: ${e.message}")
@@ -106,11 +65,11 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
     }
 
     /**
-     * Método Novo v117: API Call Direto
-     * Intercepta https://megaembed.link/api/v1/info?id={videoId}
-     * e parseia o JSON para extrair a URL do vídeo
+     * Método Principal v118: Interceptação de Rede REAL (WebView Headless)
+     * Intercepta cf-master*.txt, index-*.txt, index-f*.txt
+     * Com headers corretos, cookies do WebView, e bypass do erro 30002
      */
-    private suspend fun extractWithApiCall(
+    private suspend fun extractWithIntelligentInterception(
         url: String,
         referer: String?,
         callback: (ExtractorLink) -> Unit
@@ -124,107 +83,62 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             
             Log.d(TAG, "🆔 VideoId: $videoId")
             
-            // Fazer request para a API
-            val apiUrl = "https://megaembed.link/api/v1/info?id=$videoId"
-            Log.d(TAG, "📡 API URL: $apiUrl")
-            
-            val response = app.get(
-                apiUrl,
-                headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to "https://megaembed.link/",
-                    "Accept" to "application/json, text/plain, */*",
-                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "Origin" to "https://megaembed.link"
-                )
-            )
-            
-            val jsonText = response.text
-            Log.d(TAG, "📄 API Response (${jsonText.length} chars): ${jsonText.take(500)}")
-            
-            // Parsear JSON manualmente (sem biblioteca)
-            // Procurar por URLs .txt ou .m3u8
-            val urlPattern = Regex("""https?://[^"'\s]+\.(?:txt|m3u8)""")
-            val matches = urlPattern.findAll(jsonText)
-            
-            for (match in matches) {
-                val videoUrl = match.value
-                Log.d(TAG, "🎯 URL encontrada no JSON: $videoUrl")
-                
-                if (isValidVideoUrl(videoUrl)) {
-                    Log.d(TAG, "✅ URL válida! Emitindo link...")
-                    emitExtractorLink(videoUrl, url, callback)
-                    return true
-                }
-            }
-            
-            Log.d(TAG, "⚠️ Nenhuma URL válida encontrada no JSON")
-            false
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro na API call: ${e.message}")
-            false
-        }
-    }
-
-    /**
-     * Método Principal: Interceptação Inteligente
-     */
-    private suspend fun extractWithIntelligentInterception(
-        url: String,
-        referer: String?,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        return try {
-            val videoId = extractVideoId(url)
-            if (videoId == null) return false
-            
-            Log.d(TAG, "🆔 VideoId alvo: $videoId")
-            
             var capturedCdnUrl: String? = null
             var capturedPlaylistUrl: String? = null
             
             val resolver = WebViewResolver(
-                // v115: REGEX MELHORADO - Captura .txt (m3u8 camuflado)
-                // Pattern: /v4/{shard}/{video_id}/cf-master.*.txt
-                // Exemplo: https://spo3.marvellaholdings.sbs/v4/x6b/ilbwoq/cf-master.1768694011.txt
-                // Hosts dinâmicos: marvellaholdings.sbs, vivonaengineering.*, travianastudios.*, etc
-                interceptUrl = Regex("""(?:https?://)?[^/]+/v4/[a-z0-9]+/[a-z0-9]+/(?:cf-master|index-).*?\.txt"""),
+                // v118: REGEX MELHORADO - Intercepta cf-master*.txt, index-*.txt, index-f*.txt
+                // Padrão observado nos logs:
+                // - https://{host}/v4/{shard}/{video_id}/cf-master.{timestamp}.txt
+                // - https://{host}/v4/{shard}/{video_id}/index-f{quality}.txt
+                // - https://{host}/{hash}/{shard}/{video_id}/{quality}/cf-master.*.txt
+                interceptUrl = Regex("""(?:https?://)?[^/]+/(?:v4/[a-z0-9]+/[a-z0-9]+|[^/]+/[a-z0-9]+/[a-z0-9]+/[a-z0-9]+)/(?:cf-master|index-f|index-).*?\.txt"""),
                 additionalUrls = listOf(
-                    Regex("""/v4/.*?\.txt$"""), // Qualquer .txt no path /v4/
-                    Regex("""/v4/.*?\.woff2?$"""), // Segmentos disfarçados
+                    Regex("""/cf-master\.[0-9]+\.txt"""), // cf-master.1768694011.txt
+                    Regex("""/index-f[0-9]+\.txt"""), // index-f1.txt, index-f2.txt
+                    Regex("""/index-[^/]+\.txt"""), // index-*.txt genérico
+                    Regex("""\.txt(?:\?.*)?$"""), // Qualquer .txt com query params
                     Regex("""\.m3u8(?:\?.*)?$"""), // M3U8 com query params
-                    Regex("""\.mp4(?:\?.*)?$"""), // MP4 com query params
                     Regex("""marvellaholdings\.sbs.*?\.txt"""), // Host específico
-                    Regex("""vivonaengineering\.[a-z]+.*?\.txt"""), // Variações de host
+                    Regex("""vivonaengineering\.[a-z]+.*?\.txt"""),
                     Regex("""travianastudios\.[a-z]+.*?\.txt"""),
-                    Regex("""luminairemotion\.[a-z]+.*?\.txt""")
+                    Regex("""luminairemotion\.[a-z]+.*?\.txt"""),
+                    Regex("""valenium\.shop.*?\.txt""")
                 ),
                 useOkhttp = false,
-                timeout = 30_000L, // v115: 30s (aumentado)
+                timeout = 45_000L, // v118: 45s (aumentado para dar tempo ao WebView)
                 script = """
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 250; // 25s
+                            var maxAttempts = 400; // 40s
                             
                             var interval = setInterval(function() {
                                 attempts++;
                                 
-                                // Estratégia 1: Regex AGRESSIVO no HTML para .txt
+                                // Estratégia 1: Procurar cf-master*.txt no HTML (PRIORIDADE MÁXIMA)
                                 var html = document.documentElement.innerHTML;
                                 
-                                // Procurar cf-master.*.txt (PRIORIDADE MÁXIMA)
-                                var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/cf-master\.\d+\.txt/i);
-                                if (txtMatch) {
+                                // cf-master.{timestamp}.txt
+                                var cfMasterMatch = html.match(/https?:\/\/[^"'\s]+\/cf-master\.[0-9]+\.txt/i);
+                                if (cfMasterMatch) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado cf-master.txt:', txtMatch[0]);
-                                    resolve(txtMatch[0]);
+                                    console.log('🎯 Capturado cf-master.txt:', cfMasterMatch[0]);
+                                    resolve(cfMasterMatch[0]);
                                     return;
                                 }
                                 
-                                // Procurar index-*.txt (alternativa)
-                                var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/index-[^"'\s]+\.txt/i);
+                                // index-f{quality}.txt
+                                var indexFMatch = html.match(/https?:\/\/[^"'\s]+\/index-f[0-9]+\.txt/i);
+                                if (indexFMatch) {
+                                    clearInterval(interval);
+                                    console.log('🎯 Capturado index-f.txt:', indexFMatch[0]);
+                                    resolve(indexFMatch[0]);
+                                    return;
+                                }
+                                
+                                // index-*.txt genérico
+                                var indexMatch = html.match(/https?:\/\/[^"'\s]+\/index-[^"'\s]+\.txt/i);
                                 if (indexMatch) {
                                     clearInterval(interval);
                                     console.log('🎯 Capturado index.txt:', indexMatch[0]);
@@ -232,8 +146,8 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                     return;
                                 }
                                 
-                                // Procurar qualquer .txt no path /v4/
-                                var anyTxtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
+                                // Qualquer .txt no path /v4/ ou com hash
+                                var anyTxtMatch = html.match(/https?:\/\/[^"'\s]+\/(?:v4|[a-z0-9_-]{20,})\/[^"'\s]+\.txt/i);
                                 if (anyTxtMatch) {
                                     clearInterval(interval);
                                     console.log('🎯 Capturado .txt genérico:', anyTxtMatch[0]);
@@ -241,7 +155,22 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                     return;
                                 }
                                 
-                                // Estratégia 2: Player Source (fallback)
+                                // Estratégia 2: Procurar em variáveis globais do player
+                                if (window.__PLAYER_CONFIG__ && window.__PLAYER_CONFIG__.url) {
+                                    clearInterval(interval);
+                                    console.log('🎯 Capturado de __PLAYER_CONFIG__:', window.__PLAYER_CONFIG__.url);
+                                    resolve(window.__PLAYER_CONFIG__.url);
+                                    return;
+                                }
+                                
+                                if (window.playlistUrl) {
+                                    clearInterval(interval);
+                                    console.log('🎯 Capturado de playlistUrl:', window.playlistUrl);
+                                    resolve(window.playlistUrl);
+                                    return;
+                                }
+                                
+                                // Estratégia 3: Procurar em elementos <video>
                                 var videos = document.querySelectorAll('video');
                                 for (var i = 0; i < videos.length; i++) {
                                     if (videos[i].src && videos[i].src.includes('http')) {
@@ -251,16 +180,10 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                         return;
                                     }
                                 }
-                                
-                                // Estratégia 3: Procurar em variáveis globais
-                                if (window.playlistUrl) {
-                                    clearInterval(interval);
-                                    resolve(window.playlistUrl);
-                                    return;
-                                }
 
                                 if (attempts >= maxAttempts) {
                                     clearInterval(interval);
+                                    console.log('⏱️ Timeout atingido após', attempts, 'tentativas');
                                     resolve('');
                                 }
                             }, 100);
@@ -279,9 +202,13 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                 url,
                 headers = mapOf(
                     "User-Agent" to USER_AGENT,
-                    "Referer" to (referer ?: mainUrl),
+                    "Referer" to "https://megaembed.link/", // v118: Referer correto
+                    "Origin" to "https://megaembed.link",
                     "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
+                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Accept-Encoding" to "gzip, deflate, br",
+                    "Connection" to "keep-alive",
+                    "Upgrade-Insecure-Requests" to "1"
                 ),
                 interceptor = resolver
             )
@@ -297,36 +224,11 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                 return true
             }
             
+            Log.d(TAG, "⚠️ URL não é válida: $finalUrl")
             false
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro interceptação: ${e.message}")
-            false
-        }
-    }
-
-    private suspend fun extractWithWebViewJavaScript(
-        url: String,
-        referer: String?,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        // Implementação simplificada para backup
-        return false // Por enquanto foca na interceptação
-    }
-
-    private suspend fun extractWithApiTraditional(
-        url: String,
-        referer: String?,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        return try {
-            val videoId = extractVideoId(url) ?: return false
-            val playlistUrl = MegaEmbedLinkFetcher.fetchPlaylistUrl(videoId)
-            if (playlistUrl != null && isValidVideoUrl(playlistUrl)) {
-                emitExtractorLink(playlistUrl, url, callback)
-                return true
-            }
-            false
-        } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }
@@ -351,14 +253,18 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         // Anti-Analytics
         if (url.contains("google-analytics") || url.contains("googletagmanager")) return false
         
-        // Validação positiva (v94: Mais permissiva)
+        // Validação positiva (v118: Mais permissiva)
         return url.contains(".m3u8") || 
                url.contains(".mp4") || 
                url.contains("cf-master") ||
-               url.contains("valenium.shop") || // NOVO
+               url.contains("index-f") ||
+               url.contains("index-") ||
                url.contains(".txt") || // Permitir playlists ofuscadas em .txt
                url.contains("marvellaholdings.sbs") ||
                url.contains("luminairemotion.online") ||
+               url.contains("valenium.shop") ||
+               url.contains("vivonaengineering") ||
+               url.contains("travianastudios") ||
                url.contains("virelodesignagency.cyou")
     }
 
@@ -370,7 +276,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         val cleanUrl = videoUrl.substringBefore("#")
         val effectiveReferer = referer.takeIf { !it.isNullOrEmpty() } ?: mainUrl
         
-        if (videoUrl.contains(".m3u8") || videoUrl.contains(".txt") || videoUrl.contains("cf-master")) {
+        if (videoUrl.contains(".m3u8") || videoUrl.contains(".txt") || videoUrl.contains("cf-master") || videoUrl.contains("index-")) {
             callback.invoke(
                 newExtractorLink(
                     source = name,
@@ -395,12 +301,16 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                     )
                 }
             )
-
-            // M3u8Helper removido temporariamente para garantir build (v113)
         } else {
             callback.invoke(
-                newExtractorLink(name, "$name - HD", cleanUrl) {
+                newExtractorLink(
+                    source = name,
+                    name = "$name - HD",
+                    url = cleanUrl,
+                    type = ExtractorLinkType.VIDEO
+                ) {
                     this.referer = effectiveReferer
+                    this.quality = Qualities.Unknown.value
                 }
             )
         }

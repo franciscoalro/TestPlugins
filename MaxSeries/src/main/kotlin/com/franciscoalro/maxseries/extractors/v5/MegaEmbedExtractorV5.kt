@@ -112,43 +112,78 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             var capturedPlaylistUrl: String? = null
             
             val resolver = WebViewResolver(
-                // v108: Regex baseado em PATH, não domínio (domínios são dinâmicos)
-                // Pattern: /v4/{shard}/{video_id}/cf-master.*.txt ou index-*.txt
-                // Domínios mudam: marvellaholdings, vivonaengineering, travianastudios, etc
-                interceptUrl = Regex("""/v4/[a-z0-9]+/[a-z0-9]+/(?:cf-master|index-).*?\.txt"""),
+                // v115: REGEX MELHORADO - Captura .txt (m3u8 camuflado)
+                // Pattern: /v4/{shard}/{video_id}/cf-master.*.txt
+                // Exemplo: https://spo3.marvellaholdings.sbs/v4/x6b/ilbwoq/cf-master.1768694011.txt
+                // Hosts dinâmicos: marvellaholdings.sbs, vivonaengineering.*, travianastudios.*, etc
+                interceptUrl = Regex("""(?:https?://)?[^/]+/v4/[a-z0-9]+/[a-z0-9]+/(?:cf-master|index-).*?\.txt"""),
                 additionalUrls = listOf(
+                    Regex("""/v4/.*?\.txt$"""), // Qualquer .txt no path /v4/
                     Regex("""/v4/.*?\.woff2?$"""), // Segmentos disfarçados
-                    Regex("""\\.m3u8"""),
-                    Regex("""\\.mp4""")
+                    Regex("""\.m3u8(?:\?.*)?$"""), // M3U8 com query params
+                    Regex("""\.mp4(?:\?.*)?$"""), // MP4 com query params
+                    Regex("""marvellaholdings\.sbs.*?\.txt"""), // Host específico
+                    Regex("""vivonaengineering\.[a-z]+.*?\.txt"""), // Variações de host
+                    Regex("""travianastudios\.[a-z]+.*?\.txt"""),
+                    Regex("""luminairemotion\.[a-z]+.*?\.txt""")
                 ),
                 useOkhttp = false,
-                timeout = 25_000L, // v108: 25s
+                timeout = 30_000L, // v115: 30s (aumentado)
                 script = """
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 200; // 20s
+                            var maxAttempts = 250; // 25s
                             
                             var interval = setInterval(function() {
                                 attempts++;
                                 
-                                // Estratégia 1: Regex no HTML
+                                // Estratégia 1: Regex AGRESSIVO no HTML para .txt
                                 var html = document.documentElement.innerHTML;
-                                var match = html.match(/https?:\/\/[^"'\s]+\/cf-master\.\d+\.txt/);
-                                if (match) {
+                                
+                                // Procurar cf-master.*.txt (PRIORIDADE MÁXIMA)
+                                var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/cf-master\.\d+\.txt/i);
+                                if (txtMatch) {
                                     clearInterval(interval);
-                                    resolve(match[0]);
+                                    console.log('🎯 Capturado cf-master.txt:', txtMatch[0]);
+                                    resolve(txtMatch[0]);
                                     return;
                                 }
                                 
-                                // Estratégia 2: Player Source
+                                // Procurar index-*.txt (alternativa)
+                                var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/index-[^"'\s]+\.txt/i);
+                                if (indexMatch) {
+                                    clearInterval(interval);
+                                    console.log('🎯 Capturado index.txt:', indexMatch[0]);
+                                    resolve(indexMatch[0]);
+                                    return;
+                                }
+                                
+                                // Procurar qualquer .txt no path /v4/
+                                var anyTxtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
+                                if (anyTxtMatch) {
+                                    clearInterval(interval);
+                                    console.log('🎯 Capturado .txt genérico:', anyTxtMatch[0]);
+                                    resolve(anyTxtMatch[0]);
+                                    return;
+                                }
+                                
+                                // Estratégia 2: Player Source (fallback)
                                 var videos = document.querySelectorAll('video');
                                 for (var i = 0; i < videos.length; i++) {
                                     if (videos[i].src && videos[i].src.includes('http')) {
                                         clearInterval(interval);
+                                        console.log('🎯 Capturado video.src:', videos[i].src);
                                         resolve(videos[i].src);
                                         return;
                                     }
+                                }
+                                
+                                // Estratégia 3: Procurar em variáveis globais
+                                if (window.playlistUrl) {
+                                    clearInterval(interval);
+                                    resolve(window.playlistUrl);
+                                    return;
                                 }
 
                                 if (attempts >= maxAttempts) {
@@ -172,7 +207,8 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                 headers = mapOf(
                     "User-Agent" to USER_AGENT,
                     "Referer" to (referer ?: mainUrl),
-                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
                 ),
                 interceptor = resolver
             )

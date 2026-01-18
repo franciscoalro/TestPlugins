@@ -1,7 +1,7 @@
-version = 120
+version = 121
 
 cloudstream {
-    description = "MaxSeries v120 - FIX: MegaEmbed URL regex (exigir #videoId)"
+    description = "MaxSeries v121 - PlayerEmbedAPI v3 (Playwright Optimized) - Google Cloud Storage"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,7 +1,7 @@
-version = 122
+version = 123
 
 cloudstream {
-    description = "MaxSeries v122 - PlayerEmbedAPI v3.1 (JS Filter Fix) - Ignora core.bundle.js"
+    description = "MaxSeries v123 - PlayerEmbedAPI v3.2 (Timeout Fix 30s) - Melhor interceptação"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

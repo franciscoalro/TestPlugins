@@ -1,7 +1,7 @@
-version = 119
+version = 120
 
 cloudstream {
-    description = "MaxSeries v119 - MegaEmbed ALL STRATEGIES (HTML Regex + JsUnpacker + WebView JS + Interceptação)"
+    description = "MaxSeries v120 - FIX: MegaEmbed URL regex (exigir #videoId)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

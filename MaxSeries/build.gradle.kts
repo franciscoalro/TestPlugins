@@ -1,7 +1,7 @@
-version = 121
+version = 122
 
 cloudstream {
-    description = "MaxSeries v121 - PlayerEmbedAPI v3 (Playwright Optimized) - Google Cloud Storage"
+    description = "MaxSeries v122 - PlayerEmbedAPI v3.1 (JS Filter Fix) - Ignora core.bundle.js"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

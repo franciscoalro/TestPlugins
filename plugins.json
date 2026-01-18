@@ -21,9 +21,9 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v121.0/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v122.0/MaxSeries.cs3",
         "status": 1,
-        "version": 121,
+        "version": 122,
         "apiVersion": 1,
         "fileSize": 143000,
         "name": "MaxSeries",
@@ -31,7 +31,7 @@
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v121 - PlayerEmbedAPI v3 (Playwright Optimized) - Google Cloud Storage",
+        "description": "MaxSeries v122 - PlayerEmbedAPI v3.1 (JS Filter Fix) - Ignora core.bundle.js",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

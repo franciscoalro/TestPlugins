@@ -21,9 +21,9 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v123.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v124.0/MaxSeries.cs3",
         "status":  1,
-        "version":  123,
+        "version":  124,
         "apiVersion":  1,
         "fileSize":  143000,
         "name":  "MaxSeries",
@@ -31,7 +31,7 @@
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v123 - PlayerEmbedAPI v3.2 (Timeout Fix 30s) - Melhor interceptação",
+        "description":  "MaxSeries v124 - PlayerEmbedAPI v3.3 (SSSRR.ORG CDN Fix) - Regex corrigido",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

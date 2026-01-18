@@ -61,9 +61,23 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
-        // 0. FETCH HTML (Shared)
+        // 0. FETCH HTML (Shared) - v115: Detecção de 404
         val html = try {
-            app.get(url, headers = HeadersBuilder.playerEmbed(url)).text
+            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
+            
+            // v115: Falha rápida em 404 (vídeo não existe)
+            if (response.code == 404) {
+                ErrorLogger.w(TAG, "Vídeo não encontrado (404) - Pulando para próximo extractor", mapOf("URL" to url))
+                return // Falha rápida, sem retry
+            }
+            
+            // v115: Falha rápida em erros de servidor
+            if (response.code >= 500) {
+                ErrorLogger.w(TAG, "Servidor indisponível (${response.code}) - Pulando", mapOf("URL" to url))
+                return
+            }
+            
+            response.text
         } catch (e: Exception) {
             ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
             return

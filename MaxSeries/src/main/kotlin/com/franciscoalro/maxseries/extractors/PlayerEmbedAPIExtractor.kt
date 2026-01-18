@@ -7,17 +7,27 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v2 - OPTIMIZED (FASE 4)
+ * PlayerEmbedAPI Extractor v3 - PLAYWRIGHT OPTIMIZED (Jan 2026)
  * 
- * Handles AES-CTR encrypted sources ("core.bundle.js") by running the actual Page logic
- * and intercepting the final video request.
+ * Baseado em análise completa com Playwright + Burp Suite.
  * 
- * Melhorias v2:
+ * Descobertas:
+ * - Vídeos hospedados no Google Cloud Storage
+ * - URL pattern: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
+ * - Encriptação AES-CTR (key derivation complexa)
+ * - Solução: WebView intercepta requisição final do vídeo
+ * 
+ * Melhorias v3:
+ * - ✅ Interceptação otimizada para Google Cloud Storage
+ * - ✅ Padrões de URL baseados em análise real
+ * - ✅ Timeout reduzido (15s) - vídeo carrega rápido
  * - ✅ Cache de URLs extraídas (5min)
- * - ✅ Retry logic (3 tentativas)
+ * - ✅ Retry logic (2 tentativas)
  * - ✅ Quality detection automática
  * - ✅ Logs estruturados com ErrorLogger
  * - ✅ Performance tracking
+ * 
+ * Análise completa: brcloudstream/PLAYEREMBEDAPI_FINAL_SUMMARY.md
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -351,16 +361,18 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v108: Padrões mejorados
+                // URL Interception - v109: PLAYWRIGHT OPTIMIZED
+                // Baseado em análise real: vídeos vêm do Google Cloud Storage
+                // Pattern descoberto: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""(?i)\.(?:mp4|m3u8)|mediastorage|googleapis|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/|/video/|\.txt$"""),
+                    interceptUrl = Regex("""(?i)storage\.googleapis\.com/mediastorage/.*\.mp4|\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/|/video/|\.txt$"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
                             ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 25_000L // 25s
+                    timeout = 15_000L // 15s - PlayerEmbedAPI carrega rápido (análise Playwright)
                 )
 
                 // Configurar headers robustos (v101) - MATCH EXATO COM LOGS
@@ -382,7 +394,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 val captured = response.url
                 
                 // Sucesso se capturou um vídeo ou chegou em um host final válido
-                val isVideo = captured.contains(".mp4") || captured.contains(".m3u8") || 
+                // v109: Priorizar Google Cloud Storage (descoberto via Playwright)
+                val isVideo = captured.contains("storage.googleapis.com/mediastorage") || // PRIORIDADE 1
+                             captured.contains(".mp4") || captured.contains(".m3u8") || 
                              captured.contains("googleapis") || captured.contains("cloudatacdn") ||
                              captured.contains("iamcdn.net") || captured.contains("sssrr.org") ||
                              captured.contains("valenium.shop") ||

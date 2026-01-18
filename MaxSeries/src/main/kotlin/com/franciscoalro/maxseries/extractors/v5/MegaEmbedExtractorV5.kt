@@ -23,7 +23,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
     override val requiresReferer = true
 
     companion object {
-        private const val TAG = "MegaEmbedExtractorV5_v119"
+        private const val TAG = "MegaEmbedExtractorV5_v126"
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
         val DOMAINS = listOf(
@@ -43,7 +43,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 ALL STRATEGIES (v125) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 ALL STRATEGIES (v126) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
@@ -271,8 +271,9 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
     }
 
     /**
-     * ESTRATÉGIA 3: WebView JavaScript-Only
-     * Executa JavaScript e captura URL via callback (SEM interceptUrl)
+     * ESTRATÉGIA 3: WebView JavaScript-Only (v126 - MELHORADO)
+     * Executa JavaScript e captura URL via callback
+     * Aguarda descriptografia e extração do vídeo
      */
     private suspend fun extractWithWebViewJavaScript(
         url: String,
@@ -283,25 +284,41 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             var capturedUrl: String? = null
             
             val resolver = WebViewResolver(
-                // v119: interceptUrl dummy (não usado, mas obrigatório)
                 interceptUrl = Regex("""\.txt$"""),
                 script = """
                     (function() {
                         return new Promise(function(resolve) {
                             var attempts = 0;
-                            var maxAttempts = 600; // 60s
+                            var maxAttempts = 1200; // 120s - v126: Aumentado para aguardar descriptografia
+                            
+                            // Tentar forçar play do vídeo
+                            function tryPlay() {
+                                try {
+                                    var videos = document.querySelectorAll('video');
+                                    for(var i=0; i<videos.length; i++) {
+                                        if(videos[i].paused) {
+                                            videos[i].muted = true;
+                                            videos[i].play().catch(function(){});
+                                        }
+                                    }
+                                } catch(e) {}
+                            }
                             
                             var interval = setInterval(function() {
                                 attempts++;
                                 
-                                // Buscar no HTML completo
+                                // Tentar play a cada 10 tentativas
+                                if (attempts % 10 === 0) {
+                                    tryPlay();
+                                }
+                                
                                 var html = document.documentElement.innerHTML;
                                 
                                 // Padrão 1: cf-master.{timestamp}.txt
                                 var cfMaster = html.match(/https?:\/\/[^"'\s]+\/cf-master\.[0-9]+\.txt/i);
                                 if (cfMaster) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado cf-master:', cfMaster[0]);
+                                    console.log('Capturado cf-master:', cfMaster[0]);
                                     resolve(cfMaster[0]);
                                     return;
                                 }
@@ -310,16 +327,16 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                 var indexF = html.match(/https?:\/\/[^"'\s]+\/index-f[0-9]+\.txt/i);
                                 if (indexF) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado index-f:', indexF[0]);
+                                    console.log('Capturado index-f:', indexF[0]);
                                     resolve(indexF[0]);
                                     return;
                                 }
                                 
-                                // Padrão 3: Qualquer .txt em /v4/
+                                // Padrão 3: .txt em /v4/
                                 var v4Txt = html.match(/https?:\/\/[^"'\s]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/[^"'\s]+\.txt/i);
                                 if (v4Txt) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado v4 txt:', v4Txt[0]);
+                                    console.log('Capturado v4:', v4Txt[0]);
                                     resolve(v4Txt[0]);
                                     return;
                                 }
@@ -328,7 +345,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                 var knownHost = html.match(/https?:\/\/(marvellaholdings\.sbs|vivonaengineering\.[a-z]+|travianastudios\.[a-z]+|luminairemotion\.[a-z]+|valenium\.shop)[^"'\s]+\.txt/i);
                                 if (knownHost) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado host conhecido:', knownHost[0]);
+                                    console.log('Capturado host:', knownHost[0]);
                                     resolve(knownHost[0]);
                                     return;
                                 }
@@ -336,22 +353,35 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                                 // Padrão 5: Variáveis globais
                                 if (window.__PLAYER_CONFIG__ && window.__PLAYER_CONFIG__.url) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado de __PLAYER_CONFIG__');
                                     resolve(window.__PLAYER_CONFIG__.url);
                                     return;
                                 }
                                 
                                 if (window.playlistUrl) {
                                     clearInterval(interval);
-                                    console.log('🎯 Capturado de playlistUrl');
                                     resolve(window.playlistUrl);
                                     return;
                                 }
                                 
+                                // Padrão 6: Buscar em objetos do player (v126 NOVO)
+                                try {
+                                    var players = document.querySelectorAll('[class*="player"]');
+                                    for(var i=0; i<players.length; i++) {
+                                        var playerData = players[i].getAttribute('data-src') || 
+                                                       players[i].getAttribute('data-url') ||
+                                                       players[i].getAttribute('src');
+                                        if(playerData && playerData.includes('.txt')) {
+                                            clearInterval(interval);
+                                            resolve(playerData);
+                                            return;
+                                        }
+                                    }
+                                } catch(e) {}
+                                
                                 // Timeout
                                 if (attempts >= maxAttempts) {
                                     clearInterval(interval);
-                                    console.log('⏱️ Timeout após', attempts, 'tentativas');
+                                    console.log('Timeout apos', attempts, 'tentativas');
                                     resolve('');
                                 }
                             }, 100);
@@ -364,7 +394,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                         Log.d(TAG, "📜 JS Callback capturou: $capturedUrl")
                     }
                 },
-                timeout = 60_000L // 60s
+                timeout = 120_000L // 120s - v126: Aumentado de 60s
             )
             
             app.get(

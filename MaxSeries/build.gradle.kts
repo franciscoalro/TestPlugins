@@ -1,7 +1,7 @@
-version = 116
+version = 117
 
 cloudstream {
-    description = "MaxSeries v116 - MegaEmbed WebView-only (API tradicional desabilitada)"
+    description = "MaxSeries v117 - MegaEmbed API call interceptor + WebView fallback"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

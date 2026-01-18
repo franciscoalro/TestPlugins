@@ -7,7 +7,7 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.1 - JS FILTER FIX (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.2 - TIMEOUT FIX (Jan 2026)
  * 
  * Baseado em análise completa com Playwright + Burp Suite.
  * 
@@ -17,11 +17,12 @@ import android.util.Log
  * - Encriptação AES-CTR (key derivation complexa)
  * - Solução: WebView intercepta requisição final do vídeo
  * 
- * Melhorias v3.1:
- * - ✅ FILTRO .JS: Ignora core.bundle.js e outros arquivos JavaScript
+ * Melhorias v3.2:
+ * - ✅ TIMEOUT AUMENTADO: 15s → 30s (player precisa de mais tempo)
+ * - ✅ REGEX MELHORADO: Removido negative lookahead complexo
+ * - ✅ FILTRO .JS: Validação após captura (mais confiável)
  * - ✅ Interceptação otimizada para Google Cloud Storage
  * - ✅ Padrões de URL baseados em análise real
- * - ✅ Timeout reduzido (15s) - vídeo carrega rápido
  * - ✅ Cache de URLs extraídas (5min)
  * - ✅ Retry logic (2 tentativas)
  * - ✅ Quality detection automática
@@ -362,19 +363,19 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v122: FILTRO .JS ADICIONADO
+                // URL Interception - v123: TIMEOUT AUMENTADO + REGEX MELHORADO
                 // Baseado em análise real: vídeos vêm do Google Cloud Storage
                 // Pattern descoberto: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
-                // v122: Ignorar arquivos .js (core.bundle.js, etc)
+                // v123: Timeout 30s + Regex mais abrangente (sem negative lookahead que pode falhar)
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""(?i)(?!.*\.js)(?:storage\.googleapis\.com/mediastorage/.*\.mp4|\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/|/video/|\.txt)"""),
+                    interceptUrl = Regex("""(?i)(?:storage\.googleapis\.com/mediastorage/.*\.mp4|.*\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/.*|/video/.*|master\.txt)"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
                             ErrorLogger.d(TAG, "JS Capture Success", mapOf("URL" to result))
                         }
                     },
-                    timeout = 15_000L // 15s - PlayerEmbedAPI carrega rápido (análise Playwright)
+                    timeout = 30_000L // 30s - v123: Aumentado de 15s para dar mais tempo ao player carregar
                 )
 
                 // Configurar headers robustos (v101) - MATCH EXATO COM LOGS

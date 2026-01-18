@@ -7,26 +7,27 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.3 - SSSRR.ORG CDN FIX (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.4 - DIRECT HTML EXTRACTION (Jan 2026)
  * 
- * Baseado em análise Burp Suite (18/01/2026).
+ * Baseado em análise Burp Suite (18/01/2026) e logs ADB v124.
  * 
- * Descobertas:
- * - ERRO ANTERIOR: Procurava googleapis.com (ERRADO!)
- * - CDN REAL: sssrr.org
- * - URL patterns: sora API, direct file, future endpoint
- * - Scripts: statics.sssrr.org/player/jwplayer.min.js
- * - Solucao: WebView intercepta requisicoes sssrr.org
+ * PROBLEMA v124:
+ * - WebView carrega página mas NÃO faz requisições para sssrr.org
+ * - Timeout após 30s sem capturar nada
+ * - JavaScript não executa ou é bloqueado
  * 
- * Melhorias v3.3:
- * - REGEX CORRIGIDO: googleapis.com para sssrr.org
- * - TIMEOUT: 30s (mantido de v3.2)
- * - FILTRO .JS: Validacao apos captura
- * - Padroes baseados em captura Burp Suite real
- * - Cache de URLs extraidas (5min)
- * - Retry logic (2 tentativas)
- * - Quality detection automatica
- * - Logs estruturados com ErrorLogger
+ * SOLUÇÃO v3.4:
+ * - PRIORIDADE 1: Direct HTML/Regex extraction (SEM WebView)
+ * - PRIORIDADE 2: AES-CTR decryption (já existente)
+ * - PRIORIDADE 3: JsUnpacker (já existente)
+ * - PRIORIDADE 4: WebView (fallback final)
+ * 
+ * Melhorias v3.4:
+ * - Nova estratégia: Buscar URLs sssrr.org diretamente no HTML
+ * - Padrões baseados em Burp Suite: sora/, future, .fd files
+ * - WebView movido para último fallback
+ * - Timeout reduzido para 20s (já que é fallback)
+ * - Logs melhorados para debug
  * 
  * Analise completa: brcloudstream/PLAYEREMBEDAPI_BURP_ANALYSIS_V123.md
  */
@@ -47,6 +48,9 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         callback: (ExtractorLink) -> Unit
     ) {
         val startTime = System.currentTimeMillis()
+        
+        Log.d(TAG, "=== PlayerEmbedAPI v3.4 - Direct API Extraction ===")
+        Log.d(TAG, "URL: $url")
         
         // 1. VERIFICAR CACHE
         val cached = VideoUrlCache.get(url)
@@ -71,6 +75,83 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
+        
+        // 2. DIRECT API EXTRACTION (v125 - Baseado em analise Postman)
+        // Fluxo descoberto:
+        // 1. GET playerembedapi.link/?v={videoId} -> HTML/JS
+        // 2. Extrair: host sssrr.org + video id
+        // 3. GET {host}.sssrr.org/?timestamp=&id={id} -> metadata
+        // 4. Extrair URL final: {host}.sssrr.org/sora/{streamId}/{token}
+        runCatching {
+            Log.d(TAG, "[1/4] Tentando Direct API Extraction...")
+            
+            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
+            val html = response.text
+            
+            Log.d(TAG, "HTML baixado: ${html.length} chars")
+            
+            // Extrair host sssrr.org (ex: htm4jbxon18)
+            val hostRegex = Regex("""https?://([a-z0-9]+)\.sssrr\.org""")
+            val hostMatch = hostRegex.find(html)
+            val sssrrHost = hostMatch?.groupValues?.get(1)
+            
+            // Extrair video ID (ex: qx5haz5c0wg)
+            val idRegex = Regex("""id["\s:=]+["']?([a-z0-9]+)["']?""", RegexOption.IGNORE_CASE)
+            val idMatch = idRegex.find(html)
+            val videoId = idMatch?.groupValues?.get(1)
+            
+            if (sssrrHost != null && videoId != null) {
+                Log.d(TAG, "Extraido - Host: $sssrrHost, VideoID: $videoId")
+                
+                // Fazer requisicao para API metadata
+                val metadataUrl = "https://$sssrrHost.sssrr.org/?timestamp=&id=$videoId"
+                Log.d(TAG, "Buscando metadata: $metadataUrl")
+                
+                val metadataResponse = app.get(
+                    metadataUrl,
+                    headers = mapOf(
+                        "Referer" to "https://playerembedapi.link/",
+                        "Origin" to "https://playerembedapi.link",
+                        "User-Agent" to USER_AGENT,
+                        "Accept" to "*/*"
+                    )
+                )
+                
+                val metadataText = metadataResponse.text
+                Log.d(TAG, "Metadata recebida: ${metadataText.take(200)}...")
+                
+                // Extrair URL final do video (sora API ou direct file)
+                val videoUrlRegex = Regex("""https?://[a-z0-9]+\.sssrr\.org/(?:sora/\d+/[A-Za-z0-9+/=]+|future|[\d/a-f]+\.fd)""")
+                val videoUrlMatch = videoUrlRegex.find(metadataText)
+                
+                if (videoUrlMatch != null) {
+                    val videoUrl = videoUrlMatch.value
+                    Log.d(TAG, "Direct API capturou: $videoUrl")
+                    
+                    val quality = QualityDetector.detectFromUrl(videoUrl)
+                    VideoUrlCache.put(url, videoUrl, quality, name)
+                    
+                    callback.invoke(
+                        newExtractorLink(
+                            source = name,
+                            name = "$name ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                            url = videoUrl,
+                            type = ExtractorLinkType.VIDEO
+                        ) {
+                            this.referer = "https://playerembedapi.link/"
+                            this.quality = quality
+                        }
+                    )
+                    
+                    Log.d(TAG, "Direct API Extraction: SUCESSO")
+                    return
+                }
+            }
+            
+            Log.d(TAG, "Direct API: Nao encontrou host/id ou video URL")
+        }.onFailure { e ->
+            Log.e(TAG, "Direct API falhou: ${e.message}")
+        }
         
         // 0. FETCH HTML (Shared) - v115: Detecção de 404
         val html = try {

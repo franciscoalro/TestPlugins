@@ -7,7 +7,7 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3 - PLAYWRIGHT OPTIMIZED (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.1 - JS FILTER FIX (Jan 2026)
  * 
  * Baseado em análise completa com Playwright + Burp Suite.
  * 
@@ -17,7 +17,8 @@ import android.util.Log
  * - Encriptação AES-CTR (key derivation complexa)
  * - Solução: WebView intercepta requisição final do vídeo
  * 
- * Melhorias v3:
+ * Melhorias v3.1:
+ * - ✅ FILTRO .JS: Ignora core.bundle.js e outros arquivos JavaScript
  * - ✅ Interceptação otimizada para Google Cloud Storage
  * - ✅ Padrões de URL baseados em análise real
  * - ✅ Timeout reduzido (15s) - vídeo carrega rápido
@@ -361,11 +362,12 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                     })()
                 """.trimIndent()
 
-                // URL Interception - v109: PLAYWRIGHT OPTIMIZED
+                // URL Interception - v122: FILTRO .JS ADICIONADO
                 // Baseado em análise real: vídeos vêm do Google Cloud Storage
                 // Pattern descoberto: storage.googleapis.com/mediastorage/{timestamp}/{random}/{video_id}.mp4
+                // v122: Ignorar arquivos .js (core.bundle.js, etc)
                 val resolver = WebViewResolver(
-                    interceptUrl = Regex("""(?i)storage\.googleapis\.com/mediastorage/.*\.mp4|\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/|/video/|\.txt$"""),
+                    interceptUrl = Regex("""(?i)(?!.*\.js)(?:storage\.googleapis\.com/mediastorage/.*\.mp4|\.m3u8|googlevideo|cloudatacdn|iamcdn|sssrr|valenium|/hls/|/video/|\.txt)"""),
                     script = captureScript,
                     scriptCallback = { result ->
                         if (result.isNotEmpty() && result.startsWith("http")) {
@@ -394,15 +396,20 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 val captured = response.url
                 
                 // Sucesso se capturou um vídeo ou chegou em um host final válido
-                // v109: Priorizar Google Cloud Storage (descoberto via Playwright)
-                val isVideo = captured.contains("storage.googleapis.com/mediastorage") || // PRIORIDADE 1
+                // v122: Priorizar Google Cloud Storage + FILTRO .JS
+                val isJsFile = captured.endsWith(".js") || captured.contains(".js?") || 
+                              captured.contains("core.bundle") || captured.contains("jwplayer")
+                              
+                val isVideo = !isJsFile && (
+                             captured.contains("storage.googleapis.com/mediastorage") || // PRIORIDADE 1
                              captured.contains(".mp4") || captured.contains(".m3u8") || 
                              captured.contains("googleapis") || captured.contains("cloudatacdn") ||
                              captured.contains("iamcdn.net") || captured.contains("sssrr.org") ||
                              captured.contains("valenium.shop") ||
                              captured.contains("master.txt")
+                )
                              
-                val isHost = captured.contains("abyss.to")
+                val isHost = !isJsFile && captured.contains("abyss.to")
 
                 if (isVideo || isHost) {
                     // 3. DETECTAR QUALIDADE

@@ -1,7 +1,7 @@
-version = 125
+version = 126
 
 cloudstream {
-    description = "MaxSeries v125 - Direct API Extraction (Bypass WebView) - Baseado em analise Postman"
+    description = "MaxSeries v126 - WebView Melhorado (120s timeout + melhor captura) - Aguarda descriptografia"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

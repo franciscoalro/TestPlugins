@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v125.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v126.0/MaxSeries.cs3",
         "status":  1,
-        "version":  125,
+        "version":  126,
         "apiVersion":  1,
-        "fileSize":  143000,
+        "fileSize":  146634,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v125 - Direct API Extraction (Bypass WebView) - Baseado em analise Postman",
+        "description":  "MaxSeries v126 - WebView Melhorado (120s timeout + melhor captura) - Aguarda descriptografia",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

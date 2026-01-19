@@ -23,7 +23,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
     override val requiresReferer = true
 
     companion object {
-        private const val TAG = "MegaEmbedExtractorV5_v126"
+        private const val TAG = "MegaEmbedExtractorV5_v127"
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         
         val DOMAINS = listOf(
@@ -43,7 +43,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V5 ALL STRATEGIES (v126) ===")
+        Log.d(TAG, "=== MEGAEMBED V5 CRYPTO INTERCEPTION (v127) ===")
         Log.d(TAG, "🎬 URL: $url")
         Log.d(TAG, "🔗 Referer: $referer")
         
@@ -56,28 +56,35 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
             
             Log.d(TAG, "🆔 VideoId: $videoId")
             
-            // ESTRATÉGIA 0: DIRECT API (v125 - NOVO - MAIS RÁPIDO)
-            Log.d(TAG, "🔍 [0/5] Tentando Direct API...")
+            // ESTRATÉGIA 0: CRYPTO INTERCEPTION (v127 - NOVO - INTERCEPTA DESCRIPTOGRAFIA)
+            Log.d(TAG, "🔍 [0/5] Tentando Crypto Interception...")
+            if (extractWithCryptoInterception(url, referer, callback)) {
+                Log.d(TAG, "✅ Crypto Interception funcionou!")
+                return
+            }
+            
+            // ESTRATÉGIA 1: DIRECT API (v125)
+            Log.d(TAG, "🔍 [1/5] Tentando Direct API...")
             if (extractWithDirectAPI(videoId, referer, callback)) {
                 Log.d(TAG, "✅ Direct API funcionou!")
                 return
             }
             
-            // ESTRATÉGIA 1: HTML REGEX (mais rápido)
-            Log.d(TAG, "🔍 [1/5] Tentando HTML Regex...")
+            // ESTRATÉGIA 2: HTML REGEX
+            Log.d(TAG, "🔍 [2/5] Tentando HTML Regex...")
             if (extractWithHtmlRegex(url, referer, callback)) {
                 Log.d(TAG, "✅ HTML Regex funcionou!")
                 return
             }
             
-            // ESTRATÉGIA 2: JS UNPACKER
-            Log.d(TAG, "🔍 [2/5] Tentando JsUnpacker...")
+            // ESTRATÉGIA 3: JS UNPACKER
+            Log.d(TAG, "🔍 [3/5] Tentando JsUnpacker...")
             if (extractWithJsUnpacker(url, referer, callback)) {
                 Log.d(TAG, "✅ JsUnpacker funcionou!")
                 return
             }
             
-            // ESTRATÉGIA 3: WEBVIEW JAVASCRIPT-ONLY
+            // ESTRATÉGIA 4: WEBVIEW JAVASCRIPT-ONLY
             Log.d(TAG, "🔍 [3/5] Tentando WebView JavaScript-Only...")
             if (extractWithWebViewJavaScript(url, referer, callback)) {
                 Log.d(TAG, "✅ WebView JavaScript funcionou!")
@@ -91,7 +98,7 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
                 return
             }
             
-            Log.e(TAG, "❌ FALHA: Todas as 5 estratégias falharam")
+            Log.e(TAG, "❌ FALHA: Todas as 6 estratégias falharam")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro crítico V5: ${e.message}")
@@ -100,7 +107,149 @@ class MegaEmbedExtractorV5 : ExtractorApi() {
     }
 
     /**
-     * ESTRATÉGIA 0: Direct API (v125 - NOVO)
+     * ESTRATÉGIA 0: Crypto Interception (v127 - NOVO)
+     * Intercepta crypto.subtle.decrypt() para capturar URL descriptografada
+     * Mais confiável que aguardar URL aparecer no DOM
+     */
+    private suspend fun extractWithCryptoInterception(
+        url: String,
+        referer: String?,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        return try {
+            var capturedUrl: String? = null
+            
+            // Script para interceptar crypto.subtle.decrypt
+            val cryptoInterceptScript = """
+                (function() {
+                    console.log('[MegaEmbed v127] Interceptando crypto.subtle.decrypt...');
+                    
+                    if (!window.crypto || !window.crypto.subtle) {
+                        console.log('[MegaEmbed v127] crypto.subtle não disponível');
+                        return;
+                    }
+                    
+                    const originalDecrypt = window.crypto.subtle.decrypt;
+                    window.crypto.subtle.decrypt = function(...args) {
+                        console.log('[MegaEmbed v127] decrypt() chamado');
+                        console.log('[MegaEmbed v127] Algorithm:', args[0]);
+                        
+                        return originalDecrypt.apply(this, args).then(result => {
+                            try {
+                                const text = new TextDecoder().decode(result);
+                                console.log('[MegaEmbed v127] Descriptografado:', text.substring(0, 300));
+                                
+                                // Tentar parsear como JSON
+                                try {
+                                    const json = JSON.parse(text);
+                                    console.log('[MegaEmbed v127] JSON keys:', Object.keys(json));
+                                    
+                                    // Procurar URL em várias propriedades
+                                    const url = json.url || json.file || json.source || json.playlist || 
+                                               json.sources?.[0]?.file || json.sources?.[0]?.url;
+                                    
+                                    if (url && (url.includes('.txt') || url.includes('.m3u8') || url.includes('.mp4'))) {
+                                        window.__MEGAEMBED_VIDEO_URL__ = url;
+                                        console.log('[MegaEmbed v127] ✅ URL encontrada:', url);
+                                    }
+                                } catch(e) {
+                                    console.log('[MegaEmbed v127] Não é JSON:', e.message);
+                                    
+                                    // Tentar regex se não for JSON
+                                    const urlMatch = text.match(/https?:\/\/[^\s"']+\.(?:txt|m3u8|mp4)/i);
+                                    if (urlMatch) {
+                                        window.__MEGAEMBED_VIDEO_URL__ = urlMatch[0];
+                                        console.log('[MegaEmbed v127] ✅ URL encontrada (regex):', urlMatch[0]);
+                                    }
+                                }
+                            } catch(e) {
+                                console.log('[MegaEmbed v127] Erro ao processar:', e.message);
+                            }
+                            
+                            return result;
+                        }).catch(err => {
+                            console.log('[MegaEmbed v127] Erro no decrypt:', err);
+                            throw err;
+                        });
+                    };
+                    
+                    console.log('[MegaEmbed v127] ✅ Interceptação ativada');
+                })();
+            """.trimIndent()
+            
+            val resolver = WebViewResolver(
+                interceptUrl = Regex("""\.txt$"""),
+                script = """
+                    $cryptoInterceptScript
+                    
+                    return new Promise(function(resolve) {
+                        var attempts = 0;
+                        var maxAttempts = 600; // 60s
+                        
+                        var interval = setInterval(function() {
+                            attempts++;
+                            
+                            // Verificar se URL foi capturada pela interceptação
+                            if (window.__MEGAEMBED_VIDEO_URL__) {
+                                clearInterval(interval);
+                                console.log('[MegaEmbed v127] Resolvendo com:', window.__MEGAEMBED_VIDEO_URL__);
+                                resolve(window.__MEGAEMBED_VIDEO_URL__);
+                                return;
+                            }
+                            
+                            // Log a cada 5s
+                            if (attempts % 50 === 0) {
+                                console.log('[MegaEmbed v127] Aguardando... (' + (attempts/10) + 's)');
+                            }
+                            
+                            // Timeout
+                            if (attempts >= maxAttempts) {
+                                clearInterval(interval);
+                                console.log('[MegaEmbed v127] ⏱️ Timeout após', attempts/10, 'segundos');
+                                resolve('');
+                            }
+                        }, 100);
+                    });
+                """.trimIndent(),
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
+                        capturedUrl = result.trim('"')
+                        Log.d(TAG, "📜 Crypto Interception capturou: $capturedUrl")
+                    }
+                },
+                timeout = 60_000L // 60s
+            )
+            
+            Log.d(TAG, "🔐 Iniciando WebView com interceptação crypto...")
+            
+            app.get(
+                url,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to (referer ?: "https://playerthree.online/"),
+                    "Origin" to "https://megaembed.link",
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                ),
+                interceptor = resolver
+            )
+            
+            if (capturedUrl != null && isValidVideoUrl(capturedUrl)) {
+                Log.d(TAG, "🎯 Crypto Interception funcionou: $capturedUrl")
+                emitExtractorLink(capturedUrl!!, url, callback)
+                return true
+            }
+            
+            Log.d(TAG, "⚠️ Crypto Interception: Nenhuma URL capturada")
+            false
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Crypto Interception falhou: ${e.message}")
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * ESTRATÉGIA 1: Direct API (v125)
      * Faz requisição direta para API sem WebView
      * Baseado nos logs ADB que mostram: /api/v1/info?id=3wnuij
      */

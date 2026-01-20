@@ -2,7 +2,7 @@ package com.franciscoalro.maxseries
 
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.BasePlugin
-import com.franciscoalro.maxseries.extractors.*
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV7
 
 @CloudstreamPlugin
 class MaxSeriesPlugin: BasePlugin() {
@@ -10,18 +10,7 @@ class MaxSeriesPlugin: BasePlugin() {
         // Registrar provider principal
         registerMainAPI(MaxSeriesProvider())
         
-        // Registrar extractors principais (Prioridade 1 e 10)
-        registerExtractorAPI(PlayerEmbedAPIExtractor())
-        registerExtractorAPI(MegaEmbedSimpleExtractor())
-        
-        // Registrar extractors adicionais (Prioridade 2-9)
-        registerExtractorAPI(MyVidPlayExtractor())
-        registerExtractorAPI(StreamtapeExtractor())
-        registerExtractorAPI(FilemoonExtractor())
-        registerExtractorAPI(DoodStreamExtractor())
-        registerExtractorAPI(MixdropExtractor())
-        registerExtractorAPI(VidStackExtractor())
-        registerExtractorAPI(MediaFireExtractor())
-        // AjaxPlayerExtractor é um helper, não um ExtractorApi
+        // Registrar apenas MegaEmbed V7 (único extractor necessário)
+        registerExtractorAPI(MegaEmbedExtractorV7())
     }
 }

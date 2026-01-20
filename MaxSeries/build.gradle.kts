@@ -1,7 +1,7 @@
-version = 127
+version = 129
 
 cloudstream {
-    description = "MaxSeries v127 - Crypto Interception (intercepta crypto.subtle.decrypt) - Captura URL descriptografada"
+    description = "MaxSeries v129 - APENAS MegaEmbed V7 (~100% sucesso) - Cache + WebView fallback"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

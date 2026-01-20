@@ -34,7 +34,12 @@ import android.util.Log
  * - Segmentos podem ser .woff/.woff2 (camuflados como fontes)
  * - Exemplos: init-f1-v1-a1.woff, seg-1-f1-v1-a1.woff2
  * - WebView detecta automaticamente e converte para index.txt
- * - Regex captura: init*.woff, seg*.woff2, qualquer .woff/.woff2
+ * 
+ * REGEX ULTRA-OTIMIZADO v136:
+ * - Padrão: https://s{SUB}.{DOMAIN}.{TLD}/v4/{CLUSTER}/{VIDEO_ID}/{FILE}.{EXT}
+ * - Captura QUALQUER arquivo novo automaticamente
+ * - Performance máxima para WebView intercept
+ * - Regex: https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/\w{1,3}/\w{6}/\S+\.(txt|woff2?)
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -223,15 +228,25 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 })()
             """.trimIndent()
             
-            // Interceptar requisições para todos os formatos conhecidos
-            // Regex melhorado para capturar:
-            // - index*.txt (index.txt, index-f1-v1-a1.txt, index-f2-v1-a1.txt)
-            // - cf-master*.txt (cf-master.txt, cf-master.1767375808.txt)
-            // - init*.woff (init-f1-v1-a1.woff, init-f2-v1-a1.woff)
-            // - seg*.woff2? (seg-1-f1-v1-a1.woff2, seg-2-f1-v1-a1.woff)
-            // - Qualquer .woff ou .woff2 (camuflados como fontes)
+            // Interceptar requisições usando REGEX ULTRA-OTIMIZADO
+            // Padrão completo da URL: https://s{SUB}.{DOMAIN}.{TLD}/v4/{CLUSTER}/{VIDEO_ID}/{FILE}.{EXT}
+            // 
+            // Componentes:
+            // - s\w{2,4}                                    → Subdomínio (s9r1, spuc, ssu5, etc)
+            // - \.\w+\.(store|sbs|cyou|space|cfd|shop)     → Domínio + TLD
+            // - /v4/                                        → Path fixo
+            // - \w{1,3}                                     → Cluster (il, ty, 5w3, etc)
+            // - /\w{6}/                                     → Video ID (6 caracteres)
+            // - \S+\.(txt|woff2?)                           → Arquivo (qualquer nome + extensão)
+            //
+            // Captura TODOS os formatos:
+            // ✅ index.txt, index-f1-v1-a1.txt, index-f2-v1-a1.txt
+            // ✅ cf-master.txt, cf-master.1767375808.txt
+            // ✅ init-f1-v1-a1.woff, init-f2-v1-a1.woff2
+            // ✅ seg-1-f1-v1-a1.woff2, seg-2-f1-v1-a1.woff
+            // ✅ Qualquer arquivo novo com .txt/.woff/.woff2
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""(?i)(index[^/]*\.txt|cf-master[^/]*\.txt|init[^/]*\.woff2?|seg[^/]*\.woff2?|\.woff2?)"""),
+                interceptUrl = Regex("""https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/\w{1,3}/\w{6}/\S+\.(txt|woff2?)""", RegexOption.IGNORE_CASE),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "WebView script result: $result")

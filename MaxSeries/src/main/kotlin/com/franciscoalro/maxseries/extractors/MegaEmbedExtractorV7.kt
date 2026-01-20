@@ -117,18 +117,12 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             Log.d(TAG, "✅ Cache hit: $videoId")
             ErrorLogger.logCache(url, hit = true, VideoUrlCache.getStats())
             
-            callback.invoke(
-                newExtractorLink(
-                    source = name,
-                    name = "$name ${QualityDetector.getQualityLabel(cached.quality)}",
-                    url = cached.url,
-                    type = ExtractorLinkType.VIDEO
-                ) {
-                    this.referer = mainUrl
-                    this.quality = cached.quality
-                    this.headers = cdnHeaders
-                }
-            )
+            M3u8Helper.generateM3u8(
+                source = name,
+                streamUrl = cached.url,
+                referer = mainUrl,
+                headers = cdnHeaders
+            ).forEach(callback)
             return
         }
         
@@ -144,18 +138,14 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 val quality = QualityDetector.detectFromUrl(cdnUrl)
                 VideoUrlCache.put(url, cdnUrl, quality, name)
                 
-                callback.invoke(
-                    newExtractorLink(
-                        source = name,
-                        name = "$name ${QualityDetector.getQualityLabel(quality)} (${pattern.name})",
-                        url = cdnUrl,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = mainUrl
-                        this.quality = quality
-                        this.headers = cdnHeaders
-                    }
-                )
+                // Usar M3u8Helper para processar o stream
+                M3u8Helper.generateM3u8(
+                    source = name,
+                    streamUrl = cdnUrl,
+                    referer = mainUrl,
+                    headers = cdnHeaders
+                ).forEach(callback)
+                
                 return
             }
         }
@@ -198,18 +188,14 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 val quality = QualityDetector.detectFromUrl(captured)
                 VideoUrlCache.put(url, captured, quality, name)
                 
-                callback.invoke(
-                    newExtractorLink(
-                        source = name,
-                        name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView)",
-                        url = captured,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = mainUrl
-                        this.quality = quality
-                        this.headers = cdnHeaders
-                    }
-                )
+                // Usar M3u8Helper para processar o stream
+                M3u8Helper.generateM3u8(
+                    source = name,
+                    streamUrl = captured,
+                    referer = mainUrl,
+                    headers = cdnHeaders
+                ).forEach(callback)
+                
             } else if (captured.contains(".woff2")) {
                 // Converter URL .woff2 para index.txt
                 val parts = captured.split("/")
@@ -226,18 +212,14 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                     val quality = QualityDetector.detectFromUrl(cdnUrl)
                     VideoUrlCache.put(url, cdnUrl, quality, name)
                     
-                    callback.invoke(
-                        newExtractorLink(
-                            source = name,
-                            name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView)",
-                            url = cdnUrl,
-                            type = ExtractorLinkType.VIDEO
-                        ) {
-                            this.referer = mainUrl
-                            this.quality = quality
-                            this.headers = cdnHeaders
-                        }
-                    )
+                    // Usar M3u8Helper para processar o stream
+                    M3u8Helper.generateM3u8(
+                        source = name,
+                        streamUrl = cdnUrl,
+                        referer = mainUrl,
+                        headers = cdnHeaders
+                    ).forEach(callback)
+                    
                 } else {
                     Log.e(TAG, "❌ Falha ao converter .woff2 para index.txt")
                 }

@@ -13,31 +13,22 @@ import com.franciscoalro.maxseries.utils.LinkDecryptor
 import com.franciscoalro.maxseries.utils.RegexPatterns
 import com.franciscoalro.maxseries.utils.BRExtractorUtils
 
-// Extractors adicionais (saimuelrepo patterns)
-import com.franciscoalro.maxseries.extractors.MediaFireExtractor
-import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
-import com.franciscoalro.maxseries.extractors.FilemoonExtractor
-import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
-import com.franciscoalro.maxseries.extractors.MixdropExtractor
-import com.franciscoalro.maxseries.extractors.VidStackExtractor
+// Extractor único: MegaEmbed V7
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV7
 
 /**
- * MaxSeries Provider v128 - MegaEmbed V7 COMPLETO (Jan 2026)
+ * MaxSeries Provider v129 - APENAS MegaEmbed V7 (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
  * 2. playerthree.online/episodio/{id} → botões data-source
- * 3. Sources disponíveis (10 extractors suportados):
- *    - playerembedapi.link (MP4 direto - PRIORIDADE 1)
- *    - myvidplay.com (MP4 direto - PRIORIDADE 2)
- *    - streamtape.com (MP4 direto - PRIORIDADE 3)
- *    - dood/doodstream (MP4/HLS - PRIORIDADE 4)
- *    - mixdrop (MP4/HLS - PRIORIDADE 5)
- *    - filemoon (MP4 - PRIORIDADE 6)
- *    - uqload (MP4 - PRIORIDADE 7)
- *    - vidcloud (HLS - PRIORIDADE 8)
- *    - upstream (MP4 - PRIORIDADE 9)
- *    - megaembed.link V7 (HLS - PRIORIDADE 10 - ~100% SUCESSO)
+ * 3. Source único:
+ *    - megaembed.link V7 (HLS - ~100% SUCESSO)
+ * 
+ * v129 Changes (19 Jan 2026):
+ * - REMOVIDO: PlayerEmbedAPI e todos os outros extractors
+ * - MANTIDO: Apenas MegaEmbed V7 (mais confiável)
+ * - Simplificação total do código
  * 
  * v128 Changes (19 Jan 2026):
  * - MegaEmbed V7: Versão Completa com WebView Fallback
@@ -47,13 +38,7 @@ import com.franciscoalro.maxseries.extractors.VidStackExtractor
  * - WebView descobre novos subdomínios automaticamente
  * - Performance: ~2s (80%) / ~8s (20% primeira vez) / ~1s (cache)
  * 
- * v78 Changes:
- * - Busca corrigida: suporte a .result-item (página de busca)
- * - Fallback para article.item se necessário
- * - Logs melhorados para debug
- * 
- * Priorização: MP4 direto > HLS normal > HLS ofuscado
- * (evita erro 3003 priorizando MP4)
+ * Priorização: Apenas MegaEmbed (mais estável e confiável)
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.one"
@@ -67,15 +52,6 @@ class MaxSeriesProvider : MainAPI() {
         private const val TAG = "MaxSeriesProvider"
         // User-Agent do Firefox (HAR real)
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
-
-        val customExtractors = listOf(
-            MediaFireExtractor(),
-            StreamtapeExtractor(),
-            FilemoonExtractor(),
-            DoodStreamExtractor(),
-            MixdropExtractor(),
-            VidStackExtractor()
-        )
     }
 
     override val mainPage = mainPageOf(
@@ -482,99 +458,32 @@ class MaxSeriesProvider : MainAPI() {
                 ServerPriority.detectServer(source)
             }
             
-            Log.d(TAG, "📋 Sources ordenadas por prioridade (v97 - ServerPriority): $sortedSources")
+            Log.d(TAG, "📋 Sources ordenadas por prioridade (v129 - Apenas MegaEmbed): $sortedSources")
             
             for (source in sortedSources) {
                 Log.d(TAG, "🔄 Processando: $source")
                 try {
                     when {
-                        // PRIORIDADE 0: MediaFire (se aplicável)
-                        MediaFireExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P0] MediaFireExtractor - Download direto")
-                            val extractor = MediaFireExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 1: PlayerEmbedAPI (MP4 do Google Cloud Storage - WebView)
-                        source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P1] PlayerEmbedAPIExtractor - MP4 direto (WebView)")
-                            val extractor = com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 2: MyVidPlay (MP4 direto do cloudatacdn)
-                        source.contains("myvidplay", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P2] MyVidPlayExtractor - MP4 direto")
-                            val extractor = com.franciscoalro.maxseries.extractors.MyVidPlayExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 3: Streamtape (Custom Extractor - saimuelrepo)
-                        StreamtapeExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P3] StreamtapeExtractor - Custom (saimuelrepo)")
-                            val extractor = StreamtapeExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 4: Filemoon (Custom Extractor + JsUnpacker)
-                        FilemoonExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P4] FilemoonExtractor - Custom (JsUnpacker)")
-                            val extractor = FilemoonExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 5: DoodStream (Custom Extractor - all variants)
-                        DoodStreamExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P5] DoodStreamExtractor - Custom (all domains)")
-                            val extractor = DoodStreamExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 6: Mixdrop (Custom Extractor + JsUnpacker)
-                        MixdropExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P6] MixdropExtractor - Custom (JsUnpacker)")
-                            val extractor = MixdropExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 7: VidStack/EmbedPlay
-                        VidStackExtractor.canHandle(source) -> {
-                            Log.d(TAG, "🎬 [P7] VidStackExtractor - Custom (EmbedPlay)")
-                            val extractor = VidStackExtractor()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 8-9: Built-in extractors (CloudStream nativo)
-                        source.contains("uqload", ignoreCase = true) ||
-                        source.contains("vidcloud", ignoreCase = true) ||
-                        source.contains("upstream", ignoreCase = true) -> {
-                            val extractorName = when {
-                                source.contains("uqload", ignoreCase = true) -> "Uqload [P8]"
-                                source.contains("vidcloud", ignoreCase = true) -> "VidCloud [P9]"
-                                source.contains("upstream", ignoreCase = true) -> "UpStream [P10]"
-                                else -> "Built-in"
-                            }
-                            Log.d(TAG, "🎬 $extractorName via loadExtractor (built-in)")
-                            loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        // PRIORIDADE 10: MegaEmbed V7 (VERSÃO COMPLETA - 100% sucesso)
+                        // ÚNICA PRIORIDADE: MegaEmbed V7 (~100% sucesso)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P10] MegaEmbedExtractorV7 - VERSÃO COMPLETA (~100% sucesso)")
+                            Log.d(TAG, "🎬 [P1] MegaEmbedExtractorV7 - VERSÃO COMPLETA (~100% sucesso)")
                             val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV7()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // Fallback: tentar loadExtractor genérico para outros players
                         else -> {
-                            Log.d(TAG, "🎬 [FALLBACK] loadExtractor genérico")
-                            loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
+                            Log.d(TAG, "⚠️ Source não suportado (apenas MegaEmbed): $source")
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "⚠️ Erro no extractor para $source: ${e.message}")
+                    Log.e(TAG, "❌ Erro ao processar source: $source", e)
                 }
+            }
+
+            if (linksFound == 0) {
+                Log.w(TAG, "⚠️ Nenhum link MegaEmbed encontrado")
+            } else {
+                Log.d(TAG, "✅ Total de links encontrados: $linksFound")
             }
             
         } catch (e: Exception) {

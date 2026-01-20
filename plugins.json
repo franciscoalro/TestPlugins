@@ -21,9 +21,9 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v131.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v132.0/MaxSeries.cs3",
         "status":  1,
-        "version":  131,
+        "version":  132,
         "apiVersion":  1,
         "fileSize":  153745,
         "name":  "MaxSeries",
@@ -31,7 +31,7 @@
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v131 - M3u8Helper fix para player interno",
+        "description":  "MaxSeries v132 - 12 CDNs + 4 variacoes (index-f1-v1-a1.txt)",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

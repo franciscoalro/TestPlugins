@@ -14,11 +14,17 @@ import android.util.Log
  * 
  * Estratégia de 3 fases:
  * 1. Cache (instantâneo se já descoberto)
- * 2. Padrões conhecidos (rápido - 5 CDNs)
+ * 2. Padrões conhecidos (rápido - 12 CDNs, 4 variações)
  * 3. WebView fallback (lento mas descobre tudo)
  * 
- * Descoberta: 19 de Janeiro de 2026
+ * Descoberta: 19-20 de Janeiro de 2026
  * Baseado em análise de logs HAR e testes automatizados
+ * 
+ * VARIAÇÕES DE ARQUIVO SUPORTADAS:
+ * - index.txt (40%)
+ * - index-f1-v1-a1.txt (30%) - formato segmentado
+ * - cf-master.txt (20%)
+ * - cf-master.{timestamp}.txt (10%)
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -48,9 +54,10 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
      * - Por isso tentamos múltiplos padrões + WebView fallback
      * 
      * VARIAÇÕES DE ARQUIVO:
-     * - index.txt (mais comum)
-     * - cf-master.txt (alternativo)
-     * - cf-master.{timestamp}.txt (com cache busting)
+     * - index.txt (mais comum ~40%)
+     * - index-f1-v1-a1.txt (formato segmentado ~30%)
+     * - cf-master.txt (alternativo ~20%)
+     * - cf-master.{timestamp}.txt (com cache busting ~10%)
      */
     private val cdnPatterns = listOf(
         // valenium.shop (tipo is9)
@@ -66,8 +73,26 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         // travianastudios.space (tipo 5c)
         CDNPattern("se9d.travianastudios.space", "5c", "Traviana"),
         
-        // rivonaengineering.sbs (tipo db) - NOVO!
+        // rivonaengineering.sbs (tipo db)
         CDNPattern("srcf.rivonaengineering.sbs", "db", "Rivona"),
+        
+        // alphastrahealth.store (tipo il) - NOVO!
+        CDNPattern("spuc.alphastrahealth.store", "il", "Alphastra"),
+        
+        // wanderpeakevents.store (tipo ty) - NOVO!
+        CDNPattern("ssu5.wanderpeakevents.store", "ty", "Wanderpeak"),
+        
+        // stellarifyventures.sbs (tipo jcp) - NOVO!
+        CDNPattern("sqtd.stellarifyventures.sbs", "jcp", "Stellarify"),
+        
+        // lyonic.cyou (tipo ty) - NOVO!
+        CDNPattern("silu.lyonic.cyou", "ty", "Lyonic"),
+        
+        // mindspireleadership.space (tipo x68) - NOVO!
+        CDNPattern("shkn.mindspireleadership.space", "x68", "Mindspire"),
+        
+        // evercresthospitality.space (tipo vz1) - NOVO!
+        CDNPattern("s9r1.evercresthospitality.space", "vz1", "Evercrest"),
     )
     
     /**
@@ -163,9 +188,9 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 })()
             """.trimIndent()
             
-            // Interceptar requisições para index.txt, cf-master.txt ou .woff2
+            // Interceptar requisições para todos os formatos conhecidos
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""(?i)(index\.txt|cf-master.*\.txt|\.woff2)"""),
+                interceptUrl = Regex("""(?i)(index.*\.txt|cf-master.*\.txt|\.woff2)"""),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "WebView script result: $result")
@@ -181,8 +206,8 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             val response = app.get(url, headers = headers, interceptor = resolver)
             val captured = response.url
             
-            // Verificar se capturou index.txt ou cf-master (M3U8 camuflado)
-            if (captured.contains("index.txt") || captured.contains("cf-master")) {
+            // Verificar se capturou index.txt, index-f1-v1-a1.txt ou cf-master (M3U8 camuflado)
+            if (captured.contains("index") && captured.endsWith(".txt") || captured.contains("cf-master")) {
                 Log.d(TAG, "✅ WebView descobriu: $captured")
                 
                 val quality = QualityDetector.detectFromUrl(captured)
@@ -269,13 +294,20 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
     /**
      * Tenta acessar URL do CDN com múltiplas variações de arquivo
      * 
-     * @return true se URL é válida e retorna M3U8
+     * VARIAÇÕES DESCOBERTAS:
+     * 1. index.txt (mais comum)
+     * 2. cf-master.txt (alternativo)
+     * 3. cf-master.{timestamp}.txt (com cache busting)
+     * 4. index-f1-v1-a1.txt (NOVO! formato segmentado)
+     * 
+     * @return URL válida se encontrada
      */
     private suspend fun tryUrlWithVariations(baseUrl: String, pattern: CDNPattern, videoId: String): String? {
         val variations = listOf(
-            "index.txt",
-            "cf-master.txt",
-            "cf-master.${System.currentTimeMillis() / 1000}.txt" // timestamp atual
+            "index.txt",                                          // Variação 1 (~40%)
+            "index-f1-v1-a1.txt",                                 // Variação 4 (~30%) NOVO!
+            "cf-master.txt",                                      // Variação 2 (~20%)
+            "cf-master.${System.currentTimeMillis() / 1000}.txt"  // Variação 3 (~10%)
         )
         
         for (variation in variations) {

@@ -21,9 +21,9 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v139.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v141/MaxSeries.cs3",
         "status":  1,
-        "version":  139,
+        "version":  141,
         "apiVersion":  1,
         "fileSize":  153800,
         "name":  "MaxSeries",
@@ -31,7 +31,7 @@
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v139 - Otimizado (2 fases: Cache + WebView)",
+        "description":  "MaxSeries v141 - Regex Ultra-Simplificado (máxima flexibilidade)",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

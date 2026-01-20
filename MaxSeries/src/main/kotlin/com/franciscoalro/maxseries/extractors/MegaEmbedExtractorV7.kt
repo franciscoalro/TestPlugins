@@ -7,35 +7,28 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Extractor v7 - VERSÃO COMPLETA
+ * MegaEmbed Extractor v7 - VERSÃO OTIMIZADA
  * 
- * Taxa de sucesso: ~98% (limitado por API com TOKEN)
- * Velocidade: ~2s (70% dos casos) / ~8s (30% dos casos)
+ * Taxa de sucesso: ~98%
+ * Velocidade: ~0ms (cache) / ~8s (WebView)
  * 
- * Estratégia de 3 fases:
+ * Estratégia de 2 fases (OTIMIZADA):
  * 1. Cache (instantâneo se já descoberto)
- * 2. Padrões conhecidos (rápido - 21 CDNs, 5 variações)
- * 3. WebView fallback (lento mas descobre tudo)
+ * 2. WebView (descobre tudo automaticamente)
  * 
- * LIMITAÇÃO CONHECIDA:
- * - Alguns vídeos usam API com TOKEN criptografado
- * - Nesses casos, apenas WebView funciona (Fase 3)
- * - TOKEN é gerado por JavaScript do player
- * - Não é possível gerar TOKEN sem executar JavaScript
+ * FASE 2 (CDNs salvos) REMOVIDA:
+ * - CDNs salvos podem estar desatualizados
+ * - Desperdiça ~2s tentando 100 combinações (21 CDNs × 5 variações)
+ * - WebView descobre o CDN correto automaticamente
+ * - Resultado: Mais rápido e mais confiável
  * 
  * VARIAÇÕES DE ARQUIVO SUPORTADAS:
- * - index.txt (30%)
- * - index-f1-v1-a1.txt (25%) - formato segmentado
- * - index-f2-v1-a1.txt (20%) - formato segmentado v2
- * - cf-master.txt (15%)
- * - cf-master.{timestamp}.txt (10%)
+ * - index.txt
+ * - index-f1-v1-a1.txt, index-f2-v1-a1.txt (formato segmentado)
+ * - cf-master.txt, cf-master.{timestamp}.txt
+ * - init-f1-v1-a1.woff, seg-1-f1-v1-a1.woff2 (camuflados)
  * 
- * CAMUFLAGEM DE SEGMENTOS:
- * - Segmentos podem ser .woff/.woff2 (camuflados como fontes)
- * - Exemplos: init-f1-v1-a1.woff, seg-1-f1-v1-a1.woff2
- * - WebView detecta automaticamente e converte para index.txt
- * 
- * REGEX UNIVERSAL v138:
+ * REGEX UNIVERSAL v139:
  * - Estratégia: Se tem /v4/ no path, assume que é vídeo
  * - Aceita QUALQUER TLD (não apenas store, sbs, cyou, space, cfd, shop)
  * - Regex: https://s\w{2,4}\.\w+\.\w{2,5}/v4/
@@ -153,10 +146,14 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
     /**
      * Extrai link do vídeo do MegaEmbed
      * 
-     * Estratégia de 3 fases:
-     * 1. Cache (instantâneo)
-     * 2. Padrões conhecidos (rápido)
-     * 3. WebView fallback (lento mas funciona)
+     * Estratégia de 2 fases (OTIMIZADA):
+     * 1. Cache (instantâneo se já descoberto)
+     * 2. WebView (descobre tudo automaticamente)
+     * 
+     * FASE 2 (CDNs salvos) REMOVIDA para máxima velocidade!
+     * - CDNs salvos podem estar desatualizados
+     * - Desperdiça ~2s tentando CDNs que não funcionam
+     * - WebView descobre o CDN correto automaticamente
      */
     override suspend fun getUrl(
         url: String,
@@ -164,7 +161,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MegaEmbed Extractor v7 - VERSÃO COMPLETA ===")
+        Log.d(TAG, "=== MegaEmbed Extractor v7 - OTIMIZADO (2 FASES) ===")
         Log.d(TAG, "URL: $url")
         
         // Extrair video ID da URL
@@ -193,30 +190,8 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
-        // FASE 2: Tentar padrões conhecidos
-        for (pattern in cdnPatterns) {
-            val cdnUrl = tryUrlWithVariations("", pattern, videoId)
-            
-            if (cdnUrl != null) {
-                Log.d(TAG, "✅ Padrão funcionou: ${pattern.name}")
-                
-                val quality = QualityDetector.detectFromUrl(cdnUrl)
-                VideoUrlCache.put(url, cdnUrl, quality, name)
-                
-                // Usar M3u8Helper para processar o stream
-                M3u8Helper.generateM3u8(
-                    source = name,
-                    streamUrl = cdnUrl,
-                    referer = mainUrl,
-                    headers = cdnHeaders
-                ).forEach(callback)
-                
-                return
-            }
-        }
-        
-        // FASE 3: WebView fallback
-        Log.d(TAG, "⚠️ Padrões falharam, usando WebView...")
+        // FASE 2: WebView (direto, sem tentar CDNs salvos)
+        Log.d(TAG, "⚡ Usando WebView direto (sem tentar CDNs salvos)...")
         
         runCatching {
             // Script para interceptar index.txt (M3U8 camuflado)

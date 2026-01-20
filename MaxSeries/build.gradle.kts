@@ -1,7 +1,7 @@
-version = 129
+version = 130
 
 cloudstream {
-    description = "MaxSeries v129 - APENAS MegaEmbed V7 (~100% sucesso) - Cache + WebView fallback"
+    description = "MaxSeries v130 - MegaEmbed V7 (.txt camuflado) - ~100% sucesso"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

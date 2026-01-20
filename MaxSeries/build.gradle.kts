@@ -1,7 +1,7 @@
-version = 135
+version = 136
 
 cloudstream {
-    description = "MaxSeries v135 - Regex melhorado (.woff/.woff2 support)"
+    description = "MaxSeries v136 - Regex ultra-otimizado (padrão completo)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

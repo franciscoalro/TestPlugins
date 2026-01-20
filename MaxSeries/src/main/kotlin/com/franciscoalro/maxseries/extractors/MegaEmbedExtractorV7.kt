@@ -118,18 +118,13 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 "Referer" to mainUrl
             )
             
-            app.get(url, headers = headers, interceptor = resolver)
+            val response = app.get(url, headers = headers, interceptor = resolver)
             
-            // CLASSIFICAÇÃO
-            val all = resolver.interceptedUrls
-            Log.d(TAG, "Interceptadas: ${all.size}")
+            // CLASSIFICAÇÃO - usar a URL da resposta
+            val videoUrl = response.url
             
-            val videoUrl = all.firstOrNull { u ->
-                patterns.any { it.containsMatchIn(u) }
-            }
-            
-            if (videoUrl == null) {
-                Log.e(TAG, "❌ Nenhuma URL válida detectada")
+            if (!patterns.any { it.containsMatchIn(videoUrl) }) {
+                Log.e(TAG, "❌ URL não corresponde aos padrões: $videoUrl")
                 return
             }
             

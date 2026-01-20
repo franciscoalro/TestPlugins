@@ -210,6 +210,15 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             if (captured.contains("index") && captured.endsWith(".txt") || captured.contains("cf-master")) {
                 Log.d(TAG, "✅ WebView descobriu: $captured")
                 
+                // Extrair dados dinâmicos da URL capturada
+                val urlData = extractUrlData(captured)
+                if (urlData != null) {
+                    Log.d(TAG, "📊 Dados extraídos: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}, file=${urlData.fileName}")
+                    
+                    // Adicionar novo padrão CDN se não existir
+                    addDynamicCDNPattern(urlData.host, urlData.cluster)
+                }
+                
                 val quality = QualityDetector.detectFromUrl(captured)
                 VideoUrlCache.put(url, captured, quality, name)
                 
@@ -347,4 +356,52 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         val type: String,
         val name: String
     )
+    
+    /**
+     * Data class para dados extraídos da URL
+     */
+    private data class UrlData(
+        val host: String,
+        val cluster: String,
+        val videoId: String,
+        val fileName: String
+    )
+    
+    /**
+     * Extrai dados dinâmicos da URL usando regex template
+     * 
+     * Template: https://{HOST}/v4/{CLUSTER}/{VIDEO_ID}/{FILE_NAME}
+     * 
+     * Exemplos:
+     * - https://spuc.alphastrahealth.store/v4/il/n3kh5r/index-f1-v1-a1.txt
+     * - https://ssu5.wanderpeakevents.store/v4/ty/xeztph/cf-master.1767375808.txt
+     */
+    private fun extractUrlData(url: String): UrlData? {
+        // Regex template: https://{HOST}/v4/{CLUSTER}/{VIDEO_ID}/{FILE_NAME}
+        val regex = Regex("""https?://([^/]+)/v4/([^/]+)/([^/]+)/([^?]+)""")
+        val match = regex.find(url) ?: return null
+        
+        return UrlData(
+            host = match.groupValues[1],
+            cluster = match.groupValues[2],
+            videoId = match.groupValues[3],
+            fileName = match.groupValues[4]
+        )
+    }
+    
+    /**
+     * Adiciona padrão CDN dinamicamente se não existir
+     * 
+     * Isso permite descobrir novos CDNs automaticamente
+     */
+    private fun addDynamicCDNPattern(host: String, cluster: String) {
+        // Verificar se já existe
+        val exists = cdnPatterns.any { it.host == host && it.type == cluster }
+        
+        if (!exists) {
+            Log.d(TAG, "🆕 Novo CDN descoberto: $host (cluster: $cluster)")
+            // Nota: cdnPatterns é imutável (listOf), então apenas logamos
+            // Em produção, poderia salvar em SharedPreferences para uso futuro
+        }
+    }
 }

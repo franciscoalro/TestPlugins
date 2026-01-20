@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v135.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v136.0/MaxSeries.cs3",
         "status":  1,
-        "version":  135,
+        "version":  136,
         "apiVersion":  1,
-        "fileSize":  154200,
+        "fileSize":  154300,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v135 - Regex melhorado (.woff/.woff2 support)",
+        "description":  "MaxSeries v136 - Regex ultra-otimizado (padrão completo)",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

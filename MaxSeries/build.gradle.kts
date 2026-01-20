@@ -1,7 +1,7 @@
-version = 131
+version = 132
 
 cloudstream {
-    description = "MaxSeries v131 - M3u8Helper fix para player interno"
+    description = "MaxSeries v132 - 12 CDNs + 4 variacoes (index-f1-v1-a1.txt)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

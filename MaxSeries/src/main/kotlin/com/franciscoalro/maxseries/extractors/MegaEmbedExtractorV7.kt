@@ -46,6 +46,11 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
      * - valenium.shop pode ser: srcf, soq6, soq7, soq8...
      * - Impossível saber qual usar sem testar
      * - Por isso tentamos múltiplos padrões + WebView fallback
+     * 
+     * VARIAÇÕES DE ARQUIVO:
+     * - index.txt (mais comum)
+     * - cf-master.txt (alternativo)
+     * - cf-master.{timestamp}.txt (com cache busting)
      */
     private val cdnPatterns = listOf(
         // valenium.shop (tipo is9)
@@ -60,6 +65,9 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         
         // travianastudios.space (tipo 5c)
         CDNPattern("se9d.travianastudios.space", "5c", "Traviana"),
+        
+        // rivonaengineering.sbs (tipo db) - NOVO!
+        CDNPattern("srcf.rivonaengineering.sbs", "db", "Rivona"),
     )
     
     /**
@@ -128,9 +136,9 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         
         // FASE 2: Tentar padrões conhecidos
         for (pattern in cdnPatterns) {
-            val cdnUrl = buildCDNUrl(pattern, videoId)
+            val cdnUrl = tryUrlWithVariations("", pattern, videoId)
             
-            if (tryUrl(cdnUrl)) {
+            if (cdnUrl != null) {
                 Log.d(TAG, "✅ Padrão funcionou: ${pattern.name}")
                 
                 val quality = QualityDetector.detectFromUrl(cdnUrl)
@@ -156,7 +164,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         Log.d(TAG, "⚠️ Padrões falharam, usando WebView...")
         
         runCatching {
-            // Script para interceptar cf-master.txt
+            // Script para interceptar index.txt (M3U8 camuflado)
             val captureScript = """
                 (function() {
                     return new Promise(function(resolve) {
@@ -165,9 +173,9 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 })()
             """.trimIndent()
             
-            // Interceptar requisições para cf-master.txt ou .woff2
+            // Interceptar requisições para index.txt, cf-master.txt ou .woff2
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""(?i)(cf-master\.txt|\.woff2)"""),
+                interceptUrl = Regex("""(?i)(index\.txt|cf-master.*\.txt|\.woff2)"""),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "WebView script result: $result")
@@ -183,8 +191,8 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             val response = app.get(url, headers = headers, interceptor = resolver)
             val captured = response.url
             
-            // Verificar se capturou cf-master.txt
-            if (captured.contains("cf-master")) {
+            // Verificar se capturou index.txt ou cf-master (M3U8 camuflado)
+            if (captured.contains("index.txt") || captured.contains("cf-master")) {
                 Log.d(TAG, "✅ WebView descobriu: $captured")
                 
                 val quality = QualityDetector.detectFromUrl(captured)
@@ -203,7 +211,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                     }
                 )
             } else if (captured.contains(".woff2")) {
-                // Converter URL .woff2 para cf-master.txt
+                // Converter URL .woff2 para index.txt
                 val parts = captured.split("/")
                 if (parts.size >= 7) {
                     val protocol = parts[0]
@@ -211,7 +219,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                     val v4 = parts[3]
                     val type = parts[4]
                     val id = parts[5]
-                    val cdnUrl = "$protocol//$host/$v4/$type/$id/cf-master.txt"
+                    val cdnUrl = "$protocol//$host/$v4/$type/$id/index.txt"
                     
                     Log.d(TAG, "✅ WebView descobriu via .woff2: $cdnUrl")
                     
@@ -231,7 +239,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                         }
                     )
                 } else {
-                    Log.e(TAG, "❌ Falha ao converter .woff2 para cf-master.txt")
+                    Log.e(TAG, "❌ Falha ao converter .woff2 para index.txt")
                 }
             } else {
                 Log.e(TAG, "❌ WebView não capturou URL válida: $captured")
@@ -262,9 +270,40 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
     
     /**
      * Constrói URL do CDN a partir do padrão
+     * Formato: https://{HOST}/v4/{CLUSTER}/{VIDEO_ID}/index.txt
+     * 
+     * IMPORTANTE: O arquivo é index.txt mas contém M3U8 (camuflagem)
+     * 
+     * VARIAÇÕES POSSÍVEIS:
+     * - index.txt (padrão)
+     * - cf-master.txt (alternativo)
+     * - cf-master.{timestamp}.txt (com cache busting)
      */
     private fun buildCDNUrl(pattern: CDNPattern, videoId: String): String {
-        return "https://${pattern.host}/v4/${pattern.type}/$videoId/cf-master.txt"
+        // Tentar múltiplas variações de arquivo
+        return "https://${pattern.host}/v4/${pattern.type}/$videoId/index.txt"
+    }
+    
+    /**
+     * Tenta acessar URL do CDN com múltiplas variações de arquivo
+     * 
+     * @return true se URL é válida e retorna M3U8
+     */
+    private suspend fun tryUrlWithVariations(baseUrl: String, pattern: CDNPattern, videoId: String): String? {
+        val variations = listOf(
+            "index.txt",
+            "cf-master.txt",
+            "cf-master.${System.currentTimeMillis() / 1000}.txt" // timestamp atual
+        )
+        
+        for (variation in variations) {
+            val url = "https://${pattern.host}/v4/${pattern.type}/$videoId/$variation"
+            if (tryUrl(url)) {
+                return url
+            }
+        }
+        
+        return null
     }
     
 

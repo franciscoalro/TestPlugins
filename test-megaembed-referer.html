@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste MegaEmbed - Referer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+        }
+        .info {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #console {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #0f0;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste MegaEmbed - Validação de Referer</h1>
+    
+    <div class="test-section">
+        <h2>📋 Informações</h2>
+        <div class="info">
+            <strong>URL do MegaEmbed:</strong> https://megaembed.link/#3wnuij<br>
+            <strong>Referer Esperado:</strong> https://playerthree.online/<br>
+            <strong>Objetivo:</strong> Verificar se MegaEmbed funciona com Referer correto
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎬 Player MegaEmbed (com Referer simulado)</h2>
+        <p>Este iframe simula o acesso vindo do playerthree.online</p>
+        
+        <button onclick="loadPlayer()">▶️ Carregar Player</button>
+        <button onclick="checkNetwork()">🔍 Verificar Network</button>
+        <button onclick="clearConsole()">🗑️ Limpar Console</button>
+        
+        <div id="player-container" style="margin-top: 20px;">
+            <!-- Player será carregado aqui -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Console de Debug</h2>
+        <div id="console">
+            <div class="log-entry">Aguardando ações...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Teste Manual</h2>
+        <div class="info">
+            <strong>Passo 1:</strong> Abra DevTools (F12)<br>
+            <strong>Passo 2:</strong> Vá em Network tab<br>
+            <strong>Passo 3:</strong> Clique em "Carregar Player"<br>
+            <strong>Passo 4:</strong> Procure por:<br>
+            &nbsp;&nbsp;- <span class="success">✅ /api/v1/info?id=3wnuij</span> (API chamada)<br>
+            &nbsp;&nbsp;- <span class="success">✅ .txt ou .m3u8</span> (URL do vídeo)<br>
+            <strong>Passo 5:</strong> Se encontrar URL .txt, copie e teste no VLC
+        </div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('console');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `[${timestamp}] ${message}`;
+            if (type === 'success') entry.style.borderLeftColor = '#4CAF50';
+            if (type === 'error') entry.style.borderLeftColor = '#f44336';
+            consoleDiv.appendChild(entry);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '<div class="log-entry">Console limpo.</div>';
+        }
+
+        function loadPlayer() {
+            log('🎬 Carregando MegaEmbed player...', 'info');
+            
+            const container = document.getElementById('player-container');
+            container.innerHTML = `
+                <iframe 
+                    src="https://megaembed.link/#3wnuij"
+                    allowfullscreen
+                    allow="autoplay; encrypted-media"
+                    referrerpolicy="origin"
+                ></iframe>
+            `;
+            
+            log('✅ Player carregado! Verifique o Network tab no DevTools', 'success');
+            log('🔍 Procure por: /api/v1/info?id=3wnuij', 'info');
+            log('🔍 Procure por: .txt ou .m3u8 URLs', 'info');
+            
+            // Tentar interceptar mensagens do iframe
+            window.addEventListener('message', function(event) {
+                if (event.origin === 'https://megaembed.link') {
+                    log('📨 Mensagem do iframe: ' + JSON.stringify(event.data), 'info');
+                }
+            });
+        }
+
+        function checkNetwork() {
+            log('🔍 Para verificar Network:', 'info');
+            log('1. Abra DevTools (F12)', 'info');
+            log('2. Vá em Network tab', 'info');
+            log('3. Filtre por "megaembed"', 'info');
+            log('4. Procure por requests com .txt ou .m3u8', 'info');
+            log('5. Clique com botão direito → Copy → Copy URL', 'info');
+            log('6. Cole a URL no VLC para testar', 'info');
+        }
+
+        // Interceptar console.log do iframe (se possível)
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log('🖥️ Console: ' + args.join(' '), 'info');
+        };
+
+        // Log inicial
+        log('✅ Página carregada. Clique em "Carregar Player" para começar.', 'success');
+        log('⚠️ IMPORTANTE: Abra DevTools (F12) e vá em Network tab ANTES de carregar!', 'info');
+    </script>
+</body>
+</html>

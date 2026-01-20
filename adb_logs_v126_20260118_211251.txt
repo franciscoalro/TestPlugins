@@ -1,0 +1,38 @@
+01-18 21:12:51.520 19048 19109 E MaxSeries-Extraction: Falha na extração
+01-18 21:12:51.520 19048 19109 E MaxSeries-Extraction:   Extractor: PlayerEmbedAPI
+01-18 21:12:51.520 19048 19109 E MaxSeries-Extraction:   URL: https://playerembedapi.link/?v=kBJLtxCD3
+01-18 21:12:51.520 19048 19109 E MaxSeries-Extraction:   Error: Falha ao interceptar URL de vídeo. Final: https://playerembedapi.link/?v=kBJLtxCD3
+
+01-18 21:12:51.527 19048 19109 D MegaEmbedExtractorV5_v126: === MEGAEMBED V5 ALL STRATEGIES (v126) ===
+01-18 21:12:51.527 19048 19109 D MegaEmbedExtractorV5_v126: URL: https://megaembed.link/#3wnuij
+01-18 21:12:51.527 19048 19109 D MegaEmbedExtractorV5_v126: Referer: https://playerthree.online/embed/synden/
+01-18 21:12:51.528 19048 19109 D MegaEmbedExtractorV5_v126: VideoId: 3wnuij
+01-18 21:12:51.528 19048 19109 D MegaEmbedExtractorV5_v126: [0/5] Tentando Direct API...
+01-18 21:12:51.528 19048 19109 D MegaEmbedExtractorV5_v126: Direct API: https://megaembed.link/api/v1/info?id=3wnuij
+01-18 21:12:52.514 19048 19109 D MegaEmbedExtractorV5_v126: API Response: 3553d5e3eaa72fcf2ad4c568effbb8c345554ba6c5f94ff72cf4676611b9615ab0c1484c699efafb4e75248fc92abc386e3a312b1b0fec002fcbee3f3559a7c9f2f21b962e815f65d268b0e0aca7afaddffbb9bc06cf04f5533b35c43825616e0e5459e9...
+01-18 21:12:52.514 19048 19109 D MegaEmbedExtractorV5_v126: Direct API: Nenhuma URL encontrada no JSON
+01-18 21:12:52.514 19048 19109 D MegaEmbedExtractorV5_v126: [1/5] Tentando HTML Regex...
+01-18 21:12:53.372 19048 19109 D MegaEmbedExtractorV5_v126: HTML Regex: Nenhuma URL .txt encontrada
+01-18 21:12:53.372 19048 19109 D MegaEmbedExtractorV5_v126: [2/5] Tentando JsUnpacker...
+01-18 21:12:53.556 19048 19109 D MegaEmbedExtractorV5_v126: JsUnpacker: Nenhum código packed ou URL encontrada
+01-18 21:12:53.556 19048 19109 D MegaEmbedExtractorV5_v126: [3/5] Tentando WebView JavaScript-Only...
+
+01-18 21:12:53.562 19048 19156 I WebViewResolver: Initial web-view request: https://megaembed.link/#3wnuij
+01-18 21:12:53.633 19048 19377 I WebViewResolver: Loading WebView URL: https://megaembed.link/#3wnuij
+01-18 21:12:53.900 19048 19377 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/index-CZ_ja_1t.js
+01-18 21:12:53.902 19048 19378 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/index-DsSvO8OB.css
+01-18 21:12:54.781 19048 19379 I WebViewResolver: Loading WebView URL: https://megaembed.link/api/v1/info?id=3wnuij
+01-18 21:12:54.802 19048 19387 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-player-default-layout-BpV3Dvv2.js
+01-18 21:12:54.803 19048 19385 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-CwTj4H1w-BCQqYYxA.js
+01-18 21:12:55.060 19048 19377 I WebViewResolver: Loading WebView URL: https://megaembed.link/mPJYkWJMsG1nqOQMAntkow/x6b/r8c1nmni/8fvzfr/poster.png
+01-18 21:12:55.200 19048 19378 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-D3ltXc3a-kMM06jGa.js
+01-18 21:12:55.201 19048 19385 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-player-ui-DlsgP3iU.js
+01-18 21:12:55.646 19048 19387 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/prod-cvEtvBo1.js
+01-18 21:12:55.712 19048 19385 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-hls-BcPzC22e.js
+01-18 21:12:55.715 19048 19377 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-video-BEihePK7.js
+01-18 21:12:55.743 19048 19378 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-Bq6c3Bam-BM3rPD0E.js
+01-18 21:12:55.811 19048 19387 I WebViewResolver: Loading WebView URL: https://megaembed.link/assets/vidstack-DqAw8m9J-Y3db8mMT.js
+01-18 21:12:57.198 19048 19379 I WebViewResolver: Loading WebView URL: https://megaembed.link/favicon.png
+
+[WebView carregou todos os assets mas NUNCA fez request para URL .txt do vídeo]
+[Timeout após 120s - Nenhuma URL capturada]

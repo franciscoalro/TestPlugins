@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v134.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v135.0/MaxSeries.cs3",
         "status":  1,
-        "version":  134,
+        "version":  135,
         "apiVersion":  1,
-        "fileSize":  153745,
+        "fileSize":  154200,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v134 - 20 CDNs + 5 variacoes (index-f2-v1-a1.txt)",
+        "description":  "MaxSeries v135 - Regex melhorado (.woff/.woff2 support)",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

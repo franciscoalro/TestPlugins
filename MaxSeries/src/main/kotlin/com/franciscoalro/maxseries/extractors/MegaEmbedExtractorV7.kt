@@ -35,11 +35,11 @@ import android.util.Log
  * - Exemplos: init-f1-v1-a1.woff, seg-1-f1-v1-a1.woff2
  * - WebView detecta automaticamente e converte para index.txt
  * 
- * REGEX FLEXÍVEL v137:
+ * REGEX UNIVERSAL v138:
  * - Estratégia: Se tem /v4/ no path, assume que é vídeo
- * - Captura URLs completas E parciais
- * - Regex: https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/
- * - Máxima flexibilidade para capturar qualquer formato
+ * - Aceita QUALQUER TLD (não apenas store, sbs, cyou, space, cfd, shop)
+ * - Regex: https://s\w{2,4}\.\w+\.\w{2,5}/v4/
+ * - Máxima flexibilidade - funciona com qualquer domínio novo
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -228,28 +228,28 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 })()
             """.trimIndent()
             
-            // Interceptar requisições usando REGEX FLEXÍVEL v137
+            // Interceptar requisições usando REGEX UNIVERSAL v138
             // Estratégia: Se tem /v4/ no path, assume que é vídeo do MegaEmbed
             // 
-            // Padrão: https://s{SUB}.{DOMAIN}.{TLD}/v4/...
+            // Padrão: https://s{SUB}.{DOMAIN}.{QUALQUER_TLD}/v4/...
             // 
             // Componentes obrigatórios:
             // - https://                                    → Protocolo
             // - s\w{2,4}                                    → Subdomínio (s9r1, spuc, ssu5, etc)
-            // - \.\w+\.(store|sbs|cyou|space|cfd|shop)     → Domínio + TLD
+            // - \.\w+\.                                     → Domínio (qualquer)
+            // - \w{2,5}                                     → TLD (QUALQUER: com, net, store, sbs, cyou, shop, space, etc)
             // - /v4/                                        → Path fixo (IDENTIFICADOR CHAVE!)
-            // 
-            // Componentes opcionais (captura tudo após /v4/):
-            // - .*                                          → QUALQUER coisa após /v4/
             //
-            // Captura TUDO que tenha /v4/:
-            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/ms6hhh/index.txt
-            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/ms6hhh/
-            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/
-            // ✅ https://s9r1.virtualinfrastructure.space/v4/
-            // ✅ Qualquer URL com /v4/ = vídeo MegaEmbed
+            // Captura TUDO que tenha /v4/ com QUALQUER TLD:
+            // ✅ https://sxix.stellarpathholdings.sbs/v4/...
+            // ✅ https://sunl.omniquestsolutions.shop/v4/...
+            // ✅ https://sqtd.claravonorganics.store/v4/...
+            // ✅ https://s3ae.harmonixwellnessgroup.store/v4/...
+            // ✅ https://shkn.aurorapathcreative.space/v4/...
+            // ✅ https://silu.mindspireeducation.cyou/v4/...
+            // ✅ Qualquer URL com /v4/ e qualquer TLD = vídeo MegaEmbed
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/""", RegexOption.IGNORE_CASE),
+                interceptUrl = Regex("""https://s\w{2,4}\.\w+\.\w{2,5}/v4/""", RegexOption.IGNORE_CASE),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "WebView script result: $result")

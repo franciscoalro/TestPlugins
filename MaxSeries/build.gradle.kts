@@ -1,7 +1,7 @@
-version = 137
+version = 138
 
 cloudstream {
-    description = "MaxSeries v137 - Regex flexível (/v4/ = vídeo)"
+    description = "MaxSeries v138 - Regex universal (qualquer TLD)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

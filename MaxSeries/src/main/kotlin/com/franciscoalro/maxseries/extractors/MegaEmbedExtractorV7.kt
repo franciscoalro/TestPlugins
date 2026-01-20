@@ -76,23 +76,45 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         // rivonaengineering.sbs (tipo db)
         CDNPattern("srcf.rivonaengineering.sbs", "db", "Rivona"),
         
-        // alphastrahealth.store (tipo il) - NOVO!
-        CDNPattern("spuc.alphastrahealth.store", "il", "Alphastra"),
+        // alphastrahealth.store (tipo il, 5w3)
+        CDNPattern("spuc.alphastrahealth.store", "il", "Alphastra-il"),
+        CDNPattern("soq6.alphastrahealth.store", "5w3", "Alphastra-5w3"),
         
-        // wanderpeakevents.store (tipo ty) - NOVO!
+        // wanderpeakevents.store (tipo ty)
         CDNPattern("ssu5.wanderpeakevents.store", "ty", "Wanderpeak"),
         
-        // stellarifyventures.sbs (tipo jcp) - NOVO!
+        // stellarifyventures.sbs (tipo jcp)
         CDNPattern("sqtd.stellarifyventures.sbs", "jcp", "Stellarify"),
         
-        // lyonic.cyou (tipo ty) - NOVO!
+        // lyonic.cyou (tipo ty)
         CDNPattern("silu.lyonic.cyou", "ty", "Lyonic"),
         
-        // mindspireleadership.space (tipo x68) - NOVO!
+        // mindspireleadership.space (tipo x68)
         CDNPattern("shkn.mindspireleadership.space", "x68", "Mindspire"),
         
-        // evercresthospitality.space (tipo vz1) - NOVO!
+        // evercresthospitality.space (tipo vz1)
         CDNPattern("s9r1.evercresthospitality.space", "vz1", "Evercrest"),
+        
+        // fitnessessentials.cfd (tipo 61) - NOVO!
+        CDNPattern("s6p9.fitnessessentials.cfd", "61", "Fitness"),
+        
+        // harmonynetworks.space (tipo djx) - NOVO!
+        CDNPattern("se9d.harmonynetworks.space", "djx", "Harmony"),
+        
+        // mindspireeducation.cyou (tipo urp) - NOVO!
+        CDNPattern("sr81.mindspireeducation.cyou", "urp", "Mindspire-edu"),
+        
+        // lucernaarchitecture.space (tipo mf) - NOVO!
+        CDNPattern("soq6.lucernaarchitecture.space", "mf", "Lucerna"),
+        
+        // carvoniaconsultancy.sbs (tipo miy) - NOVO!
+        CDNPattern("sxe3.carvoniaconsultancy.sbs", "miy", "Carvonia"),
+        
+        // amberlineproductions.shop (tipo pp) - NOVO!
+        CDNPattern("spok.amberlineproductions.shop", "pp", "Amberline"),
+        
+        // northfieldgroup.store (tipo pp) - NOVO!
+        CDNPattern("se9d.northfieldgroup.store", "pp", "Northfield"),
     )
     
     /**
@@ -304,19 +326,23 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
      * Tenta acessar URL do CDN com múltiplas variações de arquivo
      * 
      * VARIAÇÕES DESCOBERTAS:
-     * 1. index.txt (mais comum)
-     * 2. cf-master.txt (alternativo)
-     * 3. cf-master.{timestamp}.txt (com cache busting)
-     * 4. index-f1-v1-a1.txt (NOVO! formato segmentado)
+     * 1. index.txt (mais comum ~30%)
+     * 2. index-f1-v1-a1.txt (formato segmentado ~25%)
+     * 3. index-f2-v1-a1.txt (formato segmentado v2 ~20%) NOVO!
+     * 4. cf-master.txt (alternativo ~15%)
+     * 5. cf-master.{timestamp}.txt (com cache busting ~10%)
+     * 
+     * IMPORTANTE: HOST muda constantemente, mas padrão /v4/{CLUSTER}/{VIDEO_ID}/{FILE} é fixo
      * 
      * @return URL válida se encontrada
      */
     private suspend fun tryUrlWithVariations(baseUrl: String, pattern: CDNPattern, videoId: String): String? {
         val variations = listOf(
-            "index.txt",                                          // Variação 1 (~40%)
-            "index-f1-v1-a1.txt",                                 // Variação 4 (~30%) NOVO!
-            "cf-master.txt",                                      // Variação 2 (~20%)
-            "cf-master.${System.currentTimeMillis() / 1000}.txt"  // Variação 3 (~10%)
+            "index.txt",                                          // Variação 1 (~30%)
+            "index-f1-v1-a1.txt",                                 // Variação 2 (~25%)
+            "index-f2-v1-a1.txt",                                 // Variação 3 (~20%) NOVO!
+            "cf-master.txt",                                      // Variação 4 (~15%)
+            "cf-master.${System.currentTimeMillis() / 1000}.txt"  // Variação 5 (~10%)
         )
         
         for (variation in variations) {

@@ -1,7 +1,7 @@
-version = 133
+version = 134
 
 cloudstream {
-    description = "MaxSeries v133 - Regex template URL para extracao dinamica"
+    description = "MaxSeries v134 - 20 CDNs + 5 variacoes (index-f2-v1-a1.txt)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

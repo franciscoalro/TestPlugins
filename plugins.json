@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v136.0/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v137.0/MaxSeries.cs3",
         "status":  1,
-        "version":  136,
+        "version":  137,
         "apiVersion":  1,
-        "fileSize":  154300,
+        "fileSize":  154200,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v136 - Regex ultra-otimizado (padrão completo)",
+        "description":  "MaxSeries v137 - Regex flexível (/v4/ = vídeo)",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

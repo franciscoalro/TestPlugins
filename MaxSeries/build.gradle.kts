@@ -1,7 +1,7 @@
-version = 139
+version = 141
 
 cloudstream {
-    description = "MaxSeries v139 - Otimizado (2 fases: Cache + WebView)"
+    description = "MaxSeries v141 - Regex Ultra-Simplificado (máxima flexibilidade)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

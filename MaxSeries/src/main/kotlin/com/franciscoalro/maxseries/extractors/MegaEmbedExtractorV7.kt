@@ -35,11 +35,11 @@ import android.util.Log
  * - Exemplos: init-f1-v1-a1.woff, seg-1-f1-v1-a1.woff2
  * - WebView detecta automaticamente e converte para index.txt
  * 
- * REGEX ULTRA-OTIMIZADO v136:
- * - Padrão: https://s{SUB}.{DOMAIN}.{TLD}/v4/{CLUSTER}/{VIDEO_ID}/{FILE}.{EXT}
- * - Captura QUALQUER arquivo novo automaticamente
- * - Performance máxima para WebView intercept
- * - Regex: https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/\w{1,3}/\w{6}/\S+\.(txt|woff2?)
+ * REGEX FLEXÍVEL v137:
+ * - Estratégia: Se tem /v4/ no path, assume que é vídeo
+ * - Captura URLs completas E parciais
+ * - Regex: https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/
+ * - Máxima flexibilidade para capturar qualquer formato
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -228,25 +228,28 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 })()
             """.trimIndent()
             
-            // Interceptar requisições usando REGEX ULTRA-OTIMIZADO
-            // Padrão completo da URL: https://s{SUB}.{DOMAIN}.{TLD}/v4/{CLUSTER}/{VIDEO_ID}/{FILE}.{EXT}
+            // Interceptar requisições usando REGEX FLEXÍVEL v137
+            // Estratégia: Se tem /v4/ no path, assume que é vídeo do MegaEmbed
             // 
-            // Componentes:
+            // Padrão: https://s{SUB}.{DOMAIN}.{TLD}/v4/...
+            // 
+            // Componentes obrigatórios:
+            // - https://                                    → Protocolo
             // - s\w{2,4}                                    → Subdomínio (s9r1, spuc, ssu5, etc)
             // - \.\w+\.(store|sbs|cyou|space|cfd|shop)     → Domínio + TLD
-            // - /v4/                                        → Path fixo
-            // - \w{1,3}                                     → Cluster (il, ty, 5w3, etc)
-            // - /\w{6}/                                     → Video ID (6 caracteres)
-            // - \S+\.(txt|woff2?)                           → Arquivo (qualquer nome + extensão)
+            // - /v4/                                        → Path fixo (IDENTIFICADOR CHAVE!)
+            // 
+            // Componentes opcionais (captura tudo após /v4/):
+            // - .*                                          → QUALQUER coisa após /v4/
             //
-            // Captura TODOS os formatos:
-            // ✅ index.txt, index-f1-v1-a1.txt, index-f2-v1-a1.txt
-            // ✅ cf-master.txt, cf-master.1767375808.txt
-            // ✅ init-f1-v1-a1.woff, init-f2-v1-a1.woff2
-            // ✅ seg-1-f1-v1-a1.woff2, seg-2-f1-v1-a1.woff
-            // ✅ Qualquer arquivo novo com .txt/.woff/.woff2
+            // Captura TUDO que tenha /v4/:
+            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/ms6hhh/index.txt
+            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/ms6hhh/
+            // ✅ https://s9r1.virtualinfrastructure.space/v4/5w3/
+            // ✅ https://s9r1.virtualinfrastructure.space/v4/
+            // ✅ Qualquer URL com /v4/ = vídeo MegaEmbed
             val resolver = WebViewResolver(
-                interceptUrl = Regex("""https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/\w{1,3}/\w{6}/\S+\.(txt|woff2?)""", RegexOption.IGNORE_CASE),
+                interceptUrl = Regex("""https://s\w{2,4}\.\w+\.(store|sbs|cyou|space|cfd|shop)/v4/""", RegexOption.IGNORE_CASE),
                 script = captureScript,
                 scriptCallback = { result ->
                     Log.d(TAG, "WebView script result: $result")

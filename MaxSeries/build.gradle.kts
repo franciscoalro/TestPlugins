@@ -1,7 +1,7 @@
-version = 148
+version = 149
 
 cloudstream {
-    description = "MaxSeries v148 - FIX WebView: Interceptação de rede funcional"
+    description = "MaxSeries v149 - WebView Híbrido: Interceptação + Script + additionalUrls"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

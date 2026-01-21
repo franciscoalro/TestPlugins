@@ -7,13 +7,17 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Extractor v7 - v148 FIX WebView
+ * MegaEmbed Extractor v7 - v149 HÍBRIDO
  *
- * PROBLEMA v147: scriptCallback retorna {} vazio
- * SOLUÇÃO v148: WebView SEM script, apenas interceptação de rede
+ * PROBLEMA v148: Interceptação de rede NÃO captura requisições
+ * - WebView retorna URL original: https://megaembed.link/#3wnuij
+ * - Regex não está batendo com requisições XHR/Fetch
  *
- * O WebView vai interceptar as requisições de rede (XHR/Fetch) automaticamente
- * sem depender de JavaScript no HTML
+ * SOLUÇÃO v149: Estratégia HÍBRIDA
+ * 1. interceptUrl: Regex MUITO amplo (qualquer .txt)
+ * 2. additionalUrls: Lista de padrões específicos
+ * 3. Script JavaScript: Monitora HTML + network requests
+ * 4. Logs detalhados: Debug completo
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -47,7 +51,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V7 v148 FIX WEBVIEW ===")
+        Log.d(TAG, "=== MEGAEMBED V7 v149 HÍBRIDO ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -104,34 +108,131 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             Log.d(TAG, "⏭️ Erro ao buscar cf-master: ${it.message}")
         }
         
-        // FASE 2 — WEBVIEW COM INTERCEPTAÇÃO DE REDE (SEM SCRIPT)
-        Log.d(TAG, "🔍 Iniciando WebView com interceptação de rede...")
+        // FASE 2 — WEBVIEW HÍBRIDO (v149)
+        Log.d(TAG, "🔍 Iniciando WebView HÍBRIDO (interceptação + script + API)...")
         
         runCatching {
-            // REGEX: Intercepta qualquer URL com /v4/ ou .txt
-            val interceptRegex = Regex("""(https?://[^/]+/v4/[^"'\s]+|https?://[^"'\s]+\.txt)""", RegexOption.IGNORE_CASE)
+            var capturedApiUrl: String? = null
             
-            // SEM SCRIPT! Deixa o WebView interceptar as requisições de rede automaticamente
-            val resolver = WebViewResolver(
-                interceptUrl = interceptRegex,
-                timeout = 15_000L
+            // Script JavaScript: Monitora API + HTML
+            val hybridScript = """
+                (function() {
+                    console.log('[v149] Script iniciado');
+                    
+                    return new Promise(function(resolve) {
+                        var attempts = 0;
+                        var maxAttempts = 150; // 15s
+                        
+                        var interval = setInterval(function() {
+                            attempts++;
+                            
+                            // 1. Tentar pegar URL de variáveis globais
+                            if (window.__PLAYER_CONFIG__ && window.__PLAYER_CONFIG__.url) {
+                                clearInterval(interval);
+                                console.log('[v149] Capturado de __PLAYER_CONFIG__:', window.__PLAYER_CONFIG__.url);
+                                resolve(window.__PLAYER_CONFIG__.url);
+                                return;
+                            }
+                            
+                            if (window.playlistUrl) {
+                                clearInterval(interval);
+                                console.log('[v149] Capturado de playlistUrl:', window.playlistUrl);
+                                resolve(window.playlistUrl);
+                                return;
+                            }
+                            
+                            // 2. Buscar no HTML
+                            var html = document.documentElement.innerHTML;
+                            
+                            // Padrão: cf-master com timestamp
+                            var cfMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/cf-master\.\d+\.txt/i);
+                            if (cfMatch) {
+                                clearInterval(interval);
+                                console.log('[v149] Capturado cf-master:', cfMatch[0]);
+                                resolve(cfMatch[0]);
+                                return;
+                            }
+                            
+                            // Padrão: index-f{qualidade}.txt
+                            var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/index-f\d+-v\d+-a\d+\.txt/i);
+                            if (indexMatch) {
+                                clearInterval(interval);
+                                console.log('[v149] Capturado index:', indexMatch[0]);
+                                resolve(indexMatch[0]);
+                                return;
+                            }
+                            
+                            // Padrão: qualquer .txt em /v4/
+                            var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
+                            if (txtMatch) {
+                                clearInterval(interval);
+                                console.log('[v149] Capturado .txt:', txtMatch[0]);
+                                resolve(txtMatch[0]);
+                                return;
+                            }
+                            
+                            // Log progresso
+                            if (attempts % 30 === 0) {
+                                console.log('[v149] Tentativa', attempts, '/', maxAttempts);
+                            }
+                            
+                            // Timeout
+                            if (attempts >= maxAttempts) {
+                                clearInterval(interval);
+                                console.log('[v149] Timeout após', attempts, 'tentativas');
+                                resolve('');
+                            }
+                        }, 100);
+                    });
+                })()
+            """.trimIndent()
+            
+            // REGEX: Intercepta TUDO relacionado a vídeo
+            val interceptRegex = Regex("""\.txt(\?|${'$'})""", RegexOption.IGNORE_CASE)
+            
+            // additionalUrls: Captura requisições específicas
+            val additionalUrls = listOf(
+                Regex("""/api/v1/info"""),
+                Regex("""/api/v1/video"""),
+                Regex("""/api/v1/player"""),
+                Regex("""cf-master\.\d+\.txt"""),
+                Regex("""index-f\d+-v\d+-a\d+\.txt"""),
+                Regex("""/v4/[^/]+/[^/]+/[^"'\s]+\.txt""")
             )
             
-            val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
-            val captured = response.url
+            val resolver = WebViewResolver(
+                interceptUrl = interceptRegex,
+                additionalUrls = additionalUrls,
+                script = hybridScript,
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
+                        capturedApiUrl = result.trim('"')
+                        Log.d(TAG, "📜 Script capturou: $capturedApiUrl")
+                    }
+                },
+                timeout = 20_000L
+            )
             
-            Log.d(TAG, "📄 WebView interceptou: $captured")
+            Log.d(TAG, "🌐 Carregando WebView...")
+            val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
+            val capturedUrl = response.url
+            
+            Log.d(TAG, "📄 WebView interceptou (response.url): $capturedUrl")
+            Log.d(TAG, "📜 Script retornou: $capturedApiUrl")
+            
+            // PRIORIDADE: Script > Interceptação
+            val finalUrl = capturedApiUrl ?: capturedUrl
             
             // FASE 3 — PROCESSAR URL CAPTURADA
-            if (!captured.contains("/v4/") && !captured.contains("index") && !captured.contains("cf-master")) {
-                Log.e(TAG, "❌ URL capturada não é válida: $captured")
+            if (!finalUrl.contains("/v4/") && !finalUrl.contains("index") && !finalUrl.contains("cf-master") && !finalUrl.contains(".txt")) {
+                Log.e(TAG, "❌ URL capturada não é válida: $finalUrl")
                 return
             }
             
             // Extrair componentes da URL
-            val urlData = extractUrlData(captured)
+            val urlData = extractUrlData(finalUrl)
             if (urlData == null) {
-                Log.e(TAG, "❌ Não foi possível extrair dados da URL: $captured")
+                Log.e(TAG, "❌ Não foi possível extrair dados da URL: $finalUrl")
                 return
             }
             

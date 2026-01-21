@@ -7,17 +7,19 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Extractor v7 - v149 HÍBRIDO
+ * MegaEmbed Extractor v7 - v150 HÍBRIDO COM HOOKS
  *
- * PROBLEMA v148: Interceptação de rede NÃO captura requisições
- * - WebView retorna URL original: https://megaembed.link/#3wnuij
- * - Regex não está batendo com requisições XHR/Fetch
+ * PROBLEMA v149: WebView não intercepta requisições fetch/XHR
+ * - Requisições assíncronas não passam por shouldInterceptRequest
+ * - Regex muito restritivo (só \.txt no final)
+ * - Timeout de 20s sem capturar URLs de vídeo
  *
- * SOLUÇÃO v149: Estratégia HÍBRIDA
- * 1. interceptUrl: Regex MUITO amplo (qualquer .txt)
- * 2. additionalUrls: Lista de padrões específicos
- * 3. Script JavaScript: Monitora HTML + network requests
- * 4. Logs detalhados: Debug completo
+ * SOLUÇÃO v150: HOOKS FETCH/XHR + REGEX MELHORADO
+ * 1. Hooks JavaScript: Intercepta fetch() e XMLHttpRequest
+ * 2. Regex amplo: /v4/.*\.(txt|m3u8|woff2)
+ * 3. Timeout aumentado: 30s (para sites lentos)
+ * 4. Logs detalhados: Debug completo de interceptação
+ * 5. Array de captura: Múltiplas URLs detectadas
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -51,7 +53,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V7 v149 HÍBRIDO ===")
+        Log.d(TAG, "=== MEGAEMBED V7 v150 HÍBRIDO COM HOOKS ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -71,20 +73,28 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             return
         }
         
-        // FASE 2 — TENTAR BUSCAR cf-master COM TIMESTAMP NO HTML
-        Log.d(TAG, "🔍 Buscando cf-master com timestamp no HTML...")
+        // FASE 2 — BUSCAR PADRÕES NO HTML (SEM WEBVIEW)
+        Log.d(TAG, "🔍 Buscando padrões de vídeo no HTML...")
         
         runCatching {
             val htmlResponse = app.get(url, headers = cdnHeaders)
             val html = htmlResponse.text
             
-            // Buscar cf-master.{timestamp}.txt no HTML
-            val cfMasterRegex = Regex("""https?://[^"'\s]+/v4/[^"'\s]+/[^"'\s]+/cf-master\.\d+\.txt""")
+            Log.d(TAG, "📄 HTML recebido (${html.length} chars)")
+            
+            // Padrão 1: cf-master com timestamp
+            val cfMasterRegex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/cf-master\.(\d+)\.txt""", RegexOption.IGNORE_CASE)
             val cfMasterMatch = cfMasterRegex.find(html)
             
             if (cfMasterMatch != null) {
                 val cfMasterUrl = cfMasterMatch.value
-                Log.d(TAG, "✅ cf-master com timestamp encontrado: $cfMasterUrl")
+                val host = cfMasterMatch.groupValues[1]
+                val cluster = cfMasterMatch.groupValues[2]
+                val videoIdFound = cfMasterMatch.groupValues[3]
+                val timestamp = cfMasterMatch.groupValues[4]
+                
+                Log.d(TAG, "✅ cf-master encontrado: host=$host, cluster=$cluster, videoId=$videoIdFound, timestamp=$timestamp")
+                Log.d(TAG, "🔗 URL completa: $cfMasterUrl")
                 
                 if (tryUrl(cfMasterUrl)) {
                     Log.d(TAG, "✅ cf-master válido!")
@@ -101,11 +111,83 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                     
                     return
                 }
-            } else {
-                Log.d(TAG, "⏭️ cf-master com timestamp não encontrado no HTML")
             }
+            
+            // Padrão 2: index-f{n}-v{n}-a{n}.txt
+            val indexRegex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/index-f\d+-v\d+-a\d+\.txt""", RegexOption.IGNORE_CASE)
+            val indexMatch = indexRegex.find(html)
+            
+            if (indexMatch != null) {
+                val indexUrl = indexMatch.value
+                val host = indexMatch.groupValues[1]
+                val cluster = indexMatch.groupValues[2]
+                val videoIdFound = indexMatch.groupValues[3]
+                
+                Log.d(TAG, "✅ index encontrado: host=$host, cluster=$cluster, videoId=$videoIdFound")
+                Log.d(TAG, "🔗 URL completa: $indexUrl")
+                
+                if (tryUrl(indexUrl)) {
+                    Log.d(TAG, "✅ index válido!")
+                    
+                    val quality = QualityDetector.detectFromUrl(indexUrl)
+                    VideoUrlCache.put(url, indexUrl, quality, name)
+                    
+                    M3u8Helper.generateM3u8(
+                        source = name,
+                        streamUrl = indexUrl,
+                        referer = mainUrl,
+                        headers = cdnHeaders
+                    ).forEach(callback)
+                    
+                    return
+                }
+            }
+            
+            // Padrão 3: Extrair host/cluster/videoId de qualquer arquivo /v4/
+            val v4Regex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/[^"'\s]+""", RegexOption.IGNORE_CASE)
+            val v4Match = v4Regex.find(html)
+            
+            if (v4Match != null) {
+                val host = v4Match.groupValues[1]
+                val cluster = v4Match.groupValues[2]
+                val videoIdFound = v4Match.groupValues[3]
+                
+                Log.d(TAG, "✅ Padrão /v4/ encontrado: host=$host, cluster=$cluster, videoId=$videoIdFound")
+                
+                // Tentar variações de arquivo
+                val fileVariations = listOf(
+                    "index-f1-v1-a1.txt",
+                    "index-f2-v1-a1.txt",
+                    "index.txt",
+                    "cf-master.txt"
+                )
+                
+                for ((index, fileName) in fileVariations.withIndex()) {
+                    val testUrl = "https://$host/v4/$cluster/$videoIdFound/$fileName"
+                    Log.d(TAG, "🧪 Testando ${index + 1}/${fileVariations.size}: $fileName")
+                    
+                    if (tryUrl(testUrl)) {
+                        Log.d(TAG, "✅ SUCESSO! URL válida: $testUrl")
+                        
+                        val quality = QualityDetector.detectFromUrl(testUrl)
+                        VideoUrlCache.put(url, testUrl, quality, name)
+                        
+                        M3u8Helper.generateM3u8(
+                            source = name,
+                            streamUrl = testUrl,
+                            referer = mainUrl,
+                            headers = cdnHeaders
+                        ).forEach(callback)
+                        
+                        return
+                    }
+                }
+            }
+            
+            Log.d(TAG, "⏭️ Nenhum padrão encontrado no HTML, tentando WebView...")
+            
         }.onFailure {
-            Log.d(TAG, "⏭️ Erro ao buscar cf-master: ${it.message}")
+            Log.e(TAG, "❌ Erro ao buscar no HTML: ${it.message}")
         }
         
         // FASE 2 — WEBVIEW HÍBRIDO (v149)
@@ -114,81 +196,138 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         runCatching {
             var capturedApiUrl: String? = null
             
-            // Script JavaScript: Monitora API + HTML
+            // Script JavaScript: Hooks fetch/XHR + Monitora HTML + variáveis globais
             val hybridScript = """
                 (function() {
-                    console.log('[v149] Script iniciado');
+                    console.log('[v150] Script COM HOOKS iniciado');
                     
+                    // Array para capturar TODAS as URLs de vídeo detectadas
+                    window.__CAPTURED_URLS__ = window.__CAPTURED_URLS__ || [];
+                    
+                    // ========== HOOK 1: FETCH ==========
+                    if (!window.__FETCH_HOOKED__) {
+                        const originalFetch = window.fetch;
+                        window.fetch = function(...args) {
+                            const url = args[0];
+                            if (url && typeof url === 'string') {
+                                // Detectar URLs de vídeo
+                                if (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)(\?|$)/i)) {
+                                    console.log('[v150] 🎯 FETCH interceptado:', url);
+                                    window.__CAPTURED_URLS__.push(url);
+                                }
+                            }
+                            return originalFetch.apply(this, args);
+                        };
+                        window.__FETCH_HOOKED__ = true;
+                        console.log('[v150] ✅ Hook fetch instalado');
+                    }
+                    
+                    // ========== HOOK 2: XMLHttpRequest ==========
+                    if (!window.__XHR_HOOKED__) {
+                        const originalOpen = XMLHttpRequest.prototype.open;
+                        XMLHttpRequest.prototype.open = function(method, url) {
+                            if (url && typeof url === 'string') {
+                                if (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)(\?|$)/i)) {
+                                    console.log('[v150] 🎯 XHR interceptado:', url);
+                                    window.__CAPTURED_URLS__.push(url);
+                                }
+                            }
+                            return originalOpen.apply(this, arguments);
+                        };
+                        window.__XHR_HOOKED__ = true;
+                        console.log('[v150] ✅ Hook XHR instalado');
+                    }
+                    
+                    // ========== MONITORAMENTO E RETORNO ==========
                     return new Promise(function(resolve) {
                         var attempts = 0;
-                        var maxAttempts = 150; // 15s
+                        var maxAttempts = 200; // 20s (100ms * 200)
                         
                         var interval = setInterval(function() {
                             attempts++;
                             
-                            // 1. Tentar pegar URL de variáveis globais
+                            // 1. Verificar URLs capturadas pelos hooks
+                            if (window.__CAPTURED_URLS__.length > 0) {
+                                clearInterval(interval);
+                                
+                                // Priorizar URLs com padrões específicos
+                                var bestUrl = window.__CAPTURED_URLS__.find(function(u) {
+                                    return u.includes('cf-master') || u.includes('index-f');
+                                }) || window.__CAPTURED_URLS__[0];
+                                
+                                console.log('[v150] ✅ URL capturada pelos hooks:', bestUrl);
+                                console.log('[v150] 📊 Total URLs detectadas:', window.__CAPTURED_URLS__.length);
+                                resolve(bestUrl);
+                                return;
+                            }
+                            
+                            // 2. Tentar pegar URL de variáveis globais (fallback)
                             if (window.__PLAYER_CONFIG__ && window.__PLAYER_CONFIG__.url) {
                                 clearInterval(interval);
-                                console.log('[v149] Capturado de __PLAYER_CONFIG__:', window.__PLAYER_CONFIG__.url);
+                                console.log('[v150] ✅ Capturado de __PLAYER_CONFIG__:', window.__PLAYER_CONFIG__.url);
                                 resolve(window.__PLAYER_CONFIG__.url);
                                 return;
                             }
                             
                             if (window.playlistUrl) {
                                 clearInterval(interval);
-                                console.log('[v149] Capturado de playlistUrl:', window.playlistUrl);
+                                console.log('[v150] ✅ Capturado de playlistUrl:', window.playlistUrl);
                                 resolve(window.playlistUrl);
                                 return;
                             }
                             
-                            // 2. Buscar no HTML
-                            var html = document.documentElement.innerHTML;
-                            
-                            // Padrão: cf-master com timestamp
-                            var cfMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/cf-master\.\d+\.txt/i);
-                            if (cfMatch) {
-                                clearInterval(interval);
-                                console.log('[v149] Capturado cf-master:', cfMatch[0]);
-                                resolve(cfMatch[0]);
-                                return;
+                            // 3. Buscar no HTML (fallback secundário)
+                            if (attempts === 50) { // Após 5s, tentar buscar no HTML
+                                var html = document.documentElement.innerHTML;
+                                
+                                // Padrão: cf-master com timestamp
+                                var cfMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/cf-master\.\d+\.txt/i);
+                                if (cfMatch) {
+                                    clearInterval(interval);
+                                    console.log('[v150] ✅ Capturado cf-master do HTML:', cfMatch[0]);
+                                    resolve(cfMatch[0]);
+                                    return;
+                                }
+                                
+                                // Padrão: index-f{qualidade}.txt
+                                var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/index-f\d+-v\d+-a\d+\.txt/i);
+                                if (indexMatch) {
+                                    clearInterval(interval);
+                                    console.log('[v150] ✅ Capturado index do HTML:', indexMatch[0]);
+                                    resolve(indexMatch[0]);
+                                    return;
+                                }
+                                
+                                // Padrão: qualquer .txt em /v4/
+                                var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
+                                if (txtMatch) {
+                                    clearInterval(interval);
+                                    console.log('[v150] ✅ Capturado .txt do HTML:', txtMatch[0]);
+                                    resolve(txtMatch[0]);
+                                    return;
+                                }
                             }
                             
-                            // Padrão: index-f{qualidade}.txt
-                            var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/index-f\d+-v\d+-a\d+\.txt/i);
-                            if (indexMatch) {
-                                clearInterval(interval);
-                                console.log('[v149] Capturado index:', indexMatch[0]);
-                                resolve(indexMatch[0]);
-                                return;
-                            }
-                            
-                            // Padrão: qualquer .txt em /v4/
-                            var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
-                            if (txtMatch) {
-                                clearInterval(interval);
-                                console.log('[v149] Capturado .txt:', txtMatch[0]);
-                                resolve(txtMatch[0]);
-                                return;
-                            }
-                            
-                            // Log progresso
+                            // 4. Log progresso a cada 3s
                             if (attempts % 30 === 0) {
-                                console.log('[v149] Tentativa', attempts, '/', maxAttempts);
+                                console.log('[v150] ⏳ Tentativa', attempts, '/', maxAttempts);
+                                console.log('[v150] 📊 URLs capturadas até agora:', window.__CAPTURED_URLS__.length);
                             }
                             
-                            // Timeout
+                            // 5. Timeout
                             if (attempts >= maxAttempts) {
                                 clearInterval(interval);
-                                console.log('[v149] Timeout após', attempts, 'tentativas');
-                                resolve('');
+                                console.log('[v150] ⏱️ Timeout após', attempts, 'tentativas');
+                                console.log('[v150] 📊 URLs capturadas:', window.__CAPTURED_URLS__);
+                                resolve(window.__CAPTURED_URLS__[0] || '');
                             }
                         }, 100);
                     });
                 })()
             """.trimIndent()
             
-            // REGEX: Intercepta TUDO relacionado a vídeo
-            val interceptRegex = Regex("""\.txt(\?|${'$'})""", RegexOption.IGNORE_CASE)
+            // REGEX MELHORADO: Intercepta /v4/ com arquivos de vídeo
+            val interceptRegex = Regex("""/v4/[^"'\s]+\.(txt|m3u8|woff2)""", RegexOption.IGNORE_CASE)
             
             // additionalUrls: Captura requisições específicas
             val additionalUrls = listOf(
@@ -205,12 +344,15 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 additionalUrls = additionalUrls,
                 script = hybridScript,
                 scriptCallback = { result ->
+                    Log.d(TAG, "📜 scriptCallback recebeu: '$result' (tipo: ${result.javaClass.simpleName}, tamanho: ${result.length})")
                     if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
                         capturedApiUrl = result.trim('"')
-                        Log.d(TAG, "📜 Script capturou: $capturedApiUrl")
+                        Log.d(TAG, "✅ Script capturou URL VÁLIDA: $capturedApiUrl")
+                    } else {
+                        Log.d(TAG, "⚠️ Script retornou valor inválido ou vazio")
                     }
                 },
-                timeout = 20_000L
+                timeout = 30_000L // Aumentado para 30s (sites lentos)
             )
             
             Log.d(TAG, "🌐 Carregando WebView...")
@@ -223,20 +365,45 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             // PRIORIDADE: Script > Interceptação
             val finalUrl = capturedApiUrl ?: capturedUrl
             
+            Log.d(TAG, "🔍 Analisando URL final: $finalUrl")
+            
             // FASE 3 — PROCESSAR URL CAPTURADA
-            if (!finalUrl.contains("/v4/") && !finalUrl.contains("index") && !finalUrl.contains("cf-master") && !finalUrl.contains(".txt")) {
-                Log.e(TAG, "❌ URL capturada não é válida: $finalUrl")
-                return
+            // Se a URL contém /v4/, extrair dados dela
+            val urlData = if (finalUrl.contains("/v4/")) {
+                extractUrlData(finalUrl)?.also {
+                    Log.d(TAG, "📦 Dados extraídos da URL: host=${it.host}, cluster=${it.cluster}, videoId=${it.videoId}")
+                }
+            } else {
+                Log.d(TAG, "⚠️ URL não contém /v4/, tentando buscar no HTML da página...")
+                
+                // Buscar padrões no HTML da página capturada
+                runCatching {
+                    val pageHtml = app.get(url, headers = cdnHeaders).text
+                    
+                    // Buscar qualquer URL com /v4/
+                    val v4Regex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/[^"'\s]+""", RegexOption.IGNORE_CASE)
+                    val v4Match = v4Regex.find(pageHtml)
+                    
+                    if (v4Match != null) {
+                        val host = v4Match.groupValues[1]
+                        val cluster = v4Match.groupValues[2]
+                        val videoIdFound = v4Match.groupValues[3]
+                        
+                        Log.d(TAG, "✅ Encontrado no HTML: host=$host, cluster=$cluster, videoId=$videoIdFound")
+                        UrlData(host, cluster, videoIdFound)
+                    } else {
+                        Log.e(TAG, "❌ Nenhum padrão /v4/ encontrado no HTML")
+                        null
+                    }
+                }.getOrNull()
             }
             
-            // Extrair componentes da URL
-            val urlData = extractUrlData(finalUrl)
             if (urlData == null) {
-                Log.e(TAG, "❌ Não foi possível extrair dados da URL: $finalUrl")
+                Log.e(TAG, "❌ Não foi possível extrair dados da URL ou do HTML")
                 return
             }
             
-            Log.d(TAG, "📦 Dados extraídos: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
+            Log.d(TAG, "📦 Usando dados: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
             
             // FASE 4 — BUSCAR cf-master COM TIMESTAMP NO HTML CAPTURADO
             runCatching {

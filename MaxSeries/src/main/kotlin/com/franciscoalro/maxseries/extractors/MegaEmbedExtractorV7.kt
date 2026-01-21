@@ -196,134 +196,79 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         runCatching {
             var capturedApiUrl: String? = null
             
-            // Script JavaScript: Hooks fetch/XHR + Monitora HTML + variáveis globais
+            // Script JavaScript SIMPLIFICADO - executa no WebView
             val hybridScript = """
                 (function() {
-                    console.log('[v150] Script COM HOOKS iniciado');
+                    var capturedUrls = [];
+                    var found = false;
                     
-                    // Array para capturar TODAS as URLs de vídeo detectadas
-                    window.__CAPTURED_URLS__ = window.__CAPTURED_URLS__ || [];
-                    
-                    // ========== HOOK 1: FETCH ==========
-                    if (!window.__FETCH_HOOKED__) {
-                        const originalFetch = window.fetch;
-                        window.fetch = function(...args) {
-                            const url = args[0];
-                            if (url && typeof url === 'string') {
-                                // Detectar URLs de vídeo
-                                if (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)(\?|$)/i)) {
-                                    console.log('[v150] 🎯 FETCH interceptado:', url);
-                                    window.__CAPTURED_URLS__.push(url);
-                                }
+                    // HOOK FETCH
+                    if (typeof window.fetch !== 'undefined') {
+                        var originalFetch = window.fetch;
+                        window.fetch = function() {
+                            var url = arguments[0];
+                            if (typeof url === 'string' && (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)/i))) {
+                                capturedUrls.push(url);
+                                found = true;
                             }
-                            return originalFetch.apply(this, args);
+                            return originalFetch.apply(this, arguments);
                         };
-                        window.__FETCH_HOOKED__ = true;
-                        console.log('[v150] ✅ Hook fetch instalado');
                     }
                     
-                    // ========== HOOK 2: XMLHttpRequest ==========
-                    if (!window.__XHR_HOOKED__) {
-                        const originalOpen = XMLHttpRequest.prototype.open;
+                    // HOOK XHR
+                    if (typeof XMLHttpRequest !== 'undefined') {
+                        var originalOpen = XMLHttpRequest.prototype.open;
                         XMLHttpRequest.prototype.open = function(method, url) {
-                            if (url && typeof url === 'string') {
-                                if (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)(\?|$)/i)) {
-                                    console.log('[v150] 🎯 XHR interceptado:', url);
-                                    window.__CAPTURED_URLS__.push(url);
-                                }
+                            if (typeof url === 'string' && (url.includes('/v4/') || url.match(/\.(txt|m3u8|woff2)/i))) {
+                                capturedUrls.push(url);
+                                found = true;
                             }
                             return originalOpen.apply(this, arguments);
                         };
-                        window.__XHR_HOOKED__ = true;
-                        console.log('[v150] ✅ Hook XHR instalado');
                     }
                     
-                    // ========== MONITORAMENTO E RETORNO ==========
-                    return new Promise(function(resolve) {
-                        var attempts = 0;
-                        var maxAttempts = 200; // 20s (100ms * 200)
+                    // AGUARDAR CAPTURA
+                    var attempts = 0;
+                    var checkInterval = setInterval(function() {
+                        attempts++;
                         
-                        var interval = setInterval(function() {
-                            attempts++;
-                            
-                            // 1. Verificar URLs capturadas pelos hooks
-                            if (window.__CAPTURED_URLS__.length > 0) {
-                                clearInterval(interval);
-                                
-                                // Priorizar URLs com padrões específicos
-                                var bestUrl = window.__CAPTURED_URLS__.find(function(u) {
-                                    return u.includes('cf-master') || u.includes('index-f');
-                                }) || window.__CAPTURED_URLS__[0];
-                                
-                                console.log('[v150] ✅ URL capturada pelos hooks:', bestUrl);
-                                console.log('[v150] 📊 Total URLs detectadas:', window.__CAPTURED_URLS__.length);
-                                resolve(bestUrl);
+                        if (found && capturedUrls.length > 0) {
+                            clearInterval(checkInterval);
+                            var best = capturedUrls.find(function(u) { return u.includes('cf-master') || u.includes('index-f'); }) || capturedUrls[0];
+                            window.__RESULT__ = best;
+                            return;
+                        }
+                        
+                        // FALLBACK: buscar no HTML
+                        if (attempts === 30) {
+                            var html = document.documentElement.innerHTML;
+                            var match = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.(txt|m3u8)/i);
+                            if (match) {
+                                clearInterval(checkInterval);
+                                window.__RESULT__ = match[0];
                                 return;
                             }
-                            
-                            // 2. Tentar pegar URL de variáveis globais (fallback)
-                            if (window.__PLAYER_CONFIG__ && window.__PLAYER_CONFIG__.url) {
-                                clearInterval(interval);
-                                console.log('[v150] ✅ Capturado de __PLAYER_CONFIG__:', window.__PLAYER_CONFIG__.url);
-                                resolve(window.__PLAYER_CONFIG__.url);
-                                return;
-                            }
-                            
-                            if (window.playlistUrl) {
-                                clearInterval(interval);
-                                console.log('[v150] ✅ Capturado de playlistUrl:', window.playlistUrl);
-                                resolve(window.playlistUrl);
-                                return;
-                            }
-                            
-                            // 3. Buscar no HTML (fallback secundário)
-                            if (attempts === 50) { // Após 5s, tentar buscar no HTML
-                                var html = document.documentElement.innerHTML;
-                                
-                                // Padrão: cf-master com timestamp
-                                var cfMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/cf-master\.\d+\.txt/i);
-                                if (cfMatch) {
-                                    clearInterval(interval);
-                                    console.log('[v150] ✅ Capturado cf-master do HTML:', cfMatch[0]);
-                                    resolve(cfMatch[0]);
-                                    return;
-                                }
-                                
-                                // Padrão: index-f{qualidade}.txt
-                                var indexMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\/index-f\d+-v\d+-a\d+\.txt/i);
-                                if (indexMatch) {
-                                    clearInterval(interval);
-                                    console.log('[v150] ✅ Capturado index do HTML:', indexMatch[0]);
-                                    resolve(indexMatch[0]);
-                                    return;
-                                }
-                                
-                                // Padrão: qualquer .txt em /v4/
-                                var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
-                                if (txtMatch) {
-                                    clearInterval(interval);
-                                    console.log('[v150] ✅ Capturado .txt do HTML:', txtMatch[0]);
-                                    resolve(txtMatch[0]);
-                                    return;
-                                }
-                            }
-                            
-                            // 4. Log progresso a cada 3s
-                            if (attempts % 30 === 0) {
-                                console.log('[v150] ⏳ Tentativa', attempts, '/', maxAttempts);
-                                console.log('[v150] 📊 URLs capturadas até agora:', window.__CAPTURED_URLS__.length);
-                            }
-                            
-                            // 5. Timeout
-                            if (attempts >= maxAttempts) {
-                                clearInterval(interval);
-                                console.log('[v150] ⏱️ Timeout após', attempts, 'tentativas');
-                                console.log('[v150] 📊 URLs capturadas:', window.__CAPTURED_URLS__);
-                                resolve(window.__CAPTURED_URLS__[0] || '');
-                            }
-                        }, 100);
-                    });
-                })()
+                        }
+                        
+                        if (attempts >= 150) {
+                            clearInterval(checkInterval);
+                            window.__RESULT__ = capturedUrls[0] || '';
+                        }
+                    }, 100);
+                    
+                    // RETORNAR RESULTADO APÓS DELAY
+                    setTimeout(function() {
+                        return window.__RESULT__ || '';
+                    }, 15000);
+                })();
+                
+                // RETORNAR RESULTADO FINAL
+                (function check() {
+                    if (typeof window.__RESULT__ !== 'undefined') {
+                        return window.__RESULT__;
+                    }
+                    return '';
+                })();
             """.trimIndent()
             
             // REGEX MELHORADO: Intercepta /v4/ com arquivos de vídeo

@@ -1,7 +1,7 @@
-version = 150
+version = 151
 
 cloudstream {
-    description = "MaxSeries v150 - Hooks Fetch/XHR + Regex Melhorado + Timeout 30s"
+    description = "MaxSeries v151 - Script JS Simplificado + Hooks Fix"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

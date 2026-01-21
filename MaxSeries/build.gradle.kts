@@ -1,7 +1,7 @@
-version = 143
+version = 145
 
 cloudstream {
-    description = "MaxSeries v143 - Pipeline WebVideoCast-like (Interceptação Total)"
+    description = "MaxSeries v145 - Multi-Regex: 8 padrões de CDN"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v152 - Busca HTML Direta (sem WebView)",
-        "version": 152,
+        "description": "MaxSeries v154 - WebView Passivo (JS nativo executa)",
+        "version": 154,
         "authors": [
             "franciscoalro"
         ],

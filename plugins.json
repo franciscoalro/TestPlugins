@@ -21,17 +21,17 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v152/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v154/MaxSeries.cs3",
         "status": 1,
-        "version": 152,
+        "version": 154,
         "apiVersion": 1,
-        "fileSize": 184000,
+        "fileSize": 175068,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v152 - Busca HTML Direta (sem WebView)",
+        "description": "MaxSeries v154 - WebView Passivo (JS nativo executa)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

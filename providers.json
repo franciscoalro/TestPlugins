@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v151 - Script JS Simplificado + Hooks Fix",
-        "version": 151,
+        "description": "MaxSeries v154 - WebView Passivo (JS nativo executa)",
+        "version": 154,
         "authors": [
             "franciscoalro"
         ],

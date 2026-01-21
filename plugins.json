@@ -21,9 +21,9 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v143/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v144/MaxSeries.cs3",
         "status":  1,
-        "version":  143,
+        "version":  144,
         "apiVersion":  1,
         "fileSize":  153800,
         "name":  "MaxSeries",
@@ -31,7 +31,7 @@
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v143 - Pipeline WebVideoCast-like (Interceptação Total)",
+        "description":  "MaxSeries v144 - Fix: Regex simplificado + logs detalhados",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v151 - Script JS Simplificado + Hooks Fix",
-        "version": 151,
+        "description": "MaxSeries v152 - Busca HTML Direta (sem WebView)",
+        "version": 152,
         "authors": [
             "franciscoalro"
         ],

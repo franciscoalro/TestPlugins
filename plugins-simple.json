@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/builds/MaxSeries.cs3?v=151",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/builds/MaxSeries.cs3?v=152",
         "status": 1,
-        "version": 151,
+        "version": 152,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v151 - Script JS Simplificado + Hooks Fix",
+        "description": "MaxSeries v152 - Busca HTML Direta (sem WebView)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

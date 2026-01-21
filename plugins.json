@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v145/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v147/MaxSeries.cs3",
         "status":  1,
-        "version":  145,
+        "version":  147,
         "apiVersion":  1,
-        "fileSize":  170000,
+        "fileSize":  178019,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v145 - Multi-Regex: 8 padrões de CDN",
+        "description":  "MaxSeries v147 - APIs do MegaEmbed + cf-master com timestamp",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

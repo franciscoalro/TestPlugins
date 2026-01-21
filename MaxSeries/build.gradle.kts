@@ -1,7 +1,7 @@
-version = 145
+version = 147
 
 cloudstream {
-    description = "MaxSeries v145 - Multi-Regex: 8 padrões de CDN"
+    description = "MaxSeries v147 - APIs do MegaEmbed + cf-master com timestamp"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

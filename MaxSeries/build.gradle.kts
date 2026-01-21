@@ -1,7 +1,7 @@
-version = 149
+version = 150
 
 cloudstream {
-    description = "MaxSeries v149 - WebView Híbrido: Interceptação + Script + additionalUrls"
+    description = "MaxSeries v150 - Hooks Fetch/XHR + Regex Melhorado + Timeout 30s"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

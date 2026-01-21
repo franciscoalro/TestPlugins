@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v114 - MegaEmbed HEX decoding + expanded CDN/shard lists",
-        "version": 114,
+        "description": "MaxSeries v150 - Hooks Fetch/XHR + Regex Melhorado + Timeout 30s",
+        "version": 150,
         "authors": [
             "franciscoalro"
         ],

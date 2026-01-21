@@ -7,15 +7,13 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Extractor v7 - v147 API-BASED
+ * MegaEmbed Extractor v7 - v148 FIX WebView
  *
- * DESCOBERTAS DO FIREFOX CONSOLE (2026-01-20):
- * 1. MegaEmbed usa APIs: /api/v1/info, /api/v1/video, /api/v1/player
- * 2. cf-master tem timestamp dinâmico: cf-master.1767387529.txt
- * 3. Nova CDN descoberta: rivonaengineering.sbs
- * 4. WebView como fallback
+ * PROBLEMA v147: scriptCallback retorna {} vazio
+ * SOLUÇÃO v148: WebView SEM script, apenas interceptação de rede
  *
- * Baseado em: ANALISE_FIREFOX_CONSOLE_REAL.md
+ * O WebView vai interceptar as requisições de rede (XHR/Fetch) automaticamente
+ * sem depender de JavaScript no HTML
  */
 class MegaEmbedExtractorV7 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -38,9 +36,9 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
     
     // Estrutura de dados da URL
     data class UrlData(
-        val host: String,      // sxix.rivonaengineering.sbs
-        val cluster: String,   // is9, ic, x6b, 5c, db
-        val videoId: String    // 6pyw3v (6 chars)
+        val host: String,
+        val cluster: String,
+        val videoId: String
     )
 
     override suspend fun getUrl(
@@ -49,7 +47,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V7 v147 API-BASED ===")
+        Log.d(TAG, "=== MEGAEMBED V7 v148 FIX WEBVIEW ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -106,72 +104,27 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             Log.d(TAG, "⏭️ Erro ao buscar cf-master: ${it.message}")
         }
         
-        // FASE 3 — WEBVIEW COM REGEX ÚNICO AMPLO
-        Log.d(TAG, "🔍 Iniciando WebView com regex único amplo...")
+        // FASE 2 — WEBVIEW COM INTERCEPTAÇÃO DE REDE (SEM SCRIPT)
+        Log.d(TAG, "🔍 Iniciando WebView com interceptação de rede...")
         
         runCatching {
-            // REGEX ÚNICO: Captura QUALQUER URL com /v4/
-            // Baseado em PIPELINE_REGEX_V142_EXPLICACAO.md
-            val universalRegex = Regex("""https?://[^/]+/v4/[^"'\s<>]+""", RegexOption.IGNORE_CASE)
+            // REGEX: Intercepta qualquer URL com /v4/ ou .txt
+            val interceptRegex = Regex("""(https?://[^/]+/v4/[^"'\s]+|https?://[^"'\s]+\.txt)""", RegexOption.IGNORE_CASE)
             
-            val captureScript = """
-                (function() {
-                    return new Promise(function(resolve) {
-                        var attempts = 0;
-                        var maxAttempts = 80;
-                        
-                        var interval = setInterval(function() {
-                            attempts++;
-                            
-                            var html = document.documentElement.innerHTML;
-                            
-                            // Procurar por URLs .txt (M3U8 camuflado)
-                            var txtMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.txt/i);
-                            if (txtMatch) {
-                                clearInterval(interval);
-                                resolve(txtMatch[0]);
-                                return;
-                            }
-                            
-                            // Procurar por .woff/.woff2 (segmentos camuflados)
-                            var woffMatch = html.match(/https?:\/\/[^"'\s]+\/v4\/[^"'\s]+\.woff2?/i);
-                            if (woffMatch) {
-                                clearInterval(interval);
-                                resolve(woffMatch[0]);
-                                return;
-                            }
-                            
-                            if (attempts >= maxAttempts) {
-                                clearInterval(interval);
-                                resolve('');
-                            }
-                        }, 100);
-                    });
-                })()
-            """.trimIndent()
-            
+            // SEM SCRIPT! Deixa o WebView interceptar as requisições de rede automaticamente
             val resolver = WebViewResolver(
-                interceptUrl = universalRegex,
-                script = captureScript,
-                scriptCallback = { result ->
-                    Log.d(TAG, "📱 WebView capturou: $result")
-                },
-                timeout = 12_000L
+                interceptUrl = interceptRegex,
+                timeout = 15_000L
             )
             
-            val headers = mapOf(
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Referer" to mainUrl
-            )
-            
-            val response = app.get(url, headers = headers, interceptor = resolver)
+            val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
             val captured = response.url
             
-            Log.d(TAG, "📄 WebView retornou: $captured")
+            Log.d(TAG, "📄 WebView interceptou: $captured")
             
             // FASE 3 — PROCESSAR URL CAPTURADA
-            if (!captured.contains("/v4/")) {
-                Log.e(TAG, "❌ URL capturada não contém /v4/")
+            if (!captured.contains("/v4/") && !captured.contains("index") && !captured.contains("cf-master")) {
+                Log.e(TAG, "❌ URL capturada não é válida: $captured")
                 return
             }
             

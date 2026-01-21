@@ -21,17 +21,17 @@
         "isAdult":  false
     },
     {
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v147/MaxSeries.cs3",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v148/MaxSeries.cs3",
         "status":  1,
-        "version":  147,
+        "version":  148,
         "apiVersion":  1,
-        "fileSize":  178019,
+        "fileSize":  176976,
         "name":  "MaxSeries",
         "internalName":  "MaxSeries",
         "authors":  [
                         "franciscoalro"
                     ],
-        "description":  "MaxSeries v147 - APIs do MegaEmbed + cf-master com timestamp",
+        "description":  "MaxSeries v148 - FIX WebView: Interceptação de rede funcional",
         "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "tvTypes":  [
                         "TvSeries",

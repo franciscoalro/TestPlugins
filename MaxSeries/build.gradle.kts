@@ -1,7 +1,7 @@
-version = 147
+version = 148
 
 cloudstream {
-    description = "MaxSeries v147 - APIs do MegaEmbed + cf-master com timestamp"
+    description = "MaxSeries v148 - FIX WebView: Interceptação de rede funcional"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

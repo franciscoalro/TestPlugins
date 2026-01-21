@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v150 - Hooks Fetch/XHR + Regex Melhorado + Timeout 30s",
-        "version": 150,
+        "description": "MaxSeries v151 - Script JS Simplificado + Hooks Fix",
+        "version": 151,
         "authors": [
             "franciscoalro"
         ],

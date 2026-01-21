@@ -1,7 +1,7 @@
-version = 152
+version = 154
 
 cloudstream {
-    description = "MaxSeries v152 - Busca HTML Direta (sem WebView)"
+    description = "MaxSeries v154 - WebView Passivo (JS nativo executa)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

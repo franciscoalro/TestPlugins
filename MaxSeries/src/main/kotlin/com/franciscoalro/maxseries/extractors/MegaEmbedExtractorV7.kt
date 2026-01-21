@@ -53,7 +53,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V7 v150 HÍBRIDO COM HOOKS ===")
+        Log.d(TAG, "=== MEGAEMBED V7 v154 WEBVIEW PASSIVO ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -73,95 +73,94 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             return
         }
         
-        // FASE 2 — BUSCA DIRETA NO HTML (SEM WEBVIEW - mais confiável)
-        Log.d(TAG, "🔍 Buscando URLs de vídeo diretamente no HTML...")
+        // FASE 2 — WEBVIEW PASSIVO (v154): Deixa JavaScript nativo executar
+        Log.d(TAG, "🌐 Iniciando WebView PASSIVO (sem scripts custom)...")
         
         runCatching {
-            val htmlResponse = app.get(url, headers = cdnHeaders)
-            val html = htmlResponse.text
+            // Regex para interceptar arquivos de vídeo
+            val interceptRegex = Regex("""/v4/[^"'\s]+\.(txt|m3u8|woff2)""", RegexOption.IGNORE_CASE)
             
-            Log.d(TAG, "📄 HTML recebido (${html.length} chars)")
+            // WebView SEM script customizado - deixa JavaScript do MegaEmbed executar
+            val resolver = WebViewResolver(
+                interceptUrl = interceptRegex,
+                script = null, // SEM scripts! Deixa JS nativo executar
+                timeout = 35_000L // 35s para JavaScript carregar
+            )
             
-            // Extrair videoId da URL
-            val videoId = extractVideoId(url)
-            if (videoId == null) {
-                Log.e(TAG, "❌ VideoID não encontrado na URL")
-                return
-            }
+            Log.d(TAG, "📱 Carregando página e aguardando JavaScript executar...")
+            val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
+            val capturedUrl = response.url
             
-            // PADRÃO 1: cf-master com timestamp no HTML
-            val cfMasterRegex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/cf-master\.(\d+)\.txt""", RegexOption.IGNORE_CASE)
-            cfMasterRegex.find(html)?.let { match ->
-                val cfUrl = match.value
-                Log.d(TAG, "✅ cf-master encontrado no HTML: $cfUrl")
+            Log.d(TAG, "✅ WebView capturou: $capturedUrl")
+            
+            // Verificar se capturou URL com /v4/
+            if (capturedUrl.contains("/v4/") && interceptRegex.containsMatchIn(capturedUrl)) {
+                Log.d(TAG, "🎯 URL de vídeo interceptada com sucesso!")
                 
-                if (tryUrl(cfUrl)) {
-                    val quality = QualityDetector.detectFromUrl(cfUrl)
-                    VideoUrlCache.put(url, cfUrl, quality, name)
+                // Tentar usar URL diretamente
+                if (tryUrl(capturedUrl)) {
+                    val quality = QualityDetector.detectFromUrl(capturedUrl)
+                    VideoUrlCache.put(url, capturedUrl, quality, name)
                     
                     M3u8Helper.generateM3u8(
                         source = name,
-                        streamUrl = cfUrl,
+                        streamUrl = capturedUrl,
                         referer = mainUrl,
                         headers = cdnHeaders
                     ).forEach(callback)
                     return
                 }
-            }
-            
-            // PADRÃO 2: index-f{n}-v{n}-a{n}.txt no HTML
-            val indexRegex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/index-f\d+-v\d+-a\d+\.txt""", RegexOption.IGNORE_CASE)
-            indexRegex.find(html)?.let { match ->
-                val indexUrl = match.value
-                Log.d(TAG, "✅ index encontrado no HTML: $indexUrl")
                 
-                if (tryUrl(indexUrl)) {
-                    val quality = QualityDetector.detectFromUrl(indexUrl)
-                    VideoUrlCache.put(url, indexUrl, quality, name)
+                // Se URL capturada não funcionar, extrair dados e tentar variações
+                extractUrlData(capturedUrl)?.let { urlData ->
+                    Log.d(TAG, "📦 Dados extraídos: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
                     
-                    M3u8Helper.generateM3u8(
-                        source = name,
-                        streamUrl = indexUrl,
-                        referer = mainUrl,
-                        headers = cdnHeaders
-                    ).forEach(callback)
-                    return
-                }
-            }
-            
-            // PADRÃO 3: Extrair host/cluster de QUALQUER arquivo no HTML e fazer brute-force
-            val v4Regex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/[^"'\s]+""", RegexOption.IGNORE_CASE)
-            v4Regex.find(html)?.let { match ->
-                val host = match.groupValues[1]
-                val cluster = match.groupValues[2]
-                val foundVideoId = match.groupValues[3]
-                
-                Log.d(TAG, "✅ Encontrado padrão /v4/: host=$host, cluster=$cluster, videoId=$foundVideoId")
-                
-                // Usar videoId da URL original, não do HTML
-                val targetVideoId = if (foundVideoId == videoId) videoId else videoId
-                
-                // Tentar variações de arquivo
-                val fileVariations = listOf(
-                    "index-f1-v1-a1.txt",
-                    "index-f2-v1-a1.txt", 
-                    "index.txt",
-                    "cf-master.txt"
-                )
-                
-                for ((index, fileName) in fileVariations.withIndex()) {
-                    val testUrl = "https://$host/v4/$cluster/$targetVideoId/$fileName"
-                    Log.d(TAG, "🧪 Testando ${index + 1}/${fileVariations.size}: $fileName")
+                    val fileVariations = listOf(
+                        "cf-master.txt",
+                        "index-f1-v1-a1.txt",
+                        "index-f2-v1-a1.txt",
+                        "index.txt"
+                    )
                     
-                    if (tryUrl(testUrl)) {
-                        Log.d(TAG, "✅ SUCESSO! URL válida: $testUrl")
+                    for ((index, fileName) in fileVariations.withIndex()) {
+                        val testUrl = "https://${urlData.host}/v4/${urlData.cluster}/${urlData.videoId}/$fileName"
+                        Log.d(TAG, "🧪 Testando ${index + 1}/${fileVariations.size}: $fileName")
                         
-                        val quality = QualityDetector.detectFromUrl(testUrl)
-                        VideoUrlCache.put(url, testUrl, quality, name)
+                        if (tryUrl(testUrl)) {
+                            Log.d(TAG, "✅ SUCESSO! URL válida: $testUrl")
+                            
+                            val quality = QualityDetector.detectFromUrl(testUrl)
+                            VideoUrlCache.put(url, testUrl, quality, name)
+                            
+                            M3u8Helper.generateM3u8(
+                                source = name,
+                                streamUrl = testUrl,
+                                referer = mainUrl,
+                                headers = cdnHeaders
+                            ).forEach(callback)
+                            return
+                        }
+                    }
+                }
+            } else {
+                Log.d(TAG, "⚠️ WebView não capturou URL com /v4/, tentando buscar no HTML carregado...")
+                
+                // Fallback: Buscar no HTML que foi carregado pelo WebView
+                val html = response.text
+                Log.d(TAG, "📄 HTML carregado pelo WebView (${html.length} chars)")
+                
+                val v4Regex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/[^"'\s]+\.(txt|m3u8)""", RegexOption.IGNORE_CASE)
+                v4Regex.find(html)?.let { match ->
+                    val foundUrl = match.value
+                    Log.d(TAG, "✅ Encontrado no HTML: $foundUrl")
+                    
+                    if (tryUrl(foundUrl)) {
+                        val quality = QualityDetector.detectFromUrl(foundUrl)
+                        VideoUrlCache.put(url, foundUrl, quality, name)
                         
                         M3u8Helper.generateM3u8(
                             source = name,
-                            streamUrl = testUrl,
+                            streamUrl = foundUrl,
                             referer = mainUrl,
                             headers = cdnHeaders
                         ).forEach(callback)
@@ -170,10 +169,11 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                 }
             }
             
-            Log.d(TAG, "⚠️ Nenhum padrão encontrado no HTML")
+            Log.e(TAG, "❌ WebView não conseguiu capturar URLs de vídeo")
             
         }.onFailure {
-            Log.e(TAG, "❌ Erro na busca HTML: ${it.message}")
+            Log.e(TAG, "❌ Erro no WebView: ${it.message}")
+            it.printStackTrace()
         }
     }
     

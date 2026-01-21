@@ -16,7 +16,7 @@ buildscript {
             exclude(group = "com.github.vidstige", module = "jadb")
         }
         classpath("com.github.vidstige:jadb:v1.2.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
     }
 }
 

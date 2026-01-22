@@ -1,7 +1,7 @@
-version = 154
+version = 155
 
 cloudstream {
-    description = "MaxSeries v154 - WebView Passivo (JS nativo executa)"
+    description = "MaxSeries v155 - Crypto Interception (captura URLs descriptografadas)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

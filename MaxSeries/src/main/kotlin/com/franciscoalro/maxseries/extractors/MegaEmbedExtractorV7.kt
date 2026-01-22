@@ -53,7 +53,7 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V7 v154 WEBVIEW PASSIVO ===")
+        Log.d(TAG, "=== MEGAEMBED V7 v155 CRYPTO INTERCEPTION ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -73,46 +73,139 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
             return
         }
         
-        // FASE 2 — WEBVIEW PASSIVO (v154): Deixa JavaScript nativo executar
-        Log.d(TAG, "🌐 Iniciando WebView PASSIVO (sem scripts custom)...")
+        // FASE 2 — WEBVIEW COM SCRIPT ATIVO (v155): Intercepta crypto.subtle.decrypt()
+        Log.d(TAG, "🌐 Iniciando WebView com CRYPTO INTERCEPTION...")
         
         runCatching {
-            // Regex para interceptar arquivos de vídeo
+            var capturedUrl: String? = null
+            
+            // Script de crypto interception - intercepta descriptografia AES
+            val cryptoScript = """
+                (function() {
+                    console.log('[MegaEmbed v155] Iniciando captura...');
+                    
+                    // Interceptar crypto.subtle.decrypt se disponível
+                    if (window.crypto && window.crypto.subtle) {
+                        const originalDecrypt = window.crypto.subtle.decrypt;
+                        window.crypto.subtle.decrypt = function(...args) {
+                            return originalDecrypt.apply(this, args).then(result => {
+                                try {
+                                    const text = new TextDecoder().decode(result);
+                                    console.log('[MegaEmbed v155] Descriptografado:', text.substring(0, 200));
+                                    
+                                    // Procurar URL no texto descriptografado
+                                    const urlMatch = text.match(/https?:\/\/[^\s"'<>]+\.(txt|m3u8)/i);
+                                    if (urlMatch) {
+                                        window.__MEGAEMBED_VIDEO_URL__ = urlMatch[0];
+                                        console.log('[MegaEmbed v155] ✅ URL capturada:', urlMatch[0]);
+                                    }
+                                    
+                                    // Tentar parsear como JSON
+                                    try {
+                                        const json = JSON.parse(text);
+                                        const u = json.url || json.file || json.source || json.playlist;
+                                        if (u && (u.includes('.txt') || u.includes('.m3u8'))) {
+                                            window.__MEGAEMBED_VIDEO_URL__ = u;
+                                            console.log('[MegaEmbed v155] ✅ URL do JSON:', u);
+                                        }
+                                    } catch(e) {}
+                                } catch(e) {}
+                                return result;
+                            });
+                        };
+                    }
+                    
+                    return new Promise(function(resolve) {
+                        var attempts = 0;
+                        var maxAttempts = 600; // 60s
+                        
+                        var interval = setInterval(function() {
+                            attempts++;
+                            
+                            // 1. Verificar variável global da interceptação
+                            if (window.__MEGAEMBED_VIDEO_URL__) {
+                                clearInterval(interval);
+                                resolve(window.__MEGAEMBED_VIDEO_URL__);
+                                return;
+                            }
+                            
+                            // 2. Buscar no DOM
+                            var html = document.documentElement.innerHTML;
+                            
+                            // Padrão: URLs com /v4/ e .txt ou .m3u8
+                            var v4Match = html.match(/https?:\/\/[^\s"'<>]+\/v4\/[a-z0-9]+\/[a-z0-9]+\/[^\s"'<>]+\.(txt|m3u8)/i);
+                            if (v4Match) {
+                                clearInterval(interval);
+                                console.log('[MegaEmbed v155] ✅ URL no DOM:', v4Match[0]);
+                                resolve(v4Match[0]);
+                                return;
+                            }
+                            
+                            // Padrão: cf-master ou index-f
+                            var cfMatch = html.match(/https?:\/\/[^\s"'<>]+(?:cf-master|index-f)[^\s"'<>]+\.txt/i);
+                            if (cfMatch) {
+                                clearInterval(interval);
+                                console.log('[MegaEmbed v155] ✅ cf-master/index:', cfMatch[0]);
+                                resolve(cfMatch[0]);
+                                return;
+                            }
+                            
+                            // Timeout
+                            if (attempts >= maxAttempts) {
+                                clearInterval(interval);
+                                console.log('[MegaEmbed v155] ⏱️ Timeout após 60s');
+                                resolve('');
+                            }
+                        }, 100);
+                    });
+                })();
+            """.trimIndent()
+            
+            // Regex para interceptar arquivos de vídeo via rede
             val interceptRegex = Regex("""/v4/[^"'\s]+\.(txt|m3u8|woff2)""", RegexOption.IGNORE_CASE)
             
-            // WebView SEM script customizado - deixa JavaScript do MegaEmbed executar
             val resolver = WebViewResolver(
                 interceptUrl = interceptRegex,
-                script = null, // SEM scripts! Deixa JS nativo executar
-                timeout = 35_000L // 35s para JavaScript carregar
+                script = cryptoScript,
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
+                        capturedUrl = result.trim('"')
+                        Log.d(TAG, "📜 Script capturou: $capturedUrl")
+                    }
+                },
+                timeout = 60_000L // 60s
             )
             
-            Log.d(TAG, "📱 Carregando página e aguardando JavaScript executar...")
+            Log.d(TAG, "📱 Carregando página com crypto interception...")
             val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
-            val capturedUrl = response.url
             
-            Log.d(TAG, "✅ WebView capturou: $capturedUrl")
+            // Prioridade: URL do script > URL interceptada via rede
+            val finalUrl = capturedUrl ?: response.url.takeIf { 
+                it.contains("/v4/") && interceptRegex.containsMatchIn(it) 
+            }
             
-            // Verificar se capturou URL com /v4/
-            if (capturedUrl.contains("/v4/") && interceptRegex.containsMatchIn(capturedUrl)) {
-                Log.d(TAG, "🎯 URL de vídeo interceptada com sucesso!")
+            Log.d(TAG, "🔍 URL do script: $capturedUrl")
+            Log.d(TAG, "🔍 URL da rede: ${response.url}")
+            Log.d(TAG, "🔍 URL final: $finalUrl")
+            
+            if (finalUrl != null && isValidVideoUrl(finalUrl)) {
+                Log.d(TAG, "🎯 URL de vídeo capturada com sucesso!")
                 
-                // Tentar usar URL diretamente
-                if (tryUrl(capturedUrl)) {
-                    val quality = QualityDetector.detectFromUrl(capturedUrl)
-                    VideoUrlCache.put(url, capturedUrl, quality, name)
+                if (tryUrl(finalUrl)) {
+                    val quality = QualityDetector.detectFromUrl(finalUrl)
+                    VideoUrlCache.put(url, finalUrl, quality, name)
                     
                     M3u8Helper.generateM3u8(
                         source = name,
-                        streamUrl = capturedUrl,
+                        streamUrl = finalUrl,
                         referer = mainUrl,
                         headers = cdnHeaders
                     ).forEach(callback)
                     return
                 }
                 
-                // Se URL capturada não funcionar, extrair dados e tentar variações
-                extractUrlData(capturedUrl)?.let { urlData ->
+                // Fallback: extrair dados e testar variações
+                extractUrlData(finalUrl)?.let { urlData ->
                     Log.d(TAG, "📦 Dados extraídos: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
                     
                     val fileVariations = listOf(
@@ -142,39 +235,45 @@ class MegaEmbedExtractorV7 : ExtractorApi() {
                         }
                     }
                 }
-            } else {
-                Log.d(TAG, "⚠️ WebView não capturou URL com /v4/, tentando buscar no HTML carregado...")
+            }
+            
+            // Fallback final: buscar no HTML
+            Log.d(TAG, "⚠️ Tentando fallback via HTML...")
+            val html = response.text
+            Log.d(TAG, "📄 HTML (${html.length} chars)")
+            
+            val v4Regex = Regex("""https?://[^\s"'<>]+/v4/[a-z0-9]+/[a-z0-9]+/[^\s"'<>]+\.(txt|m3u8)""", RegexOption.IGNORE_CASE)
+            v4Regex.find(html)?.let { match ->
+                val foundUrl = match.value
+                Log.d(TAG, "✅ Encontrado no HTML: $foundUrl")
                 
-                // Fallback: Buscar no HTML que foi carregado pelo WebView
-                val html = response.text
-                Log.d(TAG, "📄 HTML carregado pelo WebView (${html.length} chars)")
-                
-                val v4Regex = Regex("""https?://([^"'\s]+)/v4/([a-z0-9]{1,3})/([a-z0-9]{6})/[^"'\s]+\.(txt|m3u8)""", RegexOption.IGNORE_CASE)
-                v4Regex.find(html)?.let { match ->
-                    val foundUrl = match.value
-                    Log.d(TAG, "✅ Encontrado no HTML: $foundUrl")
+                if (tryUrl(foundUrl)) {
+                    val quality = QualityDetector.detectFromUrl(foundUrl)
+                    VideoUrlCache.put(url, foundUrl, quality, name)
                     
-                    if (tryUrl(foundUrl)) {
-                        val quality = QualityDetector.detectFromUrl(foundUrl)
-                        VideoUrlCache.put(url, foundUrl, quality, name)
-                        
-                        M3u8Helper.generateM3u8(
-                            source = name,
-                            streamUrl = foundUrl,
-                            referer = mainUrl,
-                            headers = cdnHeaders
-                        ).forEach(callback)
-                        return
-                    }
+                    M3u8Helper.generateM3u8(
+                        source = name,
+                        streamUrl = foundUrl,
+                        referer = mainUrl,
+                        headers = cdnHeaders
+                    ).forEach(callback)
+                    return
                 }
             }
             
-            Log.e(TAG, "❌ WebView não conseguiu capturar URLs de vídeo")
+            Log.e(TAG, "❌ Todas as estratégias falharam")
             
         }.onFailure {
-            Log.e(TAG, "❌ Erro no WebView: ${it.message}")
+            Log.e(TAG, "❌ Erro: ${it.message}")
             it.printStackTrace()
         }
+    }
+    
+    private fun isValidVideoUrl(url: String?): Boolean {
+        if (url.isNullOrEmpty() || !url.startsWith("http")) return false
+        return url.contains(".txt") || url.contains(".m3u8") || 
+               url.contains("cf-master") || url.contains("index-f") ||
+               url.contains("/v4/")
     }
     
     /**

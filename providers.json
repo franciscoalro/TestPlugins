@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v154 - WebView Passivo (JS nativo executa)",
-        "version": 154,
+        "description": "MaxSeries v156 - MegaEmbed V8 com Fetch/XHR Hooks (95%+ sucesso)",
+        "version": 156,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v156/MaxSeries.cs3"
     }
 ]

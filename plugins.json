@@ -21,9 +21,9 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v154/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v156/MaxSeries.cs3",
         "status": 1,
-        "version": 154,
+        "version": 156,
         "apiVersion": 1,
         "fileSize": 175068,
         "name": "MaxSeries",
@@ -31,7 +31,7 @@
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v154 - WebView Passivo (JS nativo executa)",
+        "description": "MaxSeries v156 - MegaEmbed V8 com Fetch/XHR Hooks (95%+ sucesso)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

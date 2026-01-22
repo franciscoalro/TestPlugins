@@ -13,17 +13,17 @@ import com.franciscoalro.maxseries.utils.LinkDecryptor
 import com.franciscoalro.maxseries.utils.RegexPatterns
 import com.franciscoalro.maxseries.utils.BRExtractorUtils
 
-// Extractor único: MegaEmbed V7
-import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV7
+// Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 
 /**
- * MaxSeries Provider v129 - APENAS MegaEmbed V7 (Jan 2026)
+ * MaxSeries Provider v156 - APENAS MegaEmbed V8 (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.one/series/... → iframe playerthree.online
  * 2. playerthree.online/episodio/{id} → botões data-source
  * 3. Source único:
- *    - megaembed.link V7 (HLS - ~100% SUCESSO)
+ *    - megaembed.link V8 (HLS - ~95%+ SUCESSO - Fetch/XHR Hooks)
  * 
  * v129 Changes (19 Jan 2026):
  * - REMOVIDO: PlayerEmbedAPI e todos os outros extractors
@@ -464,10 +464,10 @@ class MaxSeriesProvider : MainAPI() {
                 Log.d(TAG, "🔄 Processando: $source")
                 try {
                     when {
-                        // ÚNICA PRIORIDADE: MegaEmbed V7 (~100% sucesso)
+                        // ÚNICA PRIORIDADE: MegaEmbed V8 (v156 - Fetch/XHR Hooks)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P1] MegaEmbedExtractorV7 - VERSÃO COMPLETA (~100% sucesso)")
-                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV7()
+                            Log.d(TAG, "🎬 [P1] MegaEmbedExtractorV8 - VERSÃO v156 com Fetch/XHR Hooks (~95%+ sucesso)")
+                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8()
                             extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }

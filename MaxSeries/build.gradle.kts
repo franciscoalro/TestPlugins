@@ -1,7 +1,7 @@
-version = 155
+version = 156
 
 cloudstream {
-    description = "MaxSeries v155 - Crypto Interception (captura URLs descriptografadas)"
+    description = "MaxSeries v156 - MegaEmbed V8 com Fetch/XHR Hooks (95%+ sucesso)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

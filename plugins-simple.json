@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v159/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v160/MaxSeries.cs3",
         "status": 1,
-        "version": 159,
+        "version": 160,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v159 - FIX CRÍTICO: Correção de falha prematura no WebView (Promise Trap)",
+        "description": "MaxSeries v160 - FIX DEFINITIVO: Regex Universal /v4/",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

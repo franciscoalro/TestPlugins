@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v159 - FIX CRÍTICO: Correção de falha prematura no WebView (Promise Trap)",
-        "version": 159,
+        "description": "MaxSeries v160 - FIX DEFINITIVO: Regex Universal /v4/",
+        "version": 160,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v159/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v160/MaxSeries.cs3"
     }
 ]

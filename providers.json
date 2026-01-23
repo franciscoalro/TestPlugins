@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v160 - FIX DEFINITIVO: Regex Universal /v4/",
-        "version": 160,
+        "description": "MaxSeries v161 - Smart Navigation (Hash URL + Auto-Click)",
+        "version": 161,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v160/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v161/MaxSeries.cs3"
     }
 ]

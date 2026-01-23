@@ -1,8 +1,8 @@
-```json
 [
     {
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v10.0/AnimesOnlineCC.cs3",
-        "sha256": "A15919C652208F2EE0CE6767AC47F60EB9F94DE109A6D426AAE654E1D099D8BE",
+        "status": 1,
+        "version": 124,
         "apiVersion": 1,
         "name": "AnimesOnlineCC",
         "internalName": "AnimesOnlineCC",
@@ -25,7 +25,8 @@
         "status": 1,
         "version": 158,
         "apiVersion": 1,
-        "fileSize": 182443,
+        "fileSize": 182490,
+        "sha256": "A15919C652208F2EE0CE6767AC47F60EB9F94DE109A6D426AAE654E1D099D8BE",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [

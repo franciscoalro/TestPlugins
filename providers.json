@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v158 - Suporte completo a viewplayer.online e playerthree.online",
-        "version": 158,
+        "description": "MaxSeries v159 - FIX CRÍTICO: Correção de falha prematura no WebView (Promise Trap)",
+        "version": 159,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v158/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v159/MaxSeries.cs3"
     }
 ]

@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v158/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v159/MaxSeries.cs3",
         "status": 1,
-        "version": 158,
+        "version": 159,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v158 - Suporte completo a viewplayer.online e playerthree.online",
+        "description": "MaxSeries v159 - FIX CRÍTICO: Correção de falha prematura no WebView (Promise Trap)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

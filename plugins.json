@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v160/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v161/MaxSeries.cs3",
         "status": 1,
-        "version": 160,
+        "version": 161,
         "apiVersion": 1,
-        "fileSize": 181944,
-        "sha256": "4C286EE6D99987DC166B3FFE0D6500635357D9D737C580E0B7599EA6B54A789B",
+        "fileSize": 182490,
+        "sha256": "52A0A276D8FA89816606514A3BF3A464943DB598B54ED62C7B843EF7FE054A32",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v160 - FIX DEFINITIVO: Regex Universal /v4/",
+        "description": "MaxSeries v161 - Smart Navigation (Hash URL + Auto-Click)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

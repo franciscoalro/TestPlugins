@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v157 - HOTFIX: Timeout 60s (corrige Job was cancelled)",
-        "version": 157,
+        "description": "MaxSeries v158 - Suporte completo a viewplayer.online e playerthree.online",
+        "version": 158,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v157/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v158/MaxSeries.cs3"
     }
 ]

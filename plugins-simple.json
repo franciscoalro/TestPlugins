@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v157/MaxSeries.cs3?v=157",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v158/MaxSeries.cs3",
         "status": 1,
-        "version": 157,
+        "version": 158,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v157 - HOTFIX: Timeout 60s (corrige Job was cancelled)",
+        "description": "MaxSeries v158 - Suporte completo a viewplayer.online e playerthree.online",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

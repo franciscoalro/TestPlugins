@@ -1,38 +1,44 @@
-# MaxSeries v97 - ADB Log Monitor
-# Monitora logs do MaxSeries em tempo real
-
-$adb = "C:\Users\KYTHOURS\Desktop\platform-tools\adb.exe"
+# Monitor de Logs CloudStream MaxSeries v156
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  MaxSeries v97 - Log Monitor" -ForegroundColor Cyan
+Write-Host "  LOGS DO MAXSERIES V156" -ForegroundColor Cyan  
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Verificar dispositivo conectado
-Write-Host "Verificando dispositivos..." -ForegroundColor Yellow
-$devices = & $adb devices
-Write-Host $devices
+$adbPath = "C:\Users\KYTHOURS\Desktop\platform-tools\adb.exe"
+
+if (-not (Test-Path $adbPath)) {
+    Write-Host "ERRO: ADB nao encontrado" -ForegroundColor Red
+    exit 1
+}
+
+$devices = & $adbPath devices
+if ($devices -notmatch "device$") {
+    Write-Host "ERRO: Nenhum dispositivo conectado!" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "OK Dispositivo conectado!" -ForegroundColor Green
+Write-Host ""
+Write-Host "Pressione Ctrl+C para parar" -ForegroundColor Gray
 Write-Host ""
 
-if ($devices -match "device$") {
-    Write-Host "✅ Dispositivo conectado!" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Iniciando monitoramento de logs..." -ForegroundColor Yellow
-    Write-Host "Pressione Ctrl+C para parar" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host ""
-    
-    # Monitorar logs do MaxSeries
-    & $adb logcat | Select-String "MaxSeries"
-} else {
-    Write-Host "❌ Nenhum dispositivo conectado!" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "Por favor:" -ForegroundColor Yellow
-    Write-Host "1. Conecte seu Android via USB" -ForegroundColor White
-    Write-Host "2. Ative 'Depuração USB' nas opções de desenvolvedor" -ForegroundColor White
-    Write-Host "3. Execute este script novamente" -ForegroundColor White
-    Write-Host ""
-    
-    Read-Host "Pressione Enter para sair"
+& $adbPath logcat -c | Out-Null
+
+$logFile = "logs_v156_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
+Write-Host "Salvando em: $logFile" -ForegroundColor Cyan
+Write-Host ""
+
+& $adbPath logcat | ForEach-Object {
+    if ($_ -match "MegaEmbed|MaxSeries|cloudstream") {
+        
+        $color = "White"
+        if ($_ -match "SUCESSO|OK") { $color = "Green" }
+        elseif ($_ -match "ERRO|ERROR|Failed") { $color = "Red" }
+        elseif ($_ -match "AVISO|WARNING") { $color = "Yellow" }
+        elseif ($_ -match "v156|V8|FETCH|XHR") { $color = "Cyan" }
+        
+        Write-Host $_ -ForegroundColor $color
+        $_ | Out-File -Append $logFile
+    }
 }

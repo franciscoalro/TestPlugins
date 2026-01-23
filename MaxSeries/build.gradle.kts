@@ -1,7 +1,7 @@
-version = 156
+version = 157
 
 cloudstream {
-    description = "MaxSeries v156 - MegaEmbed V8 com Fetch/XHR Hooks (95%+ sucesso)"
+    description = "MaxSeries v157 - Timeout Fix 60s (corrige Job was cancelled)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

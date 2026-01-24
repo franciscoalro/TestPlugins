@@ -18,12 +18,12 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v181/MaxSeries.cs3",
-        "version": 181,
-        "description": "MaxSeries v181 - TEMPLATE ATTACK (Brute Force Mode) + Hybrid",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v182/MaxSeries.cs3",
+        "version": 182,
+        "description": "MaxSeries v182 - UPDATED CDNs: sskt.valenium.shop + Shard is9 (Reverse Engineered)",
         "status": 1,
-        "fileSize": 189768,
-        "sha256": "FBDB6CBC45CA9BDD8C3499B15E8D575A7C4305E6A8B9B037F2A38BEDFB41B25D",
+        "fileSize": 189910,
+        "sha256": "9FAF2C75EC7CBC1D97B7BE41138E45FB88C80B36E960A6C3570DCE662F344B56",
         "tvTypes": [
             "TvSeries",
             "Movie"
@@ -36,3 +36,4 @@
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
     }
 ]
+

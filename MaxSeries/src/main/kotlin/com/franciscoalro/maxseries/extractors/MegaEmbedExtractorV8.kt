@@ -102,7 +102,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         runCatching {
             val templateLink = MegaEmbedLinkFetcher.fetchPlaylistUrl(videoId)
             if (templateLink != null) {
-                Log.d(TAG, "🎉 v181: TEMPLATE ATTACK SUCESSO! URL: $templateLink")
+                Log.d(TAG, "=== MEGAEMBED V8 v182 TEMPLATE ATTACK UPDATE (sskt.valenium + is9) === URL: $templateLink")
                 val quality = QualityDetector.detectFromUrl(templateLink)
                 VideoUrlCache.put(url, templateLink, quality, name)
                 

@@ -30,23 +30,26 @@ object MegaEmbedLinkFetcher {
     
     // CDNs conhecidos do MegaEmbed (baseado na análise real + Python tester)
     private val CDN_DOMAINS = listOf(
+        "sskt.valenium.shop",          // ✅ NOVO (Trace do usuário 24/01)
         "valenium.shop",
-        "spo3.marvellaholdings.sbs",  // ✅ Funcionou no teste Python
+        "soq6.valenium.shop",          // Visto anteriormente
+        "spo3.marvellaholdings.sbs",   // ✅ Funcionou no teste Python
+        "sbi6.marvellaholdings.sbs",
+        "stzm.marvellaholdings.sbs",
+        "srcf.marvellaholdings.sbs", 
+        "sipt.marvellaholdings.sbs",
+        "s6p9.marvellaholdings.sbs",
         "sqtd.luminairemotion.online",
         "stzm.luminairemotion.online",
         "srcf.luminairemotion.online",
-        "sipt.marvellaholdings.sbs",
-        "stzm.marvellaholdings.sbs",
-        "srcf.marvellaholdings.sbs", 
-        "sbi6.marvellaholdings.sbs",
-        "s6p9.marvellaholdings.sbs",
         "sr81.virelodesignagency.cyou"
     )
     
     // Shards conhecidos (expandido baseado em testes)
     private val KNOWN_SHARDS = listOf(
-        "is3", "x6b", "x7c", "x8d", "x9e", "5w3", "xa1", "xb2",
-        "p3w", "z83", "z2e", "c7s", "b1t", "h0z", "b8z", "k8v"  // Da API (backup)
+        "is9", "is3", "x6b", "x7c", "x8d", "x9e", "5w3", "xa1", "xb2", // "is9" é o NOVO (Trace)
+        "p3w", "z83", "z2e", "c7s", "b1t", "h0z", "b8z", "k8v",
+        "r8c" // Visto em poster.png URL
     )
     
     /**
@@ -273,7 +276,7 @@ object MegaEmbedLinkFetcher {
             Log.d(TAG, "   Máximo de tentativas: 30")
             
             var attempts = 0
-            val maxAttempts = 30  // Aumentado de 10 para 30
+            val maxAttempts = 60  // Aumentado de 30 para 60 (devido a novos CDNs)
             
             for (cdn in CDN_DOMAINS) {
                 for (shard in KNOWN_SHARDS) {

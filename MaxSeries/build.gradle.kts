@@ -1,7 +1,7 @@
-version = 176
+version = 177
 
 cloudstream {
-    description = "MaxSeries v176 - IFRAME STRATEGY: carrega playerthree.online completo (não MegaEmbed direto!)"
+    description = "MaxSeries v177 - FIX CRÍTICO: passa episodeUrl correto para iframe strategy funcionar!"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

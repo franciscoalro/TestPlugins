@@ -1,7 +1,7 @@
-version = 174
+version = 175
 
 cloudstream {
-    description = "MaxSeries v174 - VERBOSE LOGS: rastreando execução JavaScript no WebView"
+    description = "MaxSeries v175 - ULTRA VERBOSE: logs detalhados de cada etapa (timing, callbacks, HTML, etc)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

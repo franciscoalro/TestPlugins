@@ -57,7 +57,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v172 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v175 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
     }
 
@@ -698,7 +698,7 @@ class MaxSeriesProvider : MainAPI() {
             }
         }
         
-        Log.d(TAG, "📋 Total sources extraídas (v172): ${sources.size} - $sources")
+        Log.d(TAG, "📋 Total sources extraídas (v175): ${sources.size} - $sources")
         return sources.distinct()
     }
 }

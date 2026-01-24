@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v174/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v175/MaxSeries.cs3",
         "status": 1,
-        "version": 174,
+        "version": 175,
         "apiVersion": 1,
-        "fileSize": 182754,
-        "sha256": "ADF48ED4612EA3903D43CD5E89E40DD973980DC0E4666D63DE660773A76C9296",
+        "fileSize": 184366,
+        "sha256": "971E579B54A009E72389CFADE812DB77850C86D13468481D23A7DE7D57076E7E",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v174 - VERBOSE LOGS: rastreando execução JavaScript",
+        "description": "MaxSeries v175 - ULTRA VERBOSE: timing + callbacks + HTML + todos os detalhes",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,6 +43,7 @@
         "isAdult": false
     }
 ]
+
 
 
 

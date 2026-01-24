@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v174 VERBOSE LOGS (rastreando JS) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v175 ULTRA VERBOSE (máximo detalhe!) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -245,16 +245,30 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                 interceptUrl = interceptRegex,
                 script = fetchXhrScript,
                 scriptCallback = { result ->
+                    Log.d(TAG, "📞 ScriptCallback chamado! Result: $result")
                     if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
-                        capturedUrl = result.trim('\"')
-                        Log.d(TAG, "📜 Script capturou: $capturedUrl")
+                        capturedUrl = result.trim('"')
+                        Log.d(TAG, "✅ Script capturou URL VÁLIDA: $capturedUrl")
+                    } else {
+                        Log.d(TAG, "⚠️ Script retornou valor inválido: $result")
                     }
                 },
                 timeout = 45_000L // v170: 45s - Tempo para JS carregar + vídeo tocar + capturar URL
             )
             
             Log.d(TAG, "📱 Carregando página com fetch/XHR interception...")
+            Log.d(TAG, "⏱️ Timeout configurado: 45s")
+            Log.d(TAG, "🔗 URL alvo: $url")
+            Log.d(TAG, "📋 Headers: $cdnHeaders")
+            
+            val startTime = System.currentTimeMillis()
             val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
+            val elapsedTime = System.currentTimeMillis() - startTime
+            
+            Log.d(TAG, "⏱️ WebView completou em ${elapsedTime}ms (${elapsedTime/1000}s)")
+            Log.d(TAG, "📄 Response code: ${response.code}")
+            Log.d(TAG, "🔗 Response URL: ${response.url}")
+            Log.d(TAG, "📏 Response size: ${response.text.length} chars")
             
             // Prioridade: URL do script > URL interceptada via rede
             val finalUrl = capturedUrl ?: response.url.takeIf { 

@@ -1,7 +1,7 @@
-version = 170
+version = 171
 
 cloudstream {
-    description = "MaxSeries v170 - TIMEOUT 45s para MegaEmbed/PlayerEmbed (aguarda JS carregar + vídeo tocar)"
+    description = "MaxSeries v171 - AUTOPLAY AGRESSIVO! Força vídeo tocar para capturar requisições"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

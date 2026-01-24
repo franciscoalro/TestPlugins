@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v170 TIMEOUT 45s (aguarda vídeo tocar) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v171 AUTOPLAY AGRESSIVO (força vídeo tocar!) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -79,19 +79,18 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         runCatching {
             var capturedUrl: String? = null
             
-            // Script v163: SEM Auto-Clicker (MegaEmbed carrega automaticamente)
+            // Script v171: AUTOPLAY AGRESSIVO - Força vídeo a tocar!
             val fetchXhrScript = """
                 (function() {
-                    console.log('[MegaEmbed v163] Interceptação ativa - aguardando requisições de vídeo');
+                    console.log('[MegaEmbed v171] AUTOPLAY AGRESSIVO ativado!');
                     
                     let captured = false;
                     
                     function trap(url) {
-                        if (captured) return; // Evita múltiplas capturas
-                        
-                        console.log('[MegaEmbed] URL capturada: ' + url);
+                        if (captured) return;
+                        console.log('[MegaEmbed] ✅ URL capturada: ' + url);
                         captured = true;
-                        window.location.href = url; // Redireciona para CloudStream capturar
+                        window.location.href = url;
                     }
 
                     // Interceptor XHR
@@ -99,7 +98,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                     XMLHttpRequest.prototype.open = function(method, url) {
                         if (typeof url === 'string') {
                             if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
-                                console.log('[MegaEmbed] XHR detectado: ' + url);
+                                console.log('[MegaEmbed] XHR: ' + url);
                                 trap(url);
                             }
                         }
@@ -112,12 +111,79 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         const url = (typeof input === 'string') ? input : (input && input.url);
                         if (url) {
                             if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
-                                console.log('[MegaEmbed] Fetch detectado: ' + url);
+                                console.log('[MegaEmbed] Fetch: ' + url);
                                 trap(url);
                             }
                         }
                         return originalFetch.apply(this, arguments);
                     };
+                    
+                    // v171: AUTOPLAY AGRESSIVO!
+                    function forceAutoplay() {
+                        console.log('[MegaEmbed] 🎬 Forçando autoplay...');
+                        
+                        // 1. Forçar TODOS os vídeos <video> a tocar
+                        document.querySelectorAll('video').forEach(function(v) {
+                            try {
+                                v.muted = true; // Mute para permitir autoplay
+                                v.play().then(() => console.log('▶️ Vídeo tocado!')).catch(e => {});
+                            } catch(e) {}
+                        });
+                        
+                        // 2. Clicar em TODOS os botões de play possíveis
+                        const playSelectors = [
+                            '.play-button', '.vjs-big-play-button', '.jw-display-icon-container',
+                            '[class*="play"]', '[id*="play"]', 'button[aria-label*="play" i]',
+                            '.player-button', '.video-play-button'
+                        ];
+                        playSelectors.forEach(function(sel) {
+                            document.querySelectorAll(sel).forEach(function(btn) {
+                                try { btn.click(); console.log('🖱️ Clicou: ' + sel); } catch(e) {}
+                            });
+                        });
+                        
+                        // 3. Tentar JWPlayer
+                        if (window.jwplayer && typeof window.jwplayer === 'function') {
+                            try {
+                                document.querySelectorAll('[id*="player"]').forEach(function(el) {
+                                    if (el.id) {
+                                        try {
+                                            const player = window.jwplayer(el.id);
+                                            if (player && player.play) {
+                                                player.setMute(true);
+                                                player.play();
+                                                console.log('▶️ JWPlayer iniciado: ' + el.id);
+                                            }
+                                        } catch(e) {}
+                                    }
+                                });
+                            } catch(e) {}
+                        }
+                        
+                        // 4. Tentar VideoJS
+                        if (window.videojs && typeof window.videojs === 'function') {
+                            try {
+                                document.querySelectorAll('.video-js').forEach(function(el) {
+                                    try {
+                                        const player = window.videojs(el.id || el);
+                                        if (player && player.play) {
+                                            player.muted(true);
+                                            player.play();
+                                            console.log('▶️ VideoJS iniciado');
+                                        }
+                                    } catch(e) {}
+                                });
+                            } catch(e) {}
+                        }
+                    }
+                    
+                    // Tentar autoplay múltiplas vezes (página pode demorar a carregar)
+                    setTimeout(forceAutoplay, 500);   // 0.5s
+                    setTimeout(forceAutoplay, 1500);  // 1.5s
+                    setTimeout(forceAutoplay, 3000);  // 3s
+                    setTimeout(forceAutoplay, 5000);  // 5s
+                    setTimeout(forceAutoplay, 10000); // 10s
+                    setTimeout(forceAutoplay, 20000); // 20s
                     
                     // Polling HTML (fallback)
                     setInterval(function() {
@@ -126,12 +192,12 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         const html = document.documentElement.innerHTML;
                         const match = html.match(/https?:\/\/[^\s"'<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]{6}\/[^\s"'<>]+/i);
                         if (match) {
-                            console.log('[MegaEmbed] URL encontrada no HTML: ' + match[0]);
+                            console.log('[MegaEmbed] HTML: ' + match[0]);
                             trap(match[0]);
                         }
                     }, 1000);
                     
-                    console.log('[MegaEmbed] Interceptação configurada com sucesso');
+                    console.log('[MegaEmbed] ✅ Interceptação + Autoplay configurados!');
                 })();
             """.trimIndent()
             

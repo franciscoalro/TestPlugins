@@ -1,7 +1,7 @@
-version = 172
+version = 173
 
 cloudstream {
-    description = "MaxSeries v172 - CLIQUE ESPECÍFICO #player-button (target exato do MegaEmbed!)"
+    description = "MaxSeries v173 - FIX: Versões hardcoded corrigidas (logs agora mostram v172 correto)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

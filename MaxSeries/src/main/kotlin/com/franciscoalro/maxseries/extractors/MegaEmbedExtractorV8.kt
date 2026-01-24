@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v172 CLIQUE ESPECÍFICO (#player-button) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v173 VERSÃO INTERNA CORRIGIDA ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {

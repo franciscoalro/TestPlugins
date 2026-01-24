@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v168/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v169/MaxSeries.cs3",
         "status": 1,
-        "version": 168,
+        "version": 169,
         "apiVersion": 1,
-        "fileSize": 178874,
-        "sha256": "8549F2AC840C4409FE94660313D30C33EBE7033D923FC7C867DC0BF069F99266",
+        "fileSize": 178879,
+        "sha256": "6A331634AA7959544A8FABC5530A11110A5D18E8A491D671517C3EF2AEF7E696",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v168 - TIMEOUT OTIMIZADO: WebView 15s (não mais 120s!)",
+        "description": "MaxSeries v169 - PRIORIDADE MyVidPlay (funciona!) antes MegaEmbed/PlayerEmbed",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,3 +43,4 @@
         "isAdult": false
     }
 ]
+

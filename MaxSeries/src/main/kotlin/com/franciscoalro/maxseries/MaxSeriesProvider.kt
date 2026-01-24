@@ -481,6 +481,14 @@ class MaxSeriesProvider : MainAPI() {
                 try {
                     Log.d(TAG, "🔍 Processando source: $source")
                     when {
+                        // v169: MyVidPlay PRIMEIRO (funciona sem iframe!)
+                        source.contains("myvidplay", ignoreCase = true) -> {
+                            Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
+                            MyVidPlayExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        // MegaEmbed e PlayerEmbedAPI só funcionam DENTRO do iframe playerthree
+                        // Por isso falham com WebView direto (sem headers corretos)
                         source.contains("megaembed", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV8...")
                             MegaEmbedExtractorV8().getUrl(source, playerthreeUrl, subtitleCallback, callback)
@@ -489,11 +497,6 @@ class MaxSeriesProvider : MainAPI() {
                         source.contains("playerembedapi", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractor...")
                             PlayerEmbedAPIExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
-                        source.contains("myvidplay", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
-                            MyVidPlayExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         else -> {

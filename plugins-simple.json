@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v171/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v172/MaxSeries.cs3",
         "status": 1,
-        "version": 171,
+        "version": 172,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v171 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
+        "description": "MaxSeries v172 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -41,6 +41,7 @@
         "isAdult": false
     }
 ]
+
 
 
 

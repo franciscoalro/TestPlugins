@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v170/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v171/MaxSeries.cs3",
         "status": 1,
-        "version": 170,
+        "version": 171,
         "apiVersion": 1,
-        "fileSize": 178812,
-        "sha256": "B71C40137BADFCC485BB91B4FFB1CADE9056B38407E12C7ECF087CD39B32B825",
+        "fileSize": 179356,
+        "sha256": "44E3AEEE7E8E08084235487BF72D771B6929BB278CAE3458811D7EE6B1251C6F",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v170 - TIMEOUT 45s para MegaEmbed/PlayerEmbed (aguarda JS + vídeo tocar)",
+        "description": "MaxSeries v171 - AUTOPLAY AGRESSIVO! Força vídeo tocar",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,5 +43,6 @@
         "isAdult": false
     }
 ]
+
 
 

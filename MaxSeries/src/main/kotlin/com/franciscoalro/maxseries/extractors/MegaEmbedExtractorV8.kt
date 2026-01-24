@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v168 TIMEOUT OTIMIZADO (15s) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v170 TIMEOUT 45s (aguarda vídeo tocar) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -147,7 +147,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         Log.d(TAG, "📜 Script capturou: $capturedUrl")
                     }
                 },
-                timeout = 15_000L // v168: 15s (reduzido de 120s) - Rápido o suficiente para NOT ser cancelado!
+                timeout = 45_000L // v170: 45s - Tempo para JS carregar + vídeo tocar + capturar URL
             )
             
             Log.d(TAG, "📱 Carregando página com fetch/XHR interception...")

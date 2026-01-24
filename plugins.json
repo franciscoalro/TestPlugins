@@ -25,14 +25,14 @@
         "status": 1,
         "version": 168,
         "apiVersion": 1,
-        "fileSize": SIZE_PLACEHOLDER,
-        "sha256": "SHA_PLACEHOLDERFA6BDB7C730FEDCCAF7C7484C0902CF1D522F",
+        "fileSize": 178862,
+        "sha256": "EE57D3758ACD3F71CDF8F8A20D6CCCAFF497AE327D2F63A1A297A83868A669BE",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v168 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
+        "description": "MaxSeries v168 - TIMEOUT OTIMIZADO: WebView 15s (não mais 120s!)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,5 +43,3 @@
         "isAdult": false
     }
 ]
-
-

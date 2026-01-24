@@ -18,34 +18,21 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v178 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
-        "version": 178,
-        "authors": [
-            "franciscoalro"
-        ],
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v180/MaxSeries.cs3",
+        "version": 180,
+        "description": "MaxSeries v180 - HYBRID EXTRACTOR (API → WebView → MyVidPlay)",
         "status": 1,
-        "language": "pt-BR",
+        "fileSize": 188710,
+        "sha256": "402CE788B52B0077368717018BAD7084EE70CA7DFC26E513FC6A4ED622565C3B",
         "tvTypes": [
             "TvSeries",
             "Movie"
         ],
-        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v178/MaxSeries.cs3"
+        "authors": [
+            "franciscoalro"
+        ],
+        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+        "language": "pt-BR",
+        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
     }
 ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

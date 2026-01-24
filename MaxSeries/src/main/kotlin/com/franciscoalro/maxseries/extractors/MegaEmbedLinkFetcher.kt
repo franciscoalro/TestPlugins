@@ -30,9 +30,11 @@ object MegaEmbedLinkFetcher {
     
     // CDNs conhecidos do MegaEmbed (baseado na análise real + Python tester)
     private val CDN_DOMAINS = listOf(
+        "smho.clarionforge.online",    // ✅ Trace 2 (hkb6cx)
+        "sxix.stellarpathholdings.sbs", // ✅ Trace 2 (n3loxr)
         "sskt.valenium.shop",          // Trace User
-        "spo3.valenium.shop",          // ✅ Scanner (24/01)
-        "soq6.valenium.shop",          // ✅ Scanner (24/01)
+        "spo3.valenium.shop",          // ✅ Scanner
+        "soq6.valenium.shop",          // ✅ Scanner
         "valenium.shop",
         "spo3.marvellaholdings.sbs",   // ✅ Funcionou no teste Python
         "sbi6.marvellaholdings.sbs",
@@ -48,6 +50,7 @@ object MegaEmbedLinkFetcher {
     
     // Shards conhecidos (expandido baseado em testes)
     private val KNOWN_SHARDS = listOf(
+        "urp", "c5u",                  // ✅ Trace 2
         "is9", "is3", "x6b", "x7c", "x8d", "x9e", "5w3", "xa1", "xb2", // "is9" é o NOVO (Trace)
         "p3w", "z83", "z2e", "c7s", "b1t", "h0z", "b8z", "k8v",
         "r8c" // Visto em poster.png URL
@@ -277,7 +280,7 @@ object MegaEmbedLinkFetcher {
             Log.d(TAG, "   Máximo de tentativas: 30")
             
             var attempts = 0
-            val maxAttempts = 60  // Aumentado de 30 para 60 (devido a novos CDNs)
+            val maxAttempts = 120  // Aumentado v184: Muitos CDNs novos (brute force precisa ser maior)
             
             for (cdn in CDN_DOMAINS) {
                 for (shard in KNOWN_SHARDS) {

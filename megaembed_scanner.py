@@ -9,6 +9,8 @@ VIDEO_ID = "xez5rx"  # ID conhecido de um vídeo (A Casa do Dragão)
 
 # Base Domains (Adicione novos que encontrar no F12)
 DOMAINS = [
+    "clarionforge.online",
+    "stellarpathholdings.sbs",
     "valenium.shop",
     "marvellaholdings.sbs",
     "luminairemotion.online",
@@ -18,14 +20,15 @@ DOMAINS = [
 
 # Potential Subdomains (Wordlist de Brute Force)
 SUBDOMAINS = [
-    "sskt", "soq6", "spo3", "sbi6", "s6p9", "stzm", "srcf", "sipt", "sqtd", "sr81",
+    "smho", "sxix", "sskt",        # ✅ Validated
+    "soq6", "spo3", "sbi6", "s6p9", "stzm", "srcf", "sipt", "sqtd", "sr81",
     "cdn", "www", "img", "data", "video", "stream",
-    # Generated variations
     "sbi7", "sbi8", "spo4", "spo5", "srcf2", "stzm2" 
 ]
 
 # Shards / Clusters
 SHARDS = [
+    "urp", "c5u",                  # ✅ Validated
     "is3", "is9", "x6b", "x7c", "x8d", "x9e", "5w3", "xa1", "xb2",
     "p3w", "z83", "z2e", "c7s", "b1t", "h0z", "b8z", "k8v", "r8c"
 ]

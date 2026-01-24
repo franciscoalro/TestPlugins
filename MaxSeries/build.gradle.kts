@@ -1,7 +1,7 @@
-version = 183
+version = 184
 
 cloudstream {
-    description = "MaxSeries v183 - Scanner Findings (spo3/soq6.valenium)"
+    description = "MaxSeries v184 - Massive CDN Update (Clarion/Stellar/Valenium)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

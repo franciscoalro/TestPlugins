@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v183/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v184/MaxSeries.cs3",
         "status": 1,
-        "version": 183,
+        "version": 184,
         "apiVersion": 1,
-        "fileSize": 189888,
-        "sha256": "A098AE62C26EAEB07738360F89D41DF652CEC7C4B6537360FEAEB047B2BF6ECF",
+        "fileSize": 189987,
+        "sha256": "486F025AA1A6AA35CFB68ACBBB1D74BF9E3F17444B7174B345661D6278AA2503",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v183 - SCANNER UPDATE: Added spo3/soq6.valenium.shop found by brute-force script",
+        "description": "MaxSeries v184 - MASSIVE CDN UPDATE: Added clarionforge, stellarpath + New Shards",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,5 +43,6 @@
         "isAdult": false
     }
 ]
+
 
 

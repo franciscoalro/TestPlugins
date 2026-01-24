@@ -30,9 +30,10 @@ object MegaEmbedLinkFetcher {
     
     // CDNs conhecidos do MegaEmbed (baseado na análise real + Python tester)
     private val CDN_DOMAINS = listOf(
-        "sskt.valenium.shop",          // ✅ NOVO (Trace do usuário 24/01)
+        "sskt.valenium.shop",          // Trace User
+        "spo3.valenium.shop",          // ✅ Scanner (24/01)
+        "soq6.valenium.shop",          // ✅ Scanner (24/01)
         "valenium.shop",
-        "soq6.valenium.shop",          // Visto anteriormente
         "spo3.marvellaholdings.sbs",   // ✅ Funcionou no teste Python
         "sbi6.marvellaholdings.sbs",
         "stzm.marvellaholdings.sbs",

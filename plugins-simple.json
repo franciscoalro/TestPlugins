@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v182/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v183/MaxSeries.cs3",
         "status": 1,
-        "version": 182,
+        "version": 183,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v182 - UPDATED CDNs: sskt.valenium.shop + Shard is9 (Reverse Engineered)",
+        "description": "MaxSeries v183 - SCANNER UPDATE: Added spo3/soq6.valenium.shop found by brute-force script",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -41,4 +41,5 @@
         "isAdult": false
     }
 ]
+
 

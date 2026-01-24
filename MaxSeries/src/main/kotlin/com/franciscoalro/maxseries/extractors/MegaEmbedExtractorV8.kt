@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v173 VERSÃO INTERNA CORRIGIDA ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v174 VERBOSE LOGS (rastreando JS) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -222,9 +222,21 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         }
                     }, 1000);
                     
+                    // v174: REPORT DE EXECUÇÃO via variável global
+                    window.megaEmbedStatus = {
+                        scriptLoaded: false,
+                        autoplayAttempts: 0,
+                        buttonsFound: 0,
+                        videosFound: 0,
+                        clicksExecuted: 0
+                    };
+                    
+                    window.megaEmbedStatus.scriptLoaded = true;
                     console.log('[MegaEmbed] ✅ Interceptação + Autoplay configurados!');
                 })();
             """.trimIndent()
+            
+            Log.d(TAG, "🔧 Script JavaScript pronto (${fetchXhrScript.length} chars)")
             
             // Regex ULTRA SIMPLES + Extensões
             val interceptRegex = Regex(""".*(/v4/|\.woff2|\.m3u8|\.txt).*""", RegexOption.IGNORE_CASE)

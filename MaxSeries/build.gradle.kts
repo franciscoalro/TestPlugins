@@ -1,7 +1,7 @@
-version = 173
+version = 174
 
 cloudstream {
-    description = "MaxSeries v173 - FIX: Versões hardcoded corrigidas (logs agora mostram v172 correto)"
+    description = "MaxSeries v174 - VERBOSE LOGS: rastreando execução JavaScript no WebView"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

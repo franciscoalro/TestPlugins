@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v177 FIX: episodeUrl correto passado! ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v178 API RESPONSE PARSER (extrai URL do JSON!) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -104,28 +104,79 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         window.location.href = url;
                     }
 
-                    // Interceptor XHR
+                    // v178: Interceptar API calls E responses JSON!
+                    // Interceptor XHR COM CAPTURA DE RESPONSE
                     const originalXhrOpen = XMLHttpRequest.prototype.open;
+                    const originalXhrSend = XMLHttpRequest.prototype.send;
+                    
                     XMLHttpRequest.prototype.open = function(method, url) {
-                        if (typeof url === 'string') {
-                            if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
-                                console.log('[MegaEmbed] XHR: ' + url);
-                                trap(url);
-                            }
-                        }
+                        this._url = url; // Salvar URL para usar no listener
                         return originalXhrOpen.apply(this, arguments);
                     };
+                    
+                    XMLHttpRequest.prototype.send = function(data) {
+                        const xhr = this;
+                        
+                        // Interceptar URLs diretas de vídeo
+                        if (xhr._url && typeof xhr._url === 'string') {
+                            if (xhr._url.includes('/v4/') || xhr._url.includes('.woff2') || xhr._url.includes('.m3u8') || xhr._url.includes('.txt')) {
+                                console.log('[MegaEmbed] XHR vídeo direto: ' + xhr._url);
+                                trap(xhr._url);
+                            }
+                        }
+                        
+                        // v178: Interceptar responses de APIs!
+                        if (xhr._url && xhr._url.includes('/api/v1/')) {
+                            xhr.addEventListener('load', function() {
+                                try {
+                                    console.log('[MegaEmbed] API response de: ' + xhr._url);
+                                    const response = xhr.responseText;
+                                    
+                                    // Tentar parsear JSON e procurar URLs de vídeo
+                                    const urlMatch = response.match(/https?:\/\/[^\s"'\}<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]+\/[^\s"'\}<>]+/i);
+                                    if (urlMatch) {
+                                        console.log('[MegaEmbed] ✅ URL encontrada no JSON: ' + urlMatch[0]);
+                                        trap(urlMatch[0]);
+                                    }
+                                } catch(e) {
+                                    console.log('[MegaEmbed] Erro ao parsear API response: ' + e);
+                                }
+                            });
+                        }
+                        
+                        return originalXhrSend.apply(this, arguments);
+                    };
 
-                    // Interceptor Fetch
+                    // Interceptor Fetch COM CAPTURA DE RESPONSE
                     const originalFetch = window.fetch;
                     window.fetch = function(input) {
                         const url = (typeof input === 'string') ? input : (input && input.url);
+                        
+                        // Interceptar vídeo direto
                         if (url) {
                             if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
-                                console.log('[MegaEmbed] Fetch: ' + url);
+                                console.log('[MegaEmbed] Fetch vídeo: ' + url);
                                 trap(url);
                             }
+                            
+                            // v178: Interceptar API calls
+                            if (url.includes('/api/v1/')) {
+                                console.log('[MegaEmbed] Fetch API: ' + url);
+                                return originalFetch.apply(this, arguments).then(response => {
+                                    return response.clone().text().then(text => {
+                                        try {
+                                            const urlMatch = text.match(/https?:\/\/[^\s"'\}<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]+\/[^\s"'\}<>]+/i);
+                                            if (urlMatch) {
+                                                console.log('[MegaEmbed] ✅ URL em Fetch API: ' + urlMatch[0]);
+                                                trap(urlMatch[0]);
+                                            }
+                                        } catch(e) {}
+                                        return response;
+                                    });
+                                });
+                            }
                         }
+                        
                         return originalFetch.apply(this, arguments);
                     };
                     

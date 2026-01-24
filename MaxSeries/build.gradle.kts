@@ -1,7 +1,7 @@
-version = 177
+version = 178
 
 cloudstream {
-    description = "MaxSeries v177 - FIX CRÍTICO: passa episodeUrl correto para iframe strategy funcionar!"
+    description = "MaxSeries v178 - CAPTURA API RESPONSES! Parseia JSON de /api/v1/ para extrair vídeo"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

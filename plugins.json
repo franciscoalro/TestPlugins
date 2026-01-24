@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v177/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v178/MaxSeries.cs3",
         "status": 1,
-        "version": 177,
+        "version": 178,
         "apiVersion": 1,
-        "fileSize": 185358,
-        "sha256": "55F5D90CA5D32CF1DA64EE69CF8F5A7714F658F3CFA9D1321E613154B68930EF",
+        "fileSize": 185826,
+        "sha256": "3F476B71BD323E8439481656EF501B56069B33D1A35B8331FAAF4B50A4454DD9",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v177 - FIX: episodeUrl correto para iframe strategy",
+        "description": "MaxSeries v178 - FIX: episodeUrl correto para iframe strategy",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,6 +43,7 @@
         "isAdult": false
     }
 ]
+
 
 
 

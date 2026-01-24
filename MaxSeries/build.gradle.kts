@@ -1,7 +1,7 @@
-version = 157
+version = 163
 
 cloudstream {
-    description = "MaxSeries v157 - Timeout Fix 60s (corrige Job was cancelled)"
+    description = "MaxSeries v163 - FIX: MegaEmbed sem auto-clicker (carrega automaticamente)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

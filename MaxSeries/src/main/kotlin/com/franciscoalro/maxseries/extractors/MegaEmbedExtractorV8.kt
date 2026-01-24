@@ -79,139 +79,64 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         runCatching {
             var capturedUrl: String? = null
             
-            // Script MELHORADO: Intercepta fetch() e XMLHttpRequest ANTES de enviar
+            // Script v163: SEM Auto-Clicker (MegaEmbed carrega automaticamente)
             val fetchXhrScript = """
                 (function() {
-                    console.log('[MegaEmbed v156] Iniciando captura com fetch/XHR hooks...');
+                    console.log('[MegaEmbed v163] Interceptação ativa - aguardando requisições de vídeo');
                     
-                    // ===== INTERCEPTAR FETCH =====
+                    let captured = false;
+                    
+                    function trap(url) {
+                        if (captured) return; // Evita múltiplas capturas
+                        
+                        console.log('[MegaEmbed] URL capturada: ' + url);
+                        captured = true;
+                        window.location.href = url; // Redireciona para CloudStream capturar
+                    }
+
+                    // Interceptor XHR
+                    const originalXhrOpen = XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function(method, url) {
+                        if (typeof url === 'string') {
+                            if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
+                                console.log('[MegaEmbed] XHR detectado: ' + url);
+                                trap(url);
+                            }
+                        }
+                        return originalXhrOpen.apply(this, arguments);
+                    };
+
+                    // Interceptor Fetch
                     const originalFetch = window.fetch;
-                    window.fetch = function(...args) {
-                        const url = args[0];
-                        console.log('[MegaEmbed v156] FETCH:', url);
-                        
-                        // Se a URL contém /v4/, capturar imediatamente
-                        if (typeof url === 'string' && url.includes('/v4/')) {
-                            window.__MEGAEMBED_VIDEO_URL__ = url;
-                            console.log('[MegaEmbed v156] ✅ URL capturada via FETCH:', url);
+                    window.fetch = function(input) {
+                        const url = (typeof input === 'string') ? input : (input && input.url);
+                        if (url) {
+                            if (url.includes('/v4/') || url.includes('.woff2') || url.includes('.m3u8') || url.includes('.txt')) {
+                                console.log('[MegaEmbed] Fetch detectado: ' + url);
+                                trap(url);
+                            }
                         }
-                        
-                        return originalFetch.apply(this, args).then(response => {
-                            const cloned = response.clone();
-                            
-                            // Tentar ler o corpo da resposta
-                            cloned.text().then(text => {
-                                try {
-                                    // Procurar URL no texto da resposta
-                                    const urlMatch = text.match(/https?:\/\/[^\s"'<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]{6}\/[^\s"'<>]*(?:\.(txt|m3u8|woff2))?/i);
-                                    if (urlMatch) {
-                                        window.__MEGAEMBED_VIDEO_URL__ = urlMatch[0];
-                                        console.log('[MegaEmbed v156] ✅ URL capturada na resposta FETCH:', urlMatch[0]);
-                                    }
-                                    
-                                    // Tentar parsear como JSON
-                                    try {
-                                        const json = JSON.parse(text);
-                                        const u = json.url || json.file || json.source || json.playlist || json.data?.url;
-                                        if (u && (u.includes('/v4/') || u.includes('.txt') || u.includes('.m3u8'))) {
-                                            window.__MEGAEMBED_VIDEO_URL__ = u;
-                                            console.log('[MegaEmbed v156] ✅ URL do JSON:', u);
-                                        }
-                                    } catch(e) {}
-                                } catch(e) {
-                                    console.log('[MegaEmbed v156] Erro ao processar resposta:', e);
-                                }
-                            }).catch(e => console.log('[MegaEmbed v156] Erro ao ler resposta:', e));
-                            
-                            return response;
-                        }).catch(e => {
-                            console.log('[MegaEmbed v156] Erro no fetch:', e);
-                            return originalFetch.apply(this, args);
-                        });
+                        return originalFetch.apply(this, arguments);
                     };
                     
-                    // ===== INTERCEPTAR XMLHttpRequest =====
-                    const originalOpen = XMLHttpRequest.prototype.open;
-                    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-                        console.log('[MegaEmbed v156] XHR:', method, url);
+                    // Polling HTML (fallback)
+                    setInterval(function() {
+                        if (captured) return;
                         
-                        // Se a URL contém /v4/, capturar imediatamente
-                        if (typeof url === 'string' && url.includes('/v4/')) {
-                            window.__MEGAEMBED_VIDEO_URL__ = url;
-                            console.log('[MegaEmbed v156] ✅ URL capturada via XHR:', url);
+                        const html = document.documentElement.innerHTML;
+                        const match = html.match(/https?:\/\/[^\s"'<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]{6}\/[^\s"'<>]+/i);
+                        if (match) {
+                            console.log('[MegaEmbed] URL encontrada no HTML: ' + match[0]);
+                            trap(match[0]);
                         }
-                        
-                        return originalOpen.apply(this, [method, url, ...rest]);
-                    };
+                    }, 1000);
                     
-                    // Interceptar onreadystatechange para capturar resposta
-                    const originalSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
-                    XMLHttpRequest.prototype.setRequestHeader = function(...args) {
-                        return originalSetRequestHeader.apply(this, args);
-                    };
-                    
-                    // ===== POLLING PARA CAPTURAR VARIÁVEIS GLOBAIS =====
-                    return new Promise(function(resolve) {
-                        var attempts = 0;
-                        var maxAttempts = 1200; // 120s (100ms × 1200)
-                        
-                        var interval = setInterval(function() {
-                            attempts++;
-                            
-                            // 1. Verificar variável global da interceptação
-                            if (window.__MEGAEMBED_VIDEO_URL__) {
-                                clearInterval(interval);
-                                console.log('[MegaEmbed v156] ✅ SUCESSO! URL capturada:', window.__MEGAEMBED_VIDEO_URL__);
-                                resolve(window.__MEGAEMBED_VIDEO_URL__);
-                                return;
-                            }
-                            
-                            // 2. Buscar no DOM (procurar em scripts, iframes, etc)
-                            var html = document.documentElement.innerHTML;
-                            
-                            // Padrão: URLs com /v4/ (ULTRA FLEXÍVEL)
-                            var v4Match = html.match(/https?:\/\/[^\s"'<>]+\/v4\/[a-z0-9]{1,3}\/[a-z0-9]{6}\/[^\s"'<>]*(?:\.(txt|m3u8|woff2))?/i);
-                            if (v4Match) {
-                                clearInterval(interval);
-                                console.log('[MegaEmbed v156] ✅ URL no DOM:', v4Match[0]);
-                                resolve(v4Match[0]);
-                                return;
-                            }
-                            
-                            // 3. Procurar em atributos de data
-                            var dataMatch = html.match(/data-url\s*=\s*["\']([^"\']+\/v4\/[^"\']+)["\']/i);
-                            if (dataMatch) {
-                                clearInterval(interval);
-                                console.log('[MegaEmbed v156] ✅ URL em data-url:', dataMatch[1]);
-                                resolve(dataMatch[1]);
-                                return;
-                            }
-                            
-                            // 4. Procurar em variáveis JavaScript
-                            var varMatch = html.match(/(?:var|let|const)\s+\w*url\w*\s*=\s*["\']([^"\']+\/v4\/[^"\']+)["\']/i);
-                            if (varMatch) {
-                                clearInterval(interval);
-                                console.log('[MegaEmbed v156] ✅ URL em variável:', varMatch[1]);
-                                resolve(varMatch[1]);
-                                return;
-                            }
-                            
-                            // Timeout
-                            if (attempts >= maxAttempts) {
-                                clearInterval(interval);
-                                console.log('[MegaEmbed v156] ⏱️ Timeout após 120s');
-                                resolve('');
-                            }
-                        }, 100);
-                    });
+                    console.log('[MegaEmbed] Interceptação configurada com sucesso');
                 })();
             """.trimIndent()
             
-            // Regex ULTRA FLEXÍVEL para interceptar arquivos de vídeo via rede
-            val interceptRegex = Regex(
-                """https?://[^/\s"'<>]+/v4/[a-z0-9]{1,3}/[a-z0-9]{6}/[^"'<>\s]*(?:\.(txt|m3u8|woff2))?(?:\?[^"'<>\s]*)?""",
-                RegexOption.IGNORE_CASE
-            )
+            // Regex ULTRA SIMPLES + Extensões
+            val interceptRegex = Regex(""".*(/v4/|\.woff2|\.m3u8|\.txt).*""", RegexOption.IGNORE_CASE)
             
             val resolver = WebViewResolver(
                 interceptUrl = interceptRegex,

@@ -1,7 +1,7 @@
-version = 171
+version = 172
 
 cloudstream {
-    description = "MaxSeries v171 - AUTOPLAY AGRESSIVO! Força vídeo tocar para capturar requisições"
+    description = "MaxSeries v172 - CLIQUE ESPECÍFICO #player-button (target exato do MegaEmbed!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

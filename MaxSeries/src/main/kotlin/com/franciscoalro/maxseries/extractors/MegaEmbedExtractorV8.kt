@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v171 AUTOPLAY AGRESSIVO (força vídeo tocar!) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v172 CLIQUE ESPECÍFICO (#player-button) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -118,9 +118,34 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         return originalFetch.apply(this, arguments);
                     };
                     
+                    // v172: CLIQUE ESPECÍFICO no botão do MegaEmbed!
+                    function clickMegaEmbedButton() {
+                        console.log('[MegaEmbed] 🎯 Tentando clicar no botão específico do player...');
+                        
+                        // IDs específicos do MegaEmbed (descobertos via inspeção)
+                        const megaEmbedButtons = [
+                            '#player-button',           // Botão principal
+                            '#player-button-container', // Container do botão
+                            '[id*="player-button"]'     // Qualquer elemento com player-button no ID
+                        ];
+                        
+                        megaEmbedButtons.forEach(function(sel) {
+                            try {
+                                const btn = document.querySelector(sel);
+                                if (btn) {
+                                    btn.click();
+                                    console.log('✅ Clicou: ' + sel);
+                                }
+                            } catch(e) {}
+                        });
+                    }
+                    
                     // v171: AUTOPLAY AGRESSIVO!
                     function forceAutoplay() {
                         console.log('[MegaEmbed] 🎬 Forçando autoplay...');
+                        
+                        // v172: Tentar clicar no botão específico PRIMEIRO
+                        clickMegaEmbedButton();
                         
                         // 1. Forçar TODOS os vídeos <video> a tocar
                         document.querySelectorAll('video').forEach(function(v) {

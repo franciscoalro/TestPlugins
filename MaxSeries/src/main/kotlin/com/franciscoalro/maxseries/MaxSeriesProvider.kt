@@ -57,7 +57,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v176 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v177 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
     }
 
@@ -484,24 +484,24 @@ class MaxSeriesProvider : MainAPI() {
                         // v169: MyVidPlay PRIMEIRO (funciona sem iframe!)
                         source.contains("myvidplay", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
-                            MyVidPlayExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            MyVidPlayExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // MegaEmbed e PlayerEmbedAPI só funcionam DENTRO do iframe playerthree
                         // Por isso falham com WebView direto (sem headers corretos)
                         source.contains("megaembed", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV8...")
-                            MegaEmbedExtractorV8().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            MegaEmbedExtractorV8().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         source.contains("playerembedapi", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractor...")
-                            PlayerEmbedAPIExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            PlayerEmbedAPIExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         else -> {
                              Log.d(TAG, "⚠️ Source desconhecida, tentando loader genérico: $source")
-                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
+                             loadExtractor(source, episodeUrl, subtitleCallback, callback)
                              linksFound++
                         }
                     }
@@ -698,7 +698,7 @@ class MaxSeriesProvider : MainAPI() {
             }
         }
         
-        Log.d(TAG, "📋 Total sources extraídas (v176): ${sources.size} - $sources")
+        Log.d(TAG, "📋 Total sources extraídas (v177): ${sources.size} - $sources")
         return sources.distinct()
     }
 }

@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v172/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v173/MaxSeries.cs3",
         "status": 1,
-        "version": 172,
+        "version": 173,
         "apiVersion": 1,
         "fileSize": 179591,
-        "sha256": "C47454E17508423A6CDC7B8480A6E0A9F1041A8FB5C8FFCBFB782183CA0C8079",
+        "sha256": "CCE85EEA45D08838B0EF8D2DF0AB7FBC00F3BE2A856F4CC6EF7F86E54BE01C9F",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v172 - CLIQUE ESPECÍFICO #player-button (MegaEmbed)",
+        "description": "MaxSeries v173 - FIX: Versões internas corrigidas (logs mostram v173)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,6 +43,7 @@
         "isAdult": false
     }
 ]
+
 
 
 

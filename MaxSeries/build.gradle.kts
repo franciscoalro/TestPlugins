@@ -1,7 +1,7 @@
-version = 181
+version = 182
 
 cloudstream {
-    description = "MaxSeries v181 - TEMPLATE ATTACK (Reverse Engineering) + Hybrid"
+    description = "MaxSeries v182 - Updated CDNs (sskt.valenium.shop, is9)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

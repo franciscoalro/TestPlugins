@@ -1,7 +1,7 @@
-version = 175
+version = 176
 
 cloudstream {
-    description = "MaxSeries v175 - ULTRA VERBOSE: logs detalhados de cada etapa (timing, callbacks, HTML, etc)"
+    description = "MaxSeries v176 - IFRAME STRATEGY: carrega playerthree.online completo (não MegaEmbed direto!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

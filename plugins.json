@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v175/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v176/MaxSeries.cs3",
         "status": 1,
-        "version": 175,
+        "version": 176,
         "apiVersion": 1,
-        "fileSize": 184366,
-        "sha256": "971E579B54A009E72389CFADE812DB77850C86D13468481D23A7DE7D57076E7E",
+        "fileSize": 185300,
+        "sha256": "089963F7836F6860D41BA099CEB1ABDCC869984E004DF1B19E0CD1EF983E8EDB",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v175 - ULTRA VERBOSE: timing + callbacks + HTML + todos os detalhes",
+        "description": "MaxSeries v176 - IFRAME STRATEGY: carrega playerthree completo",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,6 +43,7 @@
         "isAdult": false
     }
 ]
+
 
 
 

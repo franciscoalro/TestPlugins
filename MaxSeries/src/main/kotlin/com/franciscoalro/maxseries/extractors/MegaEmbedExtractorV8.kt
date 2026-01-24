@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v175 ULTRA VERBOSE (máximo detalhe!) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v176 IFRAME STRATEGY (carrega playerthree completo!) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -73,8 +73,19 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             return
         }
         
+        // v176: NOVA ESTRATÉGIA - Carregar página do episódio (iframe completo)
+        val targetUrl = if (!referer.isNullOrEmpty() && referer.contains("playerthree.online/episodio/")) {
+            Log.d(TAG, "🎯 v176: Carregando PÁGINA DO EPISÓDIO (iframe strategy)")
+            Log.d(TAG, "📄 Episode URL: $referer")
+            referer // https://playerthree.online/episodio/255703
+        } else {
+            Log.d(TAG, "⚠️ v176: Fallback para acesso direto MegaEmbed")
+            url // https://megaembed.link/#id
+        }
+        
         // FASE 2 — WEBVIEW COM FETCH/XHR HOOKS (v156)
         Log.d(TAG, "🌐 Iniciando WebView com FETCH/XHR INTERCEPTION...")
+        Log.d(TAG, "🔗 Target: $targetUrl")
         
         runCatching {
             var capturedUrl: String? = null
@@ -253,16 +264,16 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         Log.d(TAG, "⚠️ Script retornou valor inválido: $result")
                     }
                 },
-                timeout = 45_000L // v170: 45s - Tempo para JS carregar + vídeo tocar + capturar URL
+                timeout = 90_000L // v176: 90s - Tempo para página playerthree + iframe carregar + vídeo tocar
             )
             
             Log.d(TAG, "📱 Carregando página com fetch/XHR interception...")
-            Log.d(TAG, "⏱️ Timeout configurado: 45s")
-            Log.d(TAG, "🔗 URL alvo: $url")
+            Log.d(TAG, "⏱️ Timeout configurado: 90s (v176: tempo para página + iframe)")
+            Log.d(TAG, "🔗 URL alvo: $targetUrl")
             Log.d(TAG, "📋 Headers: $cdnHeaders")
             
             val startTime = System.currentTimeMillis()
-            val response = app.get(url, headers = cdnHeaders, interceptor = resolver)
+            val response = app.get(targetUrl, headers = cdnHeaders, interceptor = resolver)
             val elapsedTime = System.currentTimeMillis() - startTime
             
             Log.d(TAG, "⏱️ WebView completou em ${elapsedTime}ms (${elapsedTime/1000}s)")

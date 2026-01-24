@@ -1,7 +1,7 @@
-version = 180
+version = 181
 
 cloudstream {
-    description = "MaxSeries v180 - HYBRID EXTRACTOR (API → WebView → MyVidPlay)"
+    description = "MaxSeries v181 - TEMPLATE ATTACK (Reverse Engineering) + Hybrid"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

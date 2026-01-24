@@ -18,12 +18,12 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v180/MaxSeries.cs3",
-        "version": 180,
-        "description": "MaxSeries v180 - HYBRID EXTRACTOR (API → WebView → MyVidPlay)",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v181/MaxSeries.cs3",
+        "version": 181,
+        "description": "MaxSeries v181 - TEMPLATE ATTACK (Brute Force Mode) + Hybrid",
         "status": 1,
-        "fileSize": 188710,
-        "sha256": "402CE788B52B0077368717018BAD7084EE70CA7DFC26E513FC6A4ED622565C3B",
+        "fileSize": 189768,
+        "sha256": "FBDB6CBC45CA9BDD8C3499B15E8D575A7C4305E6A8B9B037F2A38BEDFB41B25D",
         "tvTypes": [
             "TvSeries",
             "Movie"

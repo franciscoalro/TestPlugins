@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v178 API RESPONSE PARSER (extrai URL do JSON!) ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v180 HYBRID EXTRACTOR (API -> WebView -> MyVidPlay) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -73,24 +73,49 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             return
         }
         
-        // v176: NOVA ESTRATÉGIA - Carregar página do episódio (iframe completo)
-        val targetUrl = if (!referer.isNullOrEmpty() && referer.contains("playerthree.online/episodio/")) {
-            Log.d(TAG, "🎯 v176: Carregando PÁGINA DO EPISÓDIO (iframe strategy)")
-            Log.d(TAG, "📄 Episode URL: $referer")
-            referer // https://playerthree.online/episodio/255703
+        // v180: HYBRID STRATEGY
+        // 1. Tentar API DIRETA
+        // 2. Tentar WebView (com correção de targetUrl)
+        // 3. Fallback para MyVidPlay
+        
+        Log.d(TAG, "🚀 v180: HYBRID EXTRACTOR START")
+        
+        // 1️⃣ TENTATIVA – API DIRETA
+        val refererDomain = referer?.substringAfter("://")?.substringBefore("/") ?: "playerthree.online"
+        fetchVideoViaApi(videoId, refererDomain)?.let { directUrl ->
+            // Se a API devolveu a URL, criamos o ExtractorLink e retornamos
+            val quality = QualityDetector.detectFromUrl(directUrl)
+            VideoUrlCache.put(url, directUrl, quality, name)
+            M3u8Helper.generateM3u8(
+                source = name,
+                streamUrl = directUrl,
+                referer = mainUrl,
+                headers = cdnHeaders
+            ).forEach(callback)
+            Log.d(TAG, "🎉 v180: Extração concluída via API direta")
+            return
+        }
+
+        // 2️⃣ FALLBACK – WEBVIEW (mantém script já existente)
+        Log.d(TAG, "🔄 v180: API direta falhou, tentando WebView...")
+        
+        // RECRIAR targetUrl para o escopo do WebView (VITAL PARA NÃO QUEBRAR O BUILD)
+        val webViewTargetUrl = if (!referer.isNullOrEmpty() && referer.contains("playerthree.online/episodio/")) {
+            referer 
         } else {
-            Log.d(TAG, "⚠️ v176: Fallback para acesso direto MegaEmbed")
-            url // https://megaembed.link/#id
+            url 
         }
         
-        // FASE 2 — WEBVIEW COM FETCH/XHR HOOKS (v156)
+        // FASE 2 — WEBVIEW COM FETCH/XHR HOOKS
         Log.d(TAG, "🌐 Iniciando WebView com FETCH/XHR INTERCEPTION...")
-        Log.d(TAG, "🔗 Target: $targetUrl")
+        Log.d(TAG, "🔗 Target: $webViewTargetUrl")
+        
+        var webViewSuccess = false
         
         runCatching {
             var capturedUrl: String? = null
             
-            // Script v171: AUTOPLAY AGRESSIVO - Força vídeo a tocar!
+            // Script v171: AUTOPLAY AGRESSIVO
             val fetchXhrScript = """
                 (function() {
                     console.log('[MegaEmbed v171] AUTOPLAY AGRESSIVO ativado!');
@@ -422,8 +447,52 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             Log.e(TAG, "❌ Todas as estratégias falharam")
             
         }.onFailure {
-            Log.e(TAG, "❌ Erro: ${it.message}")
-            it.printStackTrace()
+            Log.e(TAG, "❌ Erro no WebView: ${it.message}")
+        }
+        
+        if (!webViewSuccess) {
+            // 3️⃣ ULTIMO RECURSO – MyVidPlayExtractor
+            Log.d(TAG, "🔁 v180: WebView falhou, delegando a MyVidPlayExtractor")
+            MyVidPlayExtractor().getUrl(url, referer, subtitleCallback, callback)
+        }
+    }
+    
+    /**
+     * Tenta obter a URL do vídeo chamando a API pública do MegaEmbed.
+     * @param videoId   ID extraído da URL megaembed.link/#<id>
+     * @param refererDomain domínio do referer (ex.: playerthree.online)
+     * @return URL do vídeo ou null se a API não retornar nada útil
+     */
+    private suspend fun fetchVideoViaApi(videoId: String, refererDomain: String): String? {
+        val apiUrl = "https://megaembed.link/api/v1/video?id=$videoId&w=1920&h=1080&r=$refererDomain"
+        Log.d(TAG, "🚀 v180: Tentativa de extração via API direta → $apiUrl")
+
+        return try {
+            val response = app.get(
+                apiUrl,
+                headers = mapOf(
+                    "Referer" to "https://megaembed.link/",
+                    "Origin"   to "https://megaembed.link",
+                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                )
+            )
+
+            Log.d(TAG, "📡 API response code: ${response.code}")
+            if (response.code != 200) return null
+
+            val body = response.text
+            Log.d(TAG, "📡 API response size: ${body.length} chars")
+            // Procura por URLs que contenham /v4/ (padrão usado pelos players)
+            val match = Regex("""https?://[^\s"'\}<>]+/v4/[a-z0-9]{1,3}/[a-z0-9]+/[^\s"'\}<>]+""",
+                              RegexOption.IGNORE_CASE).find(body)
+            match?.value?.also {
+                Log.d(TAG, "✅ v180: URL extraída via API → ${it}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "⚠️ Erro na API direta: ${e.message}")
+            null
+        }
+    }    it.printStackTrace()
         }
     }
     

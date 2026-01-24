@@ -7,7 +7,7 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * MegaEmbed Extractor v8 - v156 CORRIGIDO COM FETCH/XHR HOOKS
+ * MegaEmbed Extractor v8 - v168 TIMEOUT OTIMIZADO (15s)
  *
  * PROBLEMA v155: WebView não intercepta requisições fetch/XHR
  * - Requisições assíncronas não passam por shouldInterceptRequest
@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v156 FETCH/XHR INTERCEPTION ===")
+        Log.d(TAG, "=== MEGAEMBED V8 v168 TIMEOUT OTIMIZADO (15s) ===")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {

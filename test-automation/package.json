@@ -1,0 +1,9 @@
+{
+    "name": "megaembed-tester",
+    "version": "1.0.0",
+    "description": "Automated test for MegaEmbed extraction",
+    "main": "test.js",
+    "dependencies": {
+        "puppeteer": "^21.0.0"
+    }
+}

@@ -1,0 +1,17 @@
+{
+  "episodes": [],
+  "iframes": [
+    {
+      "index": 1,
+      "url": "https://playerthree.online/embed/sandokan/",
+      "type": "PlayerEmbedAPI",
+      "episodesCount": 0,
+      "episodes": []
+    }
+  ],
+  "summary": {
+    "totalEpisodes": 0,
+    "totalIframes": 1,
+    "iframesWithEpisodes": 0
+  }
+}

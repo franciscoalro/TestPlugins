@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v165/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v167/MaxSeries.cs3",
         "status": 1,
-        "version": 165,
+        "version": 167,
         "apiVersion": 1,
-        "fileSize": 182681,
-        "sha256": "AA8FEEA8C6097E365C123ABB7267A1F2D63598CC7B00552D61AC4DDCD6FC6592",
+        "fileSize": 182376,
+        "sha256": "FC9EF25B893E7FB722D2DA38856E52EACC3A82F6EC0EBDCAB4D5D9829BC9C7EAFA6BDB7C730FEDCCAF7C7484C0902CF1D522F",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup",
+        "description": "MaxSeries v167 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

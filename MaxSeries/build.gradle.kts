@@ -1,7 +1,7 @@
-version = 165
+version = 167
 
 cloudstream {
-    description = "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup"
+    description = "MaxSeries v167 - FIX DEFINITIVO: Usa endpoint /episodio/ correto (não mais hash!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

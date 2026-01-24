@@ -1,7 +1,7 @@
-version = 169
+version = 170
 
 cloudstream {
-    description = "Max Series v169 - PRIORIDADE MyVidPlay (funciona!) antes MegaEmbed/PlayerEmbed (requerem iframe)"
+    description = "MaxSeries v170 - TIMEOUT 45s para MegaEmbed/PlayerEmbed (aguarda JS carregar + vídeo tocar)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

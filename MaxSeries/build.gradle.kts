@@ -1,7 +1,7 @@
-version = 178
+version = 180
 
 cloudstream {
-    description = "MaxSeries v178 - CAPTURA API RESPONSES! Parseia JSON de /api/v1/ para extrair vídeo"
+    description = "MaxSeries v180 - HYBRID EXTRACTOR (API → WebView → MyVidPlay)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

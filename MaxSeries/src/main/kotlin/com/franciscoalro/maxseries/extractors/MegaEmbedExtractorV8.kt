@@ -492,8 +492,6 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             Log.e(TAG, "⚠️ Erro na API direta: ${e.message}")
             null
         }
-    }    it.printStackTrace()
-        }
     }
     
     private fun isValidVideoUrl(url: String?): Boolean {

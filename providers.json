@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v164 - FIX: Timeout 120s + Logs detalhados",
-        "version": 164,
+        "description": "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup",
+        "version": 165,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v164/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v165/MaxSeries.cs3"
     }
 ]

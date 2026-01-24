@@ -449,17 +449,10 @@ class MaxSeriesProvider : MainAPI() {
         var linksFound = 0
         
         try {
-            // CORREÇÃO v166: Sempre extrair sources do playerthree, independentemente de ter seasonId ou não
-            val episodeUrl = if (seasonId != null) {
-                // Reconstruir URL com hash para abrir o episódio correto
-                "$playerthreeUrl#${seasonId}_$episodeId"
-            } else {
-                // Fallback: usar endpoint /episodio/
-                val baseUrl = playerthreeUrl.substringBefore("/embed/").let {
-                    if (it.isEmpty()) "https://playerthree.online" else it
-                }
-                "$baseUrl/episodio/$episodeId"
-            }
+            // CORREÇÃO v167: playerthree.online mudou!
+            // O site NÃO carrega botões via hash (#seasonId_episodeId).
+            // É necessário fazer request direto para /episodio/{episodeId}
+            val episodeUrl = "https://playerthree.online/episodio/$episodeId"
             
             Log.d(TAG, "🎬 Buscando episódio: $episodeUrl")
             

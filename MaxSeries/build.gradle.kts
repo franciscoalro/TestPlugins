@@ -1,7 +1,7 @@
-version = 166
+version = 167
 
 cloudstream {
-    description = "MaxSeries v166 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)"
+    description = "MaxSeries v167 - FIX DEFINITIVO: Usa endpoint /episodio/ correto (não mais hash!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

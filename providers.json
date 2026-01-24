@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v162 - FIX CRÍTICO: Correção de Parse de Episódios",
-        "version": 162,
+        "description": "MaxSeries v163 - FIX: MegaEmbed sem auto-clicker (carrega automaticamente)",
+        "version": 163,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,6 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v162/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v163/MaxSeries.cs3"
     }
 ]

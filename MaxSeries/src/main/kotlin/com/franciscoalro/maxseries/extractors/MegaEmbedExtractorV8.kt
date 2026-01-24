@@ -345,11 +345,11 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             
             Log.d(TAG, "📱 Carregando página com fetch/XHR interception...")
             Log.d(TAG, "⏱️ Timeout configurado: 90s (v176: tempo para página + iframe)")
-            Log.d(TAG, "🔗 URL alvo: $targetUrl")
+            Log.d(TAG, "🔗 URL alvo: $webViewTargetUrl")
             Log.d(TAG, "📋 Headers: $cdnHeaders")
             
             val startTime = System.currentTimeMillis()
-            val response = app.get(targetUrl, headers = cdnHeaders, interceptor = resolver)
+            val response = app.get(webViewTargetUrl, headers = cdnHeaders, interceptor = resolver)
             val elapsedTime = System.currentTimeMillis() - startTime
             
             Log.d(TAG, "⏱️ WebView completou em ${elapsedTime}ms (${elapsedTime/1000}s)")

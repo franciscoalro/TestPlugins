@@ -53,7 +53,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        Log.d(TAG, "=== MEGAEMBED V8 v180 HYBRID EXTRACTOR (API -> WebView -> MyVidPlay) ===")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v181 CARREGADO! 🚀🚀🚀")
         Log.d(TAG, "Input: $url")
         
         val videoId = extractVideoId(url) ?: run {
@@ -73,12 +73,13 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
             return
         }
         
-        // v180: HYBRID STRATEGY
+        // v181: REVERSE ENGINEERING & TEMPLATE ATTACK (Requested by User)
         // 1. Tentar API DIRETA
-        // 2. Tentar WebView (com correção de targetUrl)
-        // 3. Fallback para MyVidPlay
+        // 2. Tentar TEMPLATE ATTACK / BRUTE FORCE (MegaEmbedLinkFetcher)
+        // 3. Tentar WebView (fallback)
+        // 4. Fallback para MyVidPlay
         
-        Log.d(TAG, "🚀 v180: HYBRID EXTRACTOR START")
+        Log.d(TAG, "🚀 v181: HYBRID EXTRACTOR START (API + Templates + WebView + MyVidPlay)")
         
         // 1️⃣ TENTATIVA – API DIRETA
         val refererDomain = referer?.substringAfter("://")?.substringBefore("/") ?: "playerthree.online"
@@ -92,21 +93,44 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                 referer = mainUrl,
                 headers = cdnHeaders
             ).forEach(callback)
-            Log.d(TAG, "🎉 v180: Extração concluída via API direta")
+            Log.d(TAG, "🎉 v181: Extração concluída via API direta")
             return
         }
 
-        // 2️⃣ FALLBACK – WEBVIEW (mantém script já existente)
-        Log.d(TAG, "🔄 v180: API direta falhou, tentando WebView...")
+        // 2️⃣ TENTATIVA – TEMPLATE ATTACK (Engenharia Reversa / Brute Force)
+        Log.d(TAG, "🔓 v181: API direta falhou. Iniciando TEMPLATE ATTACK (Brute Force)...")
+        runCatching {
+            val templateLink = MegaEmbedLinkFetcher.fetchPlaylistUrl(videoId)
+            if (templateLink != null) {
+                Log.d(TAG, "🎉 v181: TEMPLATE ATTACK SUCESSO! URL: $templateLink")
+                val quality = QualityDetector.detectFromUrl(templateLink)
+                VideoUrlCache.put(url, templateLink, quality, name)
+                
+                M3u8Helper.generateM3u8(
+                    source = name,
+                    streamUrl = templateLink,
+                    referer = mainUrl,
+                    headers = cdnHeaders
+                ).forEach(callback)
+                return
+            } else {
+                Log.d(TAG, "⚠️ v181: Template attack falhou.")
+            }
+        }.onFailure {
+            Log.e(TAG, "❌ Erro no Template Attack: ${it.message}")
+        }
+
+        // 3️⃣ FALLBACK – WEBVIEW (mantém script já existente)
+        Log.d(TAG, "🔄 v181: Template attack falhou, tentando WebView...")
         
-        // RECRIAR targetUrl para o escopo do WebView (VITAL PARA NÃO QUEBRAR O BUILD)
+        // RECRIAR targetUrl para o escopo do WebView
         val webViewTargetUrl = if (!referer.isNullOrEmpty() && referer.contains("playerthree.online/episodio/")) {
             referer 
         } else {
             url 
         }
         
-        // FASE 2 — WEBVIEW COM FETCH/XHR HOOKS
+        // FASE 3 — WEBVIEW COM FETCH/XHR HOOKS
         Log.d(TAG, "🌐 Iniciando WebView com FETCH/XHR INTERCEPTION...")
         Log.d(TAG, "🔗 Target: $webViewTargetUrl")
         
@@ -384,7 +408,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                 
                 // Fallback: extrair dados e testar variações
                 extractUrlData(finalUrl)?.let { urlData ->
-                    Log.d(TAG, "📦 Dados extraídos: host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
+                    Log.d(TAG, "📦 Dados extraídos (v181): host=${urlData.host}, cluster=${urlData.cluster}, videoId=${urlData.videoId}")
                     
                     val fileVariations = listOf(
                         "cf-master.txt",
@@ -451,9 +475,11 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         }
         
         if (!webViewSuccess) {
-            // 3️⃣ ULTIMO RECURSO – MyVidPlayExtractor
-            Log.d(TAG, "🔁 v180: WebView falhou, delegando a MyVidPlayExtractor")
+        if (!webViewSuccess) {
+            // 4️⃣ ULTIMO RECURSO – MyVidPlayExtractor
+            Log.d(TAG, "🔁 v181: WebView falhou, delegando a MyVidPlayExtractor")
             MyVidPlayExtractor().getUrl(url, referer, subtitleCallback, callback)
+        }
         }
     }
     

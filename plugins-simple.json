@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v180/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v181/MaxSeries.cs3",
         "status": 1,
-        "version": 180,
+        "version": 181,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v180 - HYBRID EXTRACTOR (API → WebView → MyVidPlay)",
+        "description": "MaxSeries v181 - TEMPLATE ATTACK (Brute Force Mode) + Hybrid",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

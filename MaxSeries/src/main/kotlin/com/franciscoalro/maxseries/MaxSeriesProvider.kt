@@ -15,6 +15,8 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
+import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 
 /**
  * MaxSeries Provider v156 - APENAS MegaEmbed V8 (Jan 2026)
@@ -239,21 +241,21 @@ class MaxSeriesProvider : MainAPI() {
     }
 
     /**
-     * Extrai URL do iframe playerthree da página
+     * Extrai URL do iframe playerthree/viewplayer da página
      */
     private fun extractPlayerthreeUrl(document: Document): String? {
-        // Procurar iframe do playerthree
-        val iframes = document.select("iframe[src*=playerthree], iframe[src*=player]")
+        // Procurar iframe do playerthree ou viewplayer
+        val iframes = document.select("iframe[src*=playerthree], iframe[src*=viewplayer], iframe[src*=player]")
         for (iframe in iframes) {
             val src = iframe.attr("src")
-            if (src.contains("playerthree.online")) {
+            if (src.contains("playerthree.online") || src.contains("viewplayer.online")) {
                 return src
             }
         }
         
-        // Procurar no HTML bruto (às vezes está em texto)
+        // Fallback: procurar no HTML usando regex
         val html = document.html()
-        val pattern = Regex("""https?://playerthree\.online/embed/[^"'\s]+""")
+        val pattern = Regex("""https?://(playerthree|viewplayer)\.online/(embed|filme)/[^"'\s]+""")
         val match = pattern.find(html)
         return match?.value
     }
@@ -290,26 +292,33 @@ class MaxSeriesProvider : MainAPI() {
                 val isDubbed = cardTitle.contains("Dublado", true)
                 val isSubbed = cardTitle.contains("Legendado", true)
                 
-                val episodeItems = card.select("li[data-episode-id]")
+                val episodeItems = card.select("li")
                 
                 for (item in episodeItems) {
-                    val episodeId = item.attr("data-episode-id")
-                    val seasonId = item.attr("data-season-id")
+                    val linkElement = item.selectFirst("a") ?: continue
+                    val href = linkElement.attr("href")
                     
-                    if (episodeId.isEmpty()) continue
+                    // Formato esperado: #seasonId_episodeId (Ex: #12962_255703)
+                    if (!href.startsWith("#")) continue
                     
-                    val linkElement = item.selectFirst("a")
-                    val episodeTitle = linkElement?.text()?.trim() ?: "Episódio"
+                    val ids = href.removePrefix("#").split("_")
+                    if (ids.size < 2) continue
+                    
+                    val seasonId = ids[0]
+                    val episodeId = ids[1]
+                    
+                    val episodeTitle = linkElement.text().trim()
                     
                     // Extrair número do episódio do título
                     val epNumMatch = Regex("""^(\d+)\s*[-–]""").find(episodeTitle)
                     val epNum = epNumMatch?.groupValues?.get(1)?.toIntOrNull() ?: 1
                     
                     // Encontrar número da temporada
+                    // Tentar achar pelo seasonId, ou usar contador
                     val seasonNum = seasons.find { it.first == seasonId }?.second ?: 1
                     
-                    // Criar data URL com informações necessárias
-                    val dataUrl = "$playerthreeUrl|episodio|$episodeId"
+                    // Data URL v161
+                    val dataUrl = "$playerthreeUrl|episodio|$episodeId|$seasonId"
                     
                     val suffix = when {
                         isDubbed -> " (Dublado)"
@@ -396,9 +405,12 @@ class MaxSeriesProvider : MainAPI() {
             if (data.contains("|episodio|")) {
                 val parts = data.split("|episodio|")
                 val playerthreeUrl = parts[0]
-                val episodeId = parts[1]
+                // v161: Suporte a partes[2] (seasonId)
+                val params = parts[1].split("|")
+                val episodeId = params[0]
+                val seasonId = params.getOrNull(1)
                 
-                linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, subtitleCallback, callback)
+                linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, seasonId, subtitleCallback, callback)
             } 
             // URL direta do playerthree
             else if (data.contains("playerthree.online")) {
@@ -424,19 +436,35 @@ class MaxSeriesProvider : MainAPI() {
     private suspend fun extractFromPlayerthreeEpisode(
         playerthreeUrl: String,
         episodeId: String,
+        seasonId: String?,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Int {
         var linksFound = 0
         
         try {
+            // v161: Se tivermos seasonId e episodeId, podemos reconstruir a URL exata do iframe com Hash
+            if (seasonId != null) {
+                // Formato: https://playerthree.online/embed/series-name/#seasonId_episodeId
+                val hashUrl = "$playerthreeUrl#${seasonId}_$episodeId"
+                Log.d(TAG, "🎯 URL com Hash reconstruída: $hashUrl")
+                
+                // Enviar DIRETO para o MegaEmbedExtractorV8
+                // Ele vai abrir o WebView e, com o hash, o site deve abrir o player correto.
+                // O script JS v161 vai clicar no botão se necessário.
+                val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8()
+                extractor.getUrl(hashUrl, playerthreeUrl, subtitleCallback, callback)
+                return 1 // Sucesso presumido, já que delegamos pro WebView
+            }
+
+            // Fallback (se não tiver seasonId - código antigo)
             // Extrair base URL do playerthree
             val baseUrl = playerthreeUrl.substringBefore("/embed/").let {
                 if (it.isEmpty()) "https://playerthree.online" else it
             }
             
             val episodeUrl = "$baseUrl/episodio/$episodeId"
-            Log.d(TAG, "🎬 Buscando episódio: $episodeUrl")
+            Log.d(TAG, "🎬 Buscando episódio (fallback): $episodeUrl")
             
             // Headers customizados usando HeadersBuilder
             val headers = HeadersBuilder.standard(playerthreeUrl)
@@ -444,35 +472,39 @@ class MaxSeriesProvider : MainAPI() {
             val response = app.get(episodeUrl, headers = headers)
             
             val html = response.text
-            Log.d(TAG, "📄 Resposta do episódio (${html.length} chars)")
-            Log.d(TAG, "📄 HTML início: ${html.take(1000)}")
-            Log.d(TAG, "📄 HTML fim: ${html.takeLast(500)}")
             
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
             
-            // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority (v97)
-            // Ordena automaticamente: Streamtape > Filemoon > Doodstream > Mixdrop > etc.
+            // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority
             val sortedSources = ServerPriority.sortByPriority(sources) { source ->
                 ServerPriority.detectServer(source)
             }
             
-            Log.d(TAG, "📋 Sources ordenadas por prioridade (v129 - Apenas MegaEmbed): $sortedSources")
-            
             for (source in sortedSources) {
-                Log.d(TAG, "🔄 Processando: $source")
                 try {
+                    Log.d(TAG, "🔍 Processando source: $source")
                     when {
-                        // ÚNICA PRIORIDADE: MegaEmbed V8 (v156 - Fetch/XHR Hooks)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "🎬 [P1] MegaEmbedExtractorV8 - VERSÃO v156 com Fetch/XHR Hooks (~95%+ sucesso)")
-                            val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8()
-                            extractor.getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV8...")
+                            MegaEmbedExtractorV8().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        source.contains("playerembedapi", ignoreCase = true) -> {
+                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractor...")
+                            PlayerEmbedAPIExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                            linksFound++
+                        }
+                        source.contains("myvidplay", ignoreCase = true) -> {
+                            Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
+                            MyVidPlayExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         else -> {
-                            Log.d(TAG, "⚠️ Source não suportado (apenas MegaEmbed): $source")
+                             Log.d(TAG, "⚠️ Source desconhecida, tentando loader genérico: $source")
+                             loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
+                             linksFound++
                         }
                     }
                 } catch (e: Exception) {
@@ -480,12 +512,6 @@ class MaxSeriesProvider : MainAPI() {
                 }
             }
 
-            if (linksFound == 0) {
-                Log.w(TAG, "⚠️ Nenhum link MegaEmbed encontrado")
-            } else {
-                Log.d(TAG, "✅ Total de links encontrados: $linksFound")
-            }
-            
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro ao extrair episódio: ${e.message}")
         }
@@ -514,12 +540,11 @@ class MaxSeriesProvider : MainAPI() {
             
             val document = response.document
             
-            // Procurar primeiro episódio disponível
             val firstEpisode = document.selectFirst("li[data-episode-id]")
             if (firstEpisode != null) {
                 val episodeId = firstEpisode.attr("data-episode-id")
                 if (episodeId.isNotEmpty()) {
-                    linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, subtitleCallback, callback)
+                    linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, null, subtitleCallback, callback)
                 }
             }
             

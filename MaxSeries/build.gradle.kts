@@ -1,7 +1,7 @@
-version = 164
+version = 165
 
 cloudstream {
-    description = "MaxSeries v164 - FIX: Timeout 120s + Logs detalhados"
+    description = "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

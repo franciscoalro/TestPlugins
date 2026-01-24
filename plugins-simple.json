@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v164/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v165/MaxSeries.cs3",
         "status": 1,
-        "version": 164,
+        "version": 165,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v164 - FIX: Timeout 120s + Logs detalhados",
+        "description": "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

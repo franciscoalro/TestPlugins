@@ -1,7 +1,7 @@
-version = 167
+version = 168
 
 cloudstream {
-    description = "MaxSeries v167 - FIX DEFINITIVO: Usa endpoint /episodio/ correto (não mais hash!)"
+    description = "MaxSeries v168 - TIMEOUT OTIMIZADO: WebView 15s (não mais 120s!) + sem retry = rápido"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

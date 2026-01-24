@@ -147,7 +147,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
                         Log.d(TAG, "📜 Script capturou: $capturedUrl")
                     }
                 },
-                timeout = 120_000L // 120s (aumentado de 60s para evitar cancelamento prematuro)
+                timeout = 15_000L // v168: 15s (reduzido de 120s) - Rápido o suficiente para NOT ser cancelado!
             )
             
             Log.d(TAG, "📱 Carregando página com fetch/XHR interception...")

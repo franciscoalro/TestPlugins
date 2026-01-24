@@ -18,8 +18,8 @@
     },
     {
         "name": "MaxSeries",
-        "description": "MaxSeries v167 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
-        "version": 167,
+        "description": "MaxSeries v168 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)",
+        "version": 168,
         "authors": [
             "franciscoalro"
         ],
@@ -30,6 +30,8 @@
             "Movie"
         ],
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v167/MaxSeries.cs3"
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v168/MaxSeries.cs3"
     }
 ]
+
+

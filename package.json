@@ -1,5 +1,21 @@
 {
+  "name": "maxseries-video-extractor",
+  "version": "1.0.0",
+  "description": "Scripts para testar extração de vídeo do MaxSeries",
+  "main": "test-puppeteer-extractor.js",
+  "scripts": {
+    "test": "node test-puppeteer-extractor.js",
+    "test:episode": "node test-puppeteer-extractor.js https://maxseries.one/episodio/258444"
+  },
+  "keywords": [
+    "maxseries",
+    "video",
+    "extractor",
+    "puppeteer"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "playwright": "^1.57.0"
+    "puppeteer": "^21.7.0"
   }
 }

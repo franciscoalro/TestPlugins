@@ -1,7 +1,7 @@
-version = 165
+version = 166
 
 cloudstream {
-    description = "MaxSeries v165 - Multi-Técnica: Prioriza PlayerEmbedAPI + MegaEmbed Backup"
+    description = "MaxSeries v166 - FIX CRÍTICO: Extrai sources do playerthree antes (PlayerEmbedAPI funciona!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

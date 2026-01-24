@@ -55,6 +55,11 @@ class MaxSeriesProvider : MainAPI() {
         // User-Agent do Firefox (HAR real)
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
     }
+    
+    init {
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v166 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
+    }
 
     override val mainPage = mainPageOf(
         "$mainUrl/filmes" to "Filmes",
@@ -396,6 +401,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
+        Log.wtf(TAG, "🔗🔗🔗 LOADLINKS CHAMADO! DATA: $data")
         Log.d(TAG, "🔗 loadLinks: $data")
         
         return try {
@@ -443,28 +449,19 @@ class MaxSeriesProvider : MainAPI() {
         var linksFound = 0
         
         try {
-            // v161: Se tivermos seasonId e episodeId, podemos reconstruir a URL exata do iframe com Hash
-            if (seasonId != null) {
-                // Formato: https://playerthree.online/embed/series-name/#seasonId_episodeId
-                val hashUrl = "$playerthreeUrl#${seasonId}_$episodeId"
-                Log.d(TAG, "🎯 URL com Hash reconstruída: $hashUrl")
-                
-                // Enviar DIRETO para o MegaEmbedExtractorV8
-                // Ele vai abrir o WebView e, com o hash, o site deve abrir o player correto.
-                // O script JS v161 vai clicar no botão se necessário.
-                val extractor = com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8()
-                extractor.getUrl(hashUrl, playerthreeUrl, subtitleCallback, callback)
-                return 1 // Sucesso presumido, já que delegamos pro WebView
-            }
-
-            // Fallback (se não tiver seasonId - código antigo)
-            // Extrair base URL do playerthree
-            val baseUrl = playerthreeUrl.substringBefore("/embed/").let {
-                if (it.isEmpty()) "https://playerthree.online" else it
+            // CORREÇÃO v166: Sempre extrair sources do playerthree, independentemente de ter seasonId ou não
+            val episodeUrl = if (seasonId != null) {
+                // Reconstruir URL com hash para abrir o episódio correto
+                "$playerthreeUrl#${seasonId}_$episodeId"
+            } else {
+                // Fallback: usar endpoint /episodio/
+                val baseUrl = playerthreeUrl.substringBefore("/embed/").let {
+                    if (it.isEmpty()) "https://playerthree.online" else it
+                }
+                "$baseUrl/episodio/$episodeId"
             }
             
-            val episodeUrl = "$baseUrl/episodio/$episodeId"
-            Log.d(TAG, "🎬 Buscando episódio (fallback): $episodeUrl")
+            Log.d(TAG, "🎬 Buscando episódio: $episodeUrl")
             
             // Headers customizados usando HeadersBuilder
             val headers = HeadersBuilder.standard(playerthreeUrl)
@@ -476,6 +473,11 @@ class MaxSeriesProvider : MainAPI() {
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
             Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
+            
+            if (sources.isEmpty()) {
+                Log.e(TAG, "❌ Nenhuma source encontrada no playerthree!")
+                return 0
+            }
             
             // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority
             val sortedSources = ServerPriority.sortByPriority(sources) { source ->

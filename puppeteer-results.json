@@ -1,0 +1,34 @@
+{
+  "iframes": [
+    {
+      "index": 1,
+      "url": "https://playerthree.online/embed/sandokan/",
+      "type": "PlayerEmbedAPI",
+      "videoUrls": []
+    }
+  ],
+  "capturedUrls": [
+    "https://fonts.gstatic.com/s/quicksand/v37/6xKtdSZaM9iE8KbpRA_hK1QN.woff2",
+    "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-solid-900.woff2",
+    "https://vjs.zencdn.net/7.10.2/video-js.css",
+    "https://vjs.zencdn.net/7.10.2/video.min.js",
+    "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-brands-400.woff2",
+    "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2"
+  ],
+  "summary": {
+    "totalIframes": 1,
+    "totalUrls": 6,
+    "urlsByType": {
+      "🎭 Disfarçados (.woff2, .txt)": [
+        "https://fonts.gstatic.com/s/quicksand/v37/6xKtdSZaM9iE8KbpRA_hK1QN.woff2",
+        "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-solid-900.woff2",
+        "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-brands-400.woff2",
+        "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2"
+      ],
+      "🔗 Outros": [
+        "https://vjs.zencdn.net/7.10.2/video-js.css",
+        "https://vjs.zencdn.net/7.10.2/video.min.js"
+      ]
+    }
+  }
+}

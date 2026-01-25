@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v198/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v199/MaxSeries.cs3",
         "status": 1,
-        "version": 198,
+        "version": 199,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v198 - MegaEmbed V9 (Exact Target: #player-button-container)",
+        "description": "MaxSeries v199 - MegaEmbed V9 (Fix: Destroy WebView to stop background audio)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

@@ -1,7 +1,7 @@
-version = 187
+version = 188
 
 cloudstream {
-    description = "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)"
+    description = "MaxSeries v188 - MegaEmbed V9 (Exact TS Logic Port)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

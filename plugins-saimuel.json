@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)",
+    "description": "MaxSeries v188 - MegaEmbed V9 (Exact TS Logic Port)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 187,
+    "version": 188,
     "status": 1,
     "language": "pt",
     "types": [

@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v203 - Added Ratings & Recommendations",
+    "description": "MaxSeries v204 - 4K Posters (Original Quality)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 203,
+    "version": 204,
     "status": 1,
     "language": "pt",
     "types": [

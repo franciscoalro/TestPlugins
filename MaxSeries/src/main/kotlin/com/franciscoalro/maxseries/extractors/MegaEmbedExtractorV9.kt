@@ -5,6 +5,10 @@ import com.lagradost.cloudstream3.utils.*
 import android.webkit.*
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+
 import com.franciscoalro.maxseries.utils.QualityDetector
 import com.franciscoalro.maxseries.utils.VideoUrlCache
 

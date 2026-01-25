@@ -1,0 +1,8 @@
+{
+  "name": "BRCloudstream Repository",
+  "description": "Repositório completo de extensões brasileiras para Cloudstream - 7 providers incluindo MaxSeries v209 com 7 extractors",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/franciscoalro/brcloudstream/builds/plugins.json"
+  ]
+}

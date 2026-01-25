@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v195 - MegaEmbed V9 (Spy Mode - Full Network Logging)",
+    "description": "MaxSeries v196 - MegaEmbed V9 (Smart Clicker + Virtual Layout)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 195,
+    "version": 196,
     "status": 1,
     "language": "pt",
     "types": [

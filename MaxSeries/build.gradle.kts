@@ -1,7 +1,7 @@
-version = 195
+version = 196
 
 cloudstream {
-    description = "MaxSeries v195 - MegaEmbed V9 (Spy Mode - Full Network Logging)"
+    description = "MaxSeries v196 - MegaEmbed V9 (Smart Clicker + Virtual Layout)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

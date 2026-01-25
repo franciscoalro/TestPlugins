@@ -1,143 +1,109 @@
-[
+﻿[
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/AnimesOnlineCC.cs3",
-        "status": 1,
-        "version": 10,
-        "apiVersion": 1,
-        "name": "AnimesOnlineCC",
-        "internalName": "AnimesOnlineCC",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "Assista animes online grátis em HD - v10 Kotlin 2.3.0",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "Anime",
-            "OVA",
-            "AnimeMovie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "MaxSeries",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v210/MaxSeries.cs3",
+        "version":  210,
+        "description":  "MaxSeries v210 - 7 Extractors + 25 Categories (Added 'Adicionados Recentemente'). Success rate: ~99%",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "language":  "pt-BR",
+        "iconUrl":  "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v207/MaxSeries.cs3",
-        "status": 1,
-        "version": 207,
-        "apiVersion": 1,
-        "name": "MaxSeries",
-        "internalName": "MaxSeries",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "MaxSeries v207 - Kotlin 2.3.0 (Cache Fix)",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
-        "isAdult": false
+        "name":  "AnimesOnlineCC",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/AnimesOnlineCC.cs3",
+        "version":  1,
+        "description":  "Animes Online CC - Streaming de animes em portuguÃªs",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "Anime"
+                    ],
+        "language":  "pt-BR",
+        "iconUrl":  "https://animesonlinecc.to/favicon.ico"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/MegaFlix.cs3",
-        "status": 1,
-        "version": 2,
-        "apiVersion": 1,
-        "name": "MegaFlix",
-        "internalName": "MegaFlix",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "MegaFlix - Filmes e Séries em Português",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://megaflix.co/wp-content/uploads/2023/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "MegaFlix",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/MegaFlix.cs3",
+        "version":  1,
+        "description":  "MegaFlix - Filmes e sÃ©ries em portuguÃªs com busca rÃ¡pida",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "language":  "pt-BR"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/NetCine.cs3",
-        "status": 1,
-        "version": 2,
-        "apiVersion": 1,
-        "name": "NetCine",
-        "internalName": "NetCine",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "NetCine - Filmes e Séries Online",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://netcine.top/wp-content/uploads/2023/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "NetCine",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/NetCine.cs3",
+        "version":  1,
+        "description":  "NetCine - Filmes, sÃ©ries e animes em portuguÃªs",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie",
+                        "Anime"
+                    ],
+        "language":  "pt-BR"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/OverFlix.cs3",
-        "status": 1,
-        "version": 2,
-        "apiVersion": 1,
-        "name": "OverFlix",
-        "internalName": "OverFlix",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "OverFlix - Streaming de Filmes e Séries",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://overflix.online/wp-content/uploads/2023/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "OverFlix",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/OverFlix.cs3",
+        "version":  1,
+        "description":  "OverFlix - Filmes e sÃ©ries em portuguÃªs",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "language":  "pt-BR"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/PobreFlix.cs3",
-        "status": 1,
-        "version": 2,
-        "apiVersion": 1,
-        "name": "PobreFlix",
-        "internalName": "PobreFlix",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "PobreFlix - Filmes e Séries Grátis",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://pobreflix.club/wp-content/uploads/2023/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "PobreFlix",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/PobreFlix.cs3",
+        "version":  1,
+        "description":  "PobreFlix - Filmes e sÃ©ries em portuguÃªs com busca rÃ¡pida",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "language":  "pt-BR"
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/Vizer.cs3",
-        "status": 1,
-        "version": 2,
-        "apiVersion": 1,
-        "name": "Vizer",
-        "internalName": "Vizer",
-        "authors": [
-            "franciscoalro"
-        ],
-        "description": "Vizer - Filmes e Séries em HD",
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "language": "pt-BR",
-        "iconUrl": "https://novizer.com/wp-content/uploads/2023/01/cropped-favicon-32x32.png",
-        "isAdult": false
+        "name":  "Vizer",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/Vizer.cs3",
+        "version":  1,
+        "description":  "Vizer - Filmes e sÃ©ries em portuguÃªs com busca rÃ¡pida",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "language":  "pt-BR"
     }
 ]

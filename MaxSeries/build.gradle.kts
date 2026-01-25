@@ -1,7 +1,7 @@
-version = 207
+version = 210
 
 cloudstream {
-    description = "MaxSeries v205 - Added Animation Category & Build Fixes"
+    description = "MaxSeries v210 - Added 'Adicionados Recentemente' Category (25 categories total)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

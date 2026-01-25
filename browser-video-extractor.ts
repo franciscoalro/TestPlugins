@@ -1,11 +1,18 @@
 /**
- * MaxSeries Video Extractor - TypeScript Browser Script
+ * MaxSeries Video Extractor - TypeScript Browser Script v2.0
  * 
  * Como usar:
- * 1. Abra a página do episódio no navegador (https://maxseries.one/episodio/...)
+ * 1. Abra a página do episódio no navegador (https://maxseries.pics/...)
  * 2. Abra o Console do DevTools (F12)
  * 3. Cole este script e pressione Enter
  * 4. O script irá analisar todos os iframes e capturar URLs de vídeo
+ * 
+ * Compatível com:
+ * - MegaEmbed V9
+ * - PlayerEmbedAPI
+ * - MyVidPlay
+ * - DoodStream
+ * - E outros players
  */
 
 interface VideoSource {
@@ -102,9 +109,12 @@ class MaxSeriesExtractor {
     const urlLower = url.toLowerCase();
     
     if (urlLower.includes('megaembed')) return 'MegaEmbed';
-    if (urlLower.includes('playerembedapi') || urlLower.includes('playerthree')) return 'PlayerEmbedAPI';
+    if (urlLower.includes('playerembedapi')) return 'PlayerEmbedAPI';
+    if (urlLower.includes('playerthree')) return 'PlayerThree';
+    if (urlLower.includes('myvidplay')) return 'MyVidPlay';
     if (urlLower.includes('doodstream') || urlLower.includes('dood')) return 'DoodStream';
     if (urlLower.includes('streamtape')) return 'StreamTape';
+    if (urlLower.includes('mixdrop')) return 'Mixdrop';
     
     return 'Desconhecido';
   }
@@ -115,7 +125,7 @@ class MaxSeriesExtractor {
   private extractVideoUrls(html: string): string[] {
     const urls: string[] = [];
     
-    // Regex para M3U8
+    // Regex para M3U8 (HLS)
     const m3u8Regex = /https?:\/\/[^\s"'<>]+\.m3u8[^\s"'<>]*/gi;
     const m3u8Matches = html.match(m3u8Regex) || [];
     
@@ -127,11 +137,20 @@ class MaxSeriesExtractor {
     const tsRegex = /https?:\/\/[^\s"'<>]+\.ts[^\s"'<>]*/gi;
     const tsMatches = html.match(tsRegex) || [];
     
+    // Regex para WebM
+    const webmRegex = /https?:\/\/[^\s"'<>]+\.webm[^\s"'<>]*/gi;
+    const webmMatches = html.match(webmRegex) || [];
+    
+    // Regex para MKV
+    const mkvRegex = /https?:\/\/[^\s"'<>]+\.mkv[^\s"'<>]*/gi;
+    const mkvMatches = html.match(mkvRegex) || [];
+    
     // Combinar e remover duplicatas
-    const allMatches = [...m3u8Matches, ...mp4Matches, ...tsMatches];
+    const allMatches = [...m3u8Matches, ...mp4Matches, ...tsMatches, ...webmMatches, ...mkvMatches];
     
     allMatches.forEach(url => {
-      if (!this.capturedUrls.has(url)) {
+      // Filtrar URLs muito curtas ou inválidas
+      if (url.length > 20 && !this.capturedUrls.has(url)) {
         this.capturedUrls.add(url);
         urls.push(url);
       }
@@ -141,11 +160,12 @@ class MaxSeriesExtractor {
   }
 
   /**
-   * Intercepta requisições de rede (usando Fetch API)
+   * Intercepta requisições de rede (usando Fetch API e XMLHttpRequest)
    */
   interceptNetworkRequests(): void {
     console.log('\n🔍 Iniciando interceptação de requisições de rede...\n');
 
+    // Interceptar Fetch API
     const originalFetch = window.fetch;
     
     window.fetch = async (...args) => {
@@ -153,15 +173,38 @@ class MaxSeriesExtractor {
       const url = typeof args[0] === 'string' ? args[0] : args[0].url;
       
       // Filtrar URLs de vídeo
-      if (url.includes('.m3u8') || url.includes('.mp4') || url.includes('.ts')) {
-        console.log(`📡 Requisição capturada: ${url}`);
+      if (this.isVideoUrl(url)) {
+        console.log(`📡 Fetch capturado: ${url}`);
         this.capturedUrls.add(url);
       }
       
       return response;
     };
 
-    console.log('✅ Interceptação ativada. Aguardando requisições...\n');
+    // Interceptar XMLHttpRequest
+    const originalOpen = XMLHttpRequest.prototype.open;
+    const self = this;
+    
+    XMLHttpRequest.prototype.open = function(...args: any[]) {
+      const url = args[1];
+      
+      if (typeof url === 'string' && self.isVideoUrl(url)) {
+        console.log(`📡 XHR capturado: ${url}`);
+        self.capturedUrls.add(url);
+      }
+      
+      return originalOpen.apply(this, args as any);
+    };
+
+    console.log('✅ Interceptação ativada (Fetch + XHR). Aguardando requisições...\n');
+  }
+
+  /**
+   * Verifica se uma URL é de vídeo
+   */
+  private isVideoUrl(url: string): boolean {
+    const videoExtensions = ['.m3u8', '.mp4', '.ts', '.webm', '.mkv', '.avi', '.flv'];
+    return videoExtensions.some(ext => url.includes(ext));
   }
 
   /**
@@ -205,6 +248,44 @@ class MaxSeriesExtractor {
       console.error('❌ Erro ao copiar:', err);
     });
   }
+
+  /**
+   * Exporta resultados em formato JSON
+   */
+  exportJSON(): string {
+    const data = {
+      timestamp: new Date().toISOString(),
+      totalUrls: this.capturedUrls.size,
+      players: this.results.map(r => ({
+        index: r.index,
+        type: r.playerType,
+        iframeUrl: r.iframeUrl,
+        videoUrls: r.videoUrls
+      })),
+      allUrls: Array.from(this.capturedUrls)
+    };
+    
+    const json = JSON.stringify(data, null, 2);
+    console.log('\n📄 JSON exportado:');
+    console.log(json);
+    
+    return json;
+  }
+
+  /**
+   * Baixa resultados como arquivo JSON
+   */
+  downloadJSON(): void {
+    const json = this.exportJSON();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `maxseries-extract-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    console.log('✅ Arquivo JSON baixado!');
+  }
 }
 
 // ============================================
@@ -228,6 +309,8 @@ class MaxSeriesExtractor {
   
   console.log('\n💡 Dicas:');
   console.log('   - Para copiar URLs: extractor.copyToClipboard()');
+  console.log('   - Para exportar JSON: extractor.exportJSON()');
+  console.log('   - Para baixar JSON: extractor.downloadJSON()');
   console.log('   - Para reanalizar: extractor.analyzeIframes()');
   console.log('   - Aguarde o vídeo carregar e verifique o console para novas requisições');
 })();

@@ -2,52 +2,72 @@
 
 [![Build and Release](https://github.com/franciscoalro/TestPlugins/actions/workflows/build.yml/badge.svg)](https://github.com/franciscoalro/TestPlugins/actions/workflows/build.yml)
 [![Deploy to CloudstreamRepo](https://github.com/franciscoalro/TestPlugins/actions/workflows/deploy-to-cloudstream-repo.yml/badge.svg)](https://github.com/franciscoalro/TestPlugins/actions/workflows/deploy-to-cloudstream-repo.yml)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg)](https://kotlinlang.org)
+[![Release](https://img.shields.io/github/v/release/franciscoalro/TestPlugins)](https://github.com/franciscoalro/TestPlugins/releases/latest)
 
 Repositório de desenvolvimento de extensões para CloudStream 3.
 
+## 🚀 Última Release: v206 (Janeiro 2026)
+
+**7 Providers Disponíveis** | **Kotlin 2.3.0** | **316 KB Total**
+
 ## 🔌 Plugins Disponíveis
 
-### MaxSeries v187 ✅
-- **Descrição**: MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)
+### MaxSeries v206 ✅
+- **Descrição**: MaxSeries v206 - Kotlin 2.3.0 Upgrade & Build Fixes
 - **Status**: ✅ Funcionando (Janeiro 2026)
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Séries, Filmes
-- **Última atualização**: MegaEmbed V9 Integration (Triple Click Bypass)
+- **Tamanho**: 190.48 KB
+- **Última atualização**: Kotlin 2.3.0 Upgrade
 
-### AnimesOnlineCC v6 ✅
-- **Descrição**: Assista animes online grátis em HD
+### AnimesOnlineCC v10 ✅
+- **Descrição**: Assista animes online grátis em HD - v10 Kotlin 2.3.0
 - **Status**: ✅ Funcionando
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Anime, OVA, AnimeMovie
-- **Última atualização**: Estável
+- **Tamanho**: 15.57 KB
+- **Última atualização**: Kotlin 2.3.0 Upgrade
 
-### PobreFlix v1 🆕
-- **Descrição**: Assista filmes e séries grátis no PobreFlix
-- **Status**: 🆕 Integrado do saimuelrepo-main
+### MegaFlix v2 ✅
+- **Descrição**: MegaFlix - Filmes e Séries em Português
+- **Status**: ✅ Funcionando
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Filmes, Séries
-- **Autor**: saimuelbr
+- **Tamanho**: 16.40 KB
+- **Autor**: saimuelbr / franciscoalro
 
-### OverFlix v1 🆕
-- **Descrição**: Filmes e séries em alta qualidade no OverFlix
-- **Status**: 🆕 Integrado do saimuelrepo-main
+### NetCine v2 ✅
+- **Descrição**: NetCine - Filmes e Séries Online
+- **Status**: ✅ Funcionando
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Filmes, Séries
-- **Autor**: saimuelbr
+- **Tamanho**: 19.58 KB
+- **Autor**: saimuelbr / franciscoalro
 
-### Vizer v1 🆕
-- **Descrição**: Streaming de filmes e séries no Vizer
-- **Status**: 🆕 Integrado do saimuelrepo-main
+### OverFlix v2 ✅
+- **Descrição**: OverFlix - Streaming de Filmes e Séries
+- **Status**: ✅ Funcionando
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Filmes, Séries
-- **Autor**: saimuelbr
+- **Tamanho**: 25.50 KB
+- **Autor**: saimuelbr / franciscoalro
 
-### MegaFlix v1 🆕
-- **Descrição**: Filmes e séries online no MegaFlix
-- **Status**: 🆕 Integrado do saimuelrepo-main
+### PobreFlix v2 ✅
+- **Descrição**: PobreFlix - Filmes e Séries Grátis
+- **Status**: ✅ Funcionando
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Filmes, Séries
-- **Autor**: saimuelbr
+- **Tamanho**: 22.88 KB
+- **Autor**: saimuelbr / franciscoalro
+
+### Vizer v2 ✅
+- **Descrição**: Vizer - Filmes e Séries em HD
+- **Status**: ✅ Funcionando
+- **Idioma**: Português (pt-BR)
+- **Tipos**: Filmes, Séries
+- **Tamanho**: 25.75 KB
+- **Autor**: saimuelbr / franciscoalro
 
 ### NetCine v1 🆕
 - **Descrição**: Cinema online no NetCine

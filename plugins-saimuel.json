@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v191 - MegaEmbed V9 (Manual WebView - Forced Update)",
+    "description": "MaxSeries v192 - MegaEmbed V9 (Build Fix - Reflection Context)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 191,
+    "version": 192,
     "status": 1,
     "language": "pt",
     "types": [

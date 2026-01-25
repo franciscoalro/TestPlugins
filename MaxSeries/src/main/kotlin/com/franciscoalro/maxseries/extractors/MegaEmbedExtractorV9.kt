@@ -89,6 +89,19 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                 // Isso permite que o JS calcule coordenadas e 'veja' o site corretamente
                 webView.layout(0, 0, 1920, 1080)
 
+                val cleanup = {
+                    handler.post {
+                        try {
+                            Log.d(TAG, "🧹 [MegaEmbedV9] Limpando e destruindo WebView...")
+                            webView.stopLoading()
+                            webView.loadUrl("about:blank")
+                            webView.destroy()
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Erro no cleanup: ${e.message}")
+                        }
+                    }
+                }
+
                 // Script injetado para capturar e "gritar" a URL
                 val injectedScript = """
                     (function() {
@@ -109,12 +122,12 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                         const origOpen = XMLHttpRequest.prototype.open;
                         XMLHttpRequest.prototype.open = function(method, url) {
                             if (typeof url === 'string') {
-                                if (url.includes('/v4/') && (url.includes('.txt') || url.includes('.m3u8') || url.includes('cf-master'))) {
+                                if (url.includes('/v4/') && (url.includes('.txt') || url.includes('.m3u8') || url.includes('cf-master') || url.includes('.woff2'))) {
                                     reportSuccess(url);
                                 }
                             }
                             this.addEventListener('load', function() {
-                                if (this.responseURL && this.responseURL.includes('cf-master')) {
+                                if (this.responseURL && (this.responseURL.includes('cf-master') || this.responseURL.includes('.woff2'))) {
                                     reportSuccess(this.responseURL);
                                 }
                             });
@@ -125,10 +138,10 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                         const origFetch = window.fetch;
                         window.fetch = function(input, init) {
                             const url = (typeof input === 'string') ? input : (input && input.url);
-                            if (url && url.includes('cf-master')) reportSuccess(url);
+                            if (url && (url.includes('cf-master') || url.includes('.woff2'))) reportSuccess(url);
                             
                             return origFetch.apply(this, arguments).then(response => {
-                                if (response.url && response.url.includes('cf-master')) reportSuccess(response.url);
+                                if (response.url && (response.url.includes('cf-master') || response.url.includes('.woff2'))) reportSuccess(response.url);
                                 return response;
                             });
                         };
@@ -208,6 +221,7 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                             Log.d(TAG, "🎯 URL CAPTURADA VIA CONSOLE: $extracted")
                             finalUrl = extracted
                             latch.countDown()
+                            cleanup() // v199: Mata o WebView
                             return true
                         }
                         
@@ -244,11 +258,12 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                         val url = request?.url?.toString()
                         if (url != null) {
                             Log.d(TAG, "🕵️ [SPY] Request: $url")
-                            // Tenta capturar aqui também, caso o JS falhe
-                            if (url.contains("cf-master") || url.contains(".m3u8") || url.contains("v4/xy")) {
+                            // Tenta capturar aqui também, caso o JS falhe (incluindo .woff2 disfarçado)
+                            if (url.contains("cf-master") || url.contains(".m3u8") || url.contains("v4/xy") || url.contains(".woff2")) {
                                 Log.d(TAG, "🔥 [SPY] ALVO DETECTADO via Request: $url")
                                 finalUrl = url
                                 latch.countDown()
+                                cleanup() // v199: Mata o WebView
                             }
                         }
                         return super.shouldInterceptRequest(view, request)

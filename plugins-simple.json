@@ -1,15 +1,15 @@
 [
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v187/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v188/MaxSeries.cs3",
         "status": 1,
-        "version": 187,
+        "version": 188,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)",
+        "description": "MaxSeries v188 - MegaEmbed V9 (Exact TS Logic Port)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

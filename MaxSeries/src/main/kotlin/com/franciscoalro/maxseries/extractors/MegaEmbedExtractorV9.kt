@@ -25,9 +25,11 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         private const val TAG = "MegaEmbedV9"
     }
 
+    // Headers exatos do script TS que funcionou
     private val cdnHeaders = mapOf(
-        "Referer" to "https://megaembed.link/",
+        "Referer" to "https://playerthree.online/",
         "Origin" to "https://megaembed.link",
+        "Accept-Language" to "en-US,en;q=0.9",
         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     )
 
@@ -43,39 +45,62 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         val embedUrl = "https://megaembed.link/#$videoId"
         var capturedUrl: String? = null
 
-        // Script JS: Triplo Clique + Estabilidade
+        // Script JS: Replicando EXATAMENTE o megaembed_solver.ts
+        // - Clique nas coordenadas 640,360 (centro relativo)
+        // - Intervalo de 2.5s (2500ms)
+        // - 3 repetições
         val tripleClickScript = """
             (function() {
-                console.log('[MegaEmbedV9] Iniciando automação de ativação...');
+                console.log('[MegaEmbedV9] Iniciando sequência exata do TS (cliques 640x360)...');
+                
                 let clickCount = 0;
+                
+                // Função para simular clique no centro
+                function clickCenter() {
+                    const x = 640; // Coordenada usada no Puppeteer
+                    const y = 360; // Coordenada usada no Puppeteer
+                    
+                    // Tenta encontrar elemento no ponto ou usa body
+                    const el = document.elementFromPoint(x, y) || document.body;
+                    
+                    const mouseEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: x,
+                        clientY: y
+                    });
+                    el.dispatchEvent(mouseEvent);
+                    console.log('[MegaEmbedV9] Clique ' + (clickCount + 1) + '/3 disparado em ' + x + ',' + y);
+                }
+
+                // Intervalo de 2500ms (igual ao sleep(2500) do TS)
                 let clickInterval = setInterval(() => {
                     clickCount++;
-                    console.log('[MegaEmbedV9] Tentando clique ' + clickCount + '/3...');
-                    
-                    // Clica no centro do player (onde geralmente ficam os botões e overlays)
-                    const player = document.querySelector('media-player') || document.body;
-                    const rect = player.getBoundingClientRect();
-                    const x = rect.left + rect.width / 2;
-                    const y = rect.top + rect.height / 2;
-                    
-                    const el = document.elementFromPoint(x, y);
-                    if (el) el.click();
+                    clickCenter();
                     
                     if (clickCount >= 3) {
                         clearInterval(clickInterval);
-                        console.log('[MegaEmbedV9] Sequência de cliques concluída.');
+                        console.log('[MegaEmbedV9] Sequência de 3 cliques finalizada.');
                     }
                 }, 2500);
+                
+                // Tenta remover overlays de ad manualmente também
+                setInterval(() => {
+                    document.querySelectorAll('iframe[style*="z-index"], div[style*="z-index"]').forEach(el => {
+                         if(el.style.zIndex > 100) el.remove();
+                    });
+                }, 1000);
             })();
         """.trimIndent()
 
-        // Regex para interceptar vídeo na rede
+        // Regex igual ao anterior, mas focado no que o TS captura (.txt, .m3u8)
         val interceptRegex = Regex(""".*(/v4/|cf-master|\.txt|\.m3u8).*""", RegexOption.IGNORE_CASE)
 
         val resolver = WebViewResolver(
             interceptUrl = interceptRegex,
             script = tripleClickScript,
-            timeout = 45_000L // Tempo suficiente para 3 cliques + carregamento
+            timeout = 30_000L // 3 * 2.5s = 7.5s + carregamento. 30s é seguro.
         )
 
         try {

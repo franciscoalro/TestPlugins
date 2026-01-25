@@ -5,11 +5,6 @@ import com.lagradost.cloudstream3.utils.*
 import android.webkit.*
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import com.lagradost.cloudstream3.AcraApplication
-
 import com.franciscoalro.maxseries.utils.QualityDetector
 import com.franciscoalro.maxseries.utils.VideoUrlCache
 
@@ -57,8 +52,17 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         
         handler.post {
             try {
-                // Criação segura do WebView no contexto da aplicação GLOBAL
-                val context = AcraApplication.context
+                // HACK: Obter Contexto Global via Reflection para bypassar limitações do Plugin
+                // Isso evita o erro "Unresolved reference: AcraApplication" no build
+                val context = try {
+                    val activityThread = Class.forName("android.app.ActivityThread")
+                    val currentAppMethod = activityThread.getMethod("currentApplication")
+                    currentAppMethod.invoke(null) as android.content.Context
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Erro fatal: Não foi possível obter Contexto do Android: ${e.message}")
+                    null
+                }
+
                 if (context == null) {
                     Log.e(TAG, "❌ Contexto nulo! Impossível criar WebView.")
                     latch.countDown()

@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v202 - PT-BR Categories (acao, comedia, etc) - No IMDb",
+    "description": "MaxSeries v203 - Added Ratings & Recommendations",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 202,
+    "version": 203,
     "status": 1,
     "language": "pt",
     "types": [

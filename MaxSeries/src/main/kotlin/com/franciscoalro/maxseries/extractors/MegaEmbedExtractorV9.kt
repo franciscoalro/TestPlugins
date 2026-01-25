@@ -94,6 +94,11 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                     (function() {
                         console.log('[MegaEmbedV9] INJETADO: Iniciando Hooks e Clicker Inteligente...');
                         
+                        // v197: Captura de erros JS globais
+                        window.onerror = function(message, source, lineno, colno, error) {
+                            console.log('[MegaEmbedV9] JS ERROR: ' + message + ' at ' + source + ':' + lineno);
+                        };
+
                         function reportSuccess(url) {
                             if (window.hasReported) return;
                             window.hasReported = true;
@@ -128,54 +133,72 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                             });
                         };
 
-                        // AUTOMAÇÃO v196: Clicker Inteligente (Seletores) + Coordenadas
+                        // AUTOMAÇÃO v198: Alvo Exato (#player-button-container) + 3 Cliques
                         let clickCount = 0;
                         function smartClick() {
-                            // Tenta clicar no video ou botões de play
+                            // PRIORIDADE MÁXIMA: O overlay identificado pelo usuário
                             const targets = [
+                                document.querySelector('#player-button-container'),
+                                document.querySelector('#player-button'),
+                                document.querySelector('#player'),
                                 document.querySelector('video'),
-                                document.querySelector('.play'),
-                                document.querySelector('.play-button'),
-                                document.querySelector('[class*="play"]'),
-                                document.querySelector('#player')
+                                document.querySelector('.play')
                             ];
                             
                             let clicked = false;
                             targets.forEach(el => {
                                 if(el && !clicked) {
                                     try {
-                                        el.click();
-                                        // Tenta também evento de mouse
+                                        // Força visibilidade se necessário (hack para webview oculto)
+                                        el.style.display = 'block';
+                                        el.style.visibility = 'visible';
+                                        el.style.zIndex = '9999';
+                                        
+                                        // Dispara eventos nativos de mouse
                                         const ev = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
                                         el.dispatchEvent(ev);
-                                        console.log('[MegaEmbedV9] Clicked on selector: ' + el.tagName);
+                                        
+                                        // Tenta o método .click() padrão também
+                                        el.click();
+                                        
+                                        console.log('[MegaEmbedV9] 🎯 CLIQUE REALIZADO EM: #' + el.id + ' (' + el.tagName + ')');
                                         clicked = true;
-                                    } catch(e) {}
+                                    } catch(e) {
+                                        console.log('[MegaEmbedV9] Erro ao clicar: ' + e.message);
+                                    }
                                 }
                             });
                             
-                            // Fallback: Clique no centro
+                            // Fallback: Clique no centro (caso o seletor falhe)
                             if (!clicked) {
-                                const x = 640; const y = 360;
+                                const x = 960; const y = 540; // Centro de 1920x1080
                                 const el = document.elementFromPoint(x, y) || document.body;
                                 const ev = new MouseEvent('click', {
                                     view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
                                 });
                                 el.dispatchEvent(ev);
-                                console.log('[MegaEmbedV9] Clicked at (640, 360)');
+                                console.log('[MegaEmbedV9] Clicked at (960, 540) - Fallback');
                             }
                         }
 
+                        // Executa 4 vezes para garantir os "3 cliques" com margem de segurança
                         let interval = setInterval(() => {
                             clickCount++;
+                            console.log('[MegaEmbedV9] Tentativa de clique #' + clickCount);
                             smartClick();
-                            if(clickCount >= 5) clearInterval(interval); // Tentar 5 vezes
-                        }, 2000);
+                            if(clickCount >= 4) clearInterval(interval);
+                        }, 1500); // Intervalo de 1.5s entre cliques
 
                     })();
                 """.trimIndent()
 
                 webView.webChromeClient = object : WebChromeClient() {
+                    // v197: Monitorar progresso real da página
+                    override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                        Log.d(TAG, "⏳ [SPY] Progress: $newProgress%")
+                        super.onProgressChanged(view, newProgress)
+                    }
+
                     override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                         val msg = consoleMessage?.message() ?: return false
                         
@@ -196,8 +219,14 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                 }
 
                 webView.webViewClient = object : WebViewClient() {
+                    override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                        super.onPageStarted(view, url, favicon)
+                        Log.d(TAG, "🟢 [SPY] Page Started: $url")
+                    }
+
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
+                        Log.d(TAG, "🏁 [SPY] Page Finished: $url")
                         Log.d(TAG, "Pagina carregada, injetando script...")
                         view?.evaluateJavascript(injectedScript, null)
                     }
@@ -223,6 +252,12 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                             }
                         }
                         return super.shouldInterceptRequest(view, request)
+                    }
+
+                    // v197: Capturar erros de carregamento (DNS, Connection Refused, etc)
+                    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                        Log.e(TAG, "❌ [SPY] Page Error: ${error?.toString()} for ${request?.url}")
+                        super.onReceivedError(view, request, error)
                     }
 
                     // Permite bypass de erros SSL se necessário

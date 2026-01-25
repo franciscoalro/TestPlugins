@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v196/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v198/MaxSeries.cs3",
         "status": 1,
-        "version": 196,
+        "version": 198,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v196 - MegaEmbed V9 (Smart Clicker + Virtual Layout)",
+        "description": "MaxSeries v198 - MegaEmbed V9 (Exact Target: #player-button-container)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

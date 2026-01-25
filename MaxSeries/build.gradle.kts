@@ -1,7 +1,7 @@
-version = 196
+version = 198
 
 cloudstream {
-    description = "MaxSeries v196 - MegaEmbed V9 (Smart Clicker + Virtual Layout)"
+    description = "MaxSeries v198 - MegaEmbed V9 (Exact Target: #player-button-container)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

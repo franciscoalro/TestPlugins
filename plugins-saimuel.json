@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v196 - MegaEmbed V9 (Smart Clicker + Virtual Layout)",
+    "description": "MaxSeries v198 - MegaEmbed V9 (Exact Target: #player-button-container)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 196,
+    "version": 198,
     "status": 1,
     "language": "pt",
     "types": [

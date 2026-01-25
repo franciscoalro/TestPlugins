@@ -222,7 +222,8 @@ class MaxSeriesProvider : MainAPI() {
 
             val isSeriesPage = url.contains("/series/") || pageText.contains("TEMPORADAS:", true)
 
-            val rating = document.selectFirst(".dt_rating_vgs")?.text()?.trim()?.toRatingInt()
+            // FIXME: 'toRatingInt' is deprecated. Implement new Score API.
+            // val rating = document.selectFirst(".dt_rating_vgs")?.text()?.trim()?.toRatingInt()
 
             // Extrair recomendações
             val recommendations = document.select(".srelacionados article").mapNotNull {

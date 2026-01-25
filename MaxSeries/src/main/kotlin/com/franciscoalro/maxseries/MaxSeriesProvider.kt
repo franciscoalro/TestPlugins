@@ -250,7 +250,7 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
-                    this.rating = rating
+                    // this.rating = rating
                     this.recommendations = recommendations
                 }
             } else {
@@ -261,7 +261,7 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
-                    this.rating = rating
+                    // this.rating = rating
                     this.recommendations = recommendations
                 }
             }

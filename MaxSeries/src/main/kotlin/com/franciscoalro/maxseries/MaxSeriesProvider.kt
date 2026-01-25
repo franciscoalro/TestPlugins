@@ -219,7 +219,18 @@ class MaxSeriesProvider : MainAPI() {
 
             val isSeriesPage = url.contains("/series/") || pageText.contains("TEMPORADAS:", true)
 
-            // Extrair iframe do playerthree
+            val rating = document.selectFirst(".dt_rating_vgs")?.text()?.trim()?.toRatingInt()
+
+            // Extrair recomendações
+            val recommendations = document.select(".srelacionados article").mapNotNull {
+                val recTitle = it.selectFirst("img")?.attr("alt") ?: return@mapNotNull null
+                val recHref = it.selectFirst("a")?.attr("href") ?: return@mapNotNull null
+                val recPoster = it.selectFirst("img")?.attr("src")
+                newMovieSearchResponse(recTitle, fixUrl(recHref), TvType.Movie) {
+                    this.posterUrl = upgradeImageQuality(fixUrlNull(recPoster))
+                }
+            }
+
             val playerthreeUrl = extractPlayerthreeUrl(document)
             Log.d(TAG, "🎬 Playerthree URL: $playerthreeUrl")
 
@@ -235,6 +246,8 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
+                    this.rating = rating
+                    this.recommendations = recommendations
                 }
             } else {
                 // Para filmes, usar a URL do playerthree ou a página original
@@ -244,6 +257,8 @@ class MaxSeriesProvider : MainAPI() {
                     this.year = year
                     this.plot = plot
                     this.tags = genres
+                    this.rating = rating
+                    this.recommendations = recommendations
                 }
             }
         } catch (e: Exception) {

@@ -1,7 +1,7 @@
-version = 202
+version = 203
 
 cloudstream {
-    description = "MaxSeries v202 - PT-BR Categories (acao, comedia, etc) - No IMDb"
+    description = "MaxSeries v203 - Added Ratings & Recommendations"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

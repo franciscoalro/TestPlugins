@@ -1,7 +1,7 @@
-version = 201
+version = 202
 
 cloudstream {
-    description = "MaxSeries v201 - New Domain (maxseries.pics) + Correct Categories"
+    description = "MaxSeries v202 - PT-BR Categories (acao, comedia, etc) - No IMDb"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

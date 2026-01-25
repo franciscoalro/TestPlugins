@@ -66,14 +66,11 @@ class MaxSeriesProvider : MainAPI() {
         "$mainUrl/" to "Início",
         "$mainUrl/filmes" to "Filmes",
         "$mainUrl/series" to "Séries",
-        "$mainUrl/generos/animation" to "Animação",
-        "$mainUrl/generos/action-adventure" to "Ação & Aventura",
-        "$mainUrl/generos/comedy" to "Comédia",
+        "$mainUrl/generos/acao" to "Ação",
+        "$mainUrl/generos/comedia" to "Comédia",
         "$mainUrl/generos/drama" to "Drama",
-        "$mainUrl/generos/sci-fi-fantasy" to "Ficção & Fantasia",
-        "$mainUrl/generos/horror" to "Terror",
-        "$mainUrl/generos/romance" to "Romance",
-        "$mainUrl/top-imdb" to "Top IMDb"
+        "$mainUrl/generos/terror" to "Terror",
+        "$mainUrl/generos/romance" to "Romance"
     )
     
     private fun upgradeImageQuality(url: String?): String? {

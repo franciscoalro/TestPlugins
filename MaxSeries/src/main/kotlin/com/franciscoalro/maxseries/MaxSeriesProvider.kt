@@ -75,10 +75,12 @@ class MaxSeriesProvider : MainAPI() {
     
     private fun upgradeImageQuality(url: String?): String? {
         if (url.isNullOrBlank()) return null
-        return url.replace("/w185/", "/w780/")
-                  .replace("/w300/", "/w780/")
-                  .replace("/w500/", "/w780/")
-                  .replace("/w342/", "/w780/")
+        return url.replace("/w185/", "/original/")
+                  .replace("/w300/", "/original/")
+                  .replace("/w342/", "/original/")
+                  .replace("/w500/", "/original/")
+                  .replace("/w780/", "/original/")
+                  .replace("/w1280/", "/original/")
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {

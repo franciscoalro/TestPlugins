@@ -1,7 +1,7 @@
-version = 203
+version = 204
 
 cloudstream {
-    description = "MaxSeries v203 - Added Ratings & Recommendations"
+    description = "MaxSeries v204 - 4K Posters (Original Quality)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

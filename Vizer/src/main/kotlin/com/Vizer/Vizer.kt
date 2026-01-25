@@ -16,6 +16,7 @@ import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.MovieSearchResponse
 import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.Score
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.app
@@ -170,8 +171,8 @@ class Vizer : MainAPI() {
 
         val title = document.selectFirst("section.ai h2")?.ownText()?.trim() ?: ""
         val description = document.selectFirst("section.ai span.desc")?.text()?.trim()
-        val rating = document.selectFirst("section.ai a.rating")?.text()?.replace("/10", "")?.trim()
-            .toRatingInt()
+        val ratingText = document.selectFirst("section.ai a.rating")?.text()?.replace("/10", "")?.trim()
+        val score = ratingText?.toFloatOrNull() // Rating de 0-10
         val stupidPosterImg = document.selectFirst("div.stupidPoster img")?.attr("src")
         val backgroundPoster = stupidPosterImg
             ?.replace("/posterPt/", "/background/")
@@ -248,7 +249,7 @@ class Vizer : MainAPI() {
                 posterUrl = backgroundPoster
                 this.plot = description
                 this.duration = runtime.toIntOrNull()
-                this.rating = rating
+                this.score = score?.let { Score.from10(it) }
                 this.year = year
                 addActors(actors)
             }
@@ -263,7 +264,7 @@ class Vizer : MainAPI() {
                 posterUrl = backgroundPoster
                 this.plot = description
                 this.duration = runtime.toIntOrNull()
-                this.rating = rating
+                this.score = score?.let { Score.from10(it) }
                 this.year = year
                 addActors(actors)
             }

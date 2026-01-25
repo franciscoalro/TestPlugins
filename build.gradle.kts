@@ -26,6 +26,16 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
     }
+    
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-common:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-reflect:2.3.0")
+        }
+    }
 }
 
 fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
@@ -70,7 +80,7 @@ subprojects {
         val implementation by configurations
 
         implementation("com.github.recloudstream.cloudstream:library:8a4480dc42") // Commit hash estável (fix JitPack)
-        implementation(kotlin("stdlib"))
+        implementation(kotlin("stdlib", "2.3.0"))
         implementation("com.github.Blatzar:NiceHttp:0.4.13")
         implementation("org.jsoup:jsoup:1.19.1")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")

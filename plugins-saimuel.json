@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v201 - New Domain (maxseries.pics) + Correct Categories",
+    "description": "MaxSeries v202 - PT-BR Categories (acao, comedia, etc) - No IMDb",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 201,
+    "version": 202,
     "status": 1,
     "language": "pt",
     "types": [

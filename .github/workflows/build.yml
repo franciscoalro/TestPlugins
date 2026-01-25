@@ -1,68 +1,96 @@
-name: Build and Release
+name: Build All Providers
 
 on:
   push:
-    branches: [ master, main ]
-    tags:
-      - 'v*'
+    branches: [ main ]
+    paths:
+      - 'MaxSeries/**'
+      - 'AnimesOnlineCC/**'
+      - 'MegaFlix/**'
+      - 'NetCine/**'
+      - 'OverFlix/**'
+      - 'PobreFlix/**'
+      - 'Vizer/**'
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'zulu'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-
-      - name: Clean build cache
-        run: rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.recloudstream
-
-      - name: Build Plugins (with retry)
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 15
-          max_attempts: 5
-          retry_wait_seconds: 60
-          command: ./gradlew MaxSeries:make AnimesOnlineCC:make --no-daemon --no-build-cache
-
-      - name: Get version
-        id: get_version
-        run: |
-          VERSION=$(grep "version = " MaxSeries/build.gradle.kts | sed 's/version = //' | tr -d ' ')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Upload Plugins
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cloudstream-Plugins
-          path: |
-            MaxSeries/build/*.cs3
-            AnimesOnlineCC/build/*.cs3
-
-      - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            MaxSeries/build/*.cs3
-            AnimesOnlineCC/build/*.cs3
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build MaxSeries
+      run: ./gradlew MaxSeries:make
+      
+    - name: Build AnimesOnlineCC
+      run: ./gradlew AnimesOnlineCC:make
+      
+    - name: Build MegaFlix
+      run: ./gradlew MegaFlix:make
+      
+    - name: Build NetCine
+      run: ./gradlew NetCine:make
+      
+    - name: Build OverFlix
+      run: ./gradlew OverFlix:make
+      
+    - name: Build PobreFlix
+      run: ./gradlew PobreFlix:make
+      
+    - name: Build Vizer
+      run: ./gradlew Vizer:make
+      
+    - name: Upload MaxSeries artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: MaxSeries
+        path: MaxSeries/build/*.cs3
+        
+    - name: Upload AnimesOnlineCC artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: AnimesOnlineCC
+        path: AnimesOnlineCC/build/*.cs3
+        
+    - name: Upload MegaFlix artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: MegaFlix
+        path: MegaFlix/build/*.cs3
+        
+    - name: Upload NetCine artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: NetCine
+        path: NetCine/build/*.cs3
+        
+    - name: Upload OverFlix artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: OverFlix
+        path: OverFlix/build/*.cs3
+        
+    - name: Upload PobreFlix artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: PobreFlix
+        path: PobreFlix/build/*.cs3
+        
+    - name: Upload Vizer artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Vizer
+        path: Vizer/build/*.cs3

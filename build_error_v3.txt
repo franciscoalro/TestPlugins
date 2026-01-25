@@ -1,0 +1,53 @@
+﻿> Task :MaxSeries:preBuild UP-TO-DATE
+> Task :MaxSeries:preDebugBuild UP-TO-DATE
+> Task :MaxSeries:mergeDebugJniLibFolders UP-TO-DATE
+> Task :MaxSeries:mergeDebugNativeLibs NO-SOURCE
+> Task :MaxSeries:stripDebugDebugSymbols NO-SOURCE
+> Task :MaxSeries:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :MaxSeries:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :MaxSeries:generateDebugResValues UP-TO-DATE
+> Task :MaxSeries:generateDebugResources UP-TO-DATE
+> Task :MaxSeries:packageDebugResources UP-TO-DATE
+> Task :MaxSeries:parseDebugLocalResources UP-TO-DATE
+> Task :MaxSeries:generateDebugRFile UP-TO-DATE
+> Task :MaxSeries:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :MaxSeries:javaPreCompileDebug UP-TO-DATE
+> Task :MaxSeries:mergeDebugShaders UP-TO-DATE
+> Task :MaxSeries:compileDebugShaders NO-SOURCE
+> Task :MaxSeries:generateDebugAssets UP-TO-DATE
+> Task :MaxSeries:packageDebugAssets UP-TO-DATE
+> Task :MaxSeries:prepareDebugArtProfile UP-TO-DATE
+> Task :MaxSeries:prepareLintJarForPublish UP-TO-DATE
+> Task :MaxSeries:processDebugManifest UP-TO-DATE
+> Task :MaxSeries:writeDebugAarMetadata UP-TO-DATE
+
+> Task :MaxSeries:compileDebugKotlin FAILED
+./gradlew : e: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extract
+ors/MegaEmbedExtractorV9.kt:57:43 Unresolved reference 'context'.
+No linha:1 caractere:1
++ ./gradlew :MaxSeries:assembleDebug 2>&1 | out-file -encoding utf8 bui ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (e: file:///C:/U...ence 'context'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+e: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbe
+dExtractorV9.kt:188:23 Unresolved reference 'QualityDetector'.
+e: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbe
+dExtractorV9.kt:190:9 Unresolved reference 'VideoUrlCache'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':MaxSeries:compileDebugKotlin'.
+> A failure occurred while executing 
+org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 13s
+16 actionable tasks: 1 executed, 15 up-to-date

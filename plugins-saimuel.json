@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v189 - MegaEmbed V9 (Hybrid Hook + Redirect)",
+    "description": "MaxSeries v190 - MegaEmbed V9 (Manual WebView - Bypassing Network Hooks)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 189,
+    "version": 190,
     "status": 1,
     "language": "pt",
     "types": [

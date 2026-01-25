@@ -51,41 +51,61 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         // - 3 repetições
         val tripleClickScript = """
             (function() {
-                console.log('[MegaEmbedV9] Iniciando sequência exata do TS (cliques 640x360)...');
+                console.log('[MegaEmbedV9] Script híbrido: Hooks + Triplo Clique');
                 
-                let clickCount = 0;
-                
-                // Função para simular clique no centro
-                function clickCenter() {
-                    const x = 640; // Coordenada usada no Puppeteer
-                    const y = 360; // Coordenada usada no Puppeteer
+                // --- PARTE 1: NETWORK HOOKS (Captura a URL invisível) ---
+                function trap(url) {
+                    // Impede loops
+                    if (window.capturedVideo) return;
                     
-                    // Tenta encontrar elemento no ponto ou usa body
-                    const el = document.elementFromPoint(x, y) || document.body;
-                    
-                    const mouseEvent = new MouseEvent('click', {
-                        view: window,
-                        bubbles: true,
-                        cancelable: true,
-                        clientX: x,
-                        clientY: y
-                    });
-                    el.dispatchEvent(mouseEvent);
-                    console.log('[MegaEmbedV9] Clique ' + (clickCount + 1) + '/3 disparado em ' + x + ',' + y);
+                    if (url.includes('/v4/') && (url.includes('.txt') || url.includes('.m3u8') || url.includes('cf-master'))) {
+                        console.log('[MegaEmbedV9] 🎯 SUCESSO! URL capturada: ' + url);
+                        window.capturedVideo = true;
+                        // FORÇA o WebView a carregar a URL, disparando o interceptor do Kotlin
+                        window.location.href = url;
+                    }
                 }
 
-                // Intervalo de 2500ms (igual ao sleep(2500) do TS)
+                // Intercepta XHR (XMLHttpRequest)
+                const origOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url) {
+                    if (typeof url === 'string') trap(url);
+                    this.addEventListener('load', function() {
+                        if (this.responseURL) trap(this.responseURL);
+                    });
+                    return origOpen.apply(this, arguments);
+                };
+
+                // Intercepta Fetch
+                const origFetch = window.fetch;
+                window.fetch = function(input, init) {
+                    const url = (typeof input === 'string') ? input : (input && input.url);
+                    if (url) trap(url);
+                    return origFetch.apply(this, arguments);
+                };
+
+                // --- PARTE 2: AUTOMAÇÃO DE CLIQUES (Ativa o player) ---
+                console.log('[MegaEmbedV9] Iniciando sequência de cliques 640x360...');
+                let clickCount = 0;
+                
+                function clickCenter() {
+                    const x = 640; 
+                    const y = 360; 
+                    const el = document.elementFromPoint(x, y) || document.body;
+                    const mouseEvent = new MouseEvent('click', {
+                        view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
+                    });
+                    el.dispatchEvent(mouseEvent);
+                    console.log('[MegaEmbedV9] Clique ' + (clickCount + 1) + '/3');
+                }
+
                 let clickInterval = setInterval(() => {
                     clickCount++;
                     clickCenter();
-                    
-                    if (clickCount >= 3) {
-                        clearInterval(clickInterval);
-                        console.log('[MegaEmbedV9] Sequência de 3 cliques finalizada.');
-                    }
+                    if (clickCount >= 3) clearInterval(clickInterval);
                 }, 2500);
                 
-                // Tenta remover overlays de ad manualmente também
+                // Remove overlays
                 setInterval(() => {
                     document.querySelectorAll('iframe[style*="z-index"], div[style*="z-index"]').forEach(el => {
                          if(el.style.zIndex > 100) el.remove();

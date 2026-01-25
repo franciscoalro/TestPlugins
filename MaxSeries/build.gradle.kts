@@ -1,7 +1,7 @@
-version = 190
+version = 191
 
 cloudstream {
-    description = "MaxSeries v190 - MegaEmbed V9 (Manual WebView - Bypassing Network Hooks)"
+    description = "MaxSeries v191 - MegaEmbed V9 (Manual WebView - Forced Update)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

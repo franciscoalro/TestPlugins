@@ -15,6 +15,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
+import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 
@@ -57,7 +58,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v184 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v186 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
     }
 
@@ -490,8 +491,8 @@ class MaxSeriesProvider : MainAPI() {
                         // MegaEmbed e PlayerEmbedAPI só funcionam DENTRO do iframe playerthree
                         // Por isso falham com WebView direto (sem headers corretos)
                         source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV8...")
-                            MegaEmbedExtractorV8().getUrl(source, episodeUrl, subtitleCallback, callback)
+                            Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV9 (NEW)...")
+                            MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         source.contains("playerembedapi", ignoreCase = true) -> {

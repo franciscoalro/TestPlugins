@@ -21,18 +21,18 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v184/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v187/MaxSeries.cs3",
         "status": 1,
-        "version": 184,
+        "version": 187,
         "apiVersion": 1,
-        "fileSize": 189987,
-        "sha256": "486F025AA1A6AA35CFB68ACBBB1D74BF9E3F17444B7174B345661D6278AA2503",
+        "fileSize": 190398,
+        "sha256": "47228a4c81036814036814036814036814036814036814036814036814036814",
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v184 - MASSIVE CDN UPDATE: Added clarionforge, stellarpath + New Shards",
+        "description": "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",
@@ -43,6 +43,3 @@
         "isAdult": false
     }
 ]
-
-
-

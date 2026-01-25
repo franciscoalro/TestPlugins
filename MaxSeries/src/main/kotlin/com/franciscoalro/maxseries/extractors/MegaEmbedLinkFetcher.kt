@@ -29,14 +29,32 @@ object MegaEmbedLinkFetcher {
     private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
     
     // CDNs conhecidos do MegaEmbed (baseado na análise real + Python tester)
+    // Atualizado v185: Adicionado lista massiva descoberta pelo scanner
     private val CDN_DOMAINS = listOf(
-        "smho.clarionforge.online",    // ✅ Trace 2 (hkb6cx)
-        "sxix.stellarpathholdings.sbs", // ✅ Trace 2 (n3loxr)
-        "sskt.valenium.shop",          // Trace User
-        "spo3.valenium.shop",          // ✅ Scanner
-        "soq6.valenium.shop",          // ✅ Scanner
+        // === CLARIONFORGE (Highly Active 24/01) ===
+        "smho.clarionforge.online", "sxix.clarionforge.online", "soq6.clarionforge.online",
+        "spo3.clarionforge.online", "sbi6.clarionforge.online", "stzm.clarionforge.online",
+        "s6p9.clarionforge.online", "srcf.clarionforge.online", "sipt.clarionforge.online",
+        "sqtd.clarionforge.online", "sr81.clarionforge.online",
+
+        // === STELLARPATHHOLDINGS (Highly Active 24/01) ===
+        "smho.stellarpathholdings.sbs", "sxix.stellarpathholdings.sbs", "soq6.stellarpathholdings.sbs",
+        "spo3.stellarpathholdings.sbs", "sbi6.stellarpathholdings.sbs", "stzm.stellarpathholdings.sbs",
+        "s6p9.stellarpathholdings.sbs", "srcf.stellarpathholdings.sbs", "sqtd.stellarpathholdings.sbs",
+        "sr81.stellarpathholdings.sbs",
+
+        // === VALENIUM (Active 24/01) ===
+        "smho.valenium.shop", "sxix.valenium.shop", "soq6.valenium.shop", "sbi6.valenium.shop",
+        "srcf.valenium.shop", "sqtd.valenium.shop", "sr81.valenium.shop", "spo3.valenium.shop",
+        "sskt.valenium.shop", "stzm.valenium.shop","s6p9.valenium.shop", "sipt.valenium.shop",
+
+        // === VIATRIX (New Discovery 24/01 - User Trace) ===
+        "s9r1.viatrix.space",
+        "viatrix.space",
+
+        // === Legacy ===
         "valenium.shop",
-        "spo3.marvellaholdings.sbs",   // ✅ Funcionou no teste Python
+        "spo3.marvellaholdings.sbs",
         "sbi6.marvellaholdings.sbs",
         "stzm.marvellaholdings.sbs",
         "srcf.marvellaholdings.sbs", 

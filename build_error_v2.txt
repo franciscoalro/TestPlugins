@@ -1,0 +1,45 @@
+﻿> Task :MaxSeries:preBuild UP-TO-DATE
+> Task :MaxSeries:preDebugBuild UP-TO-DATE
+> Task :MaxSeries:mergeDebugJniLibFolders UP-TO-DATE
+> Task :MaxSeries:mergeDebugNativeLibs NO-SOURCE
+> Task :MaxSeries:stripDebugDebugSymbols NO-SOURCE
+> Task :MaxSeries:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :MaxSeries:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :MaxSeries:generateDebugResValues UP-TO-DATE
+> Task :MaxSeries:generateDebugResources UP-TO-DATE
+> Task :MaxSeries:packageDebugResources UP-TO-DATE
+> Task :MaxSeries:parseDebugLocalResources UP-TO-DATE
+> Task :MaxSeries:generateDebugRFile UP-TO-DATE
+> Task :MaxSeries:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :MaxSeries:javaPreCompileDebug UP-TO-DATE
+> Task :MaxSeries:mergeDebugShaders UP-TO-DATE
+> Task :MaxSeries:compileDebugShaders NO-SOURCE
+> Task :MaxSeries:generateDebugAssets UP-TO-DATE
+> Task :MaxSeries:packageDebugAssets UP-TO-DATE
+> Task :MaxSeries:prepareDebugArtProfile UP-TO-DATE
+> Task :MaxSeries:prepareLintJarForPublish UP-TO-DATE
+> Task :MaxSeries:processDebugManifest UP-TO-DATE
+> Task :MaxSeries:writeDebugAarMetadata UP-TO-DATE
+> Task :MaxSeries:compileDebugKotlin
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbedExtractor.kt:368:76 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbedExtractor.kt:370:46 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbedExtractorV3.kt:321:76 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbedExtractorV3.kt:323:46 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MixdropExtractor.kt:69:44 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MixdropExtractor.kt:71:37 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MixdropExtractor.kt:76:29 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/v5/MegaEmbedExtractorV5.kt:238:46 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+w: file:///C:/Users/KYTHOURS/Desktop/brcloudstream/MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/v5/MegaEmbedExtractorV5.kt:562:46 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+
+> Task :MaxSeries:extractDebugAnnotations
+> Task :MaxSeries:compileDebugJavaWithJavac NO-SOURCE
+> Task :MaxSeries:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :MaxSeries:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :MaxSeries:processDebugJavaRes
+> Task :MaxSeries:mergeDebugJavaResource
+> Task :MaxSeries:syncDebugLibJars
+> Task :MaxSeries:bundleDebugAar
+> Task :MaxSeries:assembleDebug
+
+BUILD SUCCESSFUL in 2m 38s
+23 actionable tasks: 6 executed, 17 up-to-date

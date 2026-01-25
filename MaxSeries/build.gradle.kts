@@ -1,7 +1,7 @@
-version = 184
+version = 187
 
 cloudstream {
-    description = "MaxSeries v184 - Massive CDN Update (Clarion/Stellar/Valenium)"
+    description = "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

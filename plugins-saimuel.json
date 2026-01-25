@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v193 - MegaEmbed V9 (Hotfix: Restore Imports)",
+    "description": "MaxSeries v194 - MegaEmbed V9 (90s Timeout Adjustment)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 193,
+    "version": 194,
     "status": 1,
     "language": "pt",
     "types": [

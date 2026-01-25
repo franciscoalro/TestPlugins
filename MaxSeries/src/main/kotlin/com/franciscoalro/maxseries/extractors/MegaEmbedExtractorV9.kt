@@ -80,15 +80,19 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                     domStorageEnabled = true
                     databaseEnabled = true
                     userAgentString = cdnHeaders["User-Agent"]
-                    // Otimizações para carregar mais rápido
-                    blockNetworkImage = true 
+                    blockNetworkImage = false // v196: Reabilitar imagens para garantir carregamento correto do player
                     mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    mediaPlaybackRequiresUserGesture = false // v196: Permitir autoplay
                 }
+
+                // v196: Forçar dimensões virtuais para o WebView (1920x1080)
+                // Isso permite que o JS calcule coordenadas e 'veja' o site corretamente
+                webView.layout(0, 0, 1920, 1080)
 
                 // Script injetado para capturar e "gritar" a URL
                 val injectedScript = """
                     (function() {
-                        console.log('[MegaEmbedV9] INJETADO: Iniciando Hooks...');
+                        console.log('[MegaEmbedV9] INJETADO: Iniciando Hooks e Clicker Inteligente...');
                         
                         function reportSuccess(url) {
                             if (window.hasReported) return;
@@ -124,22 +128,49 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                             });
                         };
 
-                        // AUTOMAÇÃO: 3 Cliques no Centro (Bypass Ads)
+                        // AUTOMAÇÃO v196: Clicker Inteligente (Seletores) + Coordenadas
                         let clickCount = 0;
-                        function clickCenter() {
-                            const x = 640; const y = 360;
-                            const el = document.elementFromPoint(x, y) || document.body;
-                            const ev = new MouseEvent('click', {
-                                view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
+                        function smartClick() {
+                            // Tenta clicar no video ou botões de play
+                            const targets = [
+                                document.querySelector('video'),
+                                document.querySelector('.play'),
+                                document.querySelector('.play-button'),
+                                document.querySelector('[class*="play"]'),
+                                document.querySelector('#player')
+                            ];
+                            
+                            let clicked = false;
+                            targets.forEach(el => {
+                                if(el && !clicked) {
+                                    try {
+                                        el.click();
+                                        // Tenta também evento de mouse
+                                        const ev = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
+                                        el.dispatchEvent(ev);
+                                        console.log('[MegaEmbedV9] Clicked on selector: ' + el.tagName);
+                                        clicked = true;
+                                    } catch(e) {}
+                                }
                             });
-                            el.dispatchEvent(ev);
+                            
+                            // Fallback: Clique no centro
+                            if (!clicked) {
+                                const x = 640; const y = 360;
+                                const el = document.elementFromPoint(x, y) || document.body;
+                                const ev = new MouseEvent('click', {
+                                    view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
+                                });
+                                el.dispatchEvent(ev);
+                                console.log('[MegaEmbedV9] Clicked at (640, 360)');
+                            }
                         }
 
                         let interval = setInterval(() => {
                             clickCount++;
-                            clickCenter();
-                            if(clickCount >= 3) clearInterval(interval);
-                        }, 2500);
+                            smartClick();
+                            if(clickCount >= 5) clearInterval(interval); // Tentar 5 vezes
+                        }, 2000);
 
                     })();
                 """.trimIndent()

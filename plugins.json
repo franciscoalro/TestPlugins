@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v206/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v207/MaxSeries.cs3",
         "status": 1,
-        "version": 206,
+        "version": 207,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v206 - Kotlin 2.3.0 Upgrade & Build Fixes",
+        "description": "MaxSeries v207 - Kotlin 2.3.0 (Cache Fix)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

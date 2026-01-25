@@ -1,4 +1,4 @@
-version = 206
+version = 207
 
 cloudstream {
     description = "MaxSeries v205 - Added Animation Category & Build Fixes"

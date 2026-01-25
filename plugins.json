@@ -1,9 +1,9 @@
 ﻿[
     {
         "name":  "MaxSeries",
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v209/MaxSeries.cs3",
-        "version":  209,
-        "description":  "MaxSeries v209 - 7 Extractors (MegaEmbed, PlayerEmbedAPI, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon) + 24 Categories + 23 Genres. Success rate: ~99%",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v210/MaxSeries.cs3",
+        "version":  210,
+        "description":  "MaxSeries v210 - 7 Extractors + 25 Categories (Added 'Adicionados Recentemente'). Success rate: ~99%",
         "authors":  [
                         "franciscoalro"
                     ],

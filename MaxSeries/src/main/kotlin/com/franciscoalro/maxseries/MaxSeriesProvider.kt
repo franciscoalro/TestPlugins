@@ -70,7 +70,8 @@ class MaxSeriesProvider : MainAPI() {
         "$mainUrl/generos/comedia" to "Comédia",
         "$mainUrl/generos/drama" to "Drama",
         "$mainUrl/generos/terror" to "Terror",
-        "$mainUrl/generos/romance" to "Romance"
+        "$mainUrl/generos/romance" to "Romance",
+        "$mainUrl/generos/animacao" to "Animação"
     )
     
     private fun upgradeImageQuality(url: String?): String? {

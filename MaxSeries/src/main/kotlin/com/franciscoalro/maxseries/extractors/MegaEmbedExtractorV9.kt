@@ -2,19 +2,27 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.network.WebViewResolver
-import com.franciscoalro.maxseries.utils.*
+import android.webkit.*
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import com.lagradost.cloudstream3.AcraApplication
+
+import com.franciscoalro.maxseries.utils.QualityDetector
+import com.franciscoalro.maxseries.utils.VideoUrlCache
 
 /**
- * MegaEmbed Extractor v9 - UNIVERSAL & AUTOMATIC (Jan 2026)
+ * MegaEmbed Extractor v9 - MANUAL WEBVIEW IMPLEMENTATION (v190)
  * 
- * NOVIDADES v9:
- * 1. TRIPLE CLICK: Automação via JS para bypass de 2 overlays de ads + ativação do player.
- *    Sem o clique, o servidor agora invalida o token (Token is invalid).
- * 2. DOMÍNIOS DINÂMICOS: Extrai o host (orion, brightcrest, mountainpeak, etc) direto do HTML.
- * 3. FALLBACK DE MONTAGEM: Se a interceptação de rede falhar, monta a URL manualmente usando
- *    o ID, Domínio e Timestamp extraídos do HTML.
+ * LÓGICA DEFINITIVA:
+ * 1. Instancia um WebView real (invisível) usando AcraApplication.context.
+ * 2. Injeta o script de Hook de Rede + Triplo Clique.
+ * 3. O script captura a URL exata do .txt/m3u8 e envia via console.log("MEGA_EMBED_RESULT: ...").
+ * 4. O WebChromeClient intercepta essa mensagem e retorna o link.
+ * 
+ * Isso bypassa qualquer falha de interceptação de rede do CloudStream ou timeouts do Resolver.
  */
 class MegaEmbedExtractorV9 : ExtractorApi() {
     override val name = "MegaEmbed"
@@ -25,7 +33,6 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         private const val TAG = "MegaEmbedV9"
     }
 
-    // Headers exatos do script TS que funcionou
     private val cdnHeaders = mapOf(
         "Referer" to "https://playerthree.online/",
         "Origin" to "https://megaembed.link",
@@ -40,126 +47,157 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         callback: (ExtractorLink) -> Unit
     ) {
         val videoId = extractVideoId(url) ?: return
-        Log.d(TAG, "🚀 Iniciando MegaEmbed V9 para ID: $videoId")
-
+        Log.d(TAG, "🚀 [MANUAL] Iniciando MegaEmbed V9 para ID: $videoId")
+        
         val embedUrl = "https://megaembed.link/#$videoId"
-        var capturedUrl: String? = null
+        var finalUrl: String? = null
+        val latch = CountDownLatch(1)
 
-        // Script JS: Replicando EXATAMENTE o megaembed_solver.ts
-        // - Clique nas coordenadas 640,360 (centro relativo)
-        // - Intervalo de 2.5s (2500ms)
-        // - 3 repetições
-        val tripleClickScript = """
-            (function() {
-                console.log('[MegaEmbedV9] Script híbrido: Hooks + Triplo Clique');
+        val handler = Handler(Looper.getMainLooper())
+        
+        handler.post {
+            try {
+                // Criação segura do WebView no contexto da aplicação GLOBAL
+                val context = AcraApplication.context
+                if (context == null) {
+                    Log.e(TAG, "❌ Contexto nulo! Impossível criar WebView.")
+                    latch.countDown()
+                    return@post
+                }
                 
-                // --- PARTE 1: NETWORK HOOKS (Captura a URL invisível) ---
-                function trap(url) {
-                    // Impede loops
-                    if (window.capturedVideo) return;
-                    
-                    if (url.includes('/v4/') && (url.includes('.txt') || url.includes('.m3u8') || url.includes('cf-master'))) {
-                        console.log('[MegaEmbedV9] 🎯 SUCESSO! URL capturada: ' + url);
-                        window.capturedVideo = true;
-                        // FORÇA o WebView a carregar a URL, disparando o interceptor do Kotlin
-                        window.location.href = url;
+                val webView = WebView(context)
+                
+                webView.settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    databaseEnabled = true
+                    userAgentString = cdnHeaders["User-Agent"]
+                    // Otimizações para carregar mais rápido
+                    blockNetworkImage = true 
+                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                }
+
+                // Script injetado para capturar e "gritar" a URL
+                val injectedScript = """
+                    (function() {
+                        console.log('[MegaEmbedV9] INJETADO: Iniciando Hooks...');
+                        
+                        function reportSuccess(url) {
+                            if (window.hasReported) return;
+                            window.hasReported = true;
+                            console.log('MEGA_EMBED_RESULT:' + url);
+                        }
+
+                        // HOOK: XMLHttpRequest
+                        const origOpen = XMLHttpRequest.prototype.open;
+                        XMLHttpRequest.prototype.open = function(method, url) {
+                            if (typeof url === 'string') {
+                                if (url.includes('/v4/') && (url.includes('.txt') || url.includes('.m3u8') || url.includes('cf-master'))) {
+                                    reportSuccess(url);
+                                }
+                            }
+                            this.addEventListener('load', function() {
+                                if (this.responseURL && this.responseURL.includes('cf-master')) {
+                                    reportSuccess(this.responseURL);
+                                }
+                            });
+                            return origOpen.apply(this, arguments);
+                        };
+                        
+                        // HOOK: Fetch
+                        const origFetch = window.fetch;
+                        window.fetch = function(input, init) {
+                            const url = (typeof input === 'string') ? input : (input && input.url);
+                            if (url && url.includes('cf-master')) reportSuccess(url);
+                            
+                            return origFetch.apply(this, arguments).then(response => {
+                                if (response.url && response.url.includes('cf-master')) reportSuccess(response.url);
+                                return response;
+                            });
+                        };
+
+                        // AUTOMAÇÃO: 3 Cliques no Centro (Bypass Ads)
+                        let clickCount = 0;
+                        function clickCenter() {
+                            const x = 640; const y = 360;
+                            const el = document.elementFromPoint(x, y) || document.body;
+                            const ev = new MouseEvent('click', {
+                                view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
+                            });
+                            el.dispatchEvent(ev);
+                        }
+
+                        let interval = setInterval(() => {
+                            clickCount++;
+                            clickCenter();
+                            if(clickCount >= 3) clearInterval(interval);
+                        }, 2500);
+
+                    })();
+                """.trimIndent()
+
+                webView.webChromeClient = object : WebChromeClient() {
+                    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                        val msg = consoleMessage?.message() ?: return false
+                        
+                        // Filtra apenas nossa mensagem de sucesso
+                        if (msg.contains("MEGA_EMBED_RESULT:")) {
+                            val extracted = msg.substringAfter("MEGA_EMBED_RESULT:")
+                            Log.d(TAG, "🎯 URL CAPTURADA VIA CONSOLE: $extracted")
+                            finalUrl = extracted
+                            latch.countDown()
+                            return true
+                        }
+                        
+                        if (msg.contains("[MegaEmbedV9]")) {
+                            Log.d(TAG, "JS LOG: $msg")
+                        }
+                        return false
                     }
                 }
 
-                // Intercepta XHR (XMLHttpRequest)
-                const origOpen = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function(method, url) {
-                    if (typeof url === 'string') trap(url);
-                    this.addEventListener('load', function() {
-                        if (this.responseURL) trap(this.responseURL);
-                    });
-                    return origOpen.apply(this, arguments);
-                };
-
-                // Intercepta Fetch
-                const origFetch = window.fetch;
-                window.fetch = function(input, init) {
-                    const url = (typeof input === 'string') ? input : (input && input.url);
-                    if (url) trap(url);
-                    return origFetch.apply(this, arguments);
-                };
-
-                // --- PARTE 2: AUTOMAÇÃO DE CLIQUES (Ativa o player) ---
-                console.log('[MegaEmbedV9] Iniciando sequência de cliques 640x360...');
-                let clickCount = 0;
-                
-                function clickCenter() {
-                    const x = 640; 
-                    const y = 360; 
-                    const el = document.elementFromPoint(x, y) || document.body;
-                    const mouseEvent = new MouseEvent('click', {
-                        view: window, bubbles: true, cancelable: true, clientX: x, clientY: y
-                    });
-                    el.dispatchEvent(mouseEvent);
-                    console.log('[MegaEmbedV9] Clique ' + (clickCount + 1) + '/3');
+                webView.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        Log.d(TAG, "Pagina carregada, injetando script...")
+                        view?.evaluateJavascript(injectedScript, null)
+                    }
+                    
+                    // Permite bypass de erros SSL se necessário
+                    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: android.net.http.SslError?) {
+                        handler?.proceed()
+                    }
                 }
 
-                let clickInterval = setInterval(() => {
-                    clickCount++;
-                    clickCenter();
-                    if (clickCount >= 3) clearInterval(clickInterval);
-                }, 2500);
-                
-                // Remove overlays
-                setInterval(() => {
-                    document.querySelectorAll('iframe[style*="z-index"], div[style*="z-index"]').forEach(el => {
-                         if(el.style.zIndex > 100) el.remove();
-                    });
-                }, 1000);
-            })();
-        """.trimIndent()
+                Log.d(TAG, "Carregando URL no WebView: $embedUrl")
+                // Headers customizados no loadUrl
+                webView.loadUrl(embedUrl, cdnHeaders)
 
-        // Regex igual ao anterior, mas focado no que o TS captura (.txt, .m3u8)
-        val interceptRegex = Regex(""".*(/v4/|cf-master|\.txt|\.m3u8).*""", RegexOption.IGNORE_CASE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao iniciar WebView: ${e.message}")
+                latch.countDown()
+            }
+        }
 
-        val resolver = WebViewResolver(
-            interceptUrl = interceptRegex,
-            script = tripleClickScript,
-            timeout = 30_000L // 3 * 2.5s = 7.5s + carregamento. 30s é seguro.
-        )
-
+        // Aguarda até 30 segundos pela captura
         try {
-            val response = app.get(embedUrl, headers = cdnHeaders, interceptor = resolver)
-            capturedUrl = response.url
-
-            // Se a rede capturou algo válido, usamos
-            if (isValidVideoUrl(capturedUrl)) {
-                Log.d(TAG, "✅ Capturado via Rede: $capturedUrl")
-                processUrl(capturedUrl, url, callback)
-                return
+            val captured = latch.await(35, TimeUnit.SECONDS)
+            if (!captured) {
+                Log.e(TAG, "❌ Timeout: Nenhuma URL capturada em 35s.")
             }
+        } catch (e: InterruptedException) {
+            Log.e(TAG, "❌ Interrompido.")
+        }
 
-            // FALLBACK: Montagem Manual via HTML
-            Log.d(TAG, "⚠️ Captura de rede falhou, tentando montagem manual via HTML...")
-            val html = response.text
-            
-            val domain = extractDomain(html)
-            val timestamp = extractTimestamp(html)
-            
-            if (domain != null && timestamp != null) {
-                val manualUrl = "https://$domain/v4/xy/$videoId/cf-master.$timestamp.txt"
-                Log.d(TAG, "🛠️ URL Montada Manualmente: $manualUrl")
-                
-                if (tryUrl(manualUrl)) {
-                    processUrl(manualUrl, url, callback)
-                    return
-                }
-            }
-
-            Log.e(TAG, "❌ Falha total na extração do ID: $videoId")
-
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro no Resolver: ${e.message}")
+        // Se capturou, processa
+        finalUrl?.let { link ->
+            processUrl(link, url, callback)
         }
     }
 
     private suspend fun processUrl(link: String, originalUrl: String, callback: (ExtractorLink) -> Unit) {
         val quality = QualityDetector.detectFromUrl(link)
+        // Cacheia para o futuro
         VideoUrlCache.put(originalUrl, link, quality, name)
         
         M3u8Helper.generateM3u8(
@@ -168,37 +206,6 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
             referer = mainUrl,
             headers = cdnHeaders
         ).forEach(callback)
-    }
-
-    private fun extractDomain(html: String): String? {
-        val domains = listOf(
-            "oriontraveldynamics.sbs",
-            "brightcrestinteractive.site",
-            "mountainpeakstudio.space"
-        )
-        for (d in domains) {
-            val regex = Regex("""[\w-]+\.$d""")
-            val match = regex.find(html)
-            if (match != null) return match.value
-        }
-        return null
-    }
-
-    private fun extractTimestamp(html: String): String? {
-        // Busca um número de 10 dígitos (padrão Unix timestamp atual 17xxxxxxxx)
-        return Regex("""\b17\d{8}\b""").find(html)?.value
-    }
-
-    private fun isValidVideoUrl(url: String?): Boolean {
-        if (url.isNullOrEmpty()) return false
-        return url.contains("/v4/") && (url.contains(".txt") || url.contains(".m3u8") || url.contains("cf-master"))
-    }
-
-    private suspend fun tryUrl(url: String): Boolean {
-        return runCatching {
-            val response = app.get(url, headers = cdnHeaders, timeout = 5)
-            response.code in 200..299 && response.text.contains("#EXTM3U")
-        }.getOrDefault(false)
     }
 
     private fun extractVideoId(url: String): String? {

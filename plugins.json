@@ -21,16 +21,16 @@
         "isAdult": false
     },
     {
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v189/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v190/MaxSeries.cs3",
         "status": 1,
-        "version": 189,
+        "version": 190,
         "apiVersion": 1,
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "authors": [
             "franciscoalro"
         ],
-        "description": "MaxSeries v189 - MegaEmbed V9 (Hybrid Hook + Redirect)",
+        "description": "MaxSeries v190 - MegaEmbed V9 (Manual WebView - Bypassing Network Hooks)",
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "tvTypes": [
             "TvSeries",

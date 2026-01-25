@@ -63,8 +63,17 @@ class MaxSeriesProvider : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
+        "$mainUrl/" to "Início",
         "$mainUrl/filmes" to "Filmes",
-        "$mainUrl/series" to "Séries"
+        "$mainUrl/series" to "Séries",
+        "$mainUrl/genero/animacao" to "Animação",
+        "$mainUrl/genero/acao" to "Ação",
+        "$mainUrl/genero/comedia" to "Comédia",
+        "$mainUrl/genero/drama" to "Drama",
+        "$mainUrl/genero/ficcao-cientifica" to "Ficção",
+        "$mainUrl/genero/terror" to "Terror",
+        "$mainUrl/genero/romance" to "Romance",
+        "$mainUrl/top-imdb" to "Top IMDb"
     )
     
     private fun upgradeImageQuality(url: String?): String? {

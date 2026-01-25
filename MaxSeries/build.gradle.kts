@@ -1,7 +1,7 @@
-version = 199
+version = 200
 
 cloudstream {
-    description = "MaxSeries v199 - MegaEmbed V9 (Fix: Destroy WebView to stop background audio)"
+    description = "MaxSeries v200 - Home Premium (New Categories + Top IMDb)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

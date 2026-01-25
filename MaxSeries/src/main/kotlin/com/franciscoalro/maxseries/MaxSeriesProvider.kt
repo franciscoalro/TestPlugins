@@ -44,7 +44,7 @@ import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
  * Priorização: Apenas MegaEmbed (mais estável e confiável)
  */
 class MaxSeriesProvider : MainAPI() {
-    override var mainUrl = "https://www.maxseries.one"
+    override var mainUrl = "https://www.maxseries.pics"
     override var name = "MaxSeries"
     override val hasMainPage = true
     override var lang = "pt"
@@ -58,7 +58,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v191 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v201 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
     }
 
@@ -66,13 +66,13 @@ class MaxSeriesProvider : MainAPI() {
         "$mainUrl/" to "Início",
         "$mainUrl/filmes" to "Filmes",
         "$mainUrl/series" to "Séries",
-        "$mainUrl/genero/animacao" to "Animação",
-        "$mainUrl/genero/acao" to "Ação",
-        "$mainUrl/genero/comedia" to "Comédia",
-        "$mainUrl/genero/drama" to "Drama",
-        "$mainUrl/genero/ficcao-cientifica" to "Ficção",
-        "$mainUrl/genero/terror" to "Terror",
-        "$mainUrl/genero/romance" to "Romance",
+        "$mainUrl/generos/animation" to "Animação",
+        "$mainUrl/generos/action-adventure" to "Ação & Aventura",
+        "$mainUrl/generos/comedy" to "Comédia",
+        "$mainUrl/generos/drama" to "Drama",
+        "$mainUrl/generos/sci-fi-fantasy" to "Ficção & Fantasia",
+        "$mainUrl/generos/horror" to "Terror",
+        "$mainUrl/generos/romance" to "Romance",
         "$mainUrl/top-imdb" to "Top IMDb"
     )
     

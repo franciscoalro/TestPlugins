@@ -171,8 +171,32 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                         view?.evaluateJavascript(injectedScript, null)
                     }
                     
+                    // SPY MODE: Logar TUDO que o WebView carrega
+                    override fun onLoadResource(view: WebView?, url: String?) {
+                        super.onLoadResource(view, url)
+                        if (url != null) {
+                            Log.d(TAG, "🔍 [SPY] LoadResource: $url")
+                        }
+                    }
+
+                    // SPY MODE: Interceptar requisições para análise profunda
+                    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+                        val url = request?.url?.toString()
+                        if (url != null) {
+                            Log.d(TAG, "🕵️ [SPY] Request: $url")
+                            // Tenta capturar aqui também, caso o JS falhe
+                            if (url.contains("cf-master") || url.contains(".m3u8") || url.contains("v4/xy")) {
+                                Log.d(TAG, "🔥 [SPY] ALVO DETECTADO via Request: $url")
+                                finalUrl = url
+                                latch.countDown()
+                            }
+                        }
+                        return super.shouldInterceptRequest(view, request)
+                    }
+
                     // Permite bypass de erros SSL se necessário
                     override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: android.net.http.SslError?) {
+                        Log.d(TAG, "⚠️ SSL Error: ${error?.toString()}")
                         handler?.proceed()
                     }
                 }

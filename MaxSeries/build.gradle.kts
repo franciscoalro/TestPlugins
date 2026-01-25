@@ -1,7 +1,7 @@
-version = 194
+version = 195
 
 cloudstream {
-    description = "MaxSeries v194 - MegaEmbed V9 (90s Timeout Adjustment)"
+    description = "MaxSeries v195 - MegaEmbed V9 (Spy Mode - Full Network Logging)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

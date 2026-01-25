@@ -1,12 +1,12 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v194 - MegaEmbed V9 (90s Timeout Adjustment)",
+    "description": "MaxSeries v195 - MegaEmbed V9 (Spy Mode - Full Network Logging)",
     "authors": [
       "franciscoalro"
     ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 194,
+    "version": 195,
     "status": 1,
     "language": "pt",
     "types": [

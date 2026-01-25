@@ -11,12 +11,12 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
+        classpath("com.android.tools.build:gradle:8.13.2")
         classpath("com.github.recloudstream:gradle:cce1b8d84d") {
             exclude(group = "com.github.vidstige", module = "jadb")
         }
         classpath("com.github.vidstige:jadb:v1.2.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
     }
 }
 
@@ -25,6 +25,16 @@ allprojects {
         google()
         mavenCentral()
         maven("https://jitpack.io")
+    }
+    
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-common:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-reflect:2.3.0")
+        }
     }
 }
 
@@ -70,7 +80,7 @@ subprojects {
         val implementation by configurations
 
         implementation("com.github.recloudstream.cloudstream:library:8a4480dc42") // Commit hash estável (fix JitPack)
-        implementation(kotlin("stdlib"))
+        implementation(kotlin("stdlib", "2.3.0"))
         implementation("com.github.Blatzar:NiceHttp:0.4.13")
         implementation("org.jsoup:jsoup:1.19.1")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")

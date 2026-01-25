@@ -1,4 +1,4 @@
-version = 9
+version = 10
 
 cloudstream {
     description = "Assista animes online grátis em HD - v9 Updated"

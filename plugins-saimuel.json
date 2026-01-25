@@ -1,85 +1,121 @@
 [
   {
     "name": "MaxSeries",
-    "description": "Assista séries online em HD no MaxSeries",
-    "authors": ["franciscoalro"],
+    "description": "MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)",
+    "authors": [
+      "franciscoalro"
+    ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "version": 8,
+    "version": 187,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.TvSeries", "TvType.Movie"],
+    "types": [
+      "TvType.TvSeries",
+      "TvType.Movie"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/MaxSeries.cs3",
     "iconUrl": "https://www.maxseries.one/favicon.ico"
   },
   {
     "name": "AnimesOnlineCC",
     "description": "Assista animes online grátis em HD",
-    "authors": ["franciscoalro"],
+    "authors": [
+      "franciscoalro"
+    ],
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "version": 6,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Anime", "TvType.OVA", "TvType.AnimeMovie"],
+    "types": [
+      "TvType.Anime",
+      "TvType.OVA",
+      "TvType.AnimeMovie"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/AnimesOnlineCC.cs3",
     "iconUrl": "https://animesonline.cc/favicon.ico"
   },
   {
     "name": "PobreFlix",
     "description": "Assista filmes e séries grátis no PobreFlix",
-    "authors": ["saimuelbr"],
+    "authors": [
+      "saimuelbr"
+    ],
     "repositoryUrl": "https://github.com/saimuelbr/saimuelrepo",
     "version": 1,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Movie", "TvType.TvSeries"],
+    "types": [
+      "TvType.Movie",
+      "TvType.TvSeries"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/PobreFlix.cs3",
     "iconUrl": "https://pobreflix.biz/favicon.ico"
   },
   {
     "name": "OverFlix",
     "description": "Filmes e séries em alta qualidade no OverFlix",
-    "authors": ["saimuelbr"],
+    "authors": [
+      "saimuelbr"
+    ],
     "repositoryUrl": "https://github.com/saimuelbr/saimuelrepo",
     "version": 1,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Movie", "TvType.TvSeries"],
+    "types": [
+      "TvType.Movie",
+      "TvType.TvSeries"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/OverFlix.cs3",
     "iconUrl": "https://overflix.online/favicon.ico"
   },
   {
     "name": "Vizer",
     "description": "Streaming de filmes e séries no Vizer",
-    "authors": ["saimuelbr"],
+    "authors": [
+      "saimuelbr"
+    ],
     "repositoryUrl": "https://github.com/saimuelbr/saimuelrepo",
     "version": 1,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Movie", "TvType.TvSeries"],
+    "types": [
+      "TvType.Movie",
+      "TvType.TvSeries"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/Vizer.cs3",
     "iconUrl": "https://vizer.tv/favicon.ico"
   },
   {
     "name": "MegaFlix",
     "description": "Filmes e séries online no MegaFlix",
-    "authors": ["saimuelbr"],
+    "authors": [
+      "saimuelbr"
+    ],
     "repositoryUrl": "https://github.com/saimuelbr/saimuelrepo",
     "version": 1,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Movie", "TvType.TvSeries"],
+    "types": [
+      "TvType.Movie",
+      "TvType.TvSeries"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/MegaFlix.cs3",
     "iconUrl": "https://megaflix.co/favicon.ico"
   },
   {
     "name": "NetCine",
     "description": "Cinema online no NetCine",
-    "authors": ["saimuelbr"],
+    "authors": [
+      "saimuelbr"
+    ],
     "repositoryUrl": "https://github.com/saimuelbr/saimuelrepo",
     "version": 1,
     "status": 1,
     "language": "pt",
-    "types": ["TvType.Movie", "TvType.TvSeries"],
+    "types": [
+      "TvType.Movie",
+      "TvType.TvSeries"
+    ],
     "url": "https://github.com/franciscoalro/TestPlugins/releases/latest/download/NetCine.cs3",
     "iconUrl": "https://netcine.tv/favicon.ico"
   }

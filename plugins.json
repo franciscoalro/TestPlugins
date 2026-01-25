@@ -1,6 +1,7 @@
 [
     {
         "name": "MaxSeries",
+        "internalName": "MaxSeries",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v210/MaxSeries.cs3",
         "version": 210,
         "apiVersion": 1,
@@ -15,6 +16,7 @@
     },
     {
         "name": "AnimesOnlineCC",
+        "internalName": "AnimesOnlineCC",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/AnimesOnlineCC.cs3",
         "version": 1,
         "apiVersion": 1,
@@ -29,6 +31,7 @@
     },
     {
         "name": "MegaFlix",
+        "internalName": "MegaFlix",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/MegaFlix.cs3",
         "version": 1,
         "apiVersion": 1,
@@ -42,6 +45,7 @@
     },
     {
         "name": "NetCine",
+        "internalName": "NetCine",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/NetCine.cs3",
         "version": 1,
         "apiVersion": 1,
@@ -55,6 +59,7 @@
     },
     {
         "name": "OverFlix",
+        "internalName": "OverFlix",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/OverFlix.cs3",
         "version": 1,
         "apiVersion": 1,
@@ -68,6 +73,7 @@
     },
     {
         "name": "PobreFlix",
+        "internalName": "PobreFlix",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/PobreFlix.cs3",
         "version": 1,
         "apiVersion": 1,
@@ -81,6 +87,7 @@
     },
     {
         "name": "Vizer",
+        "internalName": "Vizer",
         "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/Vizer.cs3",
         "version": 1,
         "apiVersion": 1,

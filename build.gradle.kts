@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
+        classpath("com.android.tools.build:gradle:8.13.2")
         classpath("com.github.recloudstream:gradle:cce1b8d84d") {
             exclude(group = "com.github.vidstige", module = "jadb")
         }

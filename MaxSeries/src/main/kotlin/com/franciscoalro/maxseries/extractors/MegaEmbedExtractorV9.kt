@@ -187,11 +187,11 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
             }
         }
 
-        // Aguarda até 30 segundos pela captura
+        // Aguarda até 90 segundos pela captura (v194: aumentado para superar lentidão)
         try {
-            val captured = latch.await(35, TimeUnit.SECONDS)
+            val captured = latch.await(90, TimeUnit.SECONDS)
             if (!captured) {
-                Log.e(TAG, "❌ Timeout: Nenhuma URL capturada em 35s.")
+                Log.e(TAG, "❌ Timeout: Nenhuma URL capturada em 90s.")
             }
         } catch (e: InterruptedException) {
             Log.e(TAG, "❌ Interrompido.")

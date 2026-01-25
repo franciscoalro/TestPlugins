@@ -1,7 +1,7 @@
-version = 193
+version = 194
 
 cloudstream {
-    description = "MaxSeries v193 - MegaEmbed V9 (Hotfix: Restore Imports)"
+    description = "MaxSeries v194 - MegaEmbed V9 (90s Timeout Adjustment)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

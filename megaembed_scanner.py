@@ -4,7 +4,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # --- CONFIGURATION ---
-VIDEO_ID = "xez5rx"  # ID conhecido de um vídeo (A Casa do Dragão)
+VIDEO_ID = "hkb6cx"  # Testando ID do trace ClarionForge
 # Se não funcionar, troque por um ID recente que você saiba que existe no site
 
 # Base Domains (Adicione novos que encontrar no F12)

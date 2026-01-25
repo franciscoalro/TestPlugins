@@ -7,12 +7,12 @@ Repositório de desenvolvimento de extensões para CloudStream 3.
 
 ## 🔌 Plugins Disponíveis
 
-### MaxSeries v8 ✅
-- **Descrição**: Assista séries online em HD no MaxSeries
-- **Status**: ✅ Compatível com CloudStream v9.0
+### MaxSeries v187 ✅
+- **Descrição**: MaxSeries v187 - MegaEmbed V9 (Universal + Triple Click)
+- **Status**: ✅ Funcionando (Janeiro 2026)
 - **Idioma**: Português (pt-BR)
 - **Tipos**: Séries, Filmes
-- **Última atualização**: Correção para CloudStream v9.0
+- **Última atualização**: MegaEmbed V9 Integration (Triple Click Bypass)
 
 ### AnimesOnlineCC v6 ✅
 - **Descrição**: Assista animes online grátis em HD

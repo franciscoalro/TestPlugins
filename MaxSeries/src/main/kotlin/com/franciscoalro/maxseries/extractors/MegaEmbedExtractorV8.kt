@@ -102,7 +102,7 @@ class MegaEmbedExtractorV8 : ExtractorApi() {
         runCatching {
             val templateLink = MegaEmbedLinkFetcher.fetchPlaylistUrl(videoId)
             if (templateLink != null) {
-                Log.d(TAG, "=== MEGAEMBED V8 v184: MASSIVE CDN UPDATE (Clarion/Stellar) ===")
+                Log.d(TAG, "=== MEGAEMBED V8 v186: NEW CDN VIATRIX ADDED ===")
                 val quality = QualityDetector.detectFromUrl(templateLink)
                 VideoUrlCache.put(url, templateLink, quality, name)
                 

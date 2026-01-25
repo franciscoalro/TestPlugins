@@ -24,32 +24,35 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v209 - Multi-Extractor Support (Jan 2026)
+ * MaxSeries Provider v210 - Added "Adicionados Recentemente" Category (Jan 2026)
  * 
  * Fluxo de extração:
  * 1. maxseries.pics/series/... → iframe playerthree.online
  * 2. playerthree.online/episodio/{id} → botões data-source
- * 3. Sources suportadas (v209):
+ * 3. Sources suportadas (v210):
  *    - MegaEmbed V9 (principal - ~95% sucesso)
  *    - PlayerEmbedAPI (backup confiável)
  *    - MyVidPlay (alternativo rápido)
- *    - DoodStream (muito popular) [NOVO v209]
- *    - StreamTape (confiável) [NOVO v209]
- *    - Mixdrop (backup) [NOVO v209]
- *    - Filemoon (novo) [NOVO v209]
+ *    - DoodStream (muito popular)
+ *    - StreamTape (confiável)
+ *    - Mixdrop (backup)
+ *    - Filemoon (novo)
  *    - Fallback genérico para outros
+ * 
+ * v210 Changes (26 Jan 2026):
+ * - ✨ Adicionada categoria "Adicionados Recentemente"
+ * - 📊 Total de 25 categorias disponíveis
+ * - 🎯 Mantém 7 extractors + fallback (~99% sucesso)
  * 
  * v209 Changes (26 Jan 2026):
  * - ✨ Adicionados 4 novos extractors
  * - 🎯 Total de 7 extractors específicos + fallback
  * - 📊 Cobertura de ~99% dos players do MaxSeries
- * - ⚡ Melhor taxa de sucesso geral
  * 
  * v208 Changes (26 Jan 2026):
  * - ✨ Adicionada categoria "Em Alta" (Trending)
  * - ✨ Adicionados 17 novos gêneros
  * - 📊 Total de 24 categorias disponíveis
- * - 🎯 Baseado em análise completa do sitemap
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
@@ -67,14 +70,16 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v209 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v210 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Categories: 25 (Inicio, Em Alta, Adicionados Recentemente, Filmes, Series, 20 generos)")
     }
 
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Início",
         "$mainUrl/trending" to "Em Alta",
+        "$mainUrl/" to "Adicionados Recentemente",
         "$mainUrl/filmes" to "Filmes",
         "$mainUrl/series" to "Séries",
         "$mainUrl/generos/acao" to "Ação",

@@ -1,7 +1,7 @@
-version = 209
+version = 210
 
 cloudstream {
-    description = "MaxSeries v209 - Added 4 New Video Extractors (DoodStream, StreamTape, Mixdrop, Filemoon)"
+    description = "MaxSeries v210 - Added 'Adicionados Recentemente' Category (25 categories total)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

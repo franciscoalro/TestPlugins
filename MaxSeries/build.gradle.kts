@@ -1,7 +1,7 @@
-version = 212
+version = 215
 
 cloudstream {
-    description = "MaxSeries v212 - PlayerEmbedAPI with Overlay Click Support (Auto-play fix)"
+    description = "MaxSeries v215 - PlayerEmbedAPI Direct Base64 Decode (No WebView needed!)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

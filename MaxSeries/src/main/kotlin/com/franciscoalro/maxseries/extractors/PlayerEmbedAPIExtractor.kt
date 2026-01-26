@@ -7,33 +7,29 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.5 - WITH OVERLAY CLICK SUPPORT (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.7 - DIRECT BASE64 DECODE (Jan 2026)
  * 
- * v3.5 Changes (26 Jan 2026):
- * - ✨ Adicionado WebView com auto-click no overlay
- * - 🎯 Simula 3 cliques no overlay #playback (igual MegaEmbed)
- * - ⚡ Fallback rápido se WebView não funcionar
+ * v3.7 Changes (26 Jan 2026):
+ * - 🚀 DECODE base64 diretamente do HTML!
+ * - ⚡ Não precisa de WebView, clicks ou espera
+ * - 🎯 Extrai `const datas = "base64..."` do código
+ * - ✅ Decripta usando AES-CTR (já existente)
  * 
- * PROBLEMA DESCOBERTO:
- * - PlayerEmbedAPI tem overlay <div id="overlay"> que precisa ser clicado
- * - Sem o click, o player não inicia e não faz requests para sssrr.org
- * - Similar ao MegaEmbed que também precisa de clicks
+ * DESCOBERTA IMPORTANTE:
+ * - PlayerEmbedAPI armazena dados do vídeo em base64 no HTML
+ * - Formato: const datas = "eyJ...base64...";
+ * - Contém: slug, md5_id, user_id, media (encriptado)
+ * - Solução: Decodificar base64 + decriptar media = URL do vídeo!
  * 
- * SOLUÇÃO v3.5:
- * - PRIORIDADE 1: WebView com auto-click no overlay (NOVO!)
- * - PRIORIDADE 2: Direct HTML/Regex extraction
- * - PRIORIDADE 3: AES-CTR decryption
+ * SOLUÇÃO v3.7:
+ * - PRIORIDADE 1: Direct Base64 Decode (NOVO! Mais rápido!)
+ * - PRIORIDADE 2: Direct API Extraction
+ * - PRIORIDADE 3: AES-CTR decryption (fallback)
  * - PRIORIDADE 4: JsUnpacker
  * - PRIORIDADE 5: HTML Regex fallback
  * 
- * Overlay HTML:
- * <div id="overlay">
- *   <div id="playback">
- *     <svg viewBox="0 0 24 24">
- *       <path d="M8.016 5.016l10.969 6.984-10.969 6.984v-13.969z"></path>
- *     </svg>
- *   </div>
- * </div>
+ * Exemplo do código fonte:
+ * const datas = "eyJzbHVnIjoia0JKTHR4Q0QzIiwibWQ1X2lkIjoyODkzMDY0NywidXNlcl9pZCI6NDgyMTIwLCJtZWRpYSI6Ir...";
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -80,95 +76,122 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
-        // 1. WEBVIEW WITH OVERLAY CLICK (v3.5 - NOVO!)
-        // PlayerEmbedAPI tem overlay que precisa ser clicado para iniciar player
-        runCatching {
-            Log.d(TAG, "[1/5] Tentando WebView com Auto-Click no Overlay...")
+        // 0. FETCH HTML (Shared) - v115: Detecção de 404
+        val html = try {
+            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
             
-            var capturedUrl: String? = null
+            // v115: Falha rápida em 404 (vídeo não existe)
+            if (response.code == 404) {
+                ErrorLogger.w(TAG, "Vídeo não encontrado (404) - Pulando para próximo extractor", mapOf("URL" to url))
+                return // Falha rápida, sem retry
+            }
             
-            // Script para clicar no overlay automaticamente
-            val clickScript = """
-                // Auto-click no overlay após página carregar
-                (function() {
-                    console.log('[PlayerEmbedAPI] Iniciando auto-click...');
-                    
-                    function clickOverlay() {
-                        // Tentar clicar no overlay
-                        const overlay = document.getElementById('overlay');
-                        const playback = document.getElementById('playback');
-                        
-                        if (overlay) {
-                            console.log('[PlayerEmbedAPI] Clicando no overlay...');
-                            overlay.click();
-                        }
-                        
-                        if (playback) {
-                            console.log('[PlayerEmbedAPI] Clicando no playback...');
-                            playback.click();
-                        }
-                        
-                        // Também tentar clicar no SVG dentro do playback
-                        const svg = playback?.querySelector('svg');
-                        if (svg) {
-                            console.log('[PlayerEmbedAPI] Clicando no SVG...');
-                            svg.click();
-                        }
-                    }
-                    
-                    // Clicar 3 vezes com intervalo (igual MegaEmbed)
-                    setTimeout(() => clickOverlay(), 1000);
-                    setTimeout(() => clickOverlay(), 2000);
-                    setTimeout(() => clickOverlay(), 3000);
-                    
-                    console.log('[PlayerEmbedAPI] Auto-click agendado!');
-                })();
-            """.trimIndent()
-            
-            val resolver = WebViewResolver(
-                interceptUrl = Regex("""sssrr\.org.*(?:/sora/|/future|\.fd|\.m3u8|\.mp4)"""),
-                script = clickScript,
-                scriptCallback = { result ->
-                    if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
-                        capturedUrl = result.trim('"')
-                        Log.d(TAG, "Script capturou: $capturedUrl")
-                    }
-                },
-                timeout = 15000L // 15 segundos
-            )
-            
-            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url), interceptor = resolver)
-            
-            // Verificar se interceptou URL
-            val interceptedUrl = capturedUrl
-            
-            if (!interceptedUrl.isNullOrEmpty() && interceptedUrl != url) {
-                Log.d(TAG, "WebView capturou URL: $interceptedUrl")
-                
-                val quality = QualityDetector.detectFromUrl(interceptedUrl)
-                VideoUrlCache.put(url, interceptedUrl, quality, name)
-                
-                callback.invoke(
-                    newExtractorLink(
-                        source = name,
-                        name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView)",
-                        url = interceptedUrl,
-                        type = ExtractorLinkType.VIDEO
-                    ) {
-                        this.referer = "https://playerembedapi.link/"
-                        this.quality = quality
-                    }
-                )
-                
-                Log.d(TAG, "WebView Extraction: SUCESSO")
-                ErrorLogger.logPerformance("PlayerEmbedAPI WebView", 
-                    System.currentTimeMillis() - startTime)
+            // v115: Falha rápida em erros de servidor
+            if (response.code >= 500) {
+                ErrorLogger.w(TAG, "Servidor indisponível (${response.code}) - Pulando", mapOf("URL" to url))
                 return
             }
             
-            Log.d(TAG, "WebView: Não interceptou nenhuma URL")
+            response.text
+        } catch (e: Exception) {
+            ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
+            return
+        }
+        
+        // 1. DIRECT BASE64 DECODE (v3.7 - MELHOR SOLUÇÃO!)
+        // PlayerEmbedAPI armazena dados do vídeo em base64 no HTML
+        // Não precisa de WebView, clicks ou espera!
+        runCatching {
+            Log.d(TAG, "[1/5] Tentando Direct Base64 Decode...")
+            
+            // Buscar o base64 no HTML
+            val base64Regex = Regex("""const datas = "([A-Za-z0-9+/=]+)";""")
+            val base64Match = base64Regex.find(html)
+            
+            if (base64Match != null) {
+                val base64Data = base64Match.groupValues[1]
+                Log.d(TAG, "Base64 encontrado: ${base64Data.take(50)}...")
+                
+                try {
+                    // Decodificar base64
+                    val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                    val decodedJson = String(decodedBytes, Charsets.UTF_8)
+                    Log.d(TAG, "JSON decodificado: ${decodedJson.take(200)}...")
+                    
+                    // Parse JSON
+                    val mapper = com.fasterxml.jackson.databind.ObjectMapper()
+                    val dataNode = mapper.readTree(decodedJson)
+                    
+                    // Extrair media (está encriptado)
+                    val mediaEncrypted = dataNode.get("media")?.asText()
+                    val userId = dataNode.get("user_id")?.asText()
+                    val slug = dataNode.get("slug")?.asText()
+                    val md5Id = dataNode.get("md5_id")?.asText()
+                    
+                    if (!mediaEncrypted.isNullOrEmpty() && !userId.isNullOrEmpty() && 
+                        !slug.isNullOrEmpty() && !md5Id.isNullOrEmpty()) {
+                        
+                        Log.d(TAG, "Decriptando media... UserID: $userId, Slug: $slug")
+                        val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted, userId, slug, md5Id)
+                        
+                        if (decrypted != null) {
+                            var found = false
+                            
+                            decrypted.hls?.let { hlsUrl ->
+                                Log.d(TAG, "Base64 Decode capturou HLS: $hlsUrl")
+                                
+                                val quality = QualityDetector.detectFromUrl(hlsUrl)
+                                VideoUrlCache.put(url, hlsUrl, quality, name)
+                                
+                                callback.invoke(
+                                    newExtractorLink(
+                                        source = name,
+                                        name = "$name ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                        url = hlsUrl,
+                                        type = ExtractorLinkType.VIDEO
+                                    ) {
+                                        this.referer = "https://playerembedapi.link/"
+                                        this.quality = quality
+                                    }
+                                )
+                                found = true
+                            }
+                            
+                            decrypted.mp4?.let { mp4Url ->
+                                Log.d(TAG, "Base64 Decode capturou MP4: $mp4Url")
+                                
+                                val quality = QualityDetector.detectFromUrl(mp4Url)
+                                
+                                callback.invoke(
+                                    newExtractorLink(
+                                        source = name,
+                                        name = "$name MP4 ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                        url = mp4Url,
+                                        type = ExtractorLinkType.VIDEO
+                                    ) {
+                                        this.referer = "https://playerembedapi.link/"
+                                        this.quality = quality
+                                    }
+                                )
+                                found = true
+                            }
+                            
+                            if (found) {
+                                Log.d(TAG, "Base64 Decode: SUCESSO")
+                                ErrorLogger.logPerformance("PlayerEmbedAPI Base64", 
+                                    System.currentTimeMillis() - startTime)
+                                return
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Erro ao decodificar base64: ${e.message}")
+                }
+            }
+            
+            Log.d(TAG, "Base64 Decode: Não encontrou dados")
         }.onFailure { e ->
-            Log.e(TAG, "WebView falhou: ${e.message}")
+            Log.e(TAG, "Base64 Decode falhou: ${e.message}")
         }
         
         // 2. DIRECT API EXTRACTION (v125 - Baseado em analise Postman)
@@ -246,28 +269,6 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             Log.d(TAG, "Direct API: Nao encontrou host/id ou video URL")
         }.onFailure { e ->
             Log.e(TAG, "Direct API falhou: ${e.message}")
-        }
-        
-        // 0. FETCH HTML (Shared) - v115: Detecção de 404
-        val html = try {
-            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
-            
-            // v115: Falha rápida em 404 (vídeo não existe)
-            if (response.code == 404) {
-                ErrorLogger.w(TAG, "Vídeo não encontrado (404) - Pulando para próximo extractor", mapOf("URL" to url))
-                return // Falha rápida, sem retry
-            }
-            
-            // v115: Falha rápida em erros de servidor
-            if (response.code >= 500) {
-                ErrorLogger.w(TAG, "Servidor indisponível (${response.code}) - Pulando", mapOf("URL" to url))
-                return
-            }
-            
-            response.text
-        } catch (e: Exception) {
-            ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
-            return
         }
 
         // 3. NATIVE DECRYPTION (v103 - AES-CTR)

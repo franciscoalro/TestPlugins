@@ -7,29 +7,33 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.4 - DIRECT HTML EXTRACTION (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.5 - WITH OVERLAY CLICK SUPPORT (Jan 2026)
  * 
- * Baseado em análise Burp Suite (18/01/2026) e logs ADB v124.
+ * v3.5 Changes (26 Jan 2026):
+ * - ✨ Adicionado WebView com auto-click no overlay
+ * - 🎯 Simula 3 cliques no overlay #playback (igual MegaEmbed)
+ * - ⚡ Fallback rápido se WebView não funcionar
  * 
- * PROBLEMA v124:
- * - WebView carrega página mas NÃO faz requisições para sssrr.org
- * - Timeout após 30s sem capturar nada
- * - JavaScript não executa ou é bloqueado
+ * PROBLEMA DESCOBERTO:
+ * - PlayerEmbedAPI tem overlay <div id="overlay"> que precisa ser clicado
+ * - Sem o click, o player não inicia e não faz requests para sssrr.org
+ * - Similar ao MegaEmbed que também precisa de clicks
  * 
- * SOLUÇÃO v3.4:
- * - PRIORIDADE 1: Direct HTML/Regex extraction (SEM WebView)
- * - PRIORIDADE 2: AES-CTR decryption (já existente)
- * - PRIORIDADE 3: JsUnpacker (já existente)
- * - PRIORIDADE 4: WebView (fallback final)
+ * SOLUÇÃO v3.5:
+ * - PRIORIDADE 1: WebView com auto-click no overlay (NOVO!)
+ * - PRIORIDADE 2: Direct HTML/Regex extraction
+ * - PRIORIDADE 3: AES-CTR decryption
+ * - PRIORIDADE 4: JsUnpacker
+ * - PRIORIDADE 5: HTML Regex fallback
  * 
- * Melhorias v3.4:
- * - Nova estratégia: Buscar URLs sssrr.org diretamente no HTML
- * - Padrões baseados em Burp Suite: sora/, future, .fd files
- * - WebView movido para último fallback
- * - Timeout reduzido para 20s (já que é fallback)
- * - Logs melhorados para debug
- * 
- * Analise completa: brcloudstream/PLAYEREMBEDAPI_BURP_ANALYSIS_V123.md
+ * Overlay HTML:
+ * <div id="overlay">
+ *   <div id="playback">
+ *     <svg viewBox="0 0 24 24">
+ *       <path d="M8.016 5.016l10.969 6.984-10.969 6.984v-13.969z"></path>
+ *     </svg>
+ *   </div>
+ * </div>
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -76,6 +80,97 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
+        // 1. WEBVIEW WITH OVERLAY CLICK (v3.5 - NOVO!)
+        // PlayerEmbedAPI tem overlay que precisa ser clicado para iniciar player
+        runCatching {
+            Log.d(TAG, "[1/5] Tentando WebView com Auto-Click no Overlay...")
+            
+            var capturedUrl: String? = null
+            
+            // Script para clicar no overlay automaticamente
+            val clickScript = """
+                // Auto-click no overlay após página carregar
+                (function() {
+                    console.log('[PlayerEmbedAPI] Iniciando auto-click...');
+                    
+                    function clickOverlay() {
+                        // Tentar clicar no overlay
+                        const overlay = document.getElementById('overlay');
+                        const playback = document.getElementById('playback');
+                        
+                        if (overlay) {
+                            console.log('[PlayerEmbedAPI] Clicando no overlay...');
+                            overlay.click();
+                        }
+                        
+                        if (playback) {
+                            console.log('[PlayerEmbedAPI] Clicando no playback...');
+                            playback.click();
+                        }
+                        
+                        // Também tentar clicar no SVG dentro do playback
+                        const svg = playback?.querySelector('svg');
+                        if (svg) {
+                            console.log('[PlayerEmbedAPI] Clicando no SVG...');
+                            svg.click();
+                        }
+                    }
+                    
+                    // Clicar 3 vezes com intervalo (igual MegaEmbed)
+                    setTimeout(() => clickOverlay(), 1000);
+                    setTimeout(() => clickOverlay(), 2000);
+                    setTimeout(() => clickOverlay(), 3000);
+                    
+                    console.log('[PlayerEmbedAPI] Auto-click agendado!');
+                })();
+            """.trimIndent()
+            
+            val resolver = WebViewResolver(
+                interceptUrl = Regex("""sssrr\.org.*(?:/sora/|/future|\.fd|\.m3u8|\.mp4)"""),
+                script = clickScript,
+                scriptCallback = { result ->
+                    if (result.isNotEmpty() && result != "null" && result.startsWith("http")) {
+                        capturedUrl = result.trim('"')
+                        Log.d(TAG, "Script capturou: $capturedUrl")
+                    }
+                },
+                timeout = 15000L // 15 segundos
+            )
+            
+            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url), interceptor = resolver)
+            
+            // Verificar se interceptou URL
+            val interceptedUrl = capturedUrl
+            
+            if (!interceptedUrl.isNullOrEmpty() && interceptedUrl != url) {
+                Log.d(TAG, "WebView capturou URL: $interceptedUrl")
+                
+                val quality = QualityDetector.detectFromUrl(interceptedUrl)
+                VideoUrlCache.put(url, interceptedUrl, quality, name)
+                
+                callback.invoke(
+                    newExtractorLink(
+                        source = name,
+                        name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView)",
+                        url = interceptedUrl,
+                        type = ExtractorLinkType.VIDEO
+                    ) {
+                        this.referer = "https://playerembedapi.link/"
+                        this.quality = quality
+                    }
+                )
+                
+                Log.d(TAG, "WebView Extraction: SUCESSO")
+                ErrorLogger.logPerformance("PlayerEmbedAPI WebView", 
+                    System.currentTimeMillis() - startTime)
+                return
+            }
+            
+            Log.d(TAG, "WebView: Não interceptou nenhuma URL")
+        }.onFailure { e ->
+            Log.e(TAG, "WebView falhou: ${e.message}")
+        }
+        
         // 2. DIRECT API EXTRACTION (v125 - Baseado em analise Postman)
         // Fluxo descoberto:
         // 1. GET playerembedapi.link/?v={videoId} -> HTML/JS
@@ -83,7 +178,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         // 3. GET {host}.sssrr.org/?timestamp=&id={id} -> metadata
         // 4. Extrair URL final: {host}.sssrr.org/sora/{streamId}/{token}
         runCatching {
-            Log.d(TAG, "[1/4] Tentando Direct API Extraction...")
+            Log.d(TAG, "[2/5] Tentando Direct API Extraction...")
             
             val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
             val html = response.text
@@ -175,7 +270,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             return
         }
 
-        // 2. NATIVE DECRYPTION (v103 - AES-CTR)
+        // 3. NATIVE DECRYPTION (v103 - AES-CTR)
         runCatching {
             ErrorLogger.d(TAG, "Tentando Decriptação Nativa (AES-CTR)...", mapOf("URL" to url))
             
@@ -228,7 +323,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
         
-        // 3. STEALTH FALLBACK (JsUnpacker)
+        // 4. STEALTH FALLBACK (JsUnpacker)
         runCatching {
             ErrorLogger.d(TAG, "Tentando Stealth Extraction (JsUnpackerUtil)...", mapOf("URL" to url))
             
@@ -267,7 +362,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
 
-        // 3.5 HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
+        // 5. HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
         runCatching {
             ErrorLogger.d(TAG, "Tentando HTML Regex Fallback...", mapOf("URL" to url))
             
@@ -319,15 +414,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             Log.d(TAG, "HTML Regex: Nenhuma URL valida encontrada")
         }
 
-        // v168: WebView removido! Causava timeout (30s+) e era cancelado pelo CloudStream
-        // Todas as técnicas acima (Direct API, AES-CTR, JsUnpacker, HTML Regex) são rápidas (<5s)
-        // Se nenhuma funcionar, falha rápido e deixa outros extractors tentarem
+        // v3.5: Se WebView com overlay click não funcionou, falha rápido
+        // Deixa outros extractors (MegaEmbed, MyVidPlay, DoodStream) tentarem
         
-        Log.d(TAG, "PlayerEmbedAPI: Todas as técnicas falharam (sem WebView na v168)")
+        Log.d(TAG, "PlayerEmbedAPI: Todas as técnicas falharam (incluindo WebView com overlay)")
         Log.d(TAG, "Tempo total: ${System.currentTimeMillis() - startTime}ms")
         
-        // Não lançar exception - deixar outros extractors (MegaEmbed, MyVidPlay) tentarem
-        ErrorLogger.w(TAG, "PlayerEmbedAPI não conseguiu extrair via métodos rápidos", mapOf(
+        // Não lançar exception - deixar outros extractors tentarem
+        ErrorLogger.w(TAG, "PlayerEmbedAPI não conseguiu extrair", mapOf(
             "URL" to url,
             "Tempo" to "${System.currentTimeMillis() - startTime}ms"
         ))

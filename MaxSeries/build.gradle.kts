@@ -1,7 +1,7 @@
-version = 211
+version = 212
 
 cloudstream {
-    description = "MaxSeries v211 - Removed 'Filmes' and 'Series' Categories (23 categories total)"
+    description = "MaxSeries v212 - PlayerEmbedAPI with Overlay Click Support (Auto-play fix)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

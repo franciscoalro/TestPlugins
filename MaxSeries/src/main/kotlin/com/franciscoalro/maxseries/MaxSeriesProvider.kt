@@ -24,10 +24,16 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v211 - Removed "Filmes" and "Séries" Categories (Jan 2026)
+ * MaxSeries Provider v212 - PlayerEmbedAPI Overlay Click Fix (Jan 2026)
+ * 
+ * v212 Changes (26 Jan 2026):
+ * - 🔧 PlayerEmbedAPI agora clica automaticamente no overlay
+ * - ⚡ Simula 3 cliques no #overlay e #playback
+ * - 🎯 Resolve problema de player não iniciar
+ * - ✅ Mantém 23 categorias e 7 extractors
  * 
  * v211 Changes (26 Jan 2026):
- * - ✨ Removidas categorias "Filmes" e "Séries"
+ * - ❌ Removidas categorias "Filmes" e "Séries"
  * - 📊 Total de 23 categorias (era 25)
  * - 🎯 Mantém 7 extractors + fallback (~99% sucesso)
  * 
@@ -55,9 +61,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v211 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v212 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (com overlay click!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 

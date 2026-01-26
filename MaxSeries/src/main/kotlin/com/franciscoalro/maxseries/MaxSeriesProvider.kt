@@ -16,7 +16,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorManual
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -24,7 +24,13 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v215 - PlayerEmbedAPI Direct Base64 (Jan 2026)
+ * MaxSeries Provider v216 - PlayerEmbedAPI Manual WebView (Jan 2026)
+ * 
+ * v216 Changes (26 Jan 2026):
+ * - 🔧 PlayerEmbedAPI agora usa WebView MANUAL (igual MegaEmbed)
+ * - 👆 Usuário clica manualmente no overlay
+ * - ⚡ Mais confiável que automação
+ * - ✅ Hooks de rede capturam URL após click
  * 
  * v215 Changes (26 Jan 2026):
  * - 🚀 PlayerEmbedAPI decode base64 direto do HTML
@@ -58,9 +64,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v215 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v216 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (base64 decode!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (MANUAL WebView!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -534,10 +540,10 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PlayerEmbedAPI (backup confiável)
+                        // PlayerEmbedAPI (backup confiável - MANUAL WebView)
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractor...")
-                            PlayerEmbedAPIExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
+                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
+                            PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // DoodStream (muito popular - v209)

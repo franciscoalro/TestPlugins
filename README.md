@@ -56,6 +56,43 @@ https://github.com/franciscoalro/brcloudstream/releases/download/v1.0.0/[Provide
 
 ---
 
+## 👆 IMPORTANTE: Como Usar MegaEmbed e PlayerEmbedAPI
+
+### Por Que Precisa Clicar?
+
+O **MegaEmbed** e o **PlayerEmbedAPI** usam WebView manual que requer **3 cliques** porque:
+
+- 🎬 **Propaganda no Frame:** Os sites de embed têm overlays/propagandas
+- 🔒 **Bypass de Proteção:** Sites bloqueiam automação, cliques manuais simulam usuário real
+- ✅ **Mais Confiável:** ~95% de sucesso vs automação que falha frequentemente
+
+### Como Usar (Passo a Passo)
+
+1. **Selecione o episódio/filme**
+2. **Aguarde o WebView carregar** (2-5 segundos)
+3. **👆👆👆 Clique 3 VEZES no centro da tela**
+   - Clique 1: Remove primeiro overlay
+   - Clique 2: Remove segundo overlay  
+   - Clique 3: Inicia o player
+4. **Aguarde a captura** (5-10 segundos)
+5. **Vídeo começa a reproduzir** 🎉
+
+### Timeouts
+
+- **MegaEmbed:** 45 segundos
+- **PlayerEmbedAPI:** 30s (1ª tentativa) + 15s (retry) = 45s total
+
+### Dicas
+
+✅ **Faça:** Clique rápido, no centro, 3 vezes seguidas  
+❌ **Evite:** Não feche o app, não clique fora, não desista rápido
+
+**Vale a pena!** MegaEmbed e PlayerEmbedAPI cobrem ~95% dos vídeos disponíveis.
+
+📖 **Guia Completo:** [COMO_USAR_MEGAEMBED_PLAYEREMBED.md](COMO_USAR_MEGAEMBED_PLAYEREMBED.md)
+
+---
+
 ## 📊 Providers Disponíveis
 
 | Provider | Versão | Tipo | Features | Status |

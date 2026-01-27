@@ -1,0 +1,85 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - builds
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build All Providers
+      run: |
+        echo "🔨 Building all providers..."
+        ./gradlew MaxSeries:make
+        ./gradlew AnimesOnlineCC:make
+        ./gradlew MegaFlix:make
+        ./gradlew NetCine:make
+        ./gradlew OverFlix:make
+        ./gradlew PobreFlix:make
+        ./gradlew Vizer:make
+        echo "✅ Build completed!"
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: cloudstream-plugins
+        path: |
+          MaxSeries/build/*.cs3
+          AnimesOnlineCC/build/*.cs3
+          MegaFlix/build/*.cs3
+          NetCine/build/*.cs3
+          OverFlix/build/*.cs3
+          PobreFlix/build/*.cs3
+          Vizer/build/*.cs3
+    
+    - name: Create Release (if tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          MaxSeries/build/*.cs3
+          AnimesOnlineCC/build/*.cs3
+          MegaFlix/build/*.cs3
+          NetCine/build/*.cs3
+          OverFlix/build/*.cs3
+          PobreFlix/build/*.cs3
+          Vizer/build/*.cs3
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Summary
+      run: |
+        echo "## 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Built Providers:" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ MaxSeries" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ AnimesOnlineCC" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ MegaFlix" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ NetCine" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ OverFlix" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ PobreFlix" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Vizer" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "### Release Created:" >> $GITHUB_STEP_SUMMARY
+          echo "🏷️ Tag: ${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
+        fi

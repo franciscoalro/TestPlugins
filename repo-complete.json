@@ -1,6 +1,6 @@
 {
   "name": "TestPlugins Repository - Brazilian Providers",
-  "description": "Repositório completo de extensões brasileiras para Cloudstream - 7 providers incluindo MaxSeries v209 com 7 extractors",
+  "description": "Repositório completo de extensões brasileiras para Cloudstream - 7 providers incluindo MaxSeries v218 com 6 extractors (PlayerEmbedAPI removido)",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"

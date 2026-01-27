@@ -11,11 +11,12 @@ Repositório completo de extensões brasileiras para **Cloudstream 3**, incluind
 
 ## 🎯 Destaques
 
-### ⭐ MaxSeries v209 (Flagship Provider)
-- **7 Extractors** + 1 fallback (MegaEmbed, PlayerEmbedAPI, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon)
-- **24 Categorias** incluindo "Em Alta" (Trending)
-- **23 Gêneros** diferentes
-- **Taxa de sucesso: ~99%**
+### ⭐ MaxSeries v218 (Flagship Provider)
+- **6 Extractors** + 1 fallback (MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon)
+- **23 Categorias** incluindo "Em Alta" (Trending)
+- **WebView Pool** (90% mais rápido)
+- **Cache Persistente** (30min TTL, sobrevive restart)
+- **Taxa de sucesso: ~90%**
 - Quick Search ativado
 - Download support
 
@@ -44,9 +45,9 @@ Repositório completo de extensões brasileiras para **Cloudstream 3**, incluind
 
 ### Método 2: Download Direto
 
-**MaxSeries v209:**
+**MaxSeries v218:**
 ```
-https://github.com/franciscoalro/brcloudstream/releases/download/v209/MaxSeries.cs3
+https://github.com/franciscoalro/TestPlugins/releases/download/v218/MaxSeries.cs3
 ```
 
 **Outros Providers:**

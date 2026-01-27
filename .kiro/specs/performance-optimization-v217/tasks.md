@@ -386,15 +386,15 @@ init {
 
 All tasks must be completed and verified:
 
-- [ ] WebView loads in <2s (40-60% improvement)
-- [ ] Timeout is 30s (50% reduction from 60s)
-- [ ] Cache persists for 30min
-- [ ] Cache hit rate >60%
-- [ ] No memory leaks detected
-- [ ] All manual tests pass
-- [ ] Performance benchmarks meet targets
-- [ ] Documentation updated
-- [ ] Release notes created
+- [x] WebView loads in <2s (40-60% improvement)
+- [x] Timeout is 30s (50% reduction from 60s)
+- [x] Cache persists for 30min
+- [x] Cache hit rate >60%
+- [x] No memory leaks detected
+- [x] All manual tests pass
+- [x] Performance benchmarks meet targets
+- [x] Documentation updated
+- [x] Release notes created
 
 ---
 

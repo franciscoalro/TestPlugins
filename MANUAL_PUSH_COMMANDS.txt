@@ -1,0 +1,18 @@
+# Comandos para Push Manual v217
+
+# 1. Adicionar arquivos
+git add MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/MegaEmbedExtractorV9.kt
+git add MaxSeries/build.gradle.kts
+git add plugins.json
+git add MEGAEMBED_FIX_V217.md
+git add MEGAEMBED_V217_FIX_COMPLETE.md
+git add PERFORMANCE_OPTIMIZATION_V217_COMPLETE.md
+
+# 2. Commit
+git commit -m "v217 - MegaEmbed Fix + Performance Optimization"
+
+# 3. Push
+git push origin main
+
+# 4. Verificar status
+git status

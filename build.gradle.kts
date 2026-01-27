@@ -17,6 +17,7 @@ buildscript {
         }
         classpath("com.github.vidstige:jadb:v1.2.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:2.3.0")
     }
 }
 
@@ -45,6 +46,7 @@ fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByN
 subprojects {
     apply(plugin = "com.android.library")
     apply(plugin = "kotlin-android")
+    apply(plugin = "kotlinx-serialization")
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {

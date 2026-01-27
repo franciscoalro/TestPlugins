@@ -17,7 +17,6 @@ import com.franciscoalro.maxseries.utils.VideoUrlCache
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorManual
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -25,7 +24,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v217 - Persistent Cache (Jan 2026)
+ * MaxSeries Provider v218 - PlayerEmbedAPI Removed (Jan 2026)
+ * 
+ * v218 Changes (27 Jan 2026):
+ * - ❌ PlayerEmbedAPI REMOVIDO (detecta automação e redireciona para abyss.to)
+ * - ✅ Mantidos: MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon
+ * - 🎯 Foco em extractors que funcionam sem detecção
  * 
  * v217 Changes (27 Jan 2026):
  * - 💾 Cache persistente com SharedPreferences (30min TTL)
@@ -38,18 +42,6 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  * - 👆 Usuário clica manualmente no overlay
  * - ⚡ Mais confiável que automação
  * - ✅ Hooks de rede capturam URL após click
- * 
- * v215 Changes (26 Jan 2026):
- * - 🚀 PlayerEmbedAPI decode base64 direto do HTML
- * - ⚡ Não precisa de WebView ou clicks!
- * - 🎯 Extração instantânea (<1s)
- * - ✅ Taxa de sucesso ~95%
- * 
- * v214 Changes (26 Jan 2026):
- * - 🔧 PlayerEmbedAPI REMOVE overlay do DOM
- * 
- * v213 Changes (26 Jan 2026):
- * - 🔧 PlayerEmbedAPI com XHR intercept
  * 
  * v211 Changes (26 Jan 2026):
  * - ❌ Removidas categorias "Filmes" e "Séries"
@@ -71,9 +63,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v217 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v218 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (MANUAL WebView!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
         
         // v217: Inicializar cache persistente
@@ -563,12 +555,6 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PlayerEmbedAPI (DESATIVADO - detecta automação e redireciona para abyss.to)
-                        // source.contains("playerembedapi", ignoreCase = true) -> {
-                        //     Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
-                        //     PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
-                        //     linksFound++
-                        // }
                         // DoodStream (muito popular - v209)
                         source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando DoodStreamExtractor...")

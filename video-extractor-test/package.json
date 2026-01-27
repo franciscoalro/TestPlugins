@@ -1,0 +1,35 @@
+{
+  "name": "video-extractor-test",
+  "version": "1.0.0",
+  "description": "TypeScript testing environment for video extractors before Kotlin implementation",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "test": "tsx src/test-all.ts",
+    "test:megaembed": "tsx src/extractors/megaembed.test.ts",
+    "test:myvidplay": "tsx src/extractors/myvidplay.test.ts",
+    "test:doodstream": "tsx src/extractors/doodstream.test.ts",
+    "test:streamtape": "tsx src/extractors/streamtape.test.ts",
+    "test:mixdrop": "tsx src/extractors/mixdrop.test.ts",
+    "test:filemoon": "tsx src/extractors/filemoon.test.ts"
+  },
+  "keywords": [
+    "video",
+    "extractor",
+    "cloudstream",
+    "typescript"
+  ],
+  "author": "franciscoalro",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "cheerio": "^1.0.0-rc.12",
+    "playwright": "^1.40.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

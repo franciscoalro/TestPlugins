@@ -12,7 +12,8 @@
     "test:doodstream": "tsx src/extractors/doodstream.test.ts",
     "test:streamtape": "tsx src/extractors/streamtape.test.ts",
     "test:mixdrop": "tsx src/extractors/mixdrop.test.ts",
-    "test:filemoon": "tsx src/extractors/filemoon.test.ts"
+    "test:filemoon": "tsx src/extractors/filemoon.test.ts",
+    "test:viewplayer": "tsx test-viewplayer.ts"
   },
   "keywords": [
     "video",

@@ -2,16 +2,19 @@ export { BaseExtractor } from './base';
 export { MyVidPlayExtractor } from './myvidplay';
 export { DoodStreamExtractor } from './doodstream';
 export { MegaEmbedExtractor } from './megaembed';
+export { ViewPlayerExtractor } from './viewplayer';
 
 import { IExtractor } from '../types';
 import { MyVidPlayExtractor } from './myvidplay';
 import { DoodStreamExtractor } from './doodstream';
 import { MegaEmbedExtractor } from './megaembed';
+import { ViewPlayerExtractor } from './viewplayer';
 
 /**
  * All available extractors
  */
 export const ALL_EXTRACTORS: IExtractor[] = [
+  new ViewPlayerExtractor(),
   new MyVidPlayExtractor(),
   new DoodStreamExtractor(),
   new MegaEmbedExtractor()

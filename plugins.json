@@ -1,20 +1,22 @@
-{
-    "name":  "MaxSeries",
-    "internalName":  "MaxSeries",
-    "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
-    "version":  216,
-    "apiVersion":  1,
-    "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
-    "fileSize":  200822,
-    "status":  1,
-    "language":  "pt-BR",
-    "description":  "MaxSeries v215 - PlayerEmbedAPI Direct Base64 Decode (20x faster!). Success rate: ~99%",
-    "authors":  [
-                    "franciscoalro"
-                ],
-    "tvTypes":  [
-                    "TvSeries",
-                    "Movie"
-                ],
-    "iconUrl":  "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
-}
+[
+    {
+        "name": "MaxSeries",
+        "internalName": "MaxSeries",
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
+        "version": 216,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+        "fileSize": 200822,
+        "status": 1,
+        "language": "pt-BR",
+        "description": "MaxSeries v216 - PlayerEmbedAPI Manual WebView (Click to Play). 7 extractors, 23 categories.",
+        "authors": [
+            "franciscoalro"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
+    }
+]

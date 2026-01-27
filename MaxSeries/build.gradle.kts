@@ -1,7 +1,7 @@
-version = 209
+version = 216
 
 cloudstream {
-    description = "MaxSeries v209 - Added 4 New Video Extractors (DoodStream, StreamTape, Mixdrop, Filemoon)"
+    description = "MaxSeries v216 - PlayerEmbedAPI Manual WebView (Click to Play)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

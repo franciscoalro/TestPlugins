@@ -7,29 +7,29 @@ import com.franciscoalro.maxseries.utils.*
 import android.util.Log
 
 /**
- * PlayerEmbedAPI Extractor v3.4 - DIRECT HTML EXTRACTION (Jan 2026)
+ * PlayerEmbedAPI Extractor v3.7 - DIRECT BASE64 DECODE (Jan 2026)
  * 
- * Baseado em análise Burp Suite (18/01/2026) e logs ADB v124.
+ * v3.7 Changes (26 Jan 2026):
+ * - 🚀 DECODE base64 diretamente do HTML!
+ * - ⚡ Não precisa de WebView, clicks ou espera
+ * - 🎯 Extrai `const datas = "base64..."` do código
+ * - ✅ Decripta usando AES-CTR (já existente)
  * 
- * PROBLEMA v124:
- * - WebView carrega página mas NÃO faz requisições para sssrr.org
- * - Timeout após 30s sem capturar nada
- * - JavaScript não executa ou é bloqueado
+ * DESCOBERTA IMPORTANTE:
+ * - PlayerEmbedAPI armazena dados do vídeo em base64 no HTML
+ * - Formato: const datas = "eyJ...base64...";
+ * - Contém: slug, md5_id, user_id, media (encriptado)
+ * - Solução: Decodificar base64 + decriptar media = URL do vídeo!
  * 
- * SOLUÇÃO v3.4:
- * - PRIORIDADE 1: Direct HTML/Regex extraction (SEM WebView)
- * - PRIORIDADE 2: AES-CTR decryption (já existente)
- * - PRIORIDADE 3: JsUnpacker (já existente)
- * - PRIORIDADE 4: WebView (fallback final)
+ * SOLUÇÃO v3.7:
+ * - PRIORIDADE 1: Direct Base64 Decode (NOVO! Mais rápido!)
+ * - PRIORIDADE 2: Direct API Extraction
+ * - PRIORIDADE 3: AES-CTR decryption (fallback)
+ * - PRIORIDADE 4: JsUnpacker
+ * - PRIORIDADE 5: HTML Regex fallback
  * 
- * Melhorias v3.4:
- * - Nova estratégia: Buscar URLs sssrr.org diretamente no HTML
- * - Padrões baseados em Burp Suite: sora/, future, .fd files
- * - WebView movido para último fallback
- * - Timeout reduzido para 20s (já que é fallback)
- * - Logs melhorados para debug
- * 
- * Analise completa: brcloudstream/PLAYEREMBEDAPI_BURP_ANALYSIS_V123.md
+ * Exemplo do código fonte:
+ * const datas = "eyJzbHVnIjoia0JKTHR4Q0QzIiwibWQ1X2lkIjoyODkzMDY0NywidXNlcl9pZCI6NDgyMTIwLCJtZWRpYSI6Ir...";
  */
 class PlayerEmbedAPIExtractor : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
@@ -76,6 +76,124 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         ErrorLogger.logCache(url, hit = false, VideoUrlCache.getStats())
         
+        // 0. FETCH HTML (Shared) - v115: Detecção de 404
+        val html = try {
+            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
+            
+            // v115: Falha rápida em 404 (vídeo não existe)
+            if (response.code == 404) {
+                ErrorLogger.w(TAG, "Vídeo não encontrado (404) - Pulando para próximo extractor", mapOf("URL" to url))
+                return // Falha rápida, sem retry
+            }
+            
+            // v115: Falha rápida em erros de servidor
+            if (response.code >= 500) {
+                ErrorLogger.w(TAG, "Servidor indisponível (${response.code}) - Pulando", mapOf("URL" to url))
+                return
+            }
+            
+            response.text
+        } catch (e: Exception) {
+            ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
+            return
+        }
+        
+        // 1. DIRECT BASE64 DECODE (v3.7 - MELHOR SOLUÇÃO!)
+        // PlayerEmbedAPI armazena dados do vídeo em base64 no HTML
+        // Não precisa de WebView, clicks ou espera!
+        runCatching {
+            Log.d(TAG, "[1/5] Tentando Direct Base64 Decode...")
+            
+            // Buscar o base64 no HTML
+            val base64Regex = Regex("""const datas = "([A-Za-z0-9+/=]+)";""")
+            val base64Match = base64Regex.find(html)
+            
+            if (base64Match != null) {
+                val base64Data = base64Match.groupValues[1]
+                Log.d(TAG, "Base64 encontrado: ${base64Data.take(50)}...")
+                
+                try {
+                    // Decodificar base64
+                    val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                    val decodedJson = String(decodedBytes, Charsets.UTF_8)
+                    Log.d(TAG, "JSON decodificado: ${decodedJson.take(200)}...")
+                    
+                    // Parse JSON
+                    val mapper = com.fasterxml.jackson.databind.ObjectMapper()
+                    val dataNode = mapper.readTree(decodedJson)
+                    
+                    // Extrair media (está encriptado)
+                    val mediaEncrypted = dataNode.get("media")?.asText()
+                    val userId = dataNode.get("user_id")?.asText()
+                    val slug = dataNode.get("slug")?.asText()
+                    val md5Id = dataNode.get("md5_id")?.asText()
+                    
+                    if (!mediaEncrypted.isNullOrEmpty() && !userId.isNullOrEmpty() && 
+                        !slug.isNullOrEmpty() && !md5Id.isNullOrEmpty()) {
+                        
+                        Log.d(TAG, "Decriptando media... UserID: $userId, Slug: $slug")
+                        val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted, userId, slug, md5Id)
+                        
+                        if (decrypted != null) {
+                            var found = false
+                            
+                            decrypted.hls?.let { hlsUrl ->
+                                Log.d(TAG, "Base64 Decode capturou HLS: $hlsUrl")
+                                
+                                val quality = QualityDetector.detectFromUrl(hlsUrl)
+                                VideoUrlCache.put(url, hlsUrl, quality, name)
+                                
+                                callback.invoke(
+                                    newExtractorLink(
+                                        source = name,
+                                        name = "$name ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                        url = hlsUrl,
+                                        type = ExtractorLinkType.VIDEO
+                                    ) {
+                                        this.referer = "https://playerembedapi.link/"
+                                        this.quality = quality
+                                    }
+                                )
+                                found = true
+                            }
+                            
+                            decrypted.mp4?.let { mp4Url ->
+                                Log.d(TAG, "Base64 Decode capturou MP4: $mp4Url")
+                                
+                                val quality = QualityDetector.detectFromUrl(mp4Url)
+                                
+                                callback.invoke(
+                                    newExtractorLink(
+                                        source = name,
+                                        name = "$name MP4 ${QualityDetector.getQualityLabel(quality)} (Direct)",
+                                        url = mp4Url,
+                                        type = ExtractorLinkType.VIDEO
+                                    ) {
+                                        this.referer = "https://playerembedapi.link/"
+                                        this.quality = quality
+                                    }
+                                )
+                                found = true
+                            }
+                            
+                            if (found) {
+                                Log.d(TAG, "Base64 Decode: SUCESSO")
+                                ErrorLogger.logPerformance("PlayerEmbedAPI Base64", 
+                                    System.currentTimeMillis() - startTime)
+                                return
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Erro ao decodificar base64: ${e.message}")
+                }
+            }
+            
+            Log.d(TAG, "Base64 Decode: Não encontrou dados")
+        }.onFailure { e ->
+            Log.e(TAG, "Base64 Decode falhou: ${e.message}")
+        }
+        
         // 2. DIRECT API EXTRACTION (v125 - Baseado em analise Postman)
         // Fluxo descoberto:
         // 1. GET playerembedapi.link/?v={videoId} -> HTML/JS
@@ -83,7 +201,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         // 3. GET {host}.sssrr.org/?timestamp=&id={id} -> metadata
         // 4. Extrair URL final: {host}.sssrr.org/sora/{streamId}/{token}
         runCatching {
-            Log.d(TAG, "[1/4] Tentando Direct API Extraction...")
+            Log.d(TAG, "[2/5] Tentando Direct API Extraction...")
             
             val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
             val html = response.text
@@ -152,30 +270,8 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }.onFailure { e ->
             Log.e(TAG, "Direct API falhou: ${e.message}")
         }
-        
-        // 0. FETCH HTML (Shared) - v115: Detecção de 404
-        val html = try {
-            val response = app.get(url, headers = HeadersBuilder.playerEmbed(url))
-            
-            // v115: Falha rápida em 404 (vídeo não existe)
-            if (response.code == 404) {
-                ErrorLogger.w(TAG, "Vídeo não encontrado (404) - Pulando para próximo extractor", mapOf("URL" to url))
-                return // Falha rápida, sem retry
-            }
-            
-            // v115: Falha rápida em erros de servidor
-            if (response.code >= 500) {
-                ErrorLogger.w(TAG, "Servidor indisponível (${response.code}) - Pulando", mapOf("URL" to url))
-                return
-            }
-            
-            response.text
-        } catch (e: Exception) {
-            ErrorLogger.e(TAG, "Falha ao obter HTML inicial", error = e)
-            return
-        }
 
-        // 2. NATIVE DECRYPTION (v103 - AES-CTR)
+        // 3. NATIVE DECRYPTION (v103 - AES-CTR)
         runCatching {
             ErrorLogger.d(TAG, "Tentando Decriptação Nativa (AES-CTR)...", mapOf("URL" to url))
             
@@ -228,7 +324,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
         
-        // 3. STEALTH FALLBACK (JsUnpacker)
+        // 4. STEALTH FALLBACK (JsUnpacker)
         runCatching {
             ErrorLogger.d(TAG, "Tentando Stealth Extraction (JsUnpackerUtil)...", mapOf("URL" to url))
             
@@ -267,7 +363,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             }
         }
 
-        // 3.5 HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
+        // 5. HTML REGEX FALLBACK (v104 - saimuelrepo pattern)
         runCatching {
             ErrorLogger.d(TAG, "Tentando HTML Regex Fallback...", mapOf("URL" to url))
             
@@ -319,15 +415,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             Log.d(TAG, "HTML Regex: Nenhuma URL valida encontrada")
         }
 
-        // v168: WebView removido! Causava timeout (30s+) e era cancelado pelo CloudStream
-        // Todas as técnicas acima (Direct API, AES-CTR, JsUnpacker, HTML Regex) são rápidas (<5s)
-        // Se nenhuma funcionar, falha rápido e deixa outros extractors tentarem
+        // v3.5: Se WebView com overlay click não funcionou, falha rápido
+        // Deixa outros extractors (MegaEmbed, MyVidPlay, DoodStream) tentarem
         
-        Log.d(TAG, "PlayerEmbedAPI: Todas as técnicas falharam (sem WebView na v168)")
+        Log.d(TAG, "PlayerEmbedAPI: Todas as técnicas falharam (incluindo WebView com overlay)")
         Log.d(TAG, "Tempo total: ${System.currentTimeMillis() - startTime}ms")
         
-        // Não lançar exception - deixar outros extractors (MegaEmbed, MyVidPlay) tentarem
-        ErrorLogger.w(TAG, "PlayerEmbedAPI não conseguiu extrair via métodos rápidos", mapOf(
+        // Não lançar exception - deixar outros extractors tentarem
+        ErrorLogger.w(TAG, "PlayerEmbedAPI não conseguiu extrair", mapOf(
             "URL" to url,
             "Tempo" to "${System.currentTimeMillis() - startTime}ms"
         ))

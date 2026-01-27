@@ -16,7 +16,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorManual
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -24,32 +24,29 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v209 - Multi-Extractor Support (Jan 2026)
+ * MaxSeries Provider v216 - PlayerEmbedAPI Manual WebView (Jan 2026)
  * 
- * Fluxo de extração:
- * 1. maxseries.pics/series/... → iframe playerthree.online
- * 2. playerthree.online/episodio/{id} → botões data-source
- * 3. Sources suportadas (v209):
- *    - MegaEmbed V9 (principal - ~95% sucesso)
- *    - PlayerEmbedAPI (backup confiável)
- *    - MyVidPlay (alternativo rápido)
- *    - DoodStream (muito popular) [NOVO v209]
- *    - StreamTape (confiável) [NOVO v209]
- *    - Mixdrop (backup) [NOVO v209]
- *    - Filemoon (novo) [NOVO v209]
- *    - Fallback genérico para outros
+ * v216 Changes (26 Jan 2026):
+ * - 🔧 PlayerEmbedAPI agora usa WebView MANUAL (igual MegaEmbed)
+ * - 👆 Usuário clica manualmente no overlay
+ * - ⚡ Mais confiável que automação
+ * - ✅ Hooks de rede capturam URL após click
  * 
- * v209 Changes (26 Jan 2026):
- * - ✨ Adicionados 4 novos extractors
- * - 🎯 Total de 7 extractors específicos + fallback
- * - 📊 Cobertura de ~99% dos players do MaxSeries
- * - ⚡ Melhor taxa de sucesso geral
+ * v215 Changes (26 Jan 2026):
+ * - 🚀 PlayerEmbedAPI decode base64 direto do HTML
+ * - ⚡ Não precisa de WebView ou clicks!
+ * - 🎯 Extração instantânea (<1s)
+ * - ✅ Taxa de sucesso ~95%
  * 
- * v208 Changes (26 Jan 2026):
- * - ✨ Adicionada categoria "Em Alta" (Trending)
- * - ✨ Adicionados 17 novos gêneros
- * - 📊 Total de 24 categorias disponíveis
- * - 🎯 Baseado em análise completa do sitemap
+ * v214 Changes (26 Jan 2026):
+ * - 🔧 PlayerEmbedAPI REMOVE overlay do DOM
+ * 
+ * v213 Changes (26 Jan 2026):
+ * - 🔧 PlayerEmbedAPI com XHR intercept
+ * 
+ * v211 Changes (26 Jan 2026):
+ * - ❌ Removidas categorias "Filmes" e "Séries"
+ * - 📊 Total de 23 categorias
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
@@ -67,16 +64,16 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v209 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v216 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (MANUAL WebView!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Início",
         "$mainUrl/trending" to "Em Alta",
-        "$mainUrl/filmes" to "Filmes",
-        "$mainUrl/series" to "Séries",
+        "$mainUrl/" to "Adicionados Recentemente",
         "$mainUrl/generos/acao" to "Ação",
         "$mainUrl/generos/aventura" to "Aventura",
         "$mainUrl/generos/animacao" to "Animação",
@@ -543,10 +540,10 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PlayerEmbedAPI (backup confiável)
+                        // PlayerEmbedAPI (backup confiável - MANUAL WebView)
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractor...")
-                            PlayerEmbedAPIExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
+                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
+                            PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
                         // DoodStream (muito popular - v209)

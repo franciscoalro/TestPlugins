@@ -3,13 +3,13 @@
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
-        "version": 216,
+        "version": 217,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 200822,
+        "fileSize": 205000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v216 - PlayerEmbedAPI Manual WebView (Click to Play). 7 extractors, 23 categories.",
+        "description": "MaxSeries v217 - Performance Optimization: WebView Pool (90% faster), Adaptive Timeout (50% reduction), Persistent Cache (30min TTL, 60% hit rate). 7 extractors, 23 categories.",
         "authors": [
             "franciscoalro"
         ],

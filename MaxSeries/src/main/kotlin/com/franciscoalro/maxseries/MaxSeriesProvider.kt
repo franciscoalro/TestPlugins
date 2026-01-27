@@ -563,12 +563,12 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PlayerEmbedAPI (backup confiável - MANUAL WebView)
-                        source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
-                            PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
-                            linksFound++
-                        }
+                        // PlayerEmbedAPI (DESATIVADO - detecta automação e redireciona para abyss.to)
+                        // source.contains("playerembedapi", ignoreCase = true) -> {
+                        //     Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
+                        //     PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
+                        //     linksFound++
+                        // }
                         // DoodStream (muito popular - v209)
                         source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {
                             Log.d(TAG, "⚡ Tentando DoodStreamExtractor...")

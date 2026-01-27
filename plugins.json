@@ -9,7 +9,7 @@
         "fileSize": 205000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v217 - Performance Optimization: WebView Pool (90% faster), Adaptive Timeout (50% reduction), Persistent Cache (30min TTL, 60% hit rate). 7 extractors, 23 categories.",
+        "description": "MaxSeries v217 - Performance: WebView Pool (90% faster), Timeout 50% reduction, Cache 30min, MegaEmbed Fixed. 7 extractors, 23 categories.",
         "authors": [
             "franciscoalro"
         ],

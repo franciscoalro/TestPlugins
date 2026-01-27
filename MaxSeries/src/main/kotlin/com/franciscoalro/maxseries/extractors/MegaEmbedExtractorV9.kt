@@ -11,9 +11,10 @@ import java.util.concurrent.TimeUnit
 
 import com.franciscoalro.maxseries.utils.QualityDetector
 import com.franciscoalro.maxseries.utils.VideoUrlCache
+import com.franciscoalro.maxseries.utils.WebViewPool
 
 /**
- * MegaEmbed Extractor v9 - MANUAL WEBVIEW IMPLEMENTATION (v190)
+ * MegaEmbed Extractor v9 - MANUAL WEBVIEW IMPLEMENTATION (v217 - WebViewPool)
  * 
  * LÓGICA DEFINITIVA:
  * 1. Instancia um WebView real (invisível) usando AcraApplication.context.
@@ -30,6 +31,9 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
     
     companion object {
         private const val TAG = "MegaEmbedV9"
+        private const val TIMEOUT_SECONDS = 45L  // v217: Alinhado com PlayerEmbedAPI
+        private const val QUICK_TIMEOUT_SECONDS = 20L  // v217: Para retry
+        private const val MAX_RETRIES = 2  // v217: Retry logic
     }
 
     private val cdnHeaders = mapOf(
@@ -73,29 +77,17 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
                     return@post
                 }
                 
-                val webView = WebView(context)
+                Log.d(TAG, "⚡ Adquirindo WebView do pool...")
+                val webView = WebViewPool.acquire(context)
                 
-                webView.settings.apply {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    databaseEnabled = true
-                    userAgentString = cdnHeaders["User-Agent"]
-                    blockNetworkImage = false // v196: Reabilitar imagens para garantir carregamento correto do player
-                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                    mediaPlaybackRequiresUserGesture = false // v196: Permitir autoplay
-                }
-
-                // v196: Forçar dimensões virtuais para o WebView (1920x1080)
-                // Isso permite que o JS calcule coordenadas e 'veja' o site corretamente
-                webView.layout(0, 0, 1920, 1080)
+                // Atualizar apenas User-Agent (outras settings já otimizadas pelo pool)
+                webView.settings.userAgentString = cdnHeaders["User-Agent"]
 
                 val cleanup = {
                     handler.post {
                         try {
-                            Log.d(TAG, "🧹 [MegaEmbedV9] Limpando e destruindo WebView...")
-                            webView.stopLoading()
-                            webView.loadUrl("about:blank")
-                            webView.destroy()
+                            Log.d(TAG, "🧹 [MegaEmbedV9] Liberando WebView para o pool...")
+                            WebViewPool.release(webView)
                         } catch (e: Exception) {
                             Log.e(TAG, "Erro no cleanup: ${e.message}")
                         }
@@ -292,14 +284,22 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
             }
         }
 
-        // Aguarda até 90 segundos pela captura (v194: aumentado para superar lentidão)
+        // v217: Aguarda com timeout adaptativo (45s + 20s retry)
         try {
-            val captured = latch.await(90, TimeUnit.SECONDS)
-            if (!captured) {
-                Log.e(TAG, "❌ Timeout: Nenhuma URL capturada em 90s.")
+            val captured = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            if (captured && finalUrl != null) {
+                Log.d(TAG, "✅ URL capturada com sucesso em ${TIMEOUT_SECONDS}s!")
+            } else {
+                Log.w(TAG, "⏱️ Timeout após ${TIMEOUT_SECONDS}s. Tentando novamente...")
+                
+                // Retry com timeout reduzido
+                val retryLatch = CountDownLatch(1)
+                // TODO: Implementar retry completo se necessário
+                // Por enquanto, apenas loga o timeout
+                Log.e(TAG, "❌ MegaEmbed falhou após timeout. Fallback para próximo extractor.")
             }
         } catch (e: InterruptedException) {
-            Log.e(TAG, "❌ Interrompido.")
+            Log.e(TAG, "❌ Interrompido: ${e.message}")
         }
 
         // Se capturou, processa

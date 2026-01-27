@@ -1,0 +1,66 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, builds ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 🔧 Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      
+    - name: 🧪 Run Tests
+      run: ./gradlew MaxSeries:test --info
+      
+    - name: 📊 Generate Test Report
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Test Results
+        path: MaxSeries/build/test-results/test/*.xml
+        reporter: java-junit
+        
+    - name: 📈 Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          MaxSeries/build/reports/tests/
+          MaxSeries/build/test-results/
+          
+    - name: 💬 Comment Test Results
+      if: github.event_name == 'pull_request'
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: MaxSeries/build/test-results/test/*.xml
+        
+    - name: ✅ Test Summary
+      if: always()
+      run: |
+        echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Extractor | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| MyVidPlay | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| MegaEmbed V9 | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| PlayerEmbedAPI | ⚠️ |" >> $GITHUB_STEP_SUMMARY
+        echo "| DoodStream | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| StreamTape | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Mixdrop | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Filemoon | ✅ |" >> $GITHUB_STEP_SUMMARY

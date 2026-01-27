@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit
 
 import com.franciscoalro.maxseries.utils.QualityDetector
 import com.franciscoalro.maxseries.utils.VideoUrlCache
+import com.franciscoalro.maxseries.utils.WebViewPool
 
 /**
  * PlayerEmbedAPI Extractor v4.0 - MANUAL WEBVIEW (Jan 2026)
@@ -35,6 +36,9 @@ class PlayerEmbedAPIExtractorManual : ExtractorApi() {
     
     companion object {
         private const val TAG = "PlayerEmbedAPI"
+        private const val TIMEOUT_SECONDS = 30L  // Reduced from 60L (50% reduction)
+        private const val QUICK_TIMEOUT_SECONDS = 15L  // For retry attempts
+        private const val MAX_RETRIES = 2  // Maximum retry attempts
     }
 
     private val headers = mapOf(
@@ -52,10 +56,21 @@ class PlayerEmbedAPIExtractorManual : ExtractorApi() {
     ) {
         Log.d(TAG, "🚀 [MANUAL] Iniciando PlayerEmbedAPI Manual para: $url")
         
-        var finalUrl: String? = null
-        val latch = CountDownLatch(1)
+        var attempt = 0
+        var success = false
+        
+        while (attempt < MAX_RETRIES && !success) {
+            attempt++
+            
+            // Adaptive timeout: 30s for first attempt, 15s for retry
+            val timeout = if (attempt == 1) TIMEOUT_SECONDS else QUICK_TIMEOUT_SECONDS
+            Log.d(TAG, "🔄 Tentativa $attempt/$MAX_RETRIES (timeout: ${timeout}s)")
+            
+            var finalUrl: String? = null
+            val latch = CountDownLatch(1)
+            var webViewRef: WebView? = null  // Referência para cleanup
 
-        val handler = Handler(Looper.getMainLooper())
+            val handler = Handler(Looper.getMainLooper())
         
         handler.post {
             try {
@@ -75,33 +90,12 @@ class PlayerEmbedAPIExtractorManual : ExtractorApi() {
                     return@post
                 }
                 
-                val webView = WebView(context)
+                Log.d(TAG, "⚡ Adquirindo WebView do pool...")
+                val webView = WebViewPool.acquire(context)
+                webViewRef = webView  // Armazenar referência para cleanup
                 
-                webView.settings.apply {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    databaseEnabled = true
-                    userAgentString = headers["User-Agent"]
-                    blockNetworkImage = false
-                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                    mediaPlaybackRequiresUserGesture = false
-                }
-
-                // Forçar dimensões virtuais
-                webView.layout(0, 0, 1920, 1080)
-
-                val cleanup = {
-                    handler.post {
-                        try {
-                            Log.d(TAG, "🧹 Limpando e destruindo WebView...")
-                            webView.stopLoading()
-                            webView.loadUrl("about:blank")
-                            webView.destroy()
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Erro no cleanup: ${e.message}")
-                        }
-                    }
-                }
+                // Atualizar apenas User-Agent (outras settings já otimizadas pelo pool)
+                webView.settings.userAgentString = headers["User-Agent"]
 
                 // Script injetado para capturar URL
                 val injectedScript = """
@@ -239,11 +233,12 @@ class PlayerEmbedAPIExtractorManual : ExtractorApi() {
             }
         }
 
-        // Aguardar captura (timeout 60s para dar tempo do usuário clicar)
-        val captured = latch.await(60, TimeUnit.SECONDS)
+        // Aguardar captura com timeout adaptativo
+        val captured = latch.await(timeout, TimeUnit.SECONDS)
         
         if (captured && finalUrl != null) {
-            Log.d(TAG, "✅ [MANUAL] Sucesso! URL: $finalUrl")
+            Log.d(TAG, "✅ [MANUAL] Sucesso na tentativa $attempt! URL: $finalUrl")
+            success = true
             
             val quality = QualityDetector.detectFromUrl(finalUrl!!)
             VideoUrlCache.put(url, finalUrl!!, quality, name)
@@ -260,7 +255,28 @@ class PlayerEmbedAPIExtractorManual : ExtractorApi() {
                 }
             )
         } else {
-            Log.e(TAG, "❌ [MANUAL] Timeout ou falha na captura")
+            Log.w(TAG, "⏱️ Timeout após ${timeout}s (tentativa $attempt)")
+            
+            if (attempt < MAX_RETRIES) {
+                Log.d(TAG, "🔄 Tentando novamente com timeout reduzido...")
+            } else {
+                Log.e(TAG, "❌ [MANUAL] Falha após $MAX_RETRIES tentativas. Fallback para próximo extractor.")
+                Log.e(TAG, "💡 Sugestão: Verifique se o usuário clicou no overlay ou se a rede está lenta.")
+            }
         }
+        
+        // Sempre liberar WebView de volta ao pool
+        webViewRef?.let { webView ->
+            handler.post {
+                try {
+                    Log.d(TAG, "🔓 Liberando WebView de volta ao pool (tentativa $attempt)...")
+                    WebViewPool.release(webView)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Erro ao liberar WebView: ${e.message}")
+                }
+            }
+        }
+        
+        } // End of retry loop
     }
 }

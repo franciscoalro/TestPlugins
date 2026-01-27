@@ -12,6 +12,7 @@ import com.franciscoalro.maxseries.utils.HeadersBuilder
 import com.franciscoalro.maxseries.utils.LinkDecryptor
 import com.franciscoalro.maxseries.utils.RegexPatterns
 import com.franciscoalro.maxseries.utils.BRExtractorUtils
+import com.franciscoalro.maxseries.utils.VideoUrlCache
 
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
@@ -24,7 +25,13 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v216 - PlayerEmbedAPI Manual WebView (Jan 2026)
+ * MaxSeries Provider v217 - Persistent Cache (Jan 2026)
+ * 
+ * v217 Changes (27 Jan 2026):
+ * - 💾 Cache persistente com SharedPreferences (30min TTL)
+ * - 🚀 LRU eviction (max 100 URLs)
+ * - 📊 Hit rate tracking (target: >60%)
+ * - ⚡ Cache sobrevive restart do app
  * 
  * v216 Changes (26 Jan 2026):
  * - 🔧 PlayerEmbedAPI agora usa WebView MANUAL (igual MegaEmbed)
@@ -64,10 +71,26 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v216 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v217 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (MANUAL WebView!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
+        
+        // v217: Inicializar cache persistente
+        try {
+            val context = Class.forName("android.app.ActivityThread")
+                .getMethod("currentApplication")
+                .invoke(null) as android.content.Context
+            VideoUrlCache.init(context)
+            Log.d(TAG, "✅ Cache persistente inicializado (30min TTL, 100 URLs max)")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Erro ao inicializar cache persistente: ${e.message}")
+            Log.e(TAG, "⚠️ Usando apenas cache em memória (5min TTL)")
+        }
+        
+        // Note: WebViewPool.destroy() não é chamado aqui pois o pool é singleton
+        // e deve persistir durante toda a vida do app. Android gerencia o cleanup
+        // quando o app é destruído.
     }
 
     override val mainPage = mainPageOf(

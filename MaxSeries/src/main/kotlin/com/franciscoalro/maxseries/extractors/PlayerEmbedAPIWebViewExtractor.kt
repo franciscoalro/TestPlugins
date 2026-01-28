@@ -2,10 +2,8 @@ package com.franciscoalro.maxseries.extractors
 
 import android.annotation.SuppressLint
 import android.webkit.*
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.*
-import java.util.concurrent.TimeUnit
 
 class PlayerEmbedAPIWebViewExtractor {
     
@@ -18,7 +16,17 @@ class PlayerEmbedAPIWebViewExtractor {
             extractionJob = CompletableDeferred()
             capturedUrls.clear()
             
-            val webView = WebView(com.lagradost.cloudstream3.app).apply {
+            // Obter Context do app
+            val context = try {
+                Class.forName("android.app.ActivityThread")
+                    .getMethod("currentApplication")
+                    .invoke(null) as android.content.Context
+            } catch (e: Exception) {
+                android.util.Log.e("PlayerEmbedAPI", "Erro ao obter Context: ${e.message}")
+                return@withContext emptyList()
+            }
+            
+            val webView = WebView(context).apply {
                 settings.apply {
                     javaScriptEnabled = true
                     domStorageEnabled = true
@@ -191,21 +199,31 @@ class PlayerEmbedAPIWebViewExtractor {
         webView.evaluateJavascript(script, null)
     }
     
-    private fun convertToExtractorLinks(): List<ExtractorLink> {
+    private suspend fun convertToExtractorLinks(): List<ExtractorLink> {
         return capturedUrls.mapNotNull { url ->
             try {
-                ExtractorLink(
+                newExtractorLink(
                     source = "PlayerEmbedAPI",
-                    name = "PlayerEmbedAPI",
+                    name = "PlayerEmbedAPI ${getQualityLabel(detectQuality(url))}",
                     url = url,
-                    referer = "https://viewplayer.online/",
-                    quality = detectQuality(url),
-                    isM3u8 = false
-                )
+                    type = ExtractorLinkType.VIDEO
+                ) {
+                    this.referer = "https://viewplayer.online/"
+                }
             } catch (e: Exception) {
                 android.util.Log.e("PlayerEmbedAPI", "Error creating link: ${e.message}")
                 null
             }
+        }
+    }
+    
+    private fun getQualityLabel(quality: Int): String {
+        return when (quality) {
+            Qualities.P1080.value -> "1080p"
+            Qualities.P720.value -> "720p"
+            Qualities.P480.value -> "480p"
+            Qualities.P360.value -> "360p"
+            else -> "HD"
         }
     }
     
@@ -228,14 +246,14 @@ class PlayerEmbedAPIWebViewExtractor {
             
             // Se capturou URLs, completar extração
             if (capturedUrls.isNotEmpty()) {
-                extractionJob?.complete(convertToExtractorLinks())
+                extractionJob?.complete(runBlocking { convertToExtractorLinks() })
             }
         }
         
         @JavascriptInterface
         fun onTimeout() {
             android.util.Log.d("PlayerEmbedAPI", "JS callback - Timeout")
-            extractionJob?.complete(convertToExtractorLinks())
+            extractionJob?.complete(runBlocking { convertToExtractorLinks() })
         }
     }
 }

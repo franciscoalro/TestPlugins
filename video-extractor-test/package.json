@@ -14,7 +14,29 @@
     "test:mixdrop": "tsx src/extractors/mixdrop.test.ts",
     "test:filemoon": "tsx src/extractors/filemoon.test.ts",
     "test:viewplayer": "tsx test-viewplayer.ts",
+    "test:viewplayer:complete": "tsx test-viewplayer-complete.ts",
+    "test:viewplayer:real": "tsx test-viewplayer-real.ts",
+    "test:viewplayer:manual": "tsx test-viewplayer-manual.ts",
+    "test:viewplayer:auto": "tsx test-viewplayer-auto.ts",
+    "test:viewplayer:instant": "tsx test-viewplayer-instant.ts",
+    "test:viewplayer:turbo": "tsx test-viewplayer-turbo.ts",
     "test:playerembedapi": "tsx test-playerembedapi-real.ts",
+    "test:playerembedapi:direct": "tsx test-playerembedapi-direct.ts",
+    "test:playerembedapi:stealth": "tsx test-playerembedapi-stealth.ts",
+    "test:playerembedapi:http": "tsx test-playerembedapi-http.ts",
+    "test:playerembedapi:iframe": "tsx test-playerembedapi-iframe.ts",
+    "test:playerembedapi:advanced": "tsx test-playerembedapi-advanced.ts",
+    "test:playerembedapi:ultimate": "tsx test-playerembedapi-ultimate.ts",
+    "test:playerembedapi:final": "tsx test-playerembedapi-final.ts",
+    "test:playerembedapi:chrome": "tsx test-playerembedapi-chrome.ts",
+    "test:playerembedapi:viewframe": "tsx test-playerembedapi-viewframe.ts",
+    "test:playerembedapi:headers": "tsx test-playerembedapi-headers.ts",
+    "test:playerembedapi:real": "tsx test-playerembedapi-real.ts",
+    "test:playerembedapi:cdp": "tsx test-playerembedapi-cdp.ts",
+    "test:playerembedapi:fast": "tsx test-playerembedapi-fast.ts",
+    "test:playerembedapi:optimized": "tsx test-playerembedapi-optimized.ts",
+    "test:playerembedapi:debug": "tsx test-playerembedapi-debug.ts",
+    "test:playerembedapi:undetected": "tsx test-playerembedapi-undetected.ts",
     "test:myvidplay:real": "tsx test-myvidplay-real.ts"
   },
   "keywords": [
@@ -28,7 +50,12 @@
   "dependencies": {
     "axios": "^1.6.5",
     "cheerio": "^1.0.0-rc.12",
-    "playwright": "^1.40.1"
+    "playwright": "^1.40.1",
+    "puppeteer": "^24.36.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-adblocker": "^2.13.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-real-browser": "^1.4.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",

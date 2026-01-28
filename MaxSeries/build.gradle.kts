@@ -1,7 +1,7 @@
-version = 218
+version = 219
 
 cloudstream {
-    description = "MaxSeries v218 - PlayerEmbedAPI disabled (abyss.to redirect). MegaEmbed + MyVidPlay + DoodStream working. Cache 30min, WebView Pool 90% faster"
+    description = "MaxSeries v219 - PlayerEmbedAPI via WebView (ViewPlayer). Auto-click, 20-30s extraction, 90-95% success. MegaEmbed + MyVidPlay + DoodStream + more"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

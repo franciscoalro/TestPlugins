@@ -3,13 +3,13 @@
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
-        "version": 219,
+        "version": 220,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "fileSize": 210000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v219 - PlayerEmbedAPI via WebView (ViewPlayer). Auto-click, 20-30s extraction, 90-95% success. MegaEmbed + MyVidPlay + DoodStream + more.",
+        "description": "MaxSeries v220 - PlayerEmbedAPI FIXED! Detecta viewplayer.online, processa sources corretamente. WebView automation, 20-30s extraction, 90-95% success.",
         "authors": [
             "franciscoalro"
         ],

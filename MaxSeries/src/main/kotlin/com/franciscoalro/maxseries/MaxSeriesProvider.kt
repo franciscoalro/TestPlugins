@@ -25,7 +25,13 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 
 /**
- * MaxSeries Provider v219 - PlayerEmbedAPI via WebView (Jan 2026)
+ * MaxSeries Provider v220 - PlayerEmbedAPI ViewPlayer Fix (Jan 2026)
+ * 
+ * v220 Changes (28 Jan 2026):
+ * - 🐛 FIX: Detecta viewplayer.online além de playerthree.online
+ * - 🐛 FIX: extractFromPlayerthreeDirect() agora processa PlayerEmbedAPI
+ * - ✅ PlayerEmbedAPI agora funciona para filmes diretos
+ * - 🎯 Sources são extraídas e processadas corretamente
  * 
  * v219 Changes (27 Jan 2026):
  * - ✅ PlayerEmbedAPI RE-ADICIONADO via WebView
@@ -72,7 +78,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v219 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v220 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
@@ -489,8 +495,8 @@ class MaxSeriesProvider : MainAPI() {
                 
                 linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, seasonId, subtitleCallback, callback)
             } 
-            // URL direta do playerthree
-            else if (data.contains("playerthree.online")) {
+            // URL direta do playerthree ou viewplayer (v219: adicionado viewplayer)
+            else if (data.contains("playerthree.online") || data.contains("viewplayer.online")) {
                 linksFound = extractFromPlayerthreeDirect(data, subtitleCallback, callback)
             }
             // URL do MaxSeries (fallback)
@@ -665,10 +671,60 @@ class MaxSeriesProvider : MainAPI() {
             // Se não encontrou episódios, procurar sources diretas
             if (linksFound == 0) {
                 val sources = extractPlayerSources(document.html())
+                Log.d(TAG, "🎯 Sources encontradas (direct): ${sources.size} - $sources")
+                
+                // Processar cada source com o extractor apropriado
                 for (source in sources) {
                     try {
-                        loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
-                        linksFound++
+                        Log.d(TAG, "🔍 Processando source (direct): $source")
+                        when {
+                            // v219: PlayerEmbedAPI via WebView
+                            source.contains("playerembedapi", ignoreCase = true) -> {
+                                Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI DETECTADO (DIRECT)! 🌐🌐🌐")
+                                Log.d(TAG, "⚡ Tentando PlayerEmbedAPIWebViewExtractor...")
+                                try {
+                                    val imdbId = extractImdbIdFromUrl(playerthreeUrl)
+                                    Log.d(TAG, "🎬 IMDB ID extraído: $imdbId")
+                                    
+                                    if (imdbId != null) {
+                                        Log.d(TAG, "✅ Iniciando extração WebView para IMDB: $imdbId")
+                                        val extractor = PlayerEmbedAPIWebViewExtractor()
+                                        val links = extractor.extract(imdbId)
+                                        links.forEach { callback(it) }
+                                        linksFound += links.size
+                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI: ${links.size} links via WebView ✅✅✅")
+                                    } else {
+                                        Log.e(TAG, "❌ IMDB ID não encontrado para PlayerEmbedAPI")
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${e.message}")
+                                }
+                            }
+                            // MegaEmbed
+                            source.contains("megaembed", ignoreCase = true) -> {
+                                Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV9...")
+                                MegaEmbedExtractorV9().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                                linksFound++
+                            }
+                            // MyVidPlay
+                            source.contains("myvidplay", ignoreCase = true) -> {
+                                Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
+                                MyVidPlayExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                                linksFound++
+                            }
+                            // DoodStream
+                            source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {
+                                Log.d(TAG, "⚡ Tentando DoodStreamExtractor...")
+                                DoodStreamExtractor().getUrl(source, playerthreeUrl, subtitleCallback, callback)
+                                linksFound++
+                            }
+                            // Outros
+                            else -> {
+                                Log.d(TAG, "⚠️ Source desconhecida, tentando loader genérico: $source")
+                                loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
+                                linksFound++
+                            }
+                        }
                     } catch (e: Exception) {
                         Log.e(TAG, "⚠️ Erro no extractor: ${e.message}")
                     }

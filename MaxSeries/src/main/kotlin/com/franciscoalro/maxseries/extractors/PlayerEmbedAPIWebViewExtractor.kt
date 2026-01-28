@@ -12,7 +12,10 @@ class PlayerEmbedAPIWebViewExtractor {
     
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun extract(imdbId: String, referer: String = "https://viewplayer.online/"): List<ExtractorLink> {
+        android.util.Log.wtf("PlayerEmbedAPI", "🚀🚀🚀 EXTRACT CHAMADO! IMDB: $imdbId 🚀🚀🚀")
+        
         return withContext(Dispatchers.Main) {
+            android.util.Log.d("PlayerEmbedAPI", "📱 Iniciando extração na Main thread")
             extractionJob = CompletableDeferred()
             capturedUrls.clear()
             
@@ -22,9 +25,11 @@ class PlayerEmbedAPIWebViewExtractor {
                     .getMethod("currentApplication")
                     .invoke(null) as android.content.Context
             } catch (e: Exception) {
-                android.util.Log.e("PlayerEmbedAPI", "Erro ao obter Context: ${e.message}")
+                android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao obter Context: ${e.message}")
                 return@withContext emptyList()
             }
+            
+            android.util.Log.d("PlayerEmbedAPI", "✅ Context obtido: ${context.javaClass.simpleName}")
             
             val webView = WebView(context).apply {
                 settings.apply {
@@ -97,14 +102,15 @@ class PlayerEmbedAPIWebViewExtractor {
             
             // Carregar ViewPlayer
             val viewPlayerUrl = "https://viewplayer.online/filme/$imdbId"
-            android.util.Log.d("PlayerEmbedAPI", "Loading: $viewPlayerUrl")
+            android.util.Log.wtf("PlayerEmbedAPI", "🌐 Loading: $viewPlayerUrl")
             webView.loadUrl(viewPlayerUrl)
             
             // Timeout de 30 segundos
+            android.util.Log.d("PlayerEmbedAPI", "⏱️ Aguardando extração (30s timeout)...")
             withTimeoutOrNull(30000) {
                 extractionJob?.await()
             } ?: run {
-                android.util.Log.e("PlayerEmbedAPI", "Timeout - captured ${capturedUrls.size} URLs")
+                android.util.Log.e("PlayerEmbedAPI", "⏱️ Timeout - captured ${capturedUrls.size} URLs")
                 convertToExtractorLinks()
             }
         }

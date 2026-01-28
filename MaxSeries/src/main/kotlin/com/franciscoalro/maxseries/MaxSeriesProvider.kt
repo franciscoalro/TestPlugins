@@ -540,6 +540,7 @@ class MaxSeriesProvider : MainAPI() {
             
             if (sources.isEmpty()) {
                 Log.e(TAG, "❌ Nenhuma source encontrada no playerthree!")
+                Log.d(TAG, "📄 HTML snippet: ${html.take(500)}")
                 return 0
             }
             
@@ -560,21 +561,28 @@ class MaxSeriesProvider : MainAPI() {
                         }
                         // v219: PlayerEmbedAPI via WebView (ViewPlayer)
                         source.contains("playerembedapi", ignoreCase = true) -> {
+                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI DETECTADO! 🌐🌐🌐")
                             Log.d(TAG, "⚡ Tentando PlayerEmbedAPIWebViewExtractor...")
+                            Log.d(TAG, "📍 PlayerthreeUrl: $playerthreeUrl")
                             try {
                                 // Extrair IMDB ID da URL do playerthree
                                 val imdbId = extractImdbIdFromUrl(playerthreeUrl)
+                                Log.d(TAG, "🎬 IMDB ID extraído: $imdbId")
+                                
                                 if (imdbId != null) {
+                                    Log.d(TAG, "✅ Iniciando extração WebView para IMDB: $imdbId")
                                     val extractor = PlayerEmbedAPIWebViewExtractor()
                                     val links = extractor.extract(imdbId)
                                     links.forEach { callback(it) }
                                     linksFound += links.size
-                                    Log.d(TAG, "✅ PlayerEmbedAPI: ${links.size} links via WebView")
+                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI: ${links.size} links via WebView ✅✅✅")
                                 } else {
                                     Log.e(TAG, "❌ IMDB ID não encontrado para PlayerEmbedAPI")
+                                    Log.e(TAG, "❌ URL analisada: $playerthreeUrl")
                                 }
                             } catch (e: Exception) {
                                 Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${e.message}")
+                                e.printStackTrace()
                             }
                         }
                         // MegaEmbed V9 (principal - ~95% sucesso)

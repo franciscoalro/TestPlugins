@@ -25,7 +25,13 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 
 /**
- * MaxSeries Provider v221 - PlayerEmbedAPI Fast Detection (Jan 2026)
+ * MaxSeries Provider v222 - PlayerEmbedAPI Redirect Fix (Jan 2026)
+ * 
+ * v222 Changes (28 Jan 2026):
+ * - 🔄 FIX: Segue redirect de sssrr.org → googleapis.com automaticamente
+ * - 🎯 Adiciona headers corretos (User-Agent, Origin, Referer)
+ * - ✅ URLs finais do Google Storage funcionam no player
+ * - 🐛 Corrige ERROR_CODE_IO_BAD_HTTP_STATUS (2004)
  * 
  * v221 Changes (28 Jan 2026):
  * - ⚡ DETECÇÃO INSTANTÂNEA: MutationObserver detecta elementos assim que aparecem
@@ -33,12 +39,6 @@ import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
  * - ⚡ TIMEOUT REDUZIDO: 20s (antes 30s) - detecção mais rápida
  * - 🎯 Cliques automáticos assim que botões ficam disponíveis
  * - 📊 Melhor performance e tempo de resposta
- * 
- * v220 Changes (28 Jan 2026):
- * - 🐛 FIX: Detecta viewplayer.online além de playerthree.online
- * - 🐛 FIX: extractFromPlayerthreeDirect() agora processa PlayerEmbedAPI
- * - ✅ PlayerEmbedAPI agora funciona para filmes diretos
- * - 🎯 Sources são extraídas e processadas corretamente
  * 
  * v219 Changes (27 Jan 2026):
  * - ✅ PlayerEmbedAPI RE-ADICIONADO via WebView
@@ -85,11 +85,11 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v221 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v222 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView FAST), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView FAST + Redirect), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
-        Log.wtf(TAG, "⚡ NEW: Detecção instantânea com MutationObserver + Polling 100ms")
+        Log.wtf(TAG, "⚡ NEW: Detecção instantânea + Redirect automático sssrr.org → googleapis.com")
         
         // v217: Inicializar cache persistente
         try {

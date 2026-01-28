@@ -3,13 +3,13 @@
         "name": "MaxSeries",
         "internalName": "MaxSeries",
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
-        "version": 221,
+        "version": 222,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "fileSize": 210000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v221 - PlayerEmbedAPI FAST! MutationObserver + polling 100ms, detecção instantânea, timeout 20s. WebView automation otimizada.",
+        "description": "MaxSeries v222 - PlayerEmbedAPI FIXED! Segue redirect sssrr.org automaticamente, headers corretos, ERROR 2004 corrigido.",
         "authors": [
             "franciscoalro"
         ],

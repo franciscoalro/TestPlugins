@@ -300,13 +300,41 @@ class PlayerEmbedAPIWebViewExtractor {
     private suspend fun convertToExtractorLinks(): List<ExtractorLink> {
         return capturedUrls.mapNotNull { url ->
             try {
+                // Se é URL do sssrr.org, seguir redirect para pegar URL final
+                val finalUrl = if (url.contains("sssrr.org")) {
+                    android.util.Log.d("PlayerEmbedAPI", "🔄 Seguindo redirect: $url")
+                    try {
+                        val response = com.lagradost.cloudstream3.app.get(
+                            url,
+                            allowRedirects = true,
+                            headers = mapOf(
+                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                "Referer" to "https://viewplayer.online/"
+                            )
+                        )
+                        val redirectedUrl = response.url
+                        android.util.Log.d("PlayerEmbedAPI", "✅ URL final: $redirectedUrl")
+                        redirectedUrl
+                    } catch (e: Exception) {
+                        android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao seguir redirect: ${e.message}")
+                        url // Usar URL original se falhar
+                    }
+                } else {
+                    url
+                }
+                
                 newExtractorLink(
                     source = "PlayerEmbedAPI",
-                    name = "PlayerEmbedAPI ${getQualityLabel(detectQuality(url))}",
-                    url = url,
+                    name = "PlayerEmbedAPI ${getQualityLabel(detectQuality(finalUrl))}",
+                    url = finalUrl,
                     type = ExtractorLinkType.VIDEO
                 ) {
                     this.referer = "https://viewplayer.online/"
+                    this.headers = mapOf(
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Origin" to "https://viewplayer.online",
+                        "Accept" to "*/*"
+                    )
                 }
             } catch (e: Exception) {
                 android.util.Log.e("PlayerEmbedAPI", "Error creating link: ${e.message}")

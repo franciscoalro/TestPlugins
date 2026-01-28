@@ -47,6 +47,9 @@ class PlayerEmbedAPIWebViewExtractor {
                     userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
                 }
                 
+                // Adicionar interface JavaScript
+                addJavascriptInterface(JavaScriptInterface(), "Android")
+                
                 // Interceptar requisições
                 webViewClient = object : WebViewClient() {
                     override fun shouldInterceptRequest(
@@ -105,9 +108,9 @@ class PlayerEmbedAPIWebViewExtractor {
             android.util.Log.wtf("PlayerEmbedAPI", "🌐 Loading: $viewPlayerUrl")
             webView.loadUrl(viewPlayerUrl)
             
-            // Timeout de 30 segundos
-            android.util.Log.d("PlayerEmbedAPI", "⏱️ Aguardando extração (30s timeout)...")
-            withTimeoutOrNull(30000) {
+            // Timeout de 20 segundos (reduzido de 30s - detecção mais rápida)
+            android.util.Log.d("PlayerEmbedAPI", "⏱️ Aguardando extração (20s timeout)...")
+            withTimeoutOrNull(20000) {
                 extractionJob?.await()
             } ?: run {
                 android.util.Log.e("PlayerEmbedAPI", "⏱️ Timeout - captured ${capturedUrls.size} URLs")
@@ -119,7 +122,7 @@ class PlayerEmbedAPIWebViewExtractor {
     private fun injectAutomationScript(webView: WebView) {
         val script = """
             (function() {
-                console.log('🚀 Automation script injected');
+                console.log('🚀 Automation script injected - FAST MODE');
                 
                 // Bloquear window.open
                 window.open = function() { 
@@ -127,11 +130,15 @@ class PlayerEmbedAPIWebViewExtractor {
                     return null; 
                 };
                 
+                // Contador de tentativas
+                let attempts = 0;
+                const MAX_ATTEMPTS = 60; // 60 segundos max
+                
                 // Função para clicar no botão PlayerEmbedAPI
                 function clickPlayerEmbedAPIButton() {
                     const btn = document.querySelector('button[data-source*="playerembedapi"]');
                     if (btn) {
-                        console.log('✅ Clicking PlayerEmbedAPI button');
+                        console.log('✅ PlayerEmbedAPI button found - clicking immediately!');
                         btn.click();
                         return true;
                     }
@@ -140,46 +147,34 @@ class PlayerEmbedAPIWebViewExtractor {
                 
                 // Função para clicar no overlay do player
                 function clickOverlay() {
-                    // Procurar em todos os iframes
                     const iframes = document.querySelectorAll('iframe');
                     for (let iframe of iframes) {
                         try {
                             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                             const overlay = iframeDoc.getElementById('overlay');
-                            if (overlay) {
-                                console.log('✅ Clicking overlay');
+                            if (overlay && overlay.offsetParent !== null) {
+                                console.log('✅ Overlay found - clicking immediately!');
                                 overlay.click();
                                 
-                                // Clicar novamente após 3s
+                                // Segundo clique após 2s
                                 setTimeout(() => {
-                                    console.log('✅ Clicking overlay again');
-                                    overlay.click();
-                                }, 3000);
+                                    if (overlay.offsetParent !== null) {
+                                        console.log('✅ Second overlay click');
+                                        overlay.click();
+                                    }
+                                }, 2000);
                                 
                                 return true;
                             }
                         } catch (e) {
-                            // Cross-origin, não pode acessar
+                            // Cross-origin
                         }
                     }
                     return false;
                 }
                 
-                // Tentar clicar no botão após 3s
-                setTimeout(() => {
-                    if (clickPlayerEmbedAPIButton()) {
-                        // Tentar clicar no overlay após 10s
-                        setTimeout(() => {
-                            clickOverlay();
-                        }, 10000);
-                    }
-                }, 3000);
-                
-                // Monitorar elemento video
-                let checkCount = 0;
-                const checkVideo = setInterval(() => {
-                    checkCount++;
-                    
+                // Função para verificar vídeo
+                function checkForVideo() {
                     const iframes = document.querySelectorAll('iframe');
                     for (let iframe of iframes) {
                         try {
@@ -187,18 +182,115 @@ class PlayerEmbedAPIWebViewExtractor {
                             const video = iframeDoc.querySelector('video');
                             if (video && video.src) {
                                 console.log('📹 Video found: ' + video.src);
-                                Android.onVideoFound(video.src);
+                                return video.src;
                             }
                         } catch (e) {}
                     }
+                    return null;
+                }
+                
+                // MutationObserver para detectar mudanças no DOM
+                const observer = new MutationObserver((mutations) => {
+                    // Verificar botão PlayerEmbedAPI
+                    const btn = document.querySelector('button[data-source*="playerembedapi"]');
+                    if (btn && !btn.dataset.clicked) {
+                        btn.dataset.clicked = 'true';
+                        console.log('🎯 Button detected via MutationObserver!');
+                        btn.click();
+                    }
                     
-                    // Parar após 40 tentativas (40s)
-                    if (checkCount >= 40) {
-                        clearInterval(checkVideo);
-                        console.log('⏱️ Timeout');
+                    // Verificar overlay em iframes
+                    const iframes = document.querySelectorAll('iframe');
+                    for (let iframe of iframes) {
+                        try {
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            const overlay = iframeDoc.getElementById('overlay');
+                            if (overlay && overlay.offsetParent !== null && !overlay.dataset.clicked) {
+                                overlay.dataset.clicked = 'true';
+                                console.log('🎯 Overlay detected via MutationObserver!');
+                                overlay.click();
+                                
+                                setTimeout(() => {
+                                    if (overlay.offsetParent !== null) {
+                                        overlay.click();
+                                    }
+                                }, 2000);
+                            }
+                        } catch (e) {}
+                    }
+                });
+                
+                // Observar mudanças no body
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true
+                });
+                
+                // Polling rápido inicial (100ms) para elementos já presentes
+                let fastCheckCount = 0;
+                const fastCheck = setInterval(() => {
+                    fastCheckCount++;
+                    
+                    // Tentar clicar no botão
+                    if (clickPlayerEmbedAPIButton()) {
+                        console.log('⚡ Button clicked in fast check!');
+                    }
+                    
+                    // Tentar clicar no overlay
+                    if (clickOverlay()) {
+                        console.log('⚡ Overlay clicked in fast check!');
+                    }
+                    
+                    // Verificar vídeo
+                    const videoUrl = checkForVideo();
+                    if (videoUrl) {
+                        console.log('⚡ Video found in fast check!');
+                        clearInterval(fastCheck);
+                        clearInterval(slowCheck);
+                        observer.disconnect();
+                        Android.onVideoFound(videoUrl);
+                        return;
+                    }
+                    
+                    // Parar fast check após 10s, continuar com slow check
+                    if (fastCheckCount >= 100) { // 100 * 100ms = 10s
+                        clearInterval(fastCheck);
+                        console.log('⏱️ Switching to slow check...');
+                    }
+                }, 100); // Check a cada 100ms
+                
+                // Polling lento (1s) após fast check
+                const slowCheck = setInterval(() => {
+                    attempts++;
+                    
+                    // Verificar vídeo
+                    const videoUrl = checkForVideo();
+                    if (videoUrl) {
+                        console.log('📹 Video found in slow check!');
+                        clearInterval(fastCheck);
+                        clearInterval(slowCheck);
+                        observer.disconnect();
+                        Android.onVideoFound(videoUrl);
+                        return;
+                    }
+                    
+                    // Timeout após MAX_ATTEMPTS
+                    if (attempts >= MAX_ATTEMPTS) {
+                        clearInterval(fastCheck);
+                        clearInterval(slowCheck);
+                        observer.disconnect();
+                        console.log('⏱️ Timeout after ' + attempts + ' seconds');
                         Android.onTimeout();
                     }
-                }, 1000);
+                }, 1000); // Check a cada 1s
+                
+                // Cleanup ao descarregar página
+                window.addEventListener('beforeunload', () => {
+                    clearInterval(fastCheck);
+                    clearInterval(slowCheck);
+                    observer.disconnect();
+                });
             })();
         """.trimIndent()
         

@@ -7,15 +7,13 @@ import com.lagradost.cloudstream3.app
 import kotlinx.coroutines.*
 
 /**
- * PlayerEmbedAPI WebView Extractor v224 - Anti-Detecção + Redirect Fix
+ * PlayerEmbedAPI WebView Extractor v225 - Otimizado + Rápido
  * 
- * Melhorias v224:
- * - 🛡️ Anti-detecção: Headers realistas para evitar redirecionamento para abyss.to
- * - 🎭 User-Agent do Chrome desktop
- * - 🍪 Cookie manager habilitado
- * - 🔒 SSL errors ignorados (alguns sites usam certificados inválidos)
- * 
- * v223: Segue redirect sssrr.org → googleapis.com
+ * Melhorias v225:
+ * - ⚡ Timeout reduzido para 15s (mais rápido)
+ * - 🎯 Detecção precoce de URLs (não espera timeout)
+ * - 🔍 Monitoramento de todas as requisições
+ * - 📊 Logs detalhados para debug
  */
 class PlayerEmbedAPIWebViewExtractor {
     
@@ -24,50 +22,41 @@ class PlayerEmbedAPIWebViewExtractor {
     
     companion object {
         private const val TAG = "PlayerEmbedAPI"
-        private const val TIMEOUT_MS = 25000L // 25 segundos
+        private const val TIMEOUT_MS = 15000L // 15 segundos apenas
     }
     
-    /**
-     * Extrai vídeo a partir da URL direta do PlayerEmbedAPI
-     * @param sourceUrl URL do playerembedapi.link/?v=...
-     * @param referer URL de referência (playerthree)
-     */
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun extractFromUrl(sourceUrl: String, referer: String): List<ExtractorLink> {
-        android.util.Log.wtf(TAG, "🚀🚀🚀 EXTRACT FROM URL: $sourceUrl 🚀🚀🚀")
+        android.util.Log.wtf(TAG, "🚀 EXTRACT v225: $sourceUrl")
         
         return withContext(Dispatchers.Main) {
             extractionJob = CompletableDeferred()
             capturedUrls.clear()
             
-            // Obter Context
             val context = try {
                 Class.forName("android.app.ActivityThread")
                     .getMethod("currentApplication")
                     .invoke(null) as android.content.Context
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Erro ao obter Context: ${e.message}")
+                android.util.Log.e(TAG, "❌ Erro Context: ${e.message}")
                 return@withContext emptyList()
             }
             
             val webView = createWebView(context, referer)
             
-            // Carregar URL direta do PlayerEmbedAPI
             android.util.Log.wtf(TAG, "🌐 Loading: $sourceUrl")
             webView.loadUrl(sourceUrl)
             
-            // Aguardar extração
-            android.util.Log.d(TAG, "⏱️ Aguardando extração (${TIMEOUT_MS}ms)...")
+            // Aguardar com timeout
             val result = withTimeoutOrNull(TIMEOUT_MS) {
                 extractionJob?.await()
             }
             
-            // Limpar
             webView.stopLoading()
             webView.destroy()
             
             if (result == null) {
-                android.util.Log.e(TAG, "⏱️ Timeout - ${capturedUrls.size} URLs")
+                android.util.Log.w(TAG, "⏱️ Timeout com ${capturedUrls.size} URLs")
             }
             
             processCapturedUrls(referer)
@@ -80,17 +69,13 @@ class PlayerEmbedAPIWebViewExtractor {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                databaseEnabled = true
                 useWideViewPort = true
                 loadWithOverviewMode = true
                 javaScriptCanOpenWindowsAutomatically = false
                 setSupportMultipleWindows(false)
-                
-                // Anti-detecção: User-Agent realista (Chrome Windows)
                 userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
             
-            // Cookie manager
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
             
@@ -103,23 +88,35 @@ class PlayerEmbedAPIWebViewExtractor {
                 ): WebResourceResponse? {
                     val url = request.url.toString()
                     
+                    // LOG TODAS AS REQUISIÇÕES (para debug)
+                    if (url.contains("sssrr") || url.contains("googleapis") || url.contains("player") || url.contains("embed")) {
+                        android.util.Log.d(TAG, "📡 REQ: ${url.take(80)}")
+                    }
+                    
                     // Capturar URLs de vídeo
                     when {
-                        url.contains("sssrr.org") && url.contains("?timestamp=") -> {
-                            android.util.Log.wtf(TAG, "🎯🎯🎯 URL SSSRR: $url")
+                        url.contains("sssrr.org") -> {
+                            android.util.Log.wtf(TAG, "🎯🎯🎯 SSSRR: $url")
                             capturedUrls.add(url)
+                            // Completar imediatamente quando encontrar
+                            if (extractionJob?.isCompleted == false) {
+                                extractionJob?.complete(emptyList())
+                            }
                         }
                         url.contains("googleapis.com") && url.contains(".mp4") -> {
-                            android.util.Log.wtf(TAG, "📹📹📹 GOOGLEAPIS: $url")
+                            android.util.Log.wtf(TAG, "📹📹📹 GOOGLE: $url")
                             capturedUrls.add(url)
+                            if (extractionJob?.isCompleted == false) {
+                                extractionJob?.complete(emptyList())
+                            }
                         }
-                        url.contains("trycloudflare.com") && url.contains("/sora/") -> {
-                            android.util.Log.d(TAG, "☁️ Cloudflare: $url")
+                        url.contains(".mp4") || url.contains(".m3u8") || url.contains("video") -> {
+                            android.util.Log.d(TAG, "🎬 VIDEO: ${url.take(60)}")
                             capturedUrls.add(url)
                         }
                     }
                     
-                    // Bloquear ads conhecidas
+                    // Bloquear ads
                     if (shouldBlockUrl(url)) {
                         return WebResourceResponse("text/plain", "utf-8", null)
                     }
@@ -127,27 +124,36 @@ class PlayerEmbedAPIWebViewExtractor {
                     return super.shouldInterceptRequest(view, request)
                 }
                 
+                override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    android.util.Log.d(TAG, "📄 START: $url")
+                }
+                
                 override fun onPageFinished(view: WebView, url: String) {
                     super.onPageFinished(view, url)
-                    android.util.Log.d(TAG, "📄 Página carregada: $url")
+                    android.util.Log.wtf(TAG, "📄 FINISHED: $url")
                     
-                    // Injetar script de automação
+                    // Se redirecionou para abyss.to, logar erro
+                    if (url.contains("abyss.to")) {
+                        android.util.Log.e(TAG, "❌ ABYSS.DETECTADO! Site bloqueou automação")
+                    }
+                    
                     injectAutomationScript(view)
+                    
+                    // Se já capturou URLs, completar
+                    if (capturedUrls.isNotEmpty() && extractionJob?.isCompleted == false) {
+                        extractionJob?.complete(emptyList())
+                    }
                 }
                 
                 override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: android.net.http.SslError?) {
-                    // Ignorar erros SSL (alguns players usam certificados inválidos)
                     handler?.proceed()
-                }
-                
-                override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                    android.util.Log.e(TAG, "❌ WebView error: ${error?.description}")
                 }
             }
             
             webChromeClient = object : WebChromeClient() {
                 override fun onConsoleMessage(message: ConsoleMessage): Boolean {
-                    android.util.Log.d("WebView", "${message.message()}")
+                    android.util.Log.d("WebView", message.message())
                     return true
                 }
             }
@@ -155,91 +161,54 @@ class PlayerEmbedAPIWebViewExtractor {
     }
     
     private fun shouldBlockUrl(url: String): Boolean {
-        val blockedDomains = listOf(
-            "usheebainaut.com",
-            "attirecideryeah.com",
-            "googlesyndication.com",
-            "googleadservices.com",
-            "doubleclick.net",
-            "facebook.com/tr",
-            "analytics",
-            "tracker"
-        )
-        return blockedDomains.any { url.contains(it) }
+        val blocked = listOf("googleads", "doubleclick", "googlesyndication", "facebook.com/tr", "analytics")
+        return blocked.any { url.contains(it) }
     }
     
     private fun injectAutomationScript(webView: WebView) {
         val script = """
             (function() {
-                console.log('🚀 PlayerEmbedAPI Automation v224');
+                console.log('🚀 v225 Automation');
                 
-                // Anti-popup
-                window.open = function() { 
-                    console.log('🚫 Popup blocked');
-                    return null; 
-                };
+                window.open = function() { return null; };
                 
-                let attempts = 0;
-                const MAX_ATTEMPTS = 50;
+                let clicks = 0;
+                const maxClicks = 5;
                 
-                // Função para clicar no overlay
-                function clickOverlay() {
-                    const selectors = [
-                        '#overlay',
-                        '.overlay',
-                        '[class*="overlay"]',
-                        '[id*="overlay"]',
-                        '.play-button',
-                        '[class*="play"]',
-                        'video'
-                    ];
+                function tryClick() {
+                    if (clicks >= maxClicks) return;
+                    clicks++;
                     
-                    for (const selector of selectors) {
-                        const el = document.querySelector(selector);
+                    const selectors = ['#overlay', '.overlay', '.play-button', 'video', '[class*="play"]', '[id*="play"]'];
+                    
+                    for (const sel of selectors) {
+                        const el = document.querySelector(sel);
                         if (el && el.offsetParent !== null) {
-                            console.log('✅ Clicking: ' + selector);
+                            console.log('✅ Click: ' + sel);
                             el.click();
-                            
-                            // Múltiplos cliques
-                            setTimeout(() => el.click(), 500);
-                            setTimeout(() => el.click(), 1000);
-                            return true;
                         }
                     }
-                    return false;
-                }
-                
-                // Observer para detectar elementos
-                const observer = new MutationObserver(() => {
-                    clickOverlay();
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-                
-                // Polling rápido
-                const interval = setInterval(() => {
-                    attempts++;
-                    clickOverlay();
                     
                     // Verificar vídeo
                     const video = document.querySelector('video');
                     if (video && video.src) {
-                        console.log('📹 Video found: ' + video.src);
+                        console.log('📹 Video: ' + video.src);
                         Android.onVideoFound(video.src);
-                        clearInterval(interval);
-                        observer.disconnect();
                     }
-                    
-                    if (attempts >= MAX_ATTEMPTS) {
-                        clearInterval(interval);
-                        observer.disconnect();
-                        Android.onTimeout();
-                    }
-                }, 500);
+                }
                 
+                // Clicks imediatos
+                setTimeout(tryClick, 100);
+                setTimeout(tryClick, 500);
+                setTimeout(tryClick, 1000);
+                setTimeout(tryClick, 2000);
+                setTimeout(tryClick, 3000);
+                
+                // Observer
+                const observer = new MutationObserver(tryClick);
+                if (document.body) {
+                    observer.observe(document.body, { childList: true, subtree: true });
+                }
             })();
         """.trimIndent()
         
@@ -247,33 +216,30 @@ class PlayerEmbedAPIWebViewExtractor {
     }
     
     private suspend fun processCapturedUrls(referer: String): List<ExtractorLink> {
-        android.util.Log.wtf(TAG, "🔄 Processando ${capturedUrls.size} URLs")
+        android.util.Log.wtf(TAG, "🔄 URLs: ${capturedUrls.size}")
         
         if (capturedUrls.isEmpty()) {
-            android.util.Log.e(TAG, "❌ NENHUMA URL CAPTURADA!")
+            android.util.Log.e(TAG, "❌ NENHUMA URL!")
             return emptyList()
         }
         
         return capturedUrls.mapNotNull { url ->
             try {
                 val finalUrl = if (url.contains("sssrr.org")) {
-                    android.util.Log.wtf(TAG, "🔄 Seguindo redirect...")
+                    android.util.Log.d(TAG, "🔄 Redirect...")
                     try {
                         val response = app.get(
                             url = url,
                             allowRedirects = true,
                             headers = mapOf(
                                 "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                                "Accept" to "*/*",
                                 "Referer" to referer
                             ),
-                            timeout = 30
+                            timeout = 15
                         )
-                        val final = response.url
-                        android.util.Log.wtf(TAG, "✅ URL FINAL: $final")
-                        final
+                        response.url
                     } catch (e: Exception) {
-                        android.util.Log.e(TAG, "❌ Erro redirect: ${e.message}")
+                        android.util.Log.e(TAG, "❌ Redirect erro: ${e.message}")
                         url
                     }
                 } else {
@@ -282,17 +248,11 @@ class PlayerEmbedAPIWebViewExtractor {
                 
                 newExtractorLink(
                     source = "PlayerEmbedAPI",
-                    name = "PlayerEmbedAPI ${detectQualityLabel(finalUrl)}",
+                    name = "PlayerEmbedAPI",
                     url = finalUrl,
                     type = ExtractorLinkType.VIDEO
                 ) {
                     this.referer = referer
-                    this.headers = mapOf(
-                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                        "Origin" to "https://playerembedapi.link",
-                        "Referer" to referer,
-                        "Accept" to "*/*"
-                    )
                 }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Erro: ${e.message}")
@@ -301,30 +261,14 @@ class PlayerEmbedAPIWebViewExtractor {
         }
     }
     
-    private fun detectQualityLabel(url: String): String {
-        return when {
-            url.contains("1080") || url.contains("1080p") -> "1080p"
-            url.contains("720") || url.contains("720p") -> "720p"
-            url.contains("480") || url.contains("480p") -> "480p"
-            url.contains("360") || url.contains("360p") -> "360p"
-            else -> "HD"
-        }
-    }
-    
     inner class JavaScriptInterface {
         @JavascriptInterface
         fun onVideoFound(url: String) {
-            android.util.Log.wtf(TAG, "📹 Video: $url")
+            android.util.Log.wtf(TAG, "📹 JS Video: ${url.take(60)}")
             capturedUrls.add(url)
-            if (capturedUrls.isNotEmpty()) {
-                extractionJob?.complete(runBlocking { processCapturedUrls("") })
+            if (extractionJob?.isCompleted == false) {
+                extractionJob?.complete(emptyList())
             }
-        }
-        
-        @JavascriptInterface
-        fun onTimeout() {
-            android.util.Log.d(TAG, "⏱️ Timeout")
-            extractionJob?.complete(runBlocking { processCapturedUrls("") })
         }
     }
 }

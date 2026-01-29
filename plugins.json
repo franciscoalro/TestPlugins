@@ -2,14 +2,14 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v224/MaxSeries.cs3",
-        "version": 224,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v225/MaxSeries.cs3",
+        "version": 225,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 209410,
+        "fileSize": 209000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v224 - PlayerEmbedAPI Anti-Detecção + Redirect Fix. Headers realistas Chrome, Cookie manager, SSL bypass. Resolve redirecionamento abyss.to.",
+        "description": "MaxSeries v225 - PlayerEmbedAPI Otimizado. Timeout 15s, detecção precoce, logs detalhados. Muito mais rápido!",
         "authors": [
             "franciscoalro"
         ],

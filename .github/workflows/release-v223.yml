@@ -1,0 +1,230 @@
+name: Release v223 - PlayerEmbedAPI Redirect Fix
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/PlayerEmbedAPIWebViewExtractor.kt'
+      - 'MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/MaxSeriesProvider.kt'
+
+env:
+  VERSION: v223
+  VERSION_CODE: 223
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Build MaxSeries v223
+      run: |
+        echo "🔨 Building MaxSeries v223 - PlayerEmbedAPI Redirect Fix..."
+        ./gradlew MaxSeries:make
+        echo "✅ Build completed!"
+    
+    - name: Verify Build Output
+      run: |
+        echo "📦 Verifying build output..."
+        ls -la MaxSeries/build/*.cs3
+        file_size=$(stat -c%s "MaxSeries/build/MaxSeries.cs3")
+        echo "File size: $file_size bytes"
+    
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MaxSeries-v223
+        path: MaxSeries/build/MaxSeries.cs3
+    
+    - name: Create Tag
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag -f ${{ env.VERSION }} || true
+        git push -f origin ${{ env.VERSION }} || true
+    
+    - name: Create Release v223
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "MaxSeries v223 - PlayerEmbedAPI Redirect Fix"
+        tag_name: ${{ env.VERSION }}
+        body: |
+          ## 🚀 MaxSeries v223 - PlayerEmbedAPI Redirect Fix
+
+          ### ✨ Novidades
+          - 🔄 **FIX FINAL**: Segue redirect `sssrr.org` → `googleapis.com` automaticamente
+          - 🎯 Headers completos para Google Storage (Sec-Fetch-*, Origin, Referer)
+          - ✅ Verificação se redirect foi bem-sucedido
+          - 🐛 Corrige `ERROR_CODE_IO_BAD_HTTP_STATUS (2004)`
+
+          ### 📝 Como Usar
+          1. Instale o arquivo `.cs3` no CloudStream
+          2. Busque por um filme/série
+          3. Selecione **PlayerEmbedAPI**
+          4. **Clique 3 vezes** no centro da tela quando o WebView abrir
+          5. O vídeo começará a reproduzir com a URL final do Google Storage!
+
+          ### 🔧 Como Funciona
+          ```
+          1. WebView captura URL: https://xxx.sssrr.org/?timestamp=...
+          2. Sistema faz request com allowRedirects=true
+          3. Segue o redirect 302 automaticamente
+          4. Retorna URL final: https://storage.googleapis.com/.../video.mp4
+          ```
+
+          ### 📱 Para Desenvolvedores
+          - Build: `./gradlew MaxSeries:make`
+          - Logs: `adb logcat -s "PlayerEmbedAPI"`
+
+          ---
+          **SHA256:** ${{ hashFiles('MaxSeries/build/MaxSeries.cs3') }}
+        files: |
+          MaxSeries/build/MaxSeries.cs3
+        generate_release_notes: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-to-builds-branch:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        path: main-repo
+    
+    - name: Checkout or Create builds branch
+      uses: actions/checkout@v4
+      with:
+        ref: builds
+        path: builds-repo
+      continue-on-error: true
+    
+    - name: Create builds branch if not exists
+      if: failure()
+      run: |
+        cd main-repo
+        git checkout --orphan builds
+        git rm -rf .
+        git commit --allow-empty -m "Initial builds branch"
+        git push origin builds
+      continue-on-error: true
+    
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: MaxSeries-v223
+        path: ./artifacts
+    
+    - name: Update builds branch
+      run: |
+        # Configurar git
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        
+        # Se o builds-repo não existe, clonar novamente
+        if [ ! -d "builds-repo" ]; then
+          git clone --branch builds --single-branch https://github.com/${{ github.repository }} builds-repo
+        fi
+        
+        cd builds-repo
+        
+        # Copiar arquivos
+        echo "📦 Copiando arquivos..."
+        cp ../artifacts/MaxSeries.cs3 .
+        cp ../main-repo/plugins.json .
+        cp ../main-repo/repo.json .
+        
+        # Commit e push
+        echo "📝 Fazendo commit..."
+        git add -A
+        git commit -m "MaxSeries v223 - PlayerEmbedAPI Redirect Fix ($(date +'%Y-%m-%d %H:%M:%S'))" || echo "Nada para commitar"
+        git push origin builds
+        
+        echo "✅ Deploy para branch builds realizado!"
+
+  deploy-to-cloudstream-repo:
+    needs: [build-and-release, deploy-to-builds-branch]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout TestPlugins
+      uses: actions/checkout@v4
+      with:
+        path: testplugins
+
+    - name: Checkout CloudstreamRepo
+      uses: actions/checkout@v4
+      with:
+        repository: franciscoalro/CloudstreamRepo
+        token: ${{ secrets.CLOUDSTREAM_REPO_TOKEN }}
+        path: cloudstream-repo
+
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: MaxSeries-v223
+        path: ./artifacts
+
+    - name: Deploy to CloudstreamRepo
+      run: |
+        echo "📦 Copiando arquivos .cs3..."
+        cp artifacts/MaxSeries.cs3 cloudstream-repo/
+        cp testplugins/plugins.json cloudstream-repo/
+        
+        echo "📊 Verificando alterações..."
+        cd cloudstream-repo
+        git status
+
+    - name: Commit and Push to CloudstreamRepo
+      run: |
+        cd cloudstream-repo
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if [[ -n $(git status --porcelain) ]]; then
+          echo "🔄 Fazendo commit das alterações..."
+          git add .
+          git commit -m "MaxSeries v223 - PlayerEmbedAPI Redirect Fix ($(date +'%Y-%m-%d %H:%M:%S'))"
+          git push
+          echo "✅ Deploy realizado com sucesso!"
+        else
+          echo "ℹ️ Nenhuma alteração detectada"
+        fi
+
+    - name: Create Summary
+      run: |
+        echo "## 🚀 Deploy v223 - Completo!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ✅ Tarefas Concluídas:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔨 Build do MaxSeries v223" >> $GITHUB_STEP_SUMMARY
+        echo "- 🏷️ Tag v223 criada" >> $GITHUB_STEP_SUMMARY
+        echo "- 📦 Release v223 publicada" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌿 Branch builds atualizada" >> $GITHUB_STEP_SUMMARY
+        echo "- 🚀 CloudstreamRepo atualizado" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Links:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌐 Repo: \`https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/repo.json\`" >> $GITHUB_STEP_SUMMARY
+        echo "- 📦 Plugins: \`https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json\`" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔗 Download: \`https://github.com/franciscoalro/TestPlugins/releases/download/v223/MaxSeries.cs3\`" >> $GITHUB_STEP_SUMMARY

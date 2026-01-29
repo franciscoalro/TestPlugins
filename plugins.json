@@ -2,14 +2,14 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/MaxSeries.cs3",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v223/MaxSeries.cs3",
         "version": 223,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 210000,
+        "fileSize": 222100,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v223 - PlayerEmbedAPI redirect fix + debug logs. Segue sssrr.org automaticamente com logs detalhados.",
+        "description": "MaxSeries v223 - PlayerEmbedAPI Redirect Fix FINAL. Segue redirect sssrr.org → googleapis.com automaticamente. Headers completos para Google Storage. Correção ERROR_CODE_IO_BAD_HTTP_STATUS (2004).",
         "authors": [
             "franciscoalro"
         ],

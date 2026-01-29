@@ -25,7 +25,13 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 
 /**
- * MaxSeries Provider v222 - PlayerEmbedAPI Redirect Fix (Jan 2026)
+ * MaxSeries Provider v223 - PlayerEmbedAPI Redirect Fix FINAL (Jan 2026)
+ * 
+ * v223 Changes (28 Jan 2026):
+ * - 🔄 FIX FINAL: Segue redirect de sssrr.org → googleapis.com automaticamente
+ * - 🎯 Headers completos para Google Storage (Sec-Fetch-*)
+ * - ✅ Verificação de redirect bem-sucedido
+ * - 🐛 Corrige ERROR_CODE_IO_BAD_HTTP_STATUS (2004)
  * 
  * v222 Changes (28 Jan 2026):
  * - 🔄 FIX: Segue redirect de sssrr.org → googleapis.com automaticamente
@@ -85,9 +91,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v223 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v223-FINAL CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView FAST + Redirect), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView + Redirect FIX v223), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
         Log.wtf(TAG, "⚡ NEW: Detecção instantânea + Redirect automático sssrr.org → googleapis.com")
         

@@ -3,19 +3,31 @@ package com.franciscoalro.maxseries.extractors
 import android.annotation.SuppressLint
 import android.webkit.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.app
 import kotlinx.coroutines.*
 
+/**
+ * PlayerEmbedAPI WebView Extractor v223 - Redirect Fix
+ * 
+ * Problema: URL intermediária (sssrr.org) não redireciona automaticamente no player
+ * Solução: Seguir redirect 302 manualmente antes de retornar a URL final
+ */
 class PlayerEmbedAPIWebViewExtractor {
     
     private val capturedUrls = mutableSetOf<String>()
     private var extractionJob: CompletableDeferred<List<ExtractorLink>>? = null
     
+    companion object {
+        private const val TAG = "PlayerEmbedAPI"
+        private const val TIMEOUT_MS = 20000L // 20 segundos
+    }
+    
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun extract(imdbId: String, referer: String = "https://viewplayer.online/"): List<ExtractorLink> {
-        android.util.Log.wtf("PlayerEmbedAPI", "🚀🚀🚀 EXTRACT CHAMADO! IMDB: $imdbId 🚀🚀🚀")
+        android.util.Log.wtf(TAG, "🚀🚀🚀 EXTRACT CHAMADO! IMDB: $imdbId 🚀🚀🚀")
         
         return withContext(Dispatchers.Main) {
-            android.util.Log.d("PlayerEmbedAPI", "📱 Iniciando extração na Main thread")
+            android.util.Log.d(TAG, "📱 Iniciando extração na Main thread")
             extractionJob = CompletableDeferred()
             capturedUrls.clear()
             
@@ -25,11 +37,11 @@ class PlayerEmbedAPIWebViewExtractor {
                     .getMethod("currentApplication")
                     .invoke(null) as android.content.Context
             } catch (e: Exception) {
-                android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao obter Context: ${e.message}")
+                android.util.Log.e(TAG, "❌ Erro ao obter Context: ${e.message}")
                 return@withContext emptyList()
             }
             
-            android.util.Log.d("PlayerEmbedAPI", "✅ Context obtido: ${context.javaClass.simpleName}")
+            android.util.Log.d(TAG, "✅ Context obtido: ${context.javaClass.simpleName}")
             
             val webView = WebView(context).apply {
                 settings.apply {
@@ -61,15 +73,15 @@ class PlayerEmbedAPIWebViewExtractor {
                         // Capturar URLs de vídeo
                         when {
                             url.contains("sssrr.org") && url.contains("?timestamp=") -> {
-                                android.util.Log.d("PlayerEmbedAPI", "🎯 Captured: $url")
+                                android.util.Log.wtf(TAG, "🎯🎯🎯 URL SSSRR CAPTURADA: $url")
                                 capturedUrls.add(url)
                             }
                             url.contains("googleapis.com") && url.contains(".mp4") -> {
-                                android.util.Log.d("PlayerEmbedAPI", "📹 Captured: $url")
+                                android.util.Log.wtf(TAG, "📹📹📹 URL GOOGLEAPIS CAPTURADA: $url")
                                 capturedUrls.add(url)
                             }
                             url.contains("trycloudflare.com") && url.contains("/sora/") -> {
-                                android.util.Log.d("PlayerEmbedAPI", "☁️ Captured: $url")
+                                android.util.Log.d(TAG, "☁️ Captured: $url")
                                 capturedUrls.add(url)
                             }
                         }
@@ -105,24 +117,34 @@ class PlayerEmbedAPIWebViewExtractor {
             
             // Carregar ViewPlayer
             val viewPlayerUrl = "https://viewplayer.online/filme/$imdbId"
-            android.util.Log.wtf("PlayerEmbedAPI", "🌐 Loading: $viewPlayerUrl")
+            android.util.Log.wtf(TAG, "🌐 Loading: $viewPlayerUrl")
             webView.loadUrl(viewPlayerUrl)
             
-            // Timeout de 20 segundos (reduzido de 30s - detecção mais rápida)
-            android.util.Log.d("PlayerEmbedAPI", "⏱️ Aguardando extração (20s timeout)...")
-            withTimeoutOrNull(20000) {
+            // Timeout de 20 segundos
+            android.util.Log.d(TAG, "⏱️ Aguardando extração (${TIMEOUT_MS}ms timeout)...")
+            val result = withTimeoutOrNull(TIMEOUT_MS) {
                 extractionJob?.await()
-            } ?: run {
-                android.util.Log.e("PlayerEmbedAPI", "⏱️ Timeout - captured ${capturedUrls.size} URLs")
-                convertToExtractorLinks()
             }
+            
+            // Limpar WebView
+            webView.stopLoading()
+            webView.destroy()
+            
+            if (result == null) {
+                android.util.Log.e(TAG, "⏱️ Timeout - capturadas ${capturedUrls.size} URLs")
+            }
+            
+            // Processar URLs capturadas (mesmo se timeout)
+            val links = processCapturedUrls()
+            android.util.Log.wtf(TAG, "✅✅✅ EXTRAÇÃO FINALIZADA: ${links.size} links ✅✅✅")
+            links
         }
     }
     
     private fun injectAutomationScript(webView: WebView) {
         val script = """
             (function() {
-                console.log('🚀 Automation script injected - FAST MODE');
+                console.log('🚀 Automation script injected - v223 Redirect Fix');
                 
                 // Bloquear window.open
                 window.open = function() { 
@@ -132,13 +154,14 @@ class PlayerEmbedAPIWebViewExtractor {
                 
                 // Contador de tentativas
                 let attempts = 0;
-                const MAX_ATTEMPTS = 60; // 60 segundos max
+                const MAX_ATTEMPTS = 60;
                 
                 // Função para clicar no botão PlayerEmbedAPI
                 function clickPlayerEmbedAPIButton() {
                     const btn = document.querySelector('button[data-source*="playerembedapi"]');
-                    if (btn) {
-                        console.log('✅ PlayerEmbedAPI button found - clicking immediately!');
+                    if (btn && !btn.dataset.clicked) {
+                        btn.dataset.clicked = 'true';
+                        console.log('✅ PlayerEmbedAPI button found - clicking!');
                         btn.click();
                         return true;
                     }
@@ -152,17 +175,14 @@ class PlayerEmbedAPIWebViewExtractor {
                         try {
                             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                             const overlay = iframeDoc.getElementById('overlay');
-                            if (overlay && overlay.offsetParent !== null) {
-                                console.log('✅ Overlay found - clicking immediately!');
+                            if (overlay && overlay.offsetParent !== null && !overlay.dataset.clicked) {
+                                overlay.dataset.clicked = 'true';
+                                console.log('✅ Overlay found - clicking!');
                                 overlay.click();
                                 
-                                // Segundo clique após 2s
-                                setTimeout(() => {
-                                    if (overlay.offsetParent !== null) {
-                                        console.log('✅ Second overlay click');
-                                        overlay.click();
-                                    }
-                                }, 2000);
+                                // Múltiplos cliques para remover ads
+                                setTimeout(() => overlay.click(), 1000);
+                                setTimeout(() => overlay.click(), 2000);
                                 
                                 return true;
                             }
@@ -173,107 +193,52 @@ class PlayerEmbedAPIWebViewExtractor {
                     return false;
                 }
                 
-                // Função para verificar vídeo
-                function checkForVideo() {
-                    const iframes = document.querySelectorAll('iframe');
-                    for (let iframe of iframes) {
-                        try {
-                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                            const video = iframeDoc.querySelector('video');
-                            if (video && video.src) {
-                                console.log('📹 Video found: ' + video.src);
-                                return video.src;
-                            }
-                        } catch (e) {}
-                    }
-                    return null;
-                }
-                
                 // MutationObserver para detectar mudanças no DOM
                 const observer = new MutationObserver((mutations) => {
-                    // Verificar botão PlayerEmbedAPI
-                    const btn = document.querySelector('button[data-source*="playerembedapi"]');
-                    if (btn && !btn.dataset.clicked) {
-                        btn.dataset.clicked = 'true';
-                        console.log('🎯 Button detected via MutationObserver!');
-                        btn.click();
-                    }
-                    
-                    // Verificar overlay em iframes
-                    const iframes = document.querySelectorAll('iframe');
-                    for (let iframe of iframes) {
-                        try {
-                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                            const overlay = iframeDoc.getElementById('overlay');
-                            if (overlay && overlay.offsetParent !== null && !overlay.dataset.clicked) {
-                                overlay.dataset.clicked = 'true';
-                                console.log('🎯 Overlay detected via MutationObserver!');
-                                overlay.click();
-                                
-                                setTimeout(() => {
-                                    if (overlay.offsetParent !== null) {
-                                        overlay.click();
-                                    }
-                                }, 2000);
-                            }
-                        } catch (e) {}
-                    }
+                    clickPlayerEmbedAPIButton();
+                    clickOverlay();
                 });
                 
                 // Observar mudanças no body
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true,
-                    attributes: true
-                });
+                if (document.body) {
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true
+                    });
+                }
                 
-                // Polling rápido inicial (100ms) para elementos já presentes
+                // Polling rápido inicial (100ms)
                 let fastCheckCount = 0;
                 const fastCheck = setInterval(() => {
                     fastCheckCount++;
                     
-                    // Tentar clicar no botão
-                    if (clickPlayerEmbedAPIButton()) {
-                        console.log('⚡ Button clicked in fast check!');
-                    }
-                    
-                    // Tentar clicar no overlay
-                    if (clickOverlay()) {
-                        console.log('⚡ Overlay clicked in fast check!');
-                    }
+                    clickPlayerEmbedAPIButton();
+                    clickOverlay();
                     
                     // Verificar vídeo
-                    const videoUrl = checkForVideo();
-                    if (videoUrl) {
-                        console.log('⚡ Video found in fast check!');
-                        clearInterval(fastCheck);
-                        clearInterval(slowCheck);
-                        observer.disconnect();
-                        Android.onVideoFound(videoUrl);
-                        return;
+                    const videos = document.querySelectorAll('video');
+                    for (let v of videos) {
+                        if (v.src) {
+                            console.log('📹 Video found: ' + v.src);
+                            Android.onVideoFound(v.src);
+                            clearInterval(fastCheck);
+                            clearInterval(slowCheck);
+                            observer.disconnect();
+                            return;
+                        }
                     }
                     
-                    // Parar fast check após 10s, continuar com slow check
-                    if (fastCheckCount >= 100) { // 100 * 100ms = 10s
+                    // Parar fast check após 10s
+                    if (fastCheckCount >= 100) {
                         clearInterval(fastCheck);
                         console.log('⏱️ Switching to slow check...');
                     }
-                }, 100); // Check a cada 100ms
+                }, 100);
                 
                 // Polling lento (1s) após fast check
                 const slowCheck = setInterval(() => {
                     attempts++;
-                    
-                    // Verificar vídeo
-                    const videoUrl = checkForVideo();
-                    if (videoUrl) {
-                        console.log('📹 Video found in slow check!');
-                        clearInterval(fastCheck);
-                        clearInterval(slowCheck);
-                        observer.disconnect();
-                        Android.onVideoFound(videoUrl);
-                        return;
-                    }
                     
                     // Timeout após MAX_ATTEMPTS
                     if (attempts >= MAX_ATTEMPTS) {
@@ -283,7 +248,7 @@ class PlayerEmbedAPIWebViewExtractor {
                         console.log('⏱️ Timeout after ' + attempts + ' seconds');
                         Android.onTimeout();
                     }
-                }, 1000); // Check a cada 1s
+                }, 1000);
                 
                 // Cleanup ao descarregar página
                 window.addEventListener('beforeunload', () => {
@@ -297,55 +262,94 @@ class PlayerEmbedAPIWebViewExtractor {
         webView.evaluateJavascript(script, null)
     }
     
-    private suspend fun convertToExtractorLinks(): List<ExtractorLink> {
-        android.util.Log.d("PlayerEmbedAPI", "📦 Convertendo ${capturedUrls.size} URLs capturadas")
+    /**
+     * Processa URLs capturadas e segue redirects se necessário
+     * v223: FIX - Segue redirect sssrr.org → googleapis.com
+     */
+    private suspend fun processCapturedUrls(): List<ExtractorLink> {
+        android.util.Log.wtf(TAG, "🔄 PROCESSANDO ${capturedUrls.size} URLs CAPTURADAS")
+        
+        if (capturedUrls.isEmpty()) {
+            android.util.Log.e(TAG, "❌ NENHUMA URL CAPTURADA!")
+            return emptyList()
+        }
         
         return capturedUrls.mapNotNull { url ->
             try {
-                android.util.Log.d("PlayerEmbedAPI", "🔗 Processando URL: $url")
+                android.util.Log.d(TAG, "🔗 Processando URL: $url")
                 
-                // Se é URL do sssrr.org, seguir redirect para pegar URL final
+                // v223 FIX: Se é URL do sssrr.org, seguir redirect para pegar URL final
                 val finalUrl = if (url.contains("sssrr.org")) {
-                    android.util.Log.d("PlayerEmbedAPI", "🔄 URL intermediária detectada, seguindo redirect...")
+                    android.util.Log.wtf(TAG, "🔄 URL INTERMEDIÁRIA DETECTADA (sssrr.org)")
+                    android.util.Log.d(TAG, "📡 Fazendo request para seguir redirect...")
+                    
                     try {
-                        val response = com.lagradost.cloudstream3.app.get(
-                            url,
+                        // Fazer request com allowRedirects = true
+                        val response = app.get(
+                            url = url,
                             allowRedirects = true,
                             headers = mapOf(
-                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                                "Referer" to "https://viewplayer.online/"
-                            )
+                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                                "Accept" to "*/*",
+                                "Accept-Language" to "pt-BR,pt;q=0.9,en;q=0.8",
+                                "Referer" to "https://viewplayer.online/",
+                                "Origin" to "https://viewplayer.online"
+                            ),
+                            timeout = 30 // 30 segundos timeout
                         )
+                        
                         val redirectedUrl = response.url
-                        android.util.Log.wtf("PlayerEmbedAPI", "✅ URL FINAL OBTIDA: $redirectedUrl")
-                        redirectedUrl
+                        android.util.Log.wtf(TAG, "✅✅✅ URL FINAL OBTIDA: $redirectedUrl")
+                        
+                        // Verificar se realmente redirecionou
+                        if (redirectedUrl != url && redirectedUrl.contains("googleapis.com")) {
+                            android.util.Log.wtf(TAG, "🎉 REDIRECT BEM-SUCEDIDO para Google Storage!")
+                            redirectedUrl
+                        } else {
+                            android.util.Log.w(TAG, "⚠️ Redirect não foi para Google Storage, usando URL original")
+                            url
+                        }
+                        
                     } catch (e: Exception) {
-                        android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao seguir redirect: ${e.message}")
+                        android.util.Log.e(TAG, "❌ Erro ao seguir redirect: ${e.message}")
+                        android.util.Log.e(TAG, "⚠️ Usando URL intermediária como fallback")
                         e.printStackTrace()
                         url // Usar URL original se falhar
                     }
                 } else {
-                    android.util.Log.d("PlayerEmbedAPI", "✅ URL final já capturada: $url")
+                    android.util.Log.d(TAG, "✅ URL final já capturada: $url")
                     url
                 }
                 
-                android.util.Log.d("PlayerEmbedAPI", "🎬 Criando ExtractorLink com URL: $finalUrl")
+                // Detectar qualidade da URL
+                val quality = detectQuality(finalUrl)
+                val qualityLabel = getQualityLabel(quality)
+                
+                android.util.Log.wtf(TAG, "🎬 CRIANDO EXTRACTOR LINK: $qualityLabel - $finalUrl")
                 
                 newExtractorLink(
                     source = "PlayerEmbedAPI",
-                    name = "PlayerEmbedAPI ${getQualityLabel(detectQuality(finalUrl))}",
+                    name = "PlayerEmbedAPI $qualityLabel",
                     url = finalUrl,
                     type = ExtractorLinkType.VIDEO
                 ) {
                     this.referer = "https://viewplayer.online/"
                     this.headers = mapOf(
-                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                         "Origin" to "https://viewplayer.online",
-                        "Accept" to "*/*"
+                        "Referer" to "https://viewplayer.online/",
+                        "Accept" to "*/*",
+                        "Accept-Language" to "pt-BR,pt;q=0.9,en;q=0.8",
+                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Connection" to "keep-alive",
+                        "Sec-Fetch-Dest" to "video",
+                        "Sec-Fetch-Mode" to "cors",
+                        "Sec-Fetch-Site" to "cross-site"
                     )
                 }
+                
             } catch (e: Exception) {
-                android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao criar link: ${e.message}")
+                android.util.Log.e(TAG, "❌ Erro ao processar URL: ${e.message}")
                 e.printStackTrace()
                 null
             }
@@ -376,19 +380,19 @@ class PlayerEmbedAPIWebViewExtractor {
     inner class JavaScriptInterface {
         @JavascriptInterface
         fun onVideoFound(url: String) {
-            android.util.Log.d("PlayerEmbedAPI", "JS callback - Video: $url")
+            android.util.Log.wtf(TAG, "📹 JS CALLBACK - Video encontrado: $url")
             capturedUrls.add(url)
             
             // Se capturou URLs, completar extração
             if (capturedUrls.isNotEmpty()) {
-                extractionJob?.complete(runBlocking { convertToExtractorLinks() })
+                extractionJob?.complete(runBlocking { processCapturedUrls() })
             }
         }
         
         @JavascriptInterface
         fun onTimeout() {
-            android.util.Log.d("PlayerEmbedAPI", "JS callback - Timeout")
-            extractionJob?.complete(runBlocking { convertToExtractorLinks() })
+            android.util.Log.d(TAG, "⏱️ JS CALLBACK - Timeout")
+            extractionJob?.complete(runBlocking { processCapturedUrls() })
         }
     }
 }

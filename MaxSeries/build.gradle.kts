@@ -1,4 +1,4 @@
-version = 222
+version = 223
 
 cloudstream {
     description = "MaxSeries v219 - PlayerEmbedAPI via WebView (ViewPlayer). Auto-click, 20-30s extraction, 90-95% success. MegaEmbed + MyVidPlay + DoodStream + more"

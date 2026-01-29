@@ -298,11 +298,15 @@ class PlayerEmbedAPIWebViewExtractor {
     }
     
     private suspend fun convertToExtractorLinks(): List<ExtractorLink> {
+        android.util.Log.d("PlayerEmbedAPI", "📦 Convertendo ${capturedUrls.size} URLs capturadas")
+        
         return capturedUrls.mapNotNull { url ->
             try {
+                android.util.Log.d("PlayerEmbedAPI", "🔗 Processando URL: $url")
+                
                 // Se é URL do sssrr.org, seguir redirect para pegar URL final
                 val finalUrl = if (url.contains("sssrr.org")) {
-                    android.util.Log.d("PlayerEmbedAPI", "🔄 Seguindo redirect: $url")
+                    android.util.Log.d("PlayerEmbedAPI", "🔄 URL intermediária detectada, seguindo redirect...")
                     try {
                         val response = com.lagradost.cloudstream3.app.get(
                             url,
@@ -313,15 +317,19 @@ class PlayerEmbedAPIWebViewExtractor {
                             )
                         )
                         val redirectedUrl = response.url
-                        android.util.Log.d("PlayerEmbedAPI", "✅ URL final: $redirectedUrl")
+                        android.util.Log.wtf("PlayerEmbedAPI", "✅ URL FINAL OBTIDA: $redirectedUrl")
                         redirectedUrl
                     } catch (e: Exception) {
                         android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao seguir redirect: ${e.message}")
+                        e.printStackTrace()
                         url // Usar URL original se falhar
                     }
                 } else {
+                    android.util.Log.d("PlayerEmbedAPI", "✅ URL final já capturada: $url")
                     url
                 }
+                
+                android.util.Log.d("PlayerEmbedAPI", "🎬 Criando ExtractorLink com URL: $finalUrl")
                 
                 newExtractorLink(
                     source = "PlayerEmbedAPI",
@@ -337,7 +345,8 @@ class PlayerEmbedAPIWebViewExtractor {
                     )
                 }
             } catch (e: Exception) {
-                android.util.Log.e("PlayerEmbedAPI", "Error creating link: ${e.message}")
+                android.util.Log.e("PlayerEmbedAPI", "❌ Erro ao criar link: ${e.message}")
+                e.printStackTrace()
                 null
             }
         }

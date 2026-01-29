@@ -2,14 +2,14 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v225/MaxSeries.cs3",
-        "version": 225,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v226/MaxSeries.cs3",
+        "version": 226,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 209000,
+        "fileSize": 208000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v225 - PlayerEmbedAPI Otimizado. Timeout 15s, detecção precoce, logs detalhados. Muito mais rápido!",
+        "description": "MaxSeries v226 - PlayerEmbedAPI Captura Imediata! Estrategia: captura URL do Google Storage assim que aparece e encerra. Timeout 10s. Testado com Puppeteer/TypeScript.",
         "authors": [
             "franciscoalro"
         ],

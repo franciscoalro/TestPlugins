@@ -77,7 +77,7 @@ import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries"
+    override var name = "MaxSeries v226"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -91,7 +91,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v223-FINAL CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v226 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerEmbedAPI (WebView + Redirect FIX v223), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
@@ -579,30 +579,17 @@ class MaxSeriesProvider : MainAPI() {
                             MyVidPlayExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // v219: PlayerEmbedAPI via WebView (ViewPlayer)
+                        // v226: PlayerEmbedAPI Captura Imediata
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI DETECTADO! 🌐🌐🌐")
-                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIWebViewExtractor...")
-                            Log.d(TAG, "📍 PlayerthreeUrl: $playerthreeUrl")
+                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v226! 🌐🌐🌐")
                             try {
-                                // Extrair IMDB ID da URL do playerthree
-                                val imdbId = extractImdbIdFromUrl(playerthreeUrl)
-                                Log.d(TAG, "🎬 IMDB ID extraído: $imdbId")
-                                
-                                if (imdbId != null) {
-                                    Log.d(TAG, "✅ Iniciando extração WebView para IMDB: $imdbId")
-                                    val extractor = PlayerEmbedAPIWebViewExtractor()
-                                    val links = extractor.extract(imdbId)
-                                    links.forEach { callback(it) }
-                                    linksFound += links.size
-                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI: ${links.size} links via WebView ✅✅✅")
-                                } else {
-                                    Log.e(TAG, "❌ IMDB ID não encontrado para PlayerEmbedAPI")
-                                    Log.e(TAG, "❌ URL analisada: $playerthreeUrl")
-                                }
+                                val extractor = PlayerEmbedAPIWebViewExtractor()
+                                val links = extractor.extractFromUrl(source, episodeUrl)
+                                links.forEach { callback(it) }
+                                linksFound += links.size
+                                Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v226: ${links.size} links")
                             } catch (e: Exception) {
-                                Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${e.message}")
-                                e.printStackTrace()
+                                Log.e(TAG, "❌ PlayerEmbedAPI v226 falhou: ${e.message}")
                             }
                         }
                         // MegaEmbed V9 (principal - ~95% sucesso)
@@ -700,15 +687,14 @@ class MaxSeriesProvider : MainAPI() {
                                     val imdbId = extractImdbIdFromUrl(playerthreeUrl)
                                     Log.d(TAG, "🎬 IMDB ID extraído: $imdbId")
                                     
-                                    if (imdbId != null) {
-                                        Log.d(TAG, "✅ Iniciando extração WebView para IMDB: $imdbId")
+                                    try {
                                         val extractor = PlayerEmbedAPIWebViewExtractor()
-                                        val links = extractor.extract(imdbId)
+                                        val links = extractor.extractFromUrl(source, playerthreeUrl)
                                         links.forEach { callback(it) }
                                         linksFound += links.size
-                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI: ${links.size} links via WebView ✅✅✅")
-                                    } else {
-                                        Log.e(TAG, "❌ IMDB ID não encontrado para PlayerEmbedAPI")
+                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v226: ${links.size} links")
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "❌ PlayerEmbedAPI v226 falhou: ${e.message}")
                                     }
                                 } catch (e: Exception) {
                                     Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${e.message}")

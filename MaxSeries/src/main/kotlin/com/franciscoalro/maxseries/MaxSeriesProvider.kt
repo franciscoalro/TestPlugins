@@ -50,7 +50,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v228"
+    override var name = "MaxSeries v229"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -64,9 +64,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v228 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v229 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v228 Filtro Rigido), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v229 Multi-Source), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -512,17 +512,27 @@ class MaxSeriesProvider : MainAPI() {
             
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
-            Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
+            Log.d(TAG, "🎯========== SOURCES DISPONÍVEIS ==========")
+            Log.d(TAG, "📊 Total: ${sources.size} sources")
             
             if (sources.isEmpty()) {
                 Log.e(TAG, "❌ Nenhuma source encontrada no playerthree!")
                 return 0
             }
             
+            // Log detalhado de cada source
+            sources.forEachIndexed { index, source ->
+                val serverName = ServerPriority.detectServer(source)
+                Log.d(TAG, "  ${index + 1}️⃣ $serverName")
+            }
+            Log.d(TAG, "🎯========== FIM DA LISTA ==========")
+            
             // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority
             val sortedSources = ServerPriority.sortByPriority(sources) { source ->
                 ServerPriority.detectServer(source)
             }
+            
+            Log.wtf(TAG, "🎬 PROCESSANDO ${sortedSources.size} SOURCES PARA O PLAYER...")
             
             for (source in sortedSources) {
                 try {

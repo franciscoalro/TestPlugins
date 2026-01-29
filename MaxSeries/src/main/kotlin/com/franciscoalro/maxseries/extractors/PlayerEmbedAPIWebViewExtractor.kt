@@ -189,10 +189,19 @@ class PlayerEmbedAPIWebViewExtractor {
     }
     
     private suspend fun createLink(url: String, referer: String): List<ExtractorLink> {
+        // Detectar qualidade da URL
+        val quality = when {
+            url.contains("1080") -> "1080p"
+            url.contains("720") -> "720p"
+            url.contains("480") -> "480p"
+            url.contains("360") -> "360p"
+            else -> "HD"
+        }
+        
         return listOf(
             newExtractorLink(
                 source = "PlayerEmbedAPI",
-                name = "PlayerEmbedAPI",
+                name = "🎬 PlayerEmbedAPI [$quality]",
                 url = url,
                 type = ExtractorLinkType.VIDEO
             ) {

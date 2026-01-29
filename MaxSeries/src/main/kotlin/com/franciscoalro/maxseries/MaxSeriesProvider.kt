@@ -50,7 +50,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v230"
+    override var name = "MaxSeries v231"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -64,9 +64,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v230 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v231 CARREGADO! (DEBUG) 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v230 Rapido 8s), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v231 DEBUG), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -550,21 +550,22 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // v230: PlayerEmbedAPI - Timeout 8s (evita Job cancelled)
+                        // v231: PlayerEmbedAPI com DEBUG completo
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v230! 🌐🌐🌐")
+                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v231 (DEBUG)! 🌐🌐🌐")
                             try {
                                 val extractor = PlayerEmbedAPIWebViewExtractor()
                                 val links = extractor.extractFromUrl(source, episodeUrl)
                                 if (links.isNotEmpty()) {
                                     links.forEach { callback(it) }
                                     linksFound += links.size
-                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v230: ${links.size} links")
+                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v231: ${links.size} links ✅✅✅")
                                 } else {
-                                    Log.w(TAG, "⚠️ PlayerEmbedAPI v230: Sem links")
+                                    Log.e(TAG, "❌❌❌ PlayerEmbedAPI v231: SEM LINKS ❌❌❌")
                                 }
                             } catch (e: Exception) {
-                                Log.e(TAG, "❌ PlayerEmbedAPI v230: ${e.message}")
+                                Log.e(TAG, "❌❌❌ PlayerEmbedAPI v231 ERRO: ${e.message} ❌❌❌")
+                                e.printStackTrace()
                             }
                         }
                         // DoodStream (muito popular - v209)

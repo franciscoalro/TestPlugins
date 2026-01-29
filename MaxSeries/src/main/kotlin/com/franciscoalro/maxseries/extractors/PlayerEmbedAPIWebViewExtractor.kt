@@ -6,21 +6,21 @@ import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.*
 
 /**
- * PlayerEmbedAPI WebView Extractor v227 - Filtro Correto de Vídeo
+ * PlayerEmbedAPI WebView Extractor v228 - Filtro Rigido
  * 
- * Correção: Capturar APENAS URLs de vídeo (.mp4, .m3u8, googleapis.com)
- * IGNORAR arquivos JS/CSS do player (jwplayer.min.js, etc.)
+ * Garante que NENHUM arquivo .js/.css seja capturado como video.
+ * Verifica extensao PRIMEIRO, antes de qualquer outra coisa.
  */
 class PlayerEmbedAPIWebViewExtractor {
     
     companion object {
         private const val TAG = "PlayerEmbedAPI"
-        private const val TIMEOUT_MS = 12000L // 12s
+        private const val TIMEOUT_MS = 12000L
     }
     
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun extractFromUrl(sourceUrl: String, referer: String): List<ExtractorLink> {
-        android.util.Log.wtf(TAG, "🚀 v227 EXTRACT: ${sourceUrl.take(40)}...")
+        android.util.Log.wtf(TAG, "🚀 v228 EXTRACT: ${sourceUrl.take(40)}...")
         
         return withContext(Dispatchers.Main) {
             var videoUrl: String? = null
@@ -32,17 +32,15 @@ class PlayerEmbedAPIWebViewExtractor {
                     .invoke(null) as android.content.Context
                 
                 webView = createWebView(context) { url ->
-                    // Callback quando encontrar URL de vídeo
                     if (videoUrl == null) {
                         videoUrl = url
-                        android.util.Log.wtf(TAG, "📹 VIDEO CAPTURADO!")
+                        android.util.Log.wtf(TAG, "📹 VIDEO OK: ${url.take(50)}...")
                     }
                 }
                 
                 android.util.Log.d(TAG, "🌐 Loading...")
                 webView.loadUrl(sourceUrl)
                 
-                // Aguardar com verificação frequente
                 var elapsed = 0L
                 while (elapsed < TIMEOUT_MS && videoUrl == null) {
                     delay(300)
@@ -57,10 +55,9 @@ class PlayerEmbedAPIWebViewExtractor {
             }
             
             if (videoUrl != null) {
-                android.util.Log.wtf(TAG, "✅ SUCESSO: ${videoUrl!!.take(50)}...")
                 createLink(videoUrl!!, referer)
             } else {
-                android.util.Log.e(TAG, "❌ Timeout - sem vídeo")
+                android.util.Log.e(TAG, "❌ Timeout - sem video")
                 emptyList()
             }
         }
@@ -80,42 +77,56 @@ class PlayerEmbedAPIWebViewExtractor {
                     view: WebView,
                     request: WebResourceRequest
                 ): WebResourceResponse? {
-                    val url = request.url.toString()
+                    val url = request.url.toString().lowercase()
                     
-                    // ✅ CAPTURAR APENAS URLs DE VÍDEO
-                    // URL direta do Google Storage
-                    if (url.contains("googleapis.com") && 
-                        (url.contains(".mp4") || url.contains(".m3u8"))) {
-                        android.util.Log.wtf(TAG, "📹 GOOGLEAPIS: ${url.take(60)}")
-                        onVideoFound(url)
+                    // ========== PRIMEIRO: IGNORAR ARQUIVOS JS/CSS/ETC ==========
+                    // Se for arquivo estatico do player, IGNORAR IMEDIATAMENTE
+                    if (url.endsWith(".js") || 
+                        url.endsWith(".css") || 
+                        url.endsWith(".json") ||
+                        url.endsWith(".png") ||
+                        url.endsWith(".jpg") ||
+                        url.endsWith(".svg") ||
+                        url.endsWith(".woff") ||
+                        url.endsWith(".woff2") ||
+                        url.endsWith(".ttf") ||
+                        url.contains("/player/") && url.contains(".js") ||
+                        url.contains("jwplayer") ||
+                        url.contains("statics.sssrr")) {
+                        // Silencioso - nao loga nada para nao poluir
+                        return super.shouldInterceptRequest(view, request)
                     }
                     
-                    // URL intermediária sssrr (com timestamp e id)
+                    // ========== DEPOIS: VERIFICAR SE E VIDEO ==========
+                    
+                    // 1. Google Storage com video
+                    if (url.contains("googleapis.com") && 
+                        (url.contains(".mp4") || url.contains(".m3u8") || url.contains("video"))) {
+                        android.util.Log.wtf(TAG, "📹 GOOGLE: ${url.take(60)}")
+                        onVideoFound(request.url.toString())
+                    }
+                    
+                    // 2. URL intermediaria SSSRR (deve ter timestamp E id, mas NAO ser arquivo)
                     else if (url.contains("sssrr.org") && 
                              url.contains("timestamp=") && 
-                             url.contains("id=")) {
-                        android.util.Log.wtf(TAG, "🎯 SSSRR INTERMEDIÁRIA: ${url.take(60)}")
-                        // Tentar seguir redirect
-                        followRedirect(url, onVideoFound)
+                             url.contains("id=") &&
+                             !url.contains(".js") &&
+                             !url.contains(".css")) {
+                        android.util.Log.wtf(TAG, "🎯 SSSRR: ${url.take(60)}")
+                        followRedirect(request.url.toString(), onVideoFound)
                     }
                     
-                    // Outros vídeos diretos
-                    else if ((url.contains(".mp4") || url.contains(".m3u8")) &&
-                             !url.contains(".js") && !url.contains(".css")) {
-                        android.util.Log.d(TAG, "🎬 VÍDEO: ${url.take(60)}")
-                        onVideoFound(url)
-                    }
-                    
-                    // ❌ IGNORAR arquivos do player
-                    else if (url.contains("sssrr.org") && 
-                             (url.contains(".js") || url.contains(".css"))) {
-                        // Log silencioso apenas
-                        android.util.Log.v(TAG, "🚫 JS ignorado: ${url.take(40)}")
+                    // 3. Outros videos diretos
+                    else if ((url.endsWith(".mp4") || url.endsWith(".m3u8")) &&
+                             !url.contains(".js") && 
+                             !url.contains(".css")) {
+                        android.util.Log.wtf(TAG, "🎬 VIDEO: ${url.take(60)}")
+                        onVideoFound(request.url.toString())
                     }
                     
                     // Bloquear ads
                     if (url.contains("googleads") || url.contains("doubleclick") || 
-                        url.contains("googlesyndication")) {
+                        url.contains("googlesyndication") || url.contains("facebook")) {
                         return WebResourceResponse("text/plain", "utf-8", null)
                     }
                     
@@ -126,10 +137,9 @@ class PlayerEmbedAPIWebViewExtractor {
                     android.util.Log.d(TAG, "📄 Page: ${url.take(40)}")
                     
                     if (url.contains("abyss.to")) {
-                        android.util.Log.w(TAG, "⚠️ ABYSS.TO detectado")
+                        android.util.Log.w(TAG, "⚠️ ABYSS.TO")
                     }
                     
-                    // Clicks rápidos
                     injectClicks(view)
                 }
                 
@@ -155,13 +165,13 @@ class PlayerEmbedAPIWebViewExtractor {
                 
                 val finalUrl = response.url
                 if (finalUrl.contains("googleapis.com") || finalUrl.contains(".mp4")) {
-                    android.util.Log.wtf(TAG, "✅ REDIRECT OK: ${finalUrl.take(60)}")
+                    android.util.Log.wtf(TAG, "✅ REDIRECT: ${finalUrl.take(60)}")
                     withContext(Dispatchers.Main) {
                         callback(finalUrl)
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Redirect falhou: ${e.message}")
+                android.util.Log.e(TAG, "❌ Redirect erro: ${e.message}")
             }
         }
     }
@@ -169,9 +179,9 @@ class PlayerEmbedAPIWebViewExtractor {
     private fun injectClicks(webView: WebView) {
         val script = """
             (function() {
-                ['#overlay', '.overlay', '.jwplayer', 'video'].forEach(sel => {
+                ['#overlay','.overlay','.jwplayer','video','[class*="play"]'].forEach(sel => {
                     const el = document.querySelector(sel);
-                    if (el) { el.click(); el.click(); el.click(); }
+                    if (el) { el.click(); el.click(); }
                 });
             })();
         """

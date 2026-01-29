@@ -1,1 +1,22 @@
-[{"name":"MaxSeries","internalName":"MaxSeries","url":"https://github.com/franciscoalro/TestPlugins/releases/download/v215/MaxSeries.cs3","version":215,"apiVersion":1,"repositoryUrl":"https://github.com/franciscoalro/TestPlugins","fileSize":200822,"status":1,"language":"pt-BR","description":"MaxSeries v215 - PlayerEmbedAPI Direct Base64 Decode (20x faster!). Success rate: ~99%","authors":["franciscoalro"],"tvTypes":["TvSeries","Movie"],"iconUrl":"https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"}]
+[
+    {
+        "name": "MaxSeries",
+        "internalName": "MaxSeries",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v224/MaxSeries.cs3",
+        "version": 224,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+        "fileSize": 209410,
+        "status": 1,
+        "language": "pt-BR",
+        "description": "MaxSeries v224 - PlayerEmbedAPI Anti-Detecção + Redirect Fix. Headers realistas Chrome, Cookie manager, SSL bypass. Resolve redirecionamento abyss.to.",
+        "authors": [
+            "franciscoalro"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
+    }
+]

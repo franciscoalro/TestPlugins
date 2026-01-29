@@ -16,7 +16,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorManual
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -50,7 +50,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries"
+    override var name = "MaxSeries v224"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -64,9 +64,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v216 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v224 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: MegaEmbed, PlayerEmbedAPI (MANUAL WebView!), MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v224 Anti-Detecção), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -540,11 +540,19 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // PlayerEmbedAPI (backup confiável - MANUAL WebView)
+                        // v224: PlayerEmbedAPI com Anti-Detecção + Redirect Fix
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando PlayerEmbedAPIExtractorManual...")
-                            PlayerEmbedAPIExtractorManual().getUrl(source, episodeUrl, subtitleCallback, callback)
-                            linksFound++
+                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI DETECTADO! 🌐🌐🌐")
+                            Log.d(TAG, "⚡ v224: Anti-detecção + Redirect Fix")
+                            try {
+                                val extractor = PlayerEmbedAPIWebViewExtractor()
+                                val links = extractor.extractFromUrl(source, episodeUrl)
+                                links.forEach { callback(it) }
+                                linksFound += links.size
+                                Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v224: ${links.size} links ✅✅✅")
+                            } catch (e: Exception) {
+                                Log.e(TAG, "❌ PlayerEmbedAPI v224 falhou: ${e.message}")
+                            }
                         }
                         // DoodStream (muito popular - v209)
                         source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {

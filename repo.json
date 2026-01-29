@@ -1,8 +1,9 @@
 {
-    "name": "TestPlugins Repository",
-    "description": "Repositório de extensões CloudStream - MaxSeries e AnimesOnlineCC",
-    "manifestVersion": 1,
-    "pluginLists": [
-        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
-    ]
+  "name": "TestPlugins Repository - Brazilian Providers",
+  "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
+  "description": "Repositório completo de extensões brasileiras para Cloudstream - MaxSeries v224 com PlayerEmbedAPI Anti-Detecção (Chrome headers, Cookie manager, SSL bypass)",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"
+  ]
 }

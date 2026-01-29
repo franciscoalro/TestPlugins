@@ -1,7 +1,7 @@
 {
   "name": "TestPlugins Repository - Brazilian Providers",
   "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
-  "description": "Repositório completo de extensões brasileiras para Cloudstream - MaxSeries v223 com PlayerEmbedAPI Redirect Fix (sssrr.org → googleapis.com)",
+  "description": "Repositório completo de extensões brasileiras para Cloudstream - MaxSeries v224 com PlayerEmbedAPI Anti-Detecção (Chrome headers, Cookie manager, SSL bypass)",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"

@@ -18,11 +18,11 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v237/MaxSeries.cs3",
-        "version": 237,
-        "description": "MaxSeries v237 - Python AES-CTR Algorithm Port + Multi-Quality Support + PlayerThreeBlogger Extractor",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v238/MaxSeries.cs3",
+        "version": 238,
+        "description": "MaxSeries v238 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality Support",
         "status": 1,
-        "fileSize": 227000,
+        "fileSize": 228000,
         "sha256": "",
         "tvTypes": [
             "TvSeries",

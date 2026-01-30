@@ -1,7 +1,7 @@
-version = 236
+version = 237
 
 cloudstream {
-    description = "MaxSeries v236 - PlayerThreeBlogger Extractor (tason.me → googlevideo)"
+    description = "MaxSeries v237 - Python AES-CTR Algorithm Port + Multi-Quality Support"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

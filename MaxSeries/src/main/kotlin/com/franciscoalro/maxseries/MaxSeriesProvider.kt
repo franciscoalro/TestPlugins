@@ -32,7 +32,13 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v237 - Python AES-CTR Algorithm Port (Jan 2026)
+ * MaxSeries Provider v238 - PlayerEmbedAPI Enhanced (Jan 2026)
+ *
+ * v238 Changes (30 Jan 2026):
+ * - 🔧 PlayerEmbedAPI v4.1: Múltiplos padrões de regex para base64
+ * - 🎯 Enhanced Base64 Detection com validação
+ * - 📄 Log detalhado do HTML quando não encontra dados
+ * - ⚡ Fallback regex melhorado
  *
  * v237 Changes (30 Jan 2026):
  * - 🐍 PORTE: Algoritmo AES-CTR do PlayerEmbedAPI portado do Python
@@ -91,7 +97,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v237"
+    override var name = "MaxSeries v238"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -105,7 +111,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v237 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v238 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")

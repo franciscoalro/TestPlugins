@@ -17,6 +17,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -24,7 +25,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v216 - PlayerEmbedAPI Manual WebView (Jan 2026)
+ * MaxSeries Provider v232 - PlayerEmbedAPI ShortIcu Extractor (Jan 2026)
+ * 
+ * v232 Changes (30 Jan 2026):
+ * - 🚀 NOVO: PlayerEmbedAPI ShortIcu Extractor
+ * - ⚡ Extrai vídeo via short.icu (mais rápido, sem WebView)
+ * - 🔄 Fallback automático para WebView se necessário
  * 
  * v216 Changes (26 Jan 2026):
  * - 🔧 PlayerEmbedAPI agora usa WebView MANUAL (igual MegaEmbed)
@@ -50,7 +56,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v225"
+    override var name = "MaxSeries v232"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -64,9 +70,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v225 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v232 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v225 Otimizado), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v232 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -512,17 +518,27 @@ class MaxSeriesProvider : MainAPI() {
             
             // Extrair botões de player com data-source
             val sources = extractPlayerSources(html)
-            Log.d(TAG, "🎯 Sources encontradas: ${sources.size} - $sources")
+            Log.d(TAG, "🎯========== SOURCES DISPONÍVEIS ==========")
+            Log.d(TAG, "📊 Total: ${sources.size} sources")
             
             if (sources.isEmpty()) {
                 Log.e(TAG, "❌ Nenhuma source encontrada no playerthree!")
                 return 0
             }
             
+            // Log detalhado de cada source
+            sources.forEachIndexed { index, source ->
+                val serverName = ServerPriority.detectServer(source)
+                Log.d(TAG, "  ${index + 1}️⃣ $serverName")
+            }
+            Log.d(TAG, "🎯========== FIM DA LISTA ==========")
+            
             // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority
             val sortedSources = ServerPriority.sortByPriority(sources) { source ->
                 ServerPriority.detectServer(source)
             }
+            
+            Log.wtf(TAG, "🎬 PROCESSANDO ${sortedSources.size} SOURCES PARA O PLAYER...")
             
             for (source in sortedSources) {
                 try {
@@ -540,17 +556,37 @@ class MaxSeriesProvider : MainAPI() {
                             MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
                             linksFound++
                         }
-                        // v225: PlayerEmbedAPI Otimizado (15s timeout)
+                        // v232: PlayerEmbedAPI com ShortIcu Extractor (NOVO!)
                         source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v225! 🌐🌐🌐")
+                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v232 (ShortIcu)! 🌐🌐🌐")
                             try {
-                                val extractor = PlayerEmbedAPIWebViewExtractor()
-                                val links = extractor.extractFromUrl(source, episodeUrl)
-                                links.forEach { callback(it) }
-                                linksFound += links.size
-                                Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v225: ${links.size} links")
+                                // NOVO: Tenta ShortIcu primeiro (mais rápido e confiável)
+                                val extractor = PlayerEmbedAPIShortIcuExtractor()
+                                val initialCount = linksFound
+                                
+                                extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                    callback(link)
+                                    linksFound++
+                                }
+                                
+                                if (linksFound > initialCount) {
+                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v232 (ShortIcu): SUCESSO ✅✅✅")
+                                } else {
+                                    // Fallback para WebView se ShortIcu falhar
+                                    Log.w(TAG, "⚠️ ShortIcu não retornou links, tentando WebView...")
+                                    val webviewExtractor = PlayerEmbedAPIWebViewExtractor()
+                                    val links = webviewExtractor.extractFromUrl(source, episodeUrl)
+                                    if (links.isNotEmpty()) {
+                                        links.forEach { callback(it) }
+                                        linksFound += links.size
+                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v232 (WebView): ${links.size} links ✅✅✅")
+                                    } else {
+                                        Log.e(TAG, "❌❌❌ PlayerEmbedAPI v232: SEM LINKS ❌❌❌")
+                                    }
+                                }
                             } catch (e: Exception) {
-                                Log.e(TAG, "❌ PlayerEmbedAPI v225 falhou: ${e.message}")
+                                Log.e(TAG, "❌❌❌ PlayerEmbedAPI v232 ERRO: ${e.message} ❌❌❌")
+                                e.printStackTrace()
                             }
                         }
                         // DoodStream (muito popular - v209)

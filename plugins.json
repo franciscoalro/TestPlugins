@@ -2,14 +2,14 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v226/MaxSeries.cs3",
-        "version": 226,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v232/MaxSeries.cs3",
+        "version": 232,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 208000,
+        "fileSize": 210000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v226 - PlayerEmbedAPI Captura Imediata! Estrategia: captura URL do Google Storage assim que aparece e encerra. Timeout 10s. Testado com Puppeteer/TypeScript.",
+        "description": "MaxSeries v232 - PlayerEmbedAPI ShortIcu Extractor! Extrai vídeo via short.icu (mais rápido, sem WebView). Fallback automático para WebView se necessário.",
         "authors": [
             "franciscoalro"
         ],

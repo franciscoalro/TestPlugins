@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import android.util.Log
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Gerenciador de Pre-fetching de URLs de vídeo
@@ -371,12 +372,12 @@ object PreFetchManager {
     /**
      * Cancela todos os jobs de pre-fetch ativos
      */
-    fun cancelAll() {
+    suspend fun cancelAll() {
         val count = activeJobs.size
         Log.d(TAG, "🛑 Cancelando $count jobs de pre-fetch")
         
-        activeJobs.values().forEach { job ->
-            job.cancel()
+        activeJobs.values.forEach { job: Job ->
+            job.cancelAndJoin()
         }
         activeJobs.clear()
     }
@@ -384,9 +385,9 @@ object PreFetchManager {
     /**
      * Cancela pre-fetch de episódios específicos
      */
-    fun cancelForEpisodes(episodeKeys: List<String>) {
+    suspend fun cancelForEpisodes(episodeKeys: List<String>) {
         episodeKeys.forEach { key ->
-            activeJobs[key]?.cancel()
+            activeJobs[key]?.cancelAndJoin()
             activeJobs.remove(key)
         }
     }

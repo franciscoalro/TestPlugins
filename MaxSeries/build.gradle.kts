@@ -1,7 +1,7 @@
-version = 234
+version = 237
 
 cloudstream {
-    description = "MaxSeries v234 - Extração Paralela Otimizada"
+    description = "MaxSeries v237 - Python AES-CTR Algorithm Port + Multi-Quality Support"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

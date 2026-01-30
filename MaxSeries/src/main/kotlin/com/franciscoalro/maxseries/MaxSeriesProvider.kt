@@ -25,7 +25,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v232 - PlayerEmbedAPI ShortIcu Extractor (Jan 2026)
+ * MaxSeries Provider v233 - Suporte viewplayer.online + Logs (Jan 2026)
+ * 
+ * v233 Changes (30 Jan 2026):
+ * - 🎬 Suporte para viewplayer.online (filmes)
+ * - 📝 Logs detalhados para debug de sources
+ * - 🔍 Melhora detecção quando não há episódios
  * 
  * v232 Changes (30 Jan 2026):
  * - 🚀 NOVO: PlayerEmbedAPI ShortIcu Extractor
@@ -56,7 +61,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v232"
+    override var name = "MaxSeries v233"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -70,9 +75,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v232 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v233 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v232 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 

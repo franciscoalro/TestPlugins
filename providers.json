@@ -18,12 +18,12 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v184/MaxSeries.cs3",
-        "version": 184,
-        "description": "MaxSeries v184 - MASSIVE CDN UPDATE: Added clarionforge, stellarpath + New Shards",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v237/MaxSeries.cs3",
+        "version": 237,
+        "description": "MaxSeries v237 - Python AES-CTR Algorithm Port + Multi-Quality Support + PlayerThreeBlogger Extractor",
         "status": 1,
-        "fileSize": 189987,
-        "sha256": "486F025AA1A6AA35CFB68ACBBB1D74BF9E3F17444B7174B345661D6278AA2503",
+        "fileSize": 227000,
+        "sha256": "",
         "tvTypes": [
             "TvSeries",
             "Movie"
@@ -36,6 +36,3 @@
         "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
     }
 ]
-
-
-

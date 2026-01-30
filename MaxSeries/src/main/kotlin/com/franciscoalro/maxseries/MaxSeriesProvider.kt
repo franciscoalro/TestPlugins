@@ -24,6 +24,7 @@ import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
+import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -31,7 +32,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v235 - Extração Paralela Otimizada (Jan 2026)
+ * MaxSeries Provider v236 - PlayerThreeBlogger Extractor (Jan 2026)
+ *
+ * v236 Changes (30 Jan 2026):
+ * - 🚀 NOVO: PlayerThreeBloggerExtractor para fluxo playerthree → tason.me → googlevideo
+ * - 🎯 Extrai contentId do HTML e segue redirect para obter URL do googlevideo
+ * - ⚡ Mais rápido que WebView para esse fluxo específico
  *
  * v235 Changes (30 Jan 2026):
  * - 🐛 CORREÇÃO: Erros de coroutine resolvidos (suspend functions em callbacks)
@@ -79,7 +85,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v235"
+    override var name = "MaxSeries v236"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -93,9 +99,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v235 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v236 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -558,8 +564,8 @@ class MaxSeriesProvider : MainAPI() {
             Log.d(TAG, "🎯========== FIM DA LISTA ==========")
             
             // 🔥 PRIORIZAÇÃO OTIMIZADA: mais rápidos primeiro
-            // Ordem: PlayerEmbedAPI > MyVidPlay > MegaEmbed > DoodStream > outros
-            val priorityOrder = listOf("playerembedapi", "myvidplay", "megaembed", "doodstream", "streamtape", "mixdrop", "filemoon")
+            // Ordem: PlayerThreeBlogger > PlayerEmbedAPI > MyVidPlay > MegaEmbed > DoodStream > outros
+            val priorityOrder = listOf("playerthreeblogger", "playerembedapi", "myvidplay", "megaembed", "doodstream", "streamtape", "mixdrop", "filemoon")
             val sortedSources = sources.sortedBy { source ->
                 val lower = source.lowercase()
                 priorityOrder.indexOfFirst { lower.contains(it) }.let { 
@@ -599,6 +605,27 @@ class MaxSeriesProvider : MainAPI() {
                                 Log.d(TAG, "🔍 [$attempts/${sortedSources.size}] Processando: ${ServerPriority.detectServer(source)}")
                                 
                                 when {
+                                    // Prioridade 0: PlayerThreeBlogger (fluxo playerthree → tason.me → googlevideo)
+                                    source.contains("playerthree.online", ignoreCase = true) || 
+                                    source.contains("tason.me", ignoreCase = true) -> {
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 0 - PlayerThreeBlogger: ${source.take(60)}...")
+                                        try {
+                                            val extractor = PlayerThreeBloggerExtractor()
+                                            val links = mutableListOf<ExtractorLink>()
+                                            extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                                links.add(link)
+                                            }
+                                            mutex.withLock {
+                                                if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                    links.forEach { callback(it) }
+                                                    linksFound.addAndGet(links.size)
+                                                    Log.wtf(TAG, "✅✅✅ PlayerThreeBlogger: SUCESSO (early exit ativado) ✅✅✅")
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "❌ PlayerThreeBlogger falhou: ${e.message}")
+                                        }
+                                    }
                                     // Prioridade 1: PlayerEmbedAPI (mais rápido - v234)
                                     source.contains("playerembedapi", ignoreCase = true) -> {
                                         Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI: ${source.take(60)}...")

@@ -1,7 +1,7 @@
-version = 234
+version = 236
 
 cloudstream {
-    description = "MaxSeries v234 - Extração Paralela Otimizada"
+    description = "MaxSeries v236 - PlayerThreeBlogger Extractor (tason.me → googlevideo)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

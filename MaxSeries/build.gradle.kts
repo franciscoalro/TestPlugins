@@ -1,7 +1,7 @@
-version = 216
+version = 232
 
 cloudstream {
-    description = "MaxSeries v216 - PlayerEmbedAPI Manual WebView (Click to Play)"
+    description = "MaxSeries v232 - PlayerEmbedAPI ShortIcu Extractor (Fast & Reliable)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

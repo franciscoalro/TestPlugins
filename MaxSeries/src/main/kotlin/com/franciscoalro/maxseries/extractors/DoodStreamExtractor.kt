@@ -3,6 +3,7 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.franciscoalro.maxseries.utils.BRExtractorUtils
+import com.franciscoalro.maxseries.utils.RetryHelper
 import android.util.Log
 import kotlin.random.Random
 
@@ -41,11 +42,25 @@ class DoodStreamExtractor : ExtractorApi() {
                 ?: "doodstream.com"
             val baseUrl = "https://$domain"
             
-            val response = app.get(
-                url,
-                referer = referer ?: baseUrl,
-                headers = mapOf("User-Agent" to USER_AGENT)
-            )
+            // Primeira requisição com timeout e retry
+            val response = RetryHelper.withRetry(maxAttempts = 2) {
+                app.get(
+                    url,
+                    referer = referer ?: baseUrl,
+                    headers = mapOf("User-Agent" to USER_AGENT),
+                    timeout = 8_000L  // 8 segundos máximo
+                )
+            }
+            
+            // Early exit para erros HTTP
+            if (response.code == 404) {
+                Log.w(TAG, "Vídeo não encontrado (404)")
+                return
+            }
+            if (response.code >= 500) {
+                Log.w(TAG, "Erro servidor (${response.code})")
+                return
+            }
             
             val html = response.text
             
@@ -59,15 +74,18 @@ class DoodStreamExtractor : ExtractorApi() {
                 
                 Log.d(TAG, "🔑 pass_md5 encontrado: $passMd5Url")
                 
-                // Fazer request para pass_md5
-                val md5Response = app.get(
-                    passMd5Url,
-                    referer = url,
-                    headers = mapOf(
-                        "User-Agent" to USER_AGENT,
-                        "Accept" to "*/*"
+                // Segunda requisição com timeout menor e retry
+                val md5Response = RetryHelper.withRetry(maxAttempts = 2) {
+                    app.get(
+                        passMd5Url,
+                        referer = url,
+                        headers = mapOf(
+                            "User-Agent" to USER_AGENT,
+                            "Accept" to "*/*"
+                        ),
+                        timeout = 5_000L  // 5s apenas
                     )
-                )
+                }
                 
                 val md5Text = md5Response.text.trim()
                 

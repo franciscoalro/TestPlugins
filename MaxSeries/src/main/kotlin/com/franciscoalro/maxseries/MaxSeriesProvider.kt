@@ -740,6 +740,7 @@ class MaxSeriesProvider : MainAPI() {
                             } catch (e: Exception) {
                                 Log.e(TAG, "❌ Erro processando ${ServerPriority.detectServer(source)}: ${e.message}")
                             }
+                            Unit
                         }
                         jobs.add(job)
                     }

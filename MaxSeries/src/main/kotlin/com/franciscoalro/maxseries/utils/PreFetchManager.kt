@@ -375,7 +375,7 @@ object PreFetchManager {
         val count = activeJobs.size
         Log.d(TAG, "🛑 Cancelando $count jobs de pre-fetch")
         
-        activeJobs.values.forEach { job ->
+        activeJobs.values().forEach { job ->
             job.cancel()
         }
         activeJobs.clear()
@@ -482,4 +482,5 @@ class ConcurrentHashMap<K, V> {
     val size: Int get() = synchronized(lock) { map.size }
     fun values(): Collection<V> = synchronized(lock) { map.values.toList() }
     fun filter(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> = synchronized(lock) { map.filter(predicate) }
+    fun clear() = synchronized(lock) { map.clear() }
 }

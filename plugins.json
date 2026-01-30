@@ -2,14 +2,14 @@
   {
     "name": "MaxSeries",
     "internalName": "MaxSeries",
-    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v209/MaxSeries.cs3",
-    "version": 209,
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v235/MaxSeries.cs3",
+    "version": 235,
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "fileSize": 222592,
+    "fileSize": 225000,
     "status": 1,
     "language": "pt-BR",
-    "description": "MaxSeries v209 - 7 Extractors + 24 Categories - Sistema completo de streaming",
+    "description": "MaxSeries v235 - Extração Paralela + PlayerEmbedAPI Fix + Timeouts Otimizados - Sistema completo de streaming",
     "authors": ["franciscoalro"],
     "tvTypes": ["TvSeries", "Movie"],
     "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"

@@ -2,14 +2,14 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v232/MaxSeries.cs3",
-        "version": 232,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v233/MaxSeries.cs3",
+        "version": 233,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "fileSize": 210000,
         "status": 1,
         "language": "pt-BR",
-        "description": "MaxSeries v232 - PlayerEmbedAPI ShortIcu Extractor! Extrai vídeo via short.icu (mais rápido, sem WebView). Fallback automático para WebView se necessário.",
+        "description": "MaxSeries v233 - PlayerEmbedAPI ShortIcu Extractor! Extrai vídeo via Suporte viewplayer.online + Logs detalhados"
         "authors": [
             "franciscoalro"
         ],

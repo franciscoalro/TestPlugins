@@ -1,22 +1,102 @@
 [
-    {
-        "name": "MaxSeries",
-        "internalName": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v233/MaxSeries.cs3",
-        "version": 233,
-        "apiVersion": 1,
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "fileSize": 210000,
-        "status": 1,
-        "language": "pt-BR",
-        "description": "MaxSeries v233 - PlayerEmbedAPI ShortIcu Extractor! Extrai vídeo via Suporte viewplayer.online + Logs detalhados",
-        "authors": [
-            "franciscoalro"
-        ],
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
-    }
+  {
+    "name": "MaxSeries",
+    "internalName": "MaxSeries",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v237/MaxSeries.cs3",
+    "version": 237,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 227000,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "MaxSeries v237 - Python AES-CTR Algorithm Port + Multi-Quality Support + PlayerThreeBlogger Extractor",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie"],
+    "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
+  },
+  {
+    "name": "AnimesOnlineCC",
+    "internalName": "AnimesOnlineCC",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/AnimesOnlineCC.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 16000,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "Animes Online CC - Streaming de animes em português",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["Anime"],
+    "iconUrl": "https://animesonlinecc.to/favicon.ico"
+  },
+  {
+    "name": "MegaFlix",
+    "internalName": "MegaFlix",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/MegaFlix.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 16400,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "MegaFlix - Filmes e séries em português com busca rápida",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie"]
+  },
+  {
+    "name": "NetCine",
+    "internalName": "NetCine",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/NetCine.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 19600,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "NetCine - Filmes, séries e animes em português",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie", "Anime"]
+  },
+  {
+    "name": "OverFlix",
+    "internalName": "OverFlix",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/OverFlix.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 25500,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "OverFlix - Filmes e séries em português",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie"]
+  },
+  {
+    "name": "PobreFlix",
+    "internalName": "PobreFlix",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/PobreFlix.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 22900,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "PobreFlix - Filmes e séries em português com busca rápida",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie"]
+  },
+  {
+    "name": "Vizer",
+    "internalName": "Vizer",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v1.0.0/Vizer.cs3",
+    "version": 1,
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "fileSize": 25800,
+    "status": 1,
+    "language": "pt-BR",
+    "description": "Vizer - Filmes e séries em português com busca rápida",
+    "authors": ["franciscoalro"],
+    "tvTypes": ["TvSeries", "Movie"]
+  }
 ]

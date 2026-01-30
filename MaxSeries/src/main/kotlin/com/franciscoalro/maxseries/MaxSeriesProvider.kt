@@ -25,7 +25,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v232 - PlayerEmbedAPI ShortIcu Extractor (Jan 2026)
+ * MaxSeries Provider v233 - Suporte viewplayer.online + Logs (Jan 2026)
+ * 
+ * v233 Changes (30 Jan 2026):
+ * - 🎬 Suporte para viewplayer.online (filmes)
+ * - 📝 Logs detalhados para debug de sources
+ * - 🔍 Melhora detecção quando não há episódios
  * 
  * v232 Changes (30 Jan 2026):
  * - 🚀 NOVO: PlayerEmbedAPI ShortIcu Extractor
@@ -56,7 +61,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v232"
+    override var name = "MaxSeries v233"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -70,9 +75,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v232 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v233 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v232 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -471,12 +476,14 @@ class MaxSeriesProvider : MainAPI() {
                 
                 linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, seasonId, subtitleCallback, callback)
             } 
-            // URL direta do playerthree
-            else if (data.contains("playerthree.online")) {
+            // URL direta do playerthree ou viewplayer (mesma estrutura)
+            else if (data.contains("playerthree.online") || data.contains("viewplayer.online")) {
+                Log.d(TAG, "🎬 Detectado player/viewplayer online")
                 linksFound = extractFromPlayerthreeDirect(data, subtitleCallback, callback)
             }
             // URL do MaxSeries (fallback)
             else {
+                Log.d(TAG, "🌐 Usando fallback MaxSeriesPage")
                 linksFound = extractFromMaxSeriesPage(data, subtitleCallback, callback)
             }
             
@@ -697,6 +704,8 @@ class MaxSeriesProvider : MainAPI() {
         var linksFound = 0
         
         try {
+            Log.d(TAG, "🎬 extractFromPlayerthreeDirect: $playerthreeUrl")
+            
             val response = app.get(
                 playerthreeUrl,
                 headers = mapOf(
@@ -706,20 +715,36 @@ class MaxSeriesProvider : MainAPI() {
             )
             
             val document = response.document
+            val html = document.html()
+            Log.d(TAG, "📄 HTML carregado: ${html.length} chars")
             
+            // Tentativa 1: Procurar episódios (para séries)
             val firstEpisode = document.selectFirst("li[data-episode-id]")
             if (firstEpisode != null) {
                 val episodeId = firstEpisode.attr("data-episode-id")
+                Log.d(TAG, "📺 Episódio encontrado: $episodeId")
                 if (episodeId.isNotEmpty()) {
                     linksFound = extractFromPlayerthreeEpisode(playerthreeUrl, episodeId, null, subtitleCallback, callback)
                 }
+            } else {
+                Log.d(TAG, "📺 Nenhum episódio encontrado (pode ser filme)")
             }
             
-            // Se não encontrou episódios, procurar sources diretas
+            // Tentativa 2: Se não encontrou episódios, procurar sources diretas (para filmes)
             if (linksFound == 0) {
-                val sources = extractPlayerSources(document.html())
+                Log.d(TAG, "🎬 Procurando sources diretas no HTML...")
+                val sources = extractPlayerSources(html)
+                Log.d(TAG, "🎯 Sources encontradas: ${sources.size}")
+                
+                if (sources.isEmpty()) {
+                    Log.w(TAG, "⚠️ Nenhuma source encontrada no HTML!")
+                    // Tentativa 3: Logar parte do HTML para debug
+                    Log.d(TAG, "📄 Primeiros 500 chars do HTML: ${html.take(500)}")
+                }
+                
                 for (source in sources) {
                     try {
+                        Log.d(TAG, "⚡ Processando source: $source")
                         loadExtractor(source, playerthreeUrl, subtitleCallback, callback)
                         linksFound++
                     } catch (e: Exception) {
@@ -730,8 +755,10 @@ class MaxSeriesProvider : MainAPI() {
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro ao extrair do playerthree: ${e.message}")
+            e.printStackTrace()
         }
         
+        Log.d(TAG, "✅ extractFromPlayerthreeDirect: $linksFound links")
         return linksFound
     }
 

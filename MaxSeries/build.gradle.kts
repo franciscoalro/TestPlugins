@@ -1,7 +1,7 @@
-version = 233
+version = 234
 
 cloudstream {
-    description = "MaxSeries v233 - Suporte viewplayer.online + Logs detalhados"
+    description = "MaxSeries v234 - Extração Paralela Otimizada"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

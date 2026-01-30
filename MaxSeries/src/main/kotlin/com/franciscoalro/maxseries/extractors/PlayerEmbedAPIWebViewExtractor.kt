@@ -3,81 +3,100 @@ package com.franciscoalro.maxseries.extractors
 import android.annotation.SuppressLint
 import android.webkit.*
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.app
 import kotlinx.coroutines.*
 
 /**
- * PlayerEmbedAPI WebView Extractor v226 - Captura Imediata
+ * PlayerEmbedAPI WebView Extractor v231 - DEBUG COMPLETO
  * 
- * Estratégia: Capturar URL do Google Storage assim que aparecer e ENCERRAR
- * Não esperar redirecionamento para abyss.to
+ * Logs detalhados para identificar onde está falhando
  */
 class PlayerEmbedAPIWebViewExtractor {
     
     companion object {
         private const val TAG = "PlayerEmbedAPI"
-        private const val TIMEOUT_MS = 10000L // 10s apenas - rápido!
+        private const val TIMEOUT_MS = 15000L // 15s para debug
     }
     
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun extractFromUrl(sourceUrl: String, referer: String): List<ExtractorLink> {
-        android.util.Log.wtf(TAG, "🚀 v226 EXTRACT: ${sourceUrl.take(50)}...")
+        android.util.Log.wtf(TAG, "========================================")
+        android.util.Log.wtf(TAG, "🚀 v231 INICIANDO EXTRACAO")
+        android.util.Log.wtf(TAG, "📍 URL: $sourceUrl")
+        android.util.Log.wtf(TAG, "📄 Referer: $referer")
+        android.util.Log.wtf(TAG, "========================================")
         
         return withContext(Dispatchers.Main) {
-            var capturedUrl: String? = null
+            val capturedUrls = mutableListOf<String>()
             var webView: WebView? = null
+            var isCompleted = false
             
             try {
                 val context = Class.forName("android.app.ActivityThread")
                     .getMethod("currentApplication")
                     .invoke(null) as android.content.Context
                 
-                webView = createWebView(context, referer) { url ->
-                    // Callback quando encontrar URL
-                    if (capturedUrl == null && url.contains("googleapis.com")) {
-                        capturedUrl = url
-                        android.util.Log.wtf(TAG, "🎬 URL CAPTURADA: ${url.take(60)}...")
+                android.util.Log.d(TAG, "✅ Contexto obtido")
+                
+                webView = createWebView(context) { url, type ->
+                    android.util.Log.wtf(TAG, "📡 CALLBACK recebido: $type")
+                    android.util.Log.wtf(TAG, "🔗 URL: ${url.take(60)}")
+                    capturedUrls.add(url)
+                    isCompleted = true
+                }
+                
+                android.util.Log.d(TAG, "🌐 WebView criado, carregando URL...")
+                webView.loadUrl(sourceUrl)
+                
+                // Aguardar com verificacao frequente
+                var elapsed = 0L
+                while (elapsed < TIMEOUT_MS && !isCompleted) {
+                    delay(100) // Verifica a cada 100ms
+                    elapsed += 100
+                    
+                    if (elapsed % 1000 == 0L) {
+                        android.util.Log.d(TAG, "⏳ Aguardando... ${elapsed/1000}s | Capturadas: ${capturedUrls.size}")
                     }
                 }
                 
-                // Carregar URL
-                android.util.Log.d(TAG, "🌐 Loading...")
-                webView.loadUrl(sourceUrl)
-                
-                // Aguardar com timeout, mas verificar a cada 500ms
-                var elapsed = 0L
-                while (elapsed < TIMEOUT_MS && capturedUrl == null) {
-                    delay(500)
-                    elapsed += 500
-                    
-                    // Log de progresso
-                    if (elapsed % 2000 == 0L) {
-                        android.util.Log.d(TAG, "⏳ Aguardando... ${elapsed/1000}s")
-                    }
+                if (isCompleted) {
+                    android.util.Log.wtf(TAG, "✅ URL capturada em ${elapsed}ms")
+                } else {
+                    android.util.Log.w(TAG, "⚠️ Timeout apos ${TIMEOUT_MS}ms")
+                    android.util.Log.d(TAG, "📊 URLs capturadas no total: ${capturedUrls.size}")
                 }
                 
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Erro: ${e.message}")
+                android.util.Log.e(TAG, "❌ ERRO CRITICO: ${e.message}")
+                e.printStackTrace()
             } finally {
-                // SEMPRE fechar WebView
-                webView?.stopLoading()
-                webView?.destroy()
-                android.util.Log.d(TAG, "🧹 WebView destruído")
+                android.util.Log.d(TAG, "🧹 Limpando WebView...")
+                try {
+                    webView?.stopLoading()
+                    webView?.destroy()
+                } catch (e: Exception) {
+                    android.util.Log.e(TAG, "❌ Erro ao limpar WebView: ${e.message}")
+                }
             }
             
-            // Processar resultado
-            if (capturedUrl != null) {
-                android.util.Log.wtf(TAG, "✅ SUCESSO: URL obtida em tempo recorde!")
-                createLink(capturedUrl!!, referer)
+            android.util.Log.wtf(TAG, "========================================")
+            android.util.Log.wtf(TAG, "📊 RESULTADO FINAL:")
+            android.util.Log.wtf(TAG, "   URLs capturadas: ${capturedUrls.size}")
+            
+            if (capturedUrls.isNotEmpty()) {
+                val url = capturedUrls.first()
+                android.util.Log.wtf(TAG, "   Usando: ${url.take(50)}...")
+                android.util.Log.wtf(TAG, "========================================")
+                createLink(url, referer)
             } else {
-                android.util.Log.e(TAG, "❌ Timeout - nenhuma URL capturada")
+                android.util.Log.e(TAG, "   ❌ NENHUMA URL CAPTURADA")
+                android.util.Log.wtf(TAG, "========================================")
                 emptyList()
             }
         }
     }
     
     @SuppressLint("SetJavaScriptEnabled")
-    private fun createWebView(context: android.content.Context, referer: String, onUrlCaptured: (String) -> Unit): WebView {
+    private fun createWebView(context: android.content.Context, onUrlFound: (String, String) -> Unit): WebView {
         return WebView(context).apply {
             settings.apply {
                 javaScriptEnabled = true
@@ -86,70 +105,134 @@ class PlayerEmbedAPIWebViewExtractor {
             }
             
             webViewClient = object : WebViewClient() {
+                
                 override fun shouldInterceptRequest(
                     view: WebView,
                     request: WebResourceRequest
                 ): WebResourceResponse? {
                     val url = request.url.toString()
                     
-                    // CAPTURAR IMEDIATAMENTE Google Storage
+                    // LOG TODAS AS REQUISICOES (para debug)
+                    if (url.contains("sssrr") || url.contains("googleapis") || url.contains("player")) {
+                        android.util.Log.v(TAG, "📡 REQ: ${url.take(80)}")
+                    }
+                    
+                    // IGNORAR arquivos estaticos
+                    if (url.endsWith(".js") || url.endsWith(".css") || 
+                        url.endsWith(".png") || url.endsWith(".jpg") ||
+                        url.contains("/player/") || url.contains("jwplayer") ||
+                        url.contains("statics.sssrr")) {
+                        return super.shouldInterceptRequest(view, request)
+                    }
+                    
+                    // CAPTURAR GOOGLE STORAGE
                     if (url.contains("googleapis.com") && url.contains(".mp4")) {
-                        android.util.Log.wtf(TAG, "📹 GOOGLEAPIS: ${url.take(60)}...")
-                        onUrlCaptured(url)
+                        android.util.Log.wtf(TAG, "🎬 VIDEO GOOGLEapis: ${url.take(60)}")
+                        onUrlFound(url, "GOOGLE")
+                        return super.shouldInterceptRequest(view, request)
                     }
                     
-                    // Também capturar sssrr como backup
-                    if (url.contains("sssrr.org") && url.contains("timestamp")) {
-                        android.util.Log.wtf(TAG, "🎯 SSSRR: ${url.take(60)}...")
-                        // Tentar seguir redirect em background
-                        followRedirectAsync(url, referer, onUrlCaptured)
+                    // CAPTURAR URL INTERMEDIARIA SSSRR
+                    if (url.contains("sssrr.org") && url.contains("timestamp=") && url.contains("id=")) {
+                        android.util.Log.wtf(TAG, "🎯 INTERMEDIARIA SSSRR: ${url.take(60)}")
+                        // Seguir redirect
+                        followRedirect(url, onUrlFound)
+                        return super.shouldInterceptRequest(view, request)
                     }
                     
-                    // Bloquear ads
-                    if (url.contains("googleads") || url.contains("doubleclick")) {
-                        return WebResourceResponse("text/plain", "utf-8", null)
+                    // CAPTURAR QUALQUER MP4/M3U8
+                    if (url.endsWith(".mp4") || url.endsWith(".m3u8")) {
+                        android.util.Log.wtf(TAG, "🎬 VIDEO DIRETO: ${url.take(60)}")
+                        onUrlFound(url, "DIRETO")
+                        return super.shouldInterceptRequest(view, request)
                     }
                     
                     return super.shouldInterceptRequest(view, request)
                 }
                 
+                override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    android.util.Log.d(TAG, "🚀 Page START: ${url?.take(40)}")
+                }
+                
                 override fun onPageFinished(view: WebView, url: String) {
-                    android.util.Log.d(TAG, "📄 Page: ${url.take(50)}")
+                    super.onPageFinished(view, url)
+                    android.util.Log.d(TAG, "📄 Page FINISHED: ${url.take(40)}")
                     
                     if (url.contains("abyss.to")) {
-                        android.util.Log.w(TAG, "⚠️ ABYSS.TO - mas URL já deve ter sido capturada")
+                        android.util.Log.e(TAG, "❌ ABYSS.TO DETECTADO! Site bloqueou automacao.")
                     }
                     
-                    // Clicks automáticos rápidos
-                    injectQuickClicks(view)
+                    // Clicks rapidos no player
+                    view.evaluateJavascript("""
+                        (function() {
+                            console.log('🚀 Script de automacao injetado');
+                            
+                            // Clicar em elementos do player
+                            var selectors = ['#overlay', '.overlay', '.jwplayer', '.play-button', 'video', '[class*="play"]', '[id*="play"]'];
+                            selectors.forEach(function(sel) {
+                                var el = document.querySelector(sel);
+                                if (el) {
+                                    console.log('✅ Clicando em: ' + sel);
+                                    el.click();
+                                    setTimeout(function() { el.click(); }, 100);
+                                    setTimeout(function() { el.click(); }, 300);
+                                }
+                            });
+                            
+                            // Verificar se video ja esta disponivel
+                            var video = document.querySelector('video');
+                            if (video && video.src) {
+                                console.log('📹 Video encontrado: ' + video.src);
+                            }
+                        })();
+                    """, null)
+                }
+                
+                override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                    android.util.Log.e(TAG, "❌ WebView Error: ${error?.description}")
                 }
                 
                 override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: android.net.http.SslError?) {
+                    android.util.Log.w(TAG, "⚠️ SSL Error (ignorado)")
                     handler?.proceed()
+                }
+            }
+            
+            // Adicionar console.log do JavaScript
+            webChromeClient = object : WebChromeClient() {
+                override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                    android.util.Log.d("WebViewJS", "${message.message()}")
+                    return true
                 }
             }
         }
     }
     
-    private fun followRedirectAsync(url: String, referer: String, callback: (String) -> Unit) {
-        GlobalScope.launch(Dispatchers.IO) {
+    private fun followRedirect(url: String, callback: (String, String) -> Unit) {
+        android.util.Log.d(TAG, "🔄 Seguindo redirect...")
+        
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                val response = app.get(
+                val response = com.lagradost.cloudstream3.app.get(
                     url = url,
                     allowRedirects = true,
                     headers = mapOf(
                         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                        "Referer" to referer
+                        "Accept" to "*/*"
                     ),
                     timeout = 10
                 )
                 
                 val finalUrl = response.url
-                if (finalUrl.contains("googleapis.com")) {
-                    android.util.Log.wtf(TAG, "✅ Redirect OK: ${finalUrl.take(60)}")
-                    withContext(Dispatchers.Main) {
-                        callback(finalUrl)
+                android.util.Log.wtf(TAG, "✅ REDIRECT RESULTADO: ${finalUrl.take(60)}")
+                
+                if (finalUrl.contains("googleapis.com") || finalUrl.contains(".mp4")) {
+                    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                        callback(finalUrl, "REDIRECT")
                     }
+                } else {
+                    android.util.Log.w(TAG, "⚠️ Redirect nao retornou video: ${finalUrl.take(40)}")
                 }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Redirect falhou: ${e.message}")
@@ -157,30 +240,29 @@ class PlayerEmbedAPIWebViewExtractor {
         }
     }
     
-    private fun injectQuickClicks(webView: WebView) {
-        val script = """
-            (function() {
-                ['#overlay', '.overlay', '.play-button', 'video'].forEach(sel => {
-                    const el = document.querySelector(sel);
-                    if (el) el.click();
-                });
-            })();
-        """
-        webView.evaluateJavascript(script, null)
-    }
-    
     private suspend fun createLink(url: String, referer: String): List<ExtractorLink> {
+        val quality = when {
+            url.contains("1080") -> "1080p"
+            url.contains("720") -> "720p"
+            url.contains("480") -> "480p"
+            url.contains("360") -> "360p"
+            else -> "HD"
+        }
+        
+        android.util.Log.wtf(TAG, "✅ CRIANDO LINK: $quality")
+        
         return listOf(
             newExtractorLink(
                 source = "PlayerEmbedAPI",
-                name = "PlayerEmbedAPI HD",
+                name = "🎬 PlayerEmbedAPI [$quality]",
                 url = url,
                 type = ExtractorLinkType.VIDEO
             ) {
                 this.referer = referer
                 this.headers = mapOf(
                     "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                    "Origin" to "https://playerembedapi.link"
+                    "Accept" to "*/*",
+                    "Referer" to referer
                 )
             }
         )

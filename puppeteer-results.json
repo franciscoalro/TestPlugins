@@ -2,32 +2,22 @@
   "iframes": [
     {
       "index": 1,
-      "url": "https://playerthree.online/embed/sandokan/",
-      "type": "PlayerEmbedAPI",
-      "videoUrls": []
+      "url": "https://short.icu/K8R6OOjS7",
+      "type": "Desconhecido",
+      "videoUrls": [
+        "https://storage.googleapis.com/mediastorage/1769732826721/4h407tzezfv/81347747.mp4#mp4/r2/1/81347747/81347747/360p/h264?maxChunkSize=5242880"
+      ]
     }
   ],
   "capturedUrls": [
-    "https://fonts.gstatic.com/s/quicksand/v37/6xKtdSZaM9iE8KbpRA_hK1QN.woff2",
-    "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-solid-900.woff2",
-    "https://vjs.zencdn.net/7.10.2/video-js.css",
-    "https://vjs.zencdn.net/7.10.2/video.min.js",
-    "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-brands-400.woff2",
-    "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2"
+    "https://storage.googleapis.com/mediastorage/1769732826721/4h407tzezfv/81347747.mp4#mp4/r2/1/81347747/81347747/360p/h264?maxChunkSize=5242880"
   ],
   "summary": {
     "totalIframes": 1,
-    "totalUrls": 6,
+    "totalUrls": 1,
     "urlsByType": {
-      "🎭 Disfarçados (.woff2, .txt)": [
-        "https://fonts.gstatic.com/s/quicksand/v37/6xKtdSZaM9iE8KbpRA_hK1QN.woff2",
-        "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-solid-900.woff2",
-        "https://www.maxseries.pics/wp-content/themes/dooplay/assets/fontawesome/webfonts/fa-brands-400.woff2",
-        "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2"
-      ],
-      "🔗 Outros": [
-        "https://vjs.zencdn.net/7.10.2/video-js.css",
-        "https://vjs.zencdn.net/7.10.2/video.min.js"
+      "📹 MP4 Videos": [
+        "https://storage.googleapis.com/mediastorage/1769732826721/4h407tzezfv/81347747.mp4#mp4/r2/1/81347747/81347747/360p/h264?maxChunkSize=5242880"
       ]
     }
   }

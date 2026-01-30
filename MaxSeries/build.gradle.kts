@@ -1,7 +1,7 @@
-version = 223
+version = 232
 
 cloudstream {
-    description = "MaxSeries v219 - PlayerEmbedAPI via WebView (ViewPlayer). Auto-click, 20-30s extraction, 90-95% success. MegaEmbed + MyVidPlay + DoodStream + more"
+    description = "MaxSeries v232 - PlayerEmbedAPI ShortIcu Extractor (Fast & Reliable)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

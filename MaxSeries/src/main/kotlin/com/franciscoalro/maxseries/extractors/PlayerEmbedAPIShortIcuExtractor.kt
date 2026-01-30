@@ -237,21 +237,29 @@ class PlayerEmbedAPIShortIcuExtractor : ExtractorApi() {
     ) {
         Log.d(TAG, "Tentando extractors legados...")
         
-        val extractors = listOf(
-            PlayerEmbedAPIExtractor(),
-            PlayerEmbedAPIWebViewExtractor()
-        )
-        
-        for (extractor in extractors) {
-            try {
-                Log.d(TAG, "Tentando: ${extractor.name}")
-                extractor.getUrl(url, referer, subtitleCallback, callback)
-                return
-            } catch (e: Exception) {
-                Log.w(TAG, "${extractor.name} falhou: ${e.message}")
-            }
+        // 1. Tentar PlayerEmbedAPIExtractor (ExtractorApi padrão)
+        try {
+            Log.d(TAG, "Tentando: PlayerEmbedAPIExtractor")
+            PlayerEmbedAPIExtractor().getUrl(url, referer, subtitleCallback, callback)
+            Log.d(TAG, "PlayerEmbedAPIExtractor: sucesso")
+            return
+        } catch (e: Exception) {
+            Log.w(TAG, "PlayerEmbedAPIExtractor falhou: ${e.message}")
         }
         
-        Log.e(TAG, "Todos os extractors falharam")
+        // 2. Tentar PlayerEmbedAPIWebViewExtractor (classe diferente)
+        try {
+            Log.d(TAG, "Tentando: PlayerEmbedAPIWebViewExtractor")
+            val links = PlayerEmbedAPIWebViewExtractor().extractFromUrl(url, referer ?: url)
+            if (links.isNotEmpty()) {
+                links.forEach { callback(it) }
+                Log.d(TAG, "PlayerEmbedAPIWebViewExtractor: ${links.size} links")
+                return
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "PlayerEmbedAPIWebViewExtractor falhou: ${e.message}")
+        }
+        
+        Log.e(TAG, "Todos os extractors legados falharam")
     }
 }

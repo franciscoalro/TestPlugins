@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import android.util.Log
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Gerenciador de Pre-fetching de URLs de vídeo

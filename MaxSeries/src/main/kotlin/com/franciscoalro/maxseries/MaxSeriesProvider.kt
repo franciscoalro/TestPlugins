@@ -22,7 +22,8 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV6
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV7
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV8
 import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
@@ -120,7 +121,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v252"
+    override var name = "MaxSeries v256"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -134,9 +135,10 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v253 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v256 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v5.0), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Correções: PlayerEmbedAPI V8 regex+V7 cleanup+Timeout 25s")
+        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v8.0), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -595,7 +597,7 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Int {
-        val extractionTimeout = 15_000L
+        val extractionTimeout = 25_000L  // Aumentado de 15s para 25s (considerando V7 interno)
         val linksFound = AtomicInteger(0)
         val mutex = Mutex()
         
@@ -628,7 +630,7 @@ class MaxSeriesProvider : MainAPI() {
                 coroutineScope {
                     val jobs = mutableListOf<Deferred<Unit>>()
                     var attempts = 0
-                    val maxAttempts = 3
+                    val maxAttempts = 5  // Aumentado de 3 para dar chance a mais extractores
                     
                     for (source in sortedSources) {
                         if (linksFound.get() > 0) {
@@ -670,22 +672,53 @@ class MaxSeriesProvider : MainAPI() {
                                         }
                                     }
                                     source.contains("playerembedapi", ignoreCase = true) -> {
-                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v5.0: ${source.take(60)}...")
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v8.0 (Pure HTTP): ${source.take(60)}...")
+                                        
+                                        var v8Succeeded = false
+                                        
                                         try {
-                                            val extractor = PlayerEmbedAPIExtractorV6()
-                                            val links = mutableListOf<ExtractorLink>()
-                                            extractor.getUrl(source, referer, subtitleCallback) { link ->
-                                                links.add(link)
+                                            // FASE 1: Tentar v8 (Pure HTTP - 10x mais rápido)
+                                            val extractorV8 = PlayerEmbedAPIExtractorV8()
+                                            val linksV8 = mutableListOf<ExtractorLink>()
+                                            extractorV8.getUrl(source, referer, subtitleCallback) { link ->
+                                                linksV8.add(link)
                                             }
-                                            mutex.withLock {
-                                                if (links.isNotEmpty() && linksFound.get() == 0) {
-                                                    links.forEach { callback(it) }
-                                                    linksFound.addAndGet(links.size)
-                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v5.0: SUCESSO ✅✅✅")
+                                            
+                                            // Se v8 funcionou, usar seus links
+                                            if (linksV8.isNotEmpty()) {
+                                                mutex.withLock {
+                                                    if (linksFound.get() == 0) {
+                                                        linksV8.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksV8.size)
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v8 (Pure): ${linksV8.size} links ✅✅✅")
+                                                        v8Succeeded = true
+                                                    }
                                                 }
                                             }
                                         } catch (e: Exception) {
-                                            Log.e(TAG, "❌ PlayerEmbedAPI v5.0 falhou: ${e.message}")
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v8 exception: ${e.message}")
+                                        }
+                                        
+                                        // FASE 2: Fallback para v7 (WebView) se v8 falhou ou lançou exceção
+                                        if (!v8Succeeded && linksFound.get() == 0) {
+                                            Log.d(TAG, "⚠️ v8 falhou ou retornou vazio, tentando v7 (WebView)...")
+                                            try {
+                                                val extractorV7 = PlayerEmbedAPIExtractorV7()
+                                                val linksV7 = mutableListOf<ExtractorLink>()
+                                                extractorV7.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksV7.add(link)
+                                                }
+                                                
+                                                mutex.withLock {
+                                                    if (linksV7.isNotEmpty() && linksFound.get() == 0) {
+                                                        linksV7.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksV7.size)
+                                                        Log.wtf(TAG, "✅ PlayerEmbedAPI v7 (WebView Fallback): ${linksV7.size} links")
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "❌ PlayerEmbedAPI v7 também falhou: ${e.message}")
+                                            }
                                         }
                                     }
                                     source.contains("myvidplay", ignoreCase = true) -> {

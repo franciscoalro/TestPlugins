@@ -150,50 +150,44 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             val md5Id = md5IdRegex.find(decodedString)?.groupValues?.get(1)
             
             // Extrair media - capturar TUDO entre "media":"..." até a próxima aspas não-escapada
-            // Precisamos lidar com escapes Unicode \uXXXX e escapes comuns \\\"
-            val mediaStart = decodedString.indexOf("\"media\":\"")
-            val mediaEncrypted = if (mediaStart >= 0) {
-                val start = mediaStart + 9 // "media":".length
-                var pos = start
-                val sb = StringBuilder()
-                while (pos < decodedString.length) {
-                    val c = decodedString[pos]
-                    if (c == '"') {
-                        // Fim do campo
-                        break
-                    } else if (c == '\\' && pos + 1 < decodedString.length) {
-                        val next = decodedString[pos + 1]
-                        when (next) {
-                            '"', '\\', '/' -> { sb.append(next); pos += 2 }
-                            'b' -> { sb.append('\b'); pos += 2 }
-                            'f' -> { sb.append('\u000c'); pos += 2 }
-                            'n' -> { sb.append('\n'); pos += 2 }
-                            'r' -> { sb.append('\r'); pos += 2 }
-                            't' -> { sb.append('\t'); pos += 2 }
-                            'u' -> {
-                                // Unicode escape \uXXXX - converter para caractere
-                                if (pos + 5 < decodedString.length) {
-                                    val hex = decodedString.substring(pos + 2, pos + 6)
-                                    try {
-                                        val code = hex.toInt(16)
-                                        sb.append(code.toChar())
-                                    } catch (e: Exception) {
-                                        sb.append("\\u$hex")
-                                    }
-                                    pos += 6
-                                } else {
-                                    sb.append(c)
-                                    pos++
-                                }
-                            }
-                            else -> { sb.append(next); pos += 2 }
-                        }
-                    } else {
-                        sb.append(c)
-                        pos++
-                    }
+            // Extrair media dos BYTES RAW (critico para preservar dados binarios)
+            val mediaKey = byteArrayOf(0x22, 0x6D, 0x65, 0x64, 0x69, 0x61, 0x22, 0x3A, 0x22) // "media":"
+            var mediaStart = -1
+            for (i in 0..decodedBytes.size - mediaKey.size) {
+                var match = true
+                for (j in mediaKey.indices) {
+                    if (decodedBytes[i + j] != mediaKey[j]) { match = false; break }
                 }
-                sb.toString()
+                if (match) { mediaStart = i + mediaKey.size; break }
+            }
+            
+            val mediaEncrypted = if (mediaStart >= 0) {
+                val result = java.io.ByteArrayOutputStream()
+                var pos = mediaStart
+                while (pos < decodedBytes.size) {
+                    val b = decodedBytes[pos]
+                    if (b == 0x22.toByte()) break // aspas - fim
+                    else if (b == 0x5C.toByte() && pos + 1 < decodedBytes.size) {
+                        when (val next = decodedBytes[pos + 1].toInt() and 0xFF) {
+                            0x22, 0x5C, 0x2F -> { result.write(next); pos += 2 }
+                            0x62 -> { result.write(0x08); pos += 2 }
+                            0x66 -> { result.write(0x0C); pos += 2 }
+                            0x6E -> { result.write(0x0A); pos += 2 }
+                            0x72 -> { result.write(0x0D); pos += 2 }
+                            0x74 -> { result.write(0x09); pos += 2 }
+                            0x75 -> {
+                                if (pos + 5 < decodedBytes.size) {
+                                    val hex = String(decodedBytes, pos + 2, 4, Charsets.US_ASCII)
+                                    try { result.write(hex.toInt(16) and 0xFF) } 
+                                    catch (e: Exception) { result.write(0x5C); result.write(0x75) }
+                                    pos += 6
+                                } else { result.write(b.toInt()); pos++ }
+                            }
+                            else -> { result.write(next); pos += 2 }
+                        }
+                    } else { result.write(b.toInt()); pos++ }
+                }
+                String(result.toByteArray(), Charsets.ISO_8859_1)
             } else null
             
             Log.d(TAG, "📋 Campos extraídos:")

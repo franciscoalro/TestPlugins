@@ -33,8 +33,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v239 - PlayerEmbedAPI Direct v4.1 (Jan 2026)
+ * MaxSeries Provider v240 - PlayerEmbedAPI v4.2 Gzip Support (Jan 2026)
  *
+ * v240 Changes (30 Jan 2026):
+ * - 🔧 PlayerEmbedAPI v4.2: Suporte a HTML gzipado (Content-Encoding: gzip)
+ * - 🎯 Detecta e descompacta automaticamente respostas comprimidas
+ * 
  * v239 Changes (30 Jan 2026):
  * - 🎯 PlayerEmbedAPI v4.1 agora é o extractor PRIMÁRIO (AES-CTR)
  * - 🚀 ShortIcu movido para fallback secundário
@@ -117,7 +121,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v239 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v240 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")

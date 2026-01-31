@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MaxSeries</string>
+    <string name="provider_name">MaxSeries v256</string>
+    <string name="provider_description">Plugin de streaming brasileiro</string>
+</resources>

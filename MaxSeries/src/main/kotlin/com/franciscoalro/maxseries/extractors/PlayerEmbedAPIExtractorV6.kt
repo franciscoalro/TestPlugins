@@ -218,6 +218,8 @@ class PlayerEmbedAPIExtractorV6 : ExtractorApi() {
     ): List<ExtractorLink> {
         val links = mutableListOf<ExtractorLink>()
         
+        Log.d(TAG, "[API] Iniciando extração para: $url")
+        
         // Buscar HTML
         val html = try {
             val response = app.get(url,
@@ -228,19 +230,24 @@ class PlayerEmbedAPIExtractorV6 : ExtractorApi() {
                     "Referer" to (referer ?: mainUrl)
                 )
             )
+            Log.d(TAG, "[API] HTML carregado: ${response.text.length} chars")
             response.text
         } catch (e: Exception) {
-            Log.e(TAG, "Erro no request: ${e.message}")
+            Log.e(TAG, "[API] Erro no request: ${e.message}")
             return links
         }
         
         // Encontrar base64 'datas'
         val base64Data = findBase64Datas(html) ?: run {
-            Log.w(TAG, "Não encontrou base64 'datas'")
+            Log.w(TAG, "[API] Não encontrou base64 'datas'")
             return links
         }
         
-        return processBase64Data(base64Data, url)
+        Log.d(TAG, "[API] Base64 encontrado: ${base64Data.take(50)}...")
+        
+        val result = processBase64Data(base64Data, url)
+        Log.d(TAG, "[API] Processamento retornou: ${result.size} links")
+        return result
     }
     
     /**
@@ -568,8 +575,10 @@ class PlayerEmbedAPIExtractorV6 : ExtractorApi() {
         
         for (pattern in VIDEO_URL_PATTERNS) {
             pattern.findAll(html).forEach { match ->
-                val url = match.groupValues[1].replace("\\/", "/")
-                if (isValidVideoUrl(url)) {
+                val url = match.groupValues[1]
+                    .replace("\\/", "/")
+                    .trim('"', '\'') // Remove aspas delimitadoras
+                if (isValidVideoUrl(url) && !foundUrls.contains(url)) {
                     foundUrls.add(url)
                 }
             }

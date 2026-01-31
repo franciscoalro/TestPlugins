@@ -140,27 +140,68 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             val decodedJson = String(decodedBytes, Charsets.UTF_8)
             Log.d(TAG, "✅ JSON decodificado: ${decodedJson.take(200)}...")
             
-            // Parse JSON
-            val mapper = com.fasterxml.jackson.databind.ObjectMapper()
-            val dataNode = mapper.readTree(decodedJson)
+            // Extrair campos simples primeiro
+            val userIdRegex = """"user_id"\s*:\s*(\d+)""".toRegex()
+            val slugRegex = """"slug"\s*:\s*"([^"]+)"""".toRegex()
+            val md5IdRegex = """"md5_id"\s*:\s*(\d+)""".toRegex()
             
-            // Extrair campos (texto normal)
-            val userId = dataNode.get("user_id")?.asText()
-            val slug = dataNode.get("slug")?.asText()
-            val md5Id = dataNode.get("md5_id")?.asText()
+            val userId = userIdRegex.find(decodedJson)?.groupValues?.get(1)
+            val slug = slugRegex.find(decodedJson)?.groupValues?.get(1)
+            val md5Id = md5IdRegex.find(decodedJson)?.groupValues?.get(1)
             
-            // Extrair media usando regex para preservar escapes Unicode raw
-            // O campo media contém dados binários criptografados que não devem ser interpretados como Unicode
-            val mediaRegex = """"media"\s*:\s*"((?:[^"\\]|\\.)*)"""".toRegex()
-            val mediaEncrypted = mediaRegex.find(decodedJson)?.groupValues?.get(1)
-                ?.replace("\\\"", "\"")  // Unescape apenas as aspas
-                ?.replace("\\\\", "\\")  // Unescape backslashes
+            // Extrair media - capturar TUDO entre "media":"..." até a próxima aspas não-escapada
+            // Precisamos lidar com escapes Unicode \uXXXX e escapes comuns \\\"
+            val mediaStart = decodedJson.indexOf("\"media\":\"")
+            val mediaEncrypted = if (mediaStart >= 0) {
+                val start = mediaStart + 9 // "media":".length
+                var pos = start
+                val sb = StringBuilder()
+                while (pos < decodedJson.length) {
+                    val c = decodedJson[pos]
+                    if (c == '"') {
+                        // Fim do campo
+                        break
+                    } else if (c == '\\' && pos + 1 < decodedJson.length) {
+                        val next = decodedJson[pos + 1]
+                        when (next) {
+                            '"', '\\', '/' -> { sb.append(next); pos += 2 }
+                            'b' -> { sb.append('\b'); pos += 2 }
+                            'f' -> { sb.append('\u000c'); pos += 2 }
+                            'n' -> { sb.append('\n'); pos += 2 }
+                            'r' -> { sb.append('\r'); pos += 2 }
+                            't' -> { sb.append('\t'); pos += 2 }
+                            'u' -> {
+                                // Unicode escape \uXXXX - converter para caractere
+                                if (pos + 5 < decodedJson.length) {
+                                    val hex = decodedJson.substring(pos + 2, pos + 6)
+                                    try {
+                                        val code = hex.toInt(16)
+                                        sb.append(code.toChar())
+                                    } catch (e: Exception) {
+                                        sb.append("\\u$hex")
+                                    }
+                                    pos += 6
+                                } else {
+                                    sb.append(c)
+                                    pos++
+                                }
+                            }
+                            else -> { sb.append(next); pos += 2 }
+                        }
+                    } else {
+                        sb.append(c)
+                        pos++
+                    }
+                }
+                sb.toString()
+            } else null
             
             Log.d(TAG, "📋 Campos extraídos:")
             Log.d(TAG, "   - userId: $userId")
             Log.d(TAG, "   - slug: $slug")
             Log.d(TAG, "   - md5Id: $md5Id")
             Log.d(TAG, "   - media: ${mediaEncrypted?.length} chars")
+            Log.d(TAG, "   - media first 20 bytes: ${mediaEncrypted?.take(20)?.map { it.code }?.joinToString(",")}")
             
             if (mediaEncrypted.isNullOrEmpty() || userId.isNullOrEmpty() || 
                 slug.isNullOrEmpty() || md5Id.isNullOrEmpty()) {

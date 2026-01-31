@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-01-31T15:18:00.320617",
+  "project_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream",
+  "summary": {
+    "total_components": 4,
+    "passed": 2,
+    "failed": 1,
+    "skipped": 1,
+    "total_duration": 4.749269723892212,
+    "overall_coverage": 83.33333333333333,
+    "success_rate": "50.0%"
+  },
+  "components": [
+    {
+      "name": "unit_tests",
+      "description": "Testes Unitários do PlayerEmbedAPI v5.0",
+      "status": "FAIL",
+      "duration": 0.7625851631164551,
+      "coverage": 50.0,
+      "script_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\auto_test_playerembedapi.py",
+      "details": [
+        "test_playerembedapi_v5.py: FAIL",
+        "test_integration_v5.py: PASS"
+      ],
+      "output": "",
+      "errors": ""
+    },
+    {
+      "name": "http_tests",
+      "description": "Testes de HTTP e Simulação de Requisições",
+      "status": "PASS",
+      "duration": 3.920776605606079,
+      "coverage": 100.0,
+      "script_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\http_simulator_test.py",
+      "details": [
+        "[OK] Conectividade básica",
+        "[OK] Headers HTTP",
+        "[OK] Session management",
+        "[OK] Retry mechanism",
+        "[OK] SSL/TLS"
+      ],
+      "output": "",
+      "errors": ""
+    },
+    {
+      "name": "structure_validation",
+      "description": "Validação de Estrutura do PlayerEmbedAPI v5.0",
+      "status": "PASS",
+      "duration": 0.0639042854309082,
+      "coverage": 100.0,
+      "script_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\validate_v5_structure.py",
+      "details": [
+        "[OK] Diretório MaxSeries",
+        "[OK] Estrutura Kotlin",
+        "[OK] Extractor V5",
+        "[OK] WebView V5",
+        "[OK] Utils",
+        "[OK] Provider",
+        "[OK] Build Gradle",
+        "[OK] Testes Python"
+      ],
+      "output": "============================================================\nVALIDAÇÃO DE IMPLEMENTAÇÃO PlayerEmbedAPI v5.0\n============================================================\n\n[ETAPA] Validando estrutura de arquivos...\n[OK] Novo Extractor V5: C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/PlayerEmbedAPIExtractorV5.kt\n[OK] WebView V5: C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\MaxSeries/src/main/kotlin/com/franciscoalro/maxseries/extractors/PlayerE",
+      "errors": ""
+    },
+    {
+      "name": "build_test",
+      "description": "Build e Verificação de Compilação",
+      "status": "SKIP",
+      "duration": 0.0,
+      "coverage": 0.0,
+      "script_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream\\build.gradle.kts",
+      "details": [],
+      "output": "",
+      "errors": ""
+    }
+  ]
+}

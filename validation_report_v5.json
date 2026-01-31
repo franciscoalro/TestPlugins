@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-01-31T12:39:20",
+  "project_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream",
+  "summary": {
+    "pass": 10,
+    "fail": 0,
+    "warn": 0,
+    "total": 10
+  },
+  "validations": [
+    {
+      "name": "Estrutura de Arquivos V5",
+      "status": "PASS",
+      "message": "Todos os arquivos necessários existem",
+      "details": [
+        "extractor: PlayerEmbedAPIExtractorV5.kt",
+        "webview: PlayerEmbedAPIWebViewExtractorV5.kt",
+        "test: PlayerEmbedAPIV5Test.kt",
+        "link_decryptor: LinkDecryptor.kt",
+        "quality_detector: QualityDetector.kt",
+        "regex_patterns: RegexPatterns.kt",
+        "video_cache: VideoUrlCache.kt"
+      ]
+    },
+    {
+      "name": "Funções Principais",
+      "status": "PASS",
+      "message": "Todas as 12 funções encontradas",
+      "details": [
+        "✓ getUrl: Função principal de extração",
+        "✓ extractViaApi: Estratégia 1: API (base64 + AES-CTR)",
+        "✓ extractViaShortIcu: Estratégia 2: ShortIcu",
+        "✓ extractViaRegexFallback: Estratégia 3: Regex Fallback",
+        "✓ extractViaWebView: Estratégia 4: WebView",
+        "✓ processBase64Data: Processamento de base64",
+        "✓ extractUrlsFromDecrypted: Extração de URLs decriptadas",
+        "✓ findBase64Datas: Busca de base64 no HTML",
+        "✓ extractShortIcuUrl: Extração de URL short.icu",
+        "✓ extractVideoUrlFromHtml: Extração de URL de vídeo do HTML",
+        "✓ isValidVideoUrl: Validação de URL de vídeo",
+        "✓ processJsonStringToBytes: Processamento de JSON escapado"
+      ]
+    },
+    {
+      "name": "Constantes e Regex",
+      "status": "PASS",
+      "message": "Todas as 10 constantes encontradas no companion object",
+      "details": [
+        "✓ TAG: Tag de logging",
+        "✓ USER_AGENT: User-Agent para requisições",
+        "✓ EXTRACTION_TIMEOUT_MS: Timeout de extração",
+        "✓ DATA_SOURCE_PATTERN: Pattern data-source",
+        "✓ DATA_SRC_PATTERN: Pattern data-src",
+        "✓ IFRAME_SRC_PATTERN: Pattern iframe src",
+        "✓ BASE64_PATTERNS: Lista de patterns base64",
+        "✓ VIDEO_URL_PATTERNS: Lista de patterns de URL de vídeo",
+        "✓ RES_ID_QUALITY: Mapeamento de res_id para qualidade",
+        "✓ ALLOWED_VIDEO_DOMAINS: Domínios permitidos"
+      ]
+    },
+    {
+      "name": "Ausência de Código v4.x",
+      "status": "PASS",
+      "message": "Nenhuma referência a código antigo encontrada; PlayerEmbedAPIExtractorV5 importado",
+      "details": [
+        "✓ Usando PlayerEmbedAPIExtractorV5"
+      ]
+    },
+    {
+      "name": "Dependências",
+      "status": "PASS",
+      "message": "Todas as 7 dependências encontradas",
+      "details": [
+        "✓ kotlin-stdlib: Biblioteca Kotlin",
+        "✓ jackson-module-kotlin: Serialização JSON",
+        "✓ jackson-databind: Processamento JSON",
+        "✓ okhttp: Cliente HTTP",
+        "✓ jsoup: Parsing HTML",
+        "✓ webkit: WebView",
+        "✓ kotlinx-coroutines-android: Coroutines"
+      ]
+    },
+    {
+      "name": "Build Gradle",
+      "status": "PASS",
+      "message": "Configuração do módulo verificada",
+      "details": [
+        "✓ Versão: 253 (>= 253 requerido para v5.0)",
+        "✓ Descrição menciona v5.0",
+        "✓ Status = 1 (ativo)",
+        "✓ Bloco cloudstream configurado"
+      ]
+    },
+    {
+      "name": "Testes Unitários",
+      "status": "PASS",
+      "message": "21 testes implementados",
+      "details": [
+        "✓ Validação de URLs",
+        "✓ Detecção de qualidade",
+        "✓ Extração de base64",
+        "✓ Extração ShortIcu",
+        "✓ Extração de URL de vídeo",
+        "✓ Processamento JSON",
+        "✓ CanHandle"
+      ]
+    },
+    {
+      "name": "Segurança",
+      "status": "PASS",
+      "message": "Todas as verificações de segurança passaram",
+      "details": [
+        "✓ WebView NÃO ignora erros SSL",
+        "✓ WebView cancela requisições inseguras",
+        "✓ Nenhum logging sensível detectado",
+        "✓ Domínios permitidos configurados",
+        "✓ Validação de URLs implementada"
+      ]
+    },
+    {
+      "name": "Performance",
+      "status": "PASS",
+      "message": "Verificações de performance concluídas",
+      "details": [
+        "✓ Regex compilados em companion object",
+        "✓ Sistema de cache implementado",
+        "✓ Não usa GlobalScope",
+        "✓ Usa CoroutineScope controlado",
+        "✓ Timeout configurado"
+      ]
+    },
+    {
+      "name": "Integração com Provider",
+      "status": "PASS",
+      "message": "Integração verificada",
+      "details": [
+        "✓ PlayerEmbedAPIExtractorV5 importado",
+        "✓ Versão do provider: v252",
+        "✓ Provider menciona v5.0 nos comentários",
+        "✓ MegaEmbed mencionado",
+        "✓ PlayerThree mencionado",
+        "✓ PlayerEmbedAPI mencionado",
+        "✓ MyVidPlay mencionado",
+        "✓ DoodStream mencionado"
+      ]
+    }
+  ]
+}

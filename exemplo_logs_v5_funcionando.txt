@@ -1,0 +1,32 @@
+--------- beginning of main
+01-31 15:23:45.123  9845  9845 D MaxSeries: 🚀🚀🚀 MAXSERIES PROVIDER v253 CARREGADO! 🚀🚀🚀
+01-31 15:23:45.124  9845  9845 D MaxSeries: Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v5.0), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon
+01-31 15:23:45.125  9845  9845 D MaxSeries: Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)
+01-31 15:24:12.456  9845 10234 D PlayerEmbedAPI-v5: === PlayerEmbedAPI v5.0 - Enhanced Detection ===
+01-31 15:24:12.457  9845 10234 D PlayerEmbedAPI-v5: URL: https://playerembedapi.link/?v=ABC123XYZ
+01-31 15:24:12.458  9845 10234 D PlayerEmbedAPI-v5: Cache MISS
+01-31 15:24:12.459  9845 10234 D PlayerEmbedAPI-v5: [1/4] Tentando extração via API...
+01-31 15:24:12.789  9845 10234 D PlayerEmbedAPI-v5: Obtendo HTML...
+01-31 15:24:13.234  9845 10234 D PlayerEmbedAPI-v5: HTML recebido: 15234 chars
+01-31 15:24:13.235  9845 10234 D PlayerEmbedAPI-v5: Procurando base64 'datas'...
+01-31 15:24:13.236  9845 10234 D PlayerEmbedAPI-v5: Pattern 1 funcionou!
+01-31 15:24:13.237  9845 10234 D PlayerEmbedAPI-v5: Decoded string length: 2048
+01-31 15:24:13.238  9845 10234 D PlayerEmbedAPI-v5: === Campos extraidos ===
+01-31 15:24:13.239  9845 10234 D PlayerEmbedAPI-v5:    userId: 12345
+01-31 15:24:13.240  9845 10234 D PlayerEmbedAPI-v5:    slug: serie-episodio-teste
+01-31 15:24:13.241  9845 10234 D PlayerEmbedAPI-v5:    md5Id: 67890
+01-31 15:24:13.242  9845 10234 D PlayerEmbedAPI-v5:    media: 1024 bytes
+01-31 15:24:13.243  9845 10234 D PlayerEmbedAPI-v5: 🔓 Decrypting media: 1024 bytes
+01-31 15:24:13.345  9845 10234 D LinkDecryptor: 🔐 Decrypting media: 1024 bytes
+01-31 15:24:13.456  9845 10234 D PlayerEmbedAPI-v5: 📺 Encontradas 3 fontes:
+01-31 15:24:13.457  9845 10234 D PlayerEmbedAPI-v5:    [0] 1080p - https://storage.googleapis.com/video/abc1080.mp4...
+01-31 15:24:13.458  9845 10234 D PlayerEmbedAPI-v5:    [1] 720p - https://storage.googleapis.com/video/abc720.mp4...
+01-31 15:24:13.459  9845 10234 D PlayerEmbedAPI-v5:    [2] 360p - https://storage.googleapis.com/video/abc360.mp4...
+01-31 15:24:13.460  9845 10234 D PlayerEmbedAPI-v5: ✅✅✅ SUCESSO: 890ms ✅✅✅
+01-31 15:24:13.461  9845 10234 D MaxSeries: 🌐 PRIORIDADE 1 - PlayerEmbedAPI v5.0: https://playerembedapi.link/?v=ABC123XYZ...
+01-31 15:24:13.462  9845 10234 D MaxSeries: ✅✅✅ PlayerEmbedAPI v5.0: SUCESSO ✅✅✅
+01-31 15:24:13.463  9845 10234 D MaxSeries: Links encontrados: 3
+01-31 15:24:15.789  9845 10234 D PlayerEmbedAPI-v5: === PlayerEmbedAPI v5.0 - Enhanced Detection ===
+01-31 15:24:15.790  9845 10234 D PlayerEmbedAPI-v5: URL: https://playerembedapi.link/?v=ABC123XYZ
+01-31 15:24:15.791  9845 10234 D PlayerEmbedAPI-v5: Cache HIT
+01-31 15:24:15.792  9845 10234 D PlayerEmbedAPI-v5: Usando cache: https://storage.googleapis.com/video/abc1080.mp4

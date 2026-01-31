@@ -24,8 +24,8 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "MaxSeries v256 - PlayerEmbedAPI V8+V7 Fixes",
-        "version": 256,
+        "description": "MaxSeries v257 - BUILD CORRIGIDO",
+        "version": 257,
         "authors": [
             "franciscoalro"
         ],
@@ -39,9 +39,9 @@
         "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
         "apiVersion": 1,
         "isAdult": false,
-        "fileSize": 653163,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v256/MaxSeries.cs3",
-        "fileHash": "541781E424BC37EF2ECC5F0AB6B1FAB402AC1B3F564232D634526CB9993CC105",
+        "fileSize": 654395,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
+        "fileHash": "E1464E768180953F37CFC4923748A55AAD6B6A101E540BB86A1FF05A3EBD5216",
         "updatedAt": "2026-01-31 18:53:57"
     }
 ]

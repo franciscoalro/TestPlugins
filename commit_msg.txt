@@ -1,0 +1,10 @@
+﻿feat: PlayerEmbedAPI v5.0 - Enhanced Detection and Security
+
+- 4 estrategias de extracao (API, ShortIcu, Regex, WebView)
+- Suporte a 4K (360p/480p/720p/1080p/2160p)
+- Correcoes de seguranca (SSL handler.cancel(), logs seguros)
+- Regex compilados em companion object para performance
+- Testes unitarios Kotlin
+- Scripts Python para teste e validacao
+
+Versao: 253

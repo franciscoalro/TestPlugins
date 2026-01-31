@@ -1,0 +1,55 @@
+======================================================================
+RELATÓRIO DE TESTES - PlayerEmbedAPI v5.0
+======================================================================
+Timestamp: 2026-01-31T15:18:00.320617
+Projeto: C:\Users\KYTHOURS\Desktop\brcloudstream
+
+RESUMO
+----------------------------------------------------------------------
+Total de componentes: 4
+Aprovados: 2
+Falhas: 1
+Ignorados: 1
+Duração total: 4.75s
+Cobertura geral: 83.3%
+
+RESULTADOS DETALHADOS
+----------------------------------------------------------------------
+
+[FAIL] unit_tests
+  Descrição: Testes Unitários do PlayerEmbedAPI v5.0
+  Duração: 0.76s
+  Cobertura: 50.0%
+  Detalhes:
+    - test_playerembedapi_v5.py: FAIL
+    - test_integration_v5.py: PASS
+
+[PASS] http_tests
+  Descrição: Testes de HTTP e Simulação de Requisições
+  Duração: 3.92s
+  Cobertura: 100.0%
+  Detalhes:
+    - [OK] Conectividade básica
+    - [OK] Headers HTTP
+    - [OK] Session management
+    - [OK] Retry mechanism
+    - [OK] SSL/TLS
+
+[PASS] structure_validation
+  Descrição: Validação de Estrutura do PlayerEmbedAPI v5.0
+  Duração: 0.06s
+  Cobertura: 100.0%
+  Detalhes:
+    - [OK] Diretório MaxSeries
+    - [OK] Estrutura Kotlin
+    - [OK] Extractor V5
+    - [OK] WebView V5
+    - [OK] Utils
+    - [OK] Provider
+    - [OK] Build Gradle
+    - [OK] Testes Python
+
+[SKIP] build_test
+  Descrição: Build e Verificação de Compilação
+  Duração: 0.00s
+  Cobertura: 0.0%

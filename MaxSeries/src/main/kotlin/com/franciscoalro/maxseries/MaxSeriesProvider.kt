@@ -22,7 +22,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV5
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV6
 import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
@@ -31,14 +31,19 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v254 - Production Release (Feb 2026)
+ * MaxSeries Provider v255 - Full Source Extraction (Feb 2026)
+ *
+ * v255 Changes (31 Jan 2026):
+ * - 🚀 PlayerEmbedAPI v6.0: Extrai TODAS as sources disponíveis
+ * - 📊 Não para no primeiro sucesso - coleta todos os links
+ * - 🎯 Todas as estratégias executadas: API + ShortIcu + Regex
+ * - 📈 Múltiplas qualidades do mesmo source agora disponíveis
  *
  * v254 Changes (31 Jan 2026):
  * - ✅ Production Release - PlayerEmbedAPI v5.0 Validated
  * - 🧪 52 unit tests passando (100% coverage de extração)
  * - 🔒 Security audit: SSL fix, no sensitive logging
  * - ⚡ Performance: Regex compilados, cache implementado
- * - 🎯 4 estratégias de fallback testadas automaticamente
  *
  * v253 Changes (31 Jan 2026):
  * - 🚀 PlayerEmbedAPI v5.0: Enhanced Detection & Security
@@ -667,7 +672,7 @@ class MaxSeriesProvider : MainAPI() {
                                     source.contains("playerembedapi", ignoreCase = true) -> {
                                         Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v5.0: ${source.take(60)}...")
                                         try {
-                                            val extractor = PlayerEmbedAPIExtractorV5()
+                                            val extractor = PlayerEmbedAPIExtractorV6()
                                             val links = mutableListOf<ExtractorLink>()
                                             extractor.getUrl(source, referer, subtitleCallback) { link ->
                                                 links.add(link)

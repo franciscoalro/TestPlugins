@@ -1,0 +1,175 @@
+================================================================================
+ VALIDAÇÃO DO PLAYEREMBEDAPI v5.0
+================================================================================
+ Projeto: C:\Users\KYTHOURS\Desktop\brcloudstream
+ Data: 31/01/2026
+--------------------------------------------------------------------------------
+
+────────────────────────────────────────────────────────────────────────────────
+ 1. VALIDAÇÃO DA ESTRUTURA DE ARQUIVOS
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Estrutura de Arquivos V5
+   └─ Todos os arquivos necessários existem
+      • extractor: PlayerEmbedAPIExtractorV5.kt
+      • webview: PlayerEmbedAPIWebViewExtractorV5.kt
+      • test: PlayerEmbedAPIV5Test.kt
+      • link_decryptor: LinkDecryptor.kt
+      • quality_detector: QualityDetector.kt
+      • regex_patterns: RegexPatterns.kt
+      • video_cache: VideoUrlCache.kt
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 2. VALIDAÇÃO DAS FUNÇÕES PRINCIPAIS
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Funções Principais
+   └─ Todas as 12 funções encontradas
+      •  getUrl: Função principal de extração
+      •  extractViaApi: Estratégia 1: API (base64 + AES-CTR)
+      •  extractViaShortIcu: Estratégia 2: ShortIcu
+      •  extractViaRegexFallback: Estratégia 3: Regex Fallback
+      •  extractViaWebView: Estratégia 4: WebView
+      •  processBase64Data: Processamento de base64
+      •  extractUrlsFromDecrypted: Extração de URLs decriptadas
+      •  findBase64Datas: Busca de base64 no HTML
+      •  extractShortIcuUrl: Extração de URL short.icu
+      •  extractVideoUrlFromHtml: Extração de URL de vídeo do HTML
+      •  isValidVideoUrl: Validação de URL de vídeo
+      •  processJsonStringToBytes: Processamento de JSON escapado
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 3. VALIDAÇÃO DE CONSTANTES E REGEX
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Constantes e Regex
+   └─ Todas as 10 constantes encontradas no companion object
+      •  TAG: Tag de logging
+      •  USER_AGENT: User-Agent para requisições
+      •  EXTRACTION_TIMEOUT_MS: Timeout de extração
+      •  DATA_SOURCE_PATTERN: Pattern data-source
+      •  DATA_SRC_PATTERN: Pattern data-src
+      •  IFRAME_SRC_PATTERN: Pattern iframe src
+      •  BASE64_PATTERNS: Lista de patterns base64
+      •  VIDEO_URL_PATTERNS: Lista de patterns de URL de vídeo
+      •  RES_ID_QUALITY: Mapeamento de res_id para qualidade
+      •  ALLOWED_VIDEO_DOMAINS: Domínios permitidos
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 4. VALIDAÇÃO DE AUSÊNCIA DE CÓDIGO v4.x
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Ausência de Código v4.x
+   └─ Nenhuma referência a código antigo encontrada; PlayerEmbedAPIExtractorV5 importado
+      •  Usando PlayerEmbedAPIExtractorV5
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 5. VALIDAÇÃO DE DEPENDÊNCIAS
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Dependências
+   └─ Todas as 7 dependências encontradas
+      •  kotlin-stdlib: Biblioteca Kotlin
+      •  jackson-module-kotlin: Serialização JSON
+      •  jackson-databind: Processamento JSON
+      •  okhttp: Cliente HTTP
+      •  jsoup: Parsing HTML
+      •  webkit: WebView
+      •  kotlinx-coroutines-android: Coroutines
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 6. VALIDAÇÃO DO BUILD.GRADLE.KTS
+────────────────────────────────────────────────────────────────────────────────
+️ WARN | Build Gradle
+   └─ Configuração do módulo verificada
+      •  Versão: 253 (>= 253 requerido para v5.0)
+      •  Descrição menciona v5.0
+      •  Status = 1 (ativo)
+      •  Bloco cloudstream configurado
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 7. VALIDAÇÃO DOS TESTES
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Testes Unitários
+   └─ 21 testes implementados
+      •  Validação de URLs
+      •  Detecção de qualidade
+      •  Extração de base64
+      •  Extração ShortIcu
+      •  Extração de URL de vídeo
+      •  Processamento JSON
+      •  CanHandle
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 8. VALIDAÇÃO DE SEGURANÇA
+────────────────────────────────────────────────────────────────────────────────
+ PASS | Segurança
+   └─ Todas as verificações de segurança passaram
+      •  WebView NÃO ignora erros SSL
+      •  WebView cancela requisições inseguras
+      •  Nenhum logging sensível detectado
+      •  Domínios permitidos configurados
+      •  Validação de URLs implementada
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 9. VALIDAÇÃO DE PERFORMANCE
+────────────────────────────────────────────────────────────────────────────────
+️ WARN | Performance
+   └─ Verificações de performance concluídas
+      •  Regex compilados em companion object
+      •  Sistema de cache implementado
+      •  Não usa GlobalScope
+      •  Usa CoroutineScope controlado
+      •  Timeout configurado
+
+
+────────────────────────────────────────────────────────────────────────────────
+ 10. VALIDAÇÃO DA INTEGRAÇÃO COM PROVIDER
+────────────────────────────────────────────────────────────────────────────────
+️ WARN | Integração com Provider
+   └─ Integração verificada
+      •  PlayerEmbedAPIExtractorV5 importado
+      •  Versão do provider: v252
+      •  Provider menciona v5.0 nos comentários
+      •  MegaEmbed mencionado
+      •  PlayerThree mencionado
+      •  PlayerEmbedAPI mencionado
+      •  MyVidPlay mencionado
+      •  DoodStream mencionado
+
+
+================================================================================
+ RELATÓRIO DE CONFORMIDADE - PLAYEREMBEDAPI v5.0
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                         RESUMO DAS VALIDAÇÕES                       │
+├─────────────────────────────────────────────────────────────────────┤
+│   PASS:   7                                                      │
+│   FAIL:   0                                                      │
+│  ️ WARN:   3                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│  TOTAL:   10                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+ LISTA DE VALIDAÇÕES REALIZADAS:
+--------------------------------------------------------------------------------
+  1.  PASS        │ Estrutura de Arquivos V5       │ Verifica se todos os arquivos V5 existem
+  2.  PASS        │ Funções Principais             │ Verifica se as funções principais estão implementadas
+  3.  PASS        │ Constantes e Regex             │ Verifica se constantes e regex estão definidos
+  4.  PASS        │ Ausência de Código v4.x        │ Verifica se não há referências ao código antigo
+  5.  PASS        │ Dependências                   │ Verifica se as dependências estão corretas
+  6. ️ WARN       │ Build Gradle                   │ Verifica se o build.gradle.kts está atualizado
+  7.  PASS        │ Testes Unitários               │ Verifica se os testes estão implementados
+  8.  PASS        │ Segurança                      │ Verifica aspectos de segurança
+  9. ️ WARN       │ Performance                    │ Verifica aspectos de performance
+  10. ️ WARN       │ Integração com Provider        │ Verifica integração com MaxSeriesProvider
+
+================================================================================
+ STATUS: VALIDAÇÕES PASSARAM COM AVISOS
+️ A implementação está funcional, mas há itens que merecem atenção.
+================================================================================

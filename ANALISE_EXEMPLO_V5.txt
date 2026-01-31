@@ -1,0 +1,119 @@
+============================================================
+ANALISE DE LOGS - CloudStream PlayerEmbedAPI v5.0
+============================================================
+
+RESUMO GERAL
+------------------------------------------------------------
+Total de extracoes: 2
+[OK] Sucesso: 2 (100.0%)
+[ERRO] Falhas: 0 (0.0%)
+Duracao media: 890ms
+
+CACHE
+------------------------------------------------------------
+Cache HIT: 1 (50.0%)
+Cache MISS: 1 (50.0%)
+
+DESEMPENHO POR ESTRATEGIA
+------------------------------------------------------------
+API          | Sucesso:   1 | Falhas:   0 | Taxa: 100.0%
+Cache        | Sucesso:   1 | Falhas:   0 | Taxa: 100.0%
+
+EVENTOS DETALHADOS
+------------------------------------------------------------
+ 1. [OK] API          |  890ms | OK
+ 2. [OK] Cache        |    0ms | OK
+
+RECOMENDACOES
+------------------------------------------------------------
+[OK] Excelente taxa de sucesso!
+[INFO] Cache esta funcionando corretamente (50% hit rate)
+[OK] Estrategia 1 (API) esta funcionando perfeitamente
+[OK] Tempo medio de extracao abaixo de 1 segundo (excelente)
+
+============================================================
+DETALHES DOS EVENTOS
+============================================================
+
+EVENTO #1 - PRIMEIRA EXTRACAO (Cache MISS)
+------------------------------------------------------------
+Horario: 01-31 15:24:12
+Estrategia: API (Estrategia 1)
+Duracao: 890ms
+Resultado: SUCESSO
+
+Fluxo completo:
+1. [15:24:12] Iniciando PlayerEmbedAPI v5.0
+2. [15:24:12] Cache MISS (primeira execucao)
+3. [15:24:12] Tentando extracao via API...
+4. [15:24:12] Obtendo HTML (15.234 chars)
+5. [15:24:13] Pattern base64 encontrado!
+6. [15:24:13] Campos extraidos (userId, slug, md5Id)
+7. [15:24:13] Decriptando media (1024 bytes)
+8. [15:24:13] 3 fontes encontradas:
+   - 1080p: https://storage.googleapis.com/...
+   - 720p:  https://storage.googleapis.com/...
+   - 360p:  https://storage.googleapis.com/...
+9. [15:24:13] SUCESSO em 890ms
+
+EVENTO #2 - SEGUNDA EXTRACAO (Cache HIT)
+------------------------------------------------------------
+Horario: 01-31 15:24:15
+Estrategia: Cache
+Duracao: 0ms (instantaneo)
+Resultado: SUCESSO
+
+Fluxo:
+1. [15:24:15] Iniciando PlayerEmbedAPI v5.0
+2. [15:24:15] Cache HIT (URL ja em cache)
+3. [15:24:15] Retornando URL cached instantaneamente
+
+============================================================
+INTERPRETACAO DOS RESULTADOS
+============================================================
+
+✅ O QUE ESTA FUNCIONANDO BEM:
+
+1. VERSAO V5.0 CARREGADA
+   - Logs mostram "MAXSERIES PROVIDER v253 CARREGADO"
+   - PlayerEmbedAPI v5.0 esta ativo
+
+2. ESTRATEGIA 1 (API) FUNCIONANDO
+   - Base64 detectado corretamente
+   - Decriptacao AES-CTR funcionando
+   - Multiplas qualidades retornadas (1080p, 720p, 360p)
+
+3. CACHE FUNCIONANDO
+   - Primeira execucao: Cache MISS (normal)
+   - Segunda execucao: Cache HIT (otimizacao funcionando)
+   - 50% hit rate indica cache eficiente
+
+4. PERFORMANCE EXCELENTE
+   - Extracao em 890ms (abaixo de 1 segundo)
+   - Cache retorna em 0ms (instantaneo)
+
+============================================================
+COMPARACAO COM VERSOES ANTERIORES
+============================================================
+
+Melhorias observadas no v5.0:
+- 4 estrategias de fallback (vs 1 na v4.x)
+- Cache por qualidade individual
+- Logs mais detalhados
+- Seguranca melhorada (sem expor chaves)
+- Suporte a 4K (novo)
+
+============================================================
+PROXIMOS PASSOS
+============================================================
+
+Se seus logs parecem com este exemplo:
+✅ Tudo esta funcionando perfeitamente!
+
+Se seus logs mostram:
+- "Cache MISS" sempre = Cache pode nao estar persistindo
+- "Fallback para ShortIcu" = Estrategia 1 falhando (investigar)
+- Erros de SSL = Problema de certificado (verificar handler)
+- Timeouts > 15s = Conexao lenta ou servidor sobrecarregado
+
+============================================================

@@ -4,6 +4,6 @@
   "description": "Repositorio completo de extensoes brasileiras para Cloudstream - MaxSeries v253 (PlayerEmbedAPI v5.0 Enhanced Detection)",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"
+    "https://franciscoalro.github.io/CloudstreamRepo/plugins.json"
   ]
 }

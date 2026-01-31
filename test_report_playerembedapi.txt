@@ -1,0 +1,281 @@
+================================================================================
+                         RELATÓRIO DE TESTES - PlayerEmbedAPI v5.0
+================================================================================
+Data/Hora: 2026-01-31 15:20:38
+Duração Total: 6.22 ms
+
+--------------------------------------------------------------------------------
+RESUMO
+--------------------------------------------------------------------------------
+  Total de Testes: 52
+  Passaram: 52
+  Falharam: 0
+  Taxa de Sucesso: 100.0%
+
+--------------------------------------------------------------------------------
+CATEGORIA: Base64 Extraction (8/8 passaram)
+--------------------------------------------------------------------------------
+  [PASS] Extract: const datas
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: var datas
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: let datas
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: data-datas attr
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: JSON inline
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: base64 com padding
+         Extraído com sucesso: 196 caracteres
+         (0.00 ms)
+         extracted_length: 196
+
+  [PASS] Extract: base64 sem padding
+         Extraído com sucesso: 195 caracteres
+         (0.00 ms)
+         extracted_length: 195
+
+  [PASS] Invalid base64 handling
+         Exceção corretamente lançada para base64 inválido
+         (0.00 ms)
+
+--------------------------------------------------------------------------------
+CATEGORIA: AES-CTR Decryption (6/6 passaram)
+--------------------------------------------------------------------------------
+  [PASS] Key derivation MD5
+         Chave: 32 bytes, IV: 16 bytes
+         (0.00 ms)
+         key_hex: 3264653532396539313334323263616561393266373962343638656138366265
+         iv_hex: 32646535323965393133343232636165
+
+  [PASS] Consistent key derivation
+         Derivação é determinística
+         (0.00 ms)
+
+  [PASS] Key size with inputs: 1...
+         Key: 32 bytes, IV: 16 bytes
+         (0.00 ms)
+
+  [PASS] Key size with inputs: 12345...
+         Key: 32 bytes, IV: 16 bytes
+         (0.00 ms)
+
+  [PASS] Key size with inputs: user_...
+         Key: 32 bytes, IV: 16 bytes
+         (0.00 ms)
+
+  [PASS] Mock AES-CTR decrypt
+         Decriptação simulada bem-sucedida
+         (0.00 ms)
+
+--------------------------------------------------------------------------------
+CATEGORIA: URL Validation (17/17 passaram)
+--------------------------------------------------------------------------------
+  [PASS] Valid URL: 480p hls
+         URL HLS válida (hls)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/hls/playlist.m3u8
+         type: hls
+
+  [PASS] Valid URL: 720p hls
+         URL HLS válida (hls)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/hls/master_720p.m3u8
+         type: hls
+
+  [PASS] Valid URL: 1080p hls
+         URL HLS válida (hls)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/hls/master_1080p.m3u8
+         type: hls
+
+  [PASS] Valid URL: 480p mp4
+         URL Progressive válida (progressive)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/videos/movie_480p.mp4
+         type: progressive
+
+  [PASS] Valid URL: 720p mp4
+         URL Progressive válida (progressive)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/videos/movie_720p.mp4
+         type: progressive
+
+  [PASS] Valid URL: 1080p mp4
+         URL Progressive válida (progressive)
+         (0.00 ms)
+         url: https://cdn.iamcdn.net/videos/movie_1080p.mp4
+         type: progressive
+
+  [PASS] Valid URL: live hls
+         URL HLS válida (hls)
+         (0.00 ms)
+         url: https://stream.example.com/live/stream.m3u8
+         type: hls
+
+  [PASS] Invalid URL rejected: not-a-url...
+         Corretamente rejeitada: Protocolo inválido
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected: ftp://invalid.protocol.com/fil...
+         Corretamente rejeitada: Protocolo inválido
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected: https://no-video-extension.com...
+         Corretamente rejeitada: Extensão de vídeo não reconhecida
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected: empty...
+         Corretamente rejeitada: URL vazia ou inválida
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected:    ...
+         Corretamente rejeitada: URL vazia após trim
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected: javascript:void(0)...
+         Corretamente rejeitada: Protocolo inválido
+         (0.00 ms)
+
+  [PASS] Invalid URL rejected: data:text/plain;base64,SGVsbG8...
+         Corretamente rejeitada: Protocolo inválido
+         (0.00 ms)
+
+  [PASS] CDN detection: iamcdn
+         CDN iamcdn reconhecida (progressive)
+         (0.00 ms)
+
+  [PASS] CDN detection: valenium
+         CDN valenium reconhecida (hls)
+         (0.00 ms)
+
+  [PASS] CDN detection: playerembed
+         CDN playerembed reconhecida (hls)
+         (0.00 ms)
+
+--------------------------------------------------------------------------------
+CATEGORIA: Quality Detection (11/11 passaram)
+--------------------------------------------------------------------------------
+  [PASS] Quality detect: 240p
+         Detectado: 240p (426x240), Bandwidth: 400000
+         (0.00 ms)
+         resolution: 240p
+         bandwidth: 400000
+
+  [PASS] Quality detect: 360p
+         Detectado: 360p (640x360), Bandwidth: 800000
+         (0.00 ms)
+         resolution: 360p
+         bandwidth: 800000
+
+  [PASS] Quality detect: 480p
+         Detectado: 480p (853x480), Bandwidth: 1400000
+         (0.00 ms)
+         resolution: 480p
+         bandwidth: 1400000
+
+  [PASS] Quality detect: 720p
+         Detectado: 720p (1280x720), Bandwidth: 2800000
+         (0.00 ms)
+         resolution: 720p
+         bandwidth: 2800000
+
+  [PASS] Quality detect: 1080p
+         Detectado: 1080p (1920x1080), Bandwidth: 5800000
+         (0.00 ms)
+         resolution: 1080p
+         bandwidth: 5800000
+
+  [PASS] Quality detect: 1080p
+         Detectado: 1080p (1920x1080), Bandwidth: 5800000
+         (0.00 ms)
+         resolution: 1080p
+         bandwidth: 5800000
+
+  [PASS] Quality detect: 720p
+         Detectado: 720p (1280x720), Bandwidth: 2800000
+         (0.00 ms)
+         resolution: 720p
+         bandwidth: 2800000
+
+  [PASS] Quality detect: 1080p
+         Detectado: 1080p, Bandwidth: 5800000
+         (0.00 ms)
+         resolution: 1080p
+         bandwidth: 5800000
+
+  [PASS] Quality detect: 720p
+         Detectado: 720p, Bandwidth: 2800000
+         (0.00 ms)
+         resolution: 720p
+         bandwidth: 2800000
+
+  [PASS] Quality detect: Unknown
+         Detectado: Unknown, Bandwidth: None
+         (0.00 ms)
+         resolution: Unknown
+         bandwidth: None
+
+  [PASS] Quality sorting
+         Ordenação correta: 1080p > 720p > 480p > 360p
+         (0.00 ms)
+
+--------------------------------------------------------------------------------
+CATEGORIA: JSON Escapes (10/10 passaram)
+--------------------------------------------------------------------------------
+  [PASS] JSON escape case 1
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 2
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 3
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 4
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 5
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 6
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON escape case 7
+         Parse correto: Parse direto bem-sucedido
+         (0.00 ms)
+
+  [PASS] JSON from JS extraction 1
+         Extraído corretamente: {'url': 'test.mp4'}
+         (6.22 ms)
+
+  [PASS] JSON from JS extraction 2
+         Extraído corretamente: {'hls': 'stream.m3u8', 'quality': 720}
+         (0.00 ms)
+
+  [PASS] JSON round-trip serialization
+         Serialização e desserialização corretas
+         (0.00 ms)
+
+================================================================================

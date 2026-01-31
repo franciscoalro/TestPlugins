@@ -144,11 +144,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             val mapper = com.fasterxml.jackson.databind.ObjectMapper()
             val dataNode = mapper.readTree(decodedJson)
             
-            // Extrair campos
-            val mediaEncrypted = dataNode.get("media")?.asText()
+            // Extrair campos (texto normal)
             val userId = dataNode.get("user_id")?.asText()
             val slug = dataNode.get("slug")?.asText()
             val md5Id = dataNode.get("md5_id")?.asText()
+            
+            // Extrair media usando regex para preservar escapes Unicode raw
+            // O campo media contém dados binários criptografados que não devem ser interpretados como Unicode
+            val mediaRegex = """"media"\s*:\s*"((?:[^"\\]|\\.)*)"""".toRegex()
+            val mediaEncrypted = mediaRegex.find(decodedJson)?.groupValues?.get(1)
+                ?.replace("\\\"", "\"")  // Unescape apenas as aspas
+                ?.replace("\\\\", "\\")  // Unescape backslashes
             
             Log.d(TAG, "📋 Campos extraídos:")
             Log.d(TAG, "   - userId: $userId")

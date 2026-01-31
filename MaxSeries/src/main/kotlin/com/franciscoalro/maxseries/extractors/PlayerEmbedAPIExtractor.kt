@@ -165,14 +165,14 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             Log.d(TAG, "   - media: ${mediaString?.length} chars")
             Log.d(TAG, "   - media first 20 bytes (hex): ${mediaEncrypted?.take(20)?.joinToString(" ") { "%02x".format(it) }}")
             
-            if (mediaEncrypted.isNullOrEmpty() || userId.isNullOrEmpty() || 
+            if (mediaEncrypted == null || mediaEncrypted.isEmpty() || userId.isNullOrEmpty() || 
                 slug.isNullOrEmpty() || md5Id.isNullOrEmpty()) {
                 Log.w(TAG, "⚠️ Campos obrigatórios faltantes")
                 return
             }
             
             Log.d(TAG, "🔓 Decriptando media com AES-CTR...")
-            val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted, userId, slug, md5Id)
+            val decrypted = LinkDecryptor.decryptPlayerEmbedMedia(mediaEncrypted!!, userId!!, slug!!, md5Id!!)
             
             if (decrypted == null) {
                 Log.e(TAG, "❌ Falha na decriptação AES-CTR")

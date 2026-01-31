@@ -1,0 +1,34 @@
+======================================================================
+RELATÓRIO DE INTEGRAÇÃO - PlayerEmbedAPI v5.0
+======================================================================
+Timestamp: 2026-01-31T13:46:15.088589
+Projeto: C:\Users\KYTHOURS\Desktop\brcloudstream
+
+----------------------------------------------------------------------
+RESUMO
+----------------------------------------------------------------------
+Total de Testes: 29
+✅ Aprovados: 25
+❌ Falhas: 3
+⚠️ Avisos: 0
+Taxa de Sucesso: 86.2%
+
+----------------------------------------------------------------------
+FALHAS DETECTADAS
+----------------------------------------------------------------------
+
+[FALHA] Sintaxe: PlayerEmbedAPIExtractorV5
+   Encontrados 1 erros de sintaxe
+   -> Linha 35: Caractere de fechamento ']' não corresponde à abertura '(' (linha 35)
+
+[FALHA] Sintaxe: PlayerEmbedAPIWebViewExtractorV5
+   Encontrados 1 erros de sintaxe
+   -> Linha 209: Caractere de fechamento '}' não corresponde à abertura '(' (linha 181)
+
+[FALHA] Sintaxe: MaxSeriesProvider
+   Encontrados 1 erros de sintaxe
+   -> Linha 371: Caractere de fechamento '}' não corresponde à abertura '(' (linha 368)
+
+======================================================================
+FIM DO RELATÓRIO
+======================================================================

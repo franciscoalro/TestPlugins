@@ -1,7 +1,7 @@
 version = 253
 
 cloudstream {
-    description = "MaxSeries v253 - PlayerEmbedAPI v4.4 Latin-1 Fix"
+    description = "MaxSeries v253 - PlayerEmbedAPI v5.0 Enhanced Detection"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

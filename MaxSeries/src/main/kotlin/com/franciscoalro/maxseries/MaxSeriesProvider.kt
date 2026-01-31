@@ -22,9 +22,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV5
 import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
@@ -33,11 +31,14 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v252 - PlayerEmbedAPI v4.2 Gzip Support (Jan 2026)
+ * MaxSeries Provider v253 - PlayerEmbedAPI v5.0 Enhanced (Feb 2026)
  *
- * v252 Changes (30 Jan 2026):
- * - 🔧 PlayerEmbedAPI v4.2: Suporte a HTML gzipado (Content-Encoding: gzip)
- * - 🎯 Detecta e descompacta automaticamente respostas comprimidas
+ * v253 Changes (31 Jan 2026):
+ * - 🚀 PlayerEmbedAPI v5.0: Enhanced Detection & Security
+ * - 🔒 Removido logging de dados sensíveis
+ * - 🎯 Múltiplas estratégias de extração (API, ShortIcu, Regex, WebView)
+ * - 🛡️ Validação de URLs antes de retornar
+ * - ⚡ Performance: Regex compilados em companion object
  * 
  * v239 Changes (30 Jan 2026):
  * - 🎯 PlayerEmbedAPI v4.1 agora é o extractor PRIMÁRIO (AES-CTR)
@@ -121,9 +122,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v252 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v253 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v5.0), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -657,9 +658,9 @@ class MaxSeriesProvider : MainAPI() {
                                         }
                                     }
                                     source.contains("playerembedapi", ignoreCase = true) -> {
-                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v4.2: ${source.take(60)}...")
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v5.0: ${source.take(60)}...")
                                         try {
-                                            val extractor = PlayerEmbedAPIExtractor()
+                                            val extractor = PlayerEmbedAPIExtractorV5()
                                             val links = mutableListOf<ExtractorLink>()
                                             extractor.getUrl(source, referer, subtitleCallback) { link ->
                                                 links.add(link)
@@ -668,11 +669,11 @@ class MaxSeriesProvider : MainAPI() {
                                                 if (links.isNotEmpty() && linksFound.get() == 0) {
                                                     links.forEach { callback(it) }
                                                     linksFound.addAndGet(links.size)
-                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v4.2: SUCESSO ✅✅✅")
+                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v5.0: SUCESSO ✅✅✅")
                                                 }
                                             }
                                         } catch (e: Exception) {
-                                            Log.e(TAG, "❌ PlayerEmbedAPI v4.2 falhou: ${e.message}")
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v5.0 falhou: ${e.message}")
                                         }
                                     }
                                     source.contains("myvidplay", ignoreCase = true) -> {

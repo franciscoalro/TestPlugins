@@ -129,16 +129,16 @@ class CloudStreamLogAnalyzer:
         report.append("")
         
         # Resumo geral
-        report.append("📊 RESUMO GERAL")
+        report.append("RESUMO GERAL")
         report.append("-" * 60)
         report.append(f"Total de extrações: {self.stats['total_extractions']}")
-        report.append(f"✅ Sucesso: {self.stats['successful']} ({self._percentage(self.stats['successful'])}%)")
-        report.append(f"❌ Falhas: {self.stats['failed']} ({self._percentage(self.stats['failed'])}%)")
+        report.append(f"[OK] Sucesso: {self.stats['successful']} ({self._percentage(self.stats['successful'])}%)")
+        report.append(f"[OK] Falhas: {self.stats['failed']} ({self._percentage(self.stats['failed'])}%)")
         report.append(f"⏱️  Duração média: {self.stats['avg_duration']:.0f}ms")
         report.append("")
         
         # Cache
-        report.append("🗄️  CACHE")
+        report.append("CACHE")
         report.append("-" * 60)
         cache_total = self.stats['cache_hits'] + self.stats['cache_misses']
         if cache_total > 0:
@@ -150,7 +150,7 @@ class CloudStreamLogAnalyzer:
         report.append("")
         
         # Por estratégia
-        report.append("🎯 DESEMPENHO POR ESTRATÉGIA")
+        report.append("DESEMPENHO POR ESTRATEGIA")
         report.append("-" * 60)
         for strategy, counts in self.stats['by_strategy'].items():
             total = counts['success'] + counts['failed']
@@ -159,10 +159,10 @@ class CloudStreamLogAnalyzer:
         report.append("")
         
         # Detalhes dos eventos
-        report.append("📋 EVENTOS DETALHADOS")
+        report.append("EVENTOS DETALHADOS")
         report.append("-" * 60)
         for i, event in enumerate(self.events[:20], 1):  # Primeiros 20
-            status = "✅" if event.success else "❌"
+            status = "[OK]" if event.success else "[OK]"
             report.append(f"{i:2}. {status} {event.strategy:12} | {event.duration_ms:4}ms | {event.error[:40] if event.error else 'OK'}")
         
         if len(self.events) > 20:
@@ -172,34 +172,34 @@ class CloudStreamLogAnalyzer:
         report.append("=" * 60)
         
         # Recomendações
-        report.append("💡 RECOMENDAÇÕES")
+        report.append("RECOMENDACOES")
         report.append("-" * 60)
         
         if self.stats['failed'] > self.stats['successful']:
-            report.append("⚠️  Muitas falhas detectadas!")
+            report.append("[AVISO] Muitas falhas detectadas!")
             report.append("   - Verificar conexão de internet")
             report.append("   - Verificar se o site está online")
             report.append("   - Analisar mensagens de erro específicas")
         
         if 'WebView' in self.stats['by_strategy'] and self.stats['by_strategy']['WebView']['success'] > 0:
-            report.append("ℹ️  WebView sendo usado frequentemente")
+            report.append("[INFO] WebView sendo usado frequentemente")
             report.append("   - Considere melhorar as estratégias 1-3")
             report.append("   - WebView é mais lento que as outras")
         
         if self.stats['cache_hits'] == 0 and self.stats['cache_misses'] > 0:
-            report.append("ℹ️  Cache não está sendo aproveitado")
+            report.append("[INFO] Cache nao esta sendo aproveitado")
             report.append("   - Isso é normal na primeira execução")
             report.append("   - Na segunda execução deve mostrar HITs")
         
         success_rate = self._percentage(self.stats['successful'])
         if success_rate >= 95:
-            report.append("✅ Excelente taxa de sucesso!")
+            report.append("[OK] Excelente taxa de sucesso!")
         elif success_rate >= 80:
-            report.append("✅ Boa taxa de sucesso")
+            report.append("[OK] Boa taxa de sucesso")
         elif success_rate >= 50:
-            report.append("⚠️  Taxa de sucesso moderada")
+            report.append("[AVISO] Taxa de sucesso moderada")
         else:
-            report.append("❌ Taxa de sucesso baixa - necessita atenção")
+            report.append("[ERRO] Taxa de sucesso baixa - necessita atencao")
         
         report.append("=" * 60)
         
@@ -249,13 +249,13 @@ def main():
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(report)
         
-        print(f"\n📄 Relatório salvo em: {output_file}")
+        print(f"\n[emoji] Relatório salvo em: {output_file}")
         
     except FileNotFoundError:
-        print(f"❌ Arquivo não encontrado: {log_file}")
+        print(f"[OK] Arquivo não encontrado: {log_file}")
         sys.exit(1)
     except Exception as e:
-        print(f"❌ Erro: {e}")
+        print(f"[OK] Erro: {e}")
         sys.exit(1)
 
 

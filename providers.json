@@ -18,9 +18,9 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v242/MaxSeries.cs3",
-        "version": 242,
-        "description": "MaxSeries v242 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality Support",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v243/MaxSeries.cs3",
+        "version": 243,
+        "description": "MaxSeries v243 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality Support",
         "status": 1,
         "fileSize": 228000,
         "sha256": "",

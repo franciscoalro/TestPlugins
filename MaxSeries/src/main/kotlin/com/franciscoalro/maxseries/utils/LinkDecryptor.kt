@@ -58,11 +58,21 @@ object LinkDecryptor {
             val keyBytes = md5Hash.toByteArray(Charsets.UTF_8)
             val ivBytes = keyBytes.copyOfRange(0, 16)
 
+            Log.d("LinkDecryptor", "🔐 Decrypt params:")
+            Log.d("LinkDecryptor", "   preKey: $preKey")
+            Log.d("LinkDecryptor", "   md5Hash: $md5Hash")
+            Log.d("LinkDecryptor", "   keyBytes: ${keyBytes.size} bytes")
+            Log.d("LinkDecryptor", "   ivBytes: ${ivBytes.size} bytes")
+            Log.d("LinkDecryptor", "   mediaEncrypted length: ${mediaEncrypted.length}")
+            Log.d("LinkDecryptor", "   mediaEncrypted first 50 chars (codes): ${mediaEncrypted.take(50).map { it.code }}")
+
             // Converter a string criptografada em bytes (charCodeAt logic)
             val encryptedBytes = ByteArray(mediaEncrypted.length)
             for (i in mediaEncrypted.indices) {
                 encryptedBytes[i] = mediaEncrypted[i].code.toByte()
             }
+            
+            Log.d("LinkDecryptor", "   encryptedBytes first 20: ${encryptedBytes.take(20).joinToString(",")}")
 
             val algorithm = "AES/CTR/NoPadding"
             val secretKeySpec = SecretKeySpec(keyBytes, "AES")
@@ -73,9 +83,12 @@ object LinkDecryptor {
 
             val decryptedBytes = cipher.doFinal(encryptedBytes)
             val decryptedString = String(decryptedBytes, Charsets.UTF_8)
+            
+            Log.d("LinkDecryptor", "✅ Decrypted: ${decryptedString.take(100)}...")
 
             JsonHelper.mapper.readValue<PlayerEmbedMedia>(decryptedString)
         } catch (e: Exception) {
+            Log.e("LinkDecryptor", "❌ Decrypt error: ${e.message}")
             e.printStackTrace()
             null
         }

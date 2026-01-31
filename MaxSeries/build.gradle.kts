@@ -1,7 +1,7 @@
-version = 254
+version = 255
 
 cloudstream {
-    description = "MaxSeries v254 - Production Release (v5.0 Tested)"
+    description = "MaxSeries v255 - Full Source Extraction (v6.0 Multi-Strategy)"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

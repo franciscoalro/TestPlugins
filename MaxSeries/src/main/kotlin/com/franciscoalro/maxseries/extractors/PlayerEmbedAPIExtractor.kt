@@ -137,17 +137,17 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         try {
             // Decodificar base64
             val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
-            val decodedJson = String(decodedBytes, Charsets.UTF_8)
-            Log.d(TAG, "✅ JSON decodificado: ${decodedJson.take(200)}...")
+            val decodedString = String(decodedBytes, Charsets.ISO_8859_1)
+            Log.d(TAG, "✅ JSON decodificado (ISO-8859-1): ${decodedString.take(200)}...")
             
             // Extrair campos simples primeiro
             val userIdRegex = """"user_id"\s*:\s*(\d+)""".toRegex()
             val slugRegex = """"slug"\s*:\s*"([^"]+)"""".toRegex()
             val md5IdRegex = """"md5_id"\s*:\s*(\d+)""".toRegex()
             
-            val userId = userIdRegex.find(decodedJson)?.groupValues?.get(1)
-            val slug = slugRegex.find(decodedJson)?.groupValues?.get(1)
-            val md5Id = md5IdRegex.find(decodedJson)?.groupValues?.get(1)
+            val userId = userIdRegex.find(decodedString)?.groupValues?.get(1)
+            val slug = slugRegex.find(decodedString)?.groupValues?.get(1)
+            val md5Id = md5IdRegex.find(decodedString)?.groupValues?.get(1)
             
             // Extrair media - capturar TUDO entre "media":"..." até a próxima aspas não-escapada
             // Precisamos lidar com escapes Unicode \uXXXX e escapes comuns \\\"

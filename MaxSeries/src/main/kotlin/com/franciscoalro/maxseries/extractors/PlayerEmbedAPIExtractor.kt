@@ -4,9 +4,16 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.franciscoalro.maxseries.utils.*
 import android.util.Log
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPInputStream
 
 /**
- * PlayerEmbedAPI Extractor v4.1 - ENHANCED BASE64 DETECTION (Jan 2026)
+ * PlayerEmbedAPI Extractor v4.2 - GZIP SUPPORT (Jan 2026)
+ * 
+ * v4.2 Changes (30 Jan 2026):
+ * - 🔧 Suporte a HTML gzipado (detecta e descompacta automaticamente)
+ * - 🎯 Corrige problema de conteúdo binário sendo tratado como HTML
  * 
  * v4.1 Changes (30 Jan 2026):
  * - 🔧 Múltiplos padrões de regex para encontrar base64 'datas'
@@ -82,8 +89,28 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 return
             }
             
-            Log.d(TAG, "✅ HTML carregado: ${response.text.length} chars")
-            response.text
+            // Verificar se o conteúdo é gzipado (caracteres não-ASCII no início)
+            val rawText = response.text
+            val isGzipped = rawText.isNotEmpty() && (
+                rawText[0].code == 0x1f ||  // Magic number gzip (0x1f8b)
+                (rawText[0].code < 32 && rawText[0].code != 9 && rawText[0].code != 10 && rawText[0].code != 13) ||
+                !rawText.substring(0, minOf(100, rawText.length)).any { it.isLetterOrDigit() || it in "<!/\"'= {}" }
+            )
+            
+            if (isGzipped) {
+                Log.w(TAG, "⚠️ Conteúdo gzipado detectado, tentando descompactar...")
+                try {
+                    val decompressed = decompressGzip(response.body.bytes())
+                    Log.d(TAG, "✅ HTML descompactado: ${decompressed.length} chars")
+                    decompressed
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Falha ao descompactar gzip: ${e.message}")
+                    rawText
+                }
+            } else {
+                Log.d(TAG, "✅ HTML carregado: ${rawText.length} chars")
+                rawText
+            }
         } catch (e: Exception) {
             Log.e(TAG, "❌ Falha ao obter HTML: ${e.message}")
             return
@@ -313,5 +340,24 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         }
         
         Log.e(TAG, "❌ Todas as técnicas falharam")
+    }
+    
+    /**
+     * Descompacta dados gzip
+     */
+    private fun decompressGzip(compressed: ByteArray): String {
+        return try {
+            ByteArrayInputStream(compressed).use { bis ->
+                GZIPInputStream(bis).use { gis ->
+                    ByteArrayOutputStream().use { bos ->
+                        gis.copyTo(bos)
+                        bos.toString("UTF-8")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Se falhar, tenta como UTF-8 direto
+            String(compressed, Charsets.UTF_8)
+        }
     }
 }

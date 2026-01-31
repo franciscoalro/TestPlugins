@@ -33,9 +33,9 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v246 - PlayerEmbedAPI v4.2 Gzip Support (Jan 2026)
+ * MaxSeries Provider v247 - PlayerEmbedAPI v4.2 Gzip Support (Jan 2026)
  *
- * v246 Changes (30 Jan 2026):
+ * v247 Changes (30 Jan 2026):
  * - 🔧 PlayerEmbedAPI v4.2: Suporte a HTML gzipado (Content-Encoding: gzip)
  * - 🎯 Detecta e descompacta automaticamente respostas comprimidas
  * 
@@ -107,7 +107,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v246"
+    override var name = "MaxSeries v247"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -121,7 +121,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v246 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v247 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")

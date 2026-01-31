@@ -9,13 +9,13 @@ import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
 
 /**
- * PlayerEmbedAPI Extractor v4.2 - GZIP SUPPORT (Jan 2026)
+ * PlayerEmbedAPI Extractor v4.3 - GZIP SUPPORT (Jan 2026)
  * 
- * v4.2 Changes (30 Jan 2026):
+ * v4.3 Changes (30 Jan 2026):
  * - 🔧 Suporte a HTML gzipado (detecta e descompacta automaticamente)
  * - 🎯 Corrige problema de conteúdo binário sendo tratado como HTML
  * 
- * v4.1 Changes (30 Jan 2026):
+ * v4.3 Changes (30 Jan 2026):
  * - 🔧 Múltiplos padrões de regex para encontrar base64 'datas'
  * - 🎯 Validação de base64 antes de usar
  * - 📄 Log do HTML quando não encontra (para debug)
@@ -52,7 +52,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     ) {
         val startTime = System.currentTimeMillis()
         
-        Log.wtf(TAG, "=== PlayerEmbedAPI v4.1 - Enhanced Detection ===")
+        Log.wtf(TAG, "=== PlayerEmbedAPI v4.3 - Enhanced Detection ===")
         Log.d(TAG, "URL: $url")
         
         // 1. VERIFICAR CACHE
@@ -89,25 +89,25 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                 return
             }
             
-            // Verificar se o conteúdo é gzipado (caracteres não-ASCII no início)
-            val rawText = response.text
-            val isGzipped = rawText.isNotEmpty() && (
-                rawText[0].code == 0x1f ||  // Magic number gzip (0x1f8b)
-                (rawText[0].code < 32 && rawText[0].code != 9 && rawText[0].code != 10 && rawText[0].code != 13) ||
-                !rawText.substring(0, minOf(100, rawText.length)).any { it.isLetterOrDigit() || it in "<!/\"'= {}" }
-            )
+            // Pegar os bytes brutos antes de qualquer conversão
+            val rawBytes = response.body.bytes()
+            
+            // Verificar se é gzip pelo magic number (0x1f 0x8b)
+            val isGzipped = rawBytes.size >= 2 && rawBytes[0] == 0x1f.toByte() && rawBytes[1] == 0x8b.toByte()
             
             if (isGzipped) {
-                Log.w(TAG, "⚠️ Conteúdo gzipado detectado, tentando descompactar...")
+                Log.w(TAG, "⚠️ Conteúdo gzipado detectado (magic number), descompactando...")
                 try {
-                    val decompressed = decompressGzip(response.body.bytes())
+                    val decompressed = decompressGzip(rawBytes)
                     Log.d(TAG, "✅ HTML descompactado: ${decompressed.length} chars")
                     decompressed
                 } catch (e: Exception) {
                     Log.e(TAG, "❌ Falha ao descompactar gzip: ${e.message}")
-                    rawText
+                    // Fallback: tentar como string direta
+                    String(rawBytes, Charsets.UTF_8)
                 }
             } else {
+                val rawText = String(rawBytes, Charsets.UTF_8)
                 Log.d(TAG, "✅ HTML carregado: ${rawText.length} chars")
                 rawText
             }
@@ -116,7 +116,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             return
         }
         
-        // 3. ENHANCED BASE64 DETECTION (v4.1)
+        // 3. ENHANCED BASE64 DETECTION (v4.3)
         Log.d(TAG, "[2/5] Procurando base64 'datas'...")
         
         val base64Data = findBase64Datas(html)
@@ -259,7 +259,7 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
     }
     
     /**
-     * V4.1: Procura base64 'datas' com múltiplos padrões
+     * v4.3: Procura base64 'datas' com múltiplos padrões
      */
     private fun findBase64Datas(html: String): String? {
         val patterns = listOf(

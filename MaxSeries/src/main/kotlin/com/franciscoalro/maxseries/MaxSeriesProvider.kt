@@ -22,6 +22,7 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
 import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
@@ -32,7 +33,12 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v238 - PlayerEmbedAPI Enhanced (Jan 2026)
+ * MaxSeries Provider v239 - PlayerEmbedAPI Direct v4.1 (Jan 2026)
+ *
+ * v239 Changes (30 Jan 2026):
+ * - 🎯 PlayerEmbedAPI v4.1 agora é o extractor PRIMÁRIO (AES-CTR)
+ * - 🚀 ShortIcu movido para fallback secundário
+ * - 🔧 Correção: Provider chama diretamente o extractor com base64 detection
  *
  * v238 Changes (30 Jan 2026):
  * - 🔧 PlayerEmbedAPI v4.1: Múltiplos padrões de regex para base64
@@ -111,7 +117,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v238 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v239 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
@@ -638,11 +644,11 @@ class MaxSeriesProvider : MainAPI() {
                                             Log.e(TAG, "❌ PlayerThreeBlogger falhou: ${e.message}")
                                         }
                                     }
-                                    // Prioridade 1: PlayerEmbedAPI (mais rápido - v234)
+                                    // Prioridade 1: PlayerEmbedAPI v4.1 (AES-CTR - mais confiável)
                                     source.contains("playerembedapi", ignoreCase = true) -> {
-                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI: ${source.take(60)}...")
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v4.1: ${source.take(60)}...")
                                         try {
-                                            val extractor = PlayerEmbedAPIShortIcuExtractor()
+                                            val extractor = PlayerEmbedAPIExtractor()
                                             val links = mutableListOf<ExtractorLink>()
                                             extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
                                                 links.add(link)
@@ -651,24 +657,28 @@ class MaxSeriesProvider : MainAPI() {
                                                 if (links.isNotEmpty() && linksFound.get() == 0) {
                                                     links.forEach { callback(it) }
                                                     linksFound.addAndGet(links.size)
-                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI: SUCESSO (early exit ativado) ✅✅✅")
+                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v4.1: SUCESSO (early exit ativado) ✅✅✅")
                                                 }
                                             }
                                         } catch (e: Exception) {
-                                            // Fallback para WebView se necessário
-                                            Log.w(TAG, "⚠️ ShortIcu falhou, tentando WebView...")
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v4.1 falhou: ${e.message}")
+                                            // Fallback para ShortIcu
+                                            Log.w(TAG, "⚠️ Tentando ShortIcu como fallback...")
                                             try {
-                                                val webviewExtractor = PlayerEmbedAPIWebViewExtractor()
-                                                val links = webviewExtractor.extractFromUrl(source, episodeUrl)
+                                                val shortExtractor = PlayerEmbedAPIShortIcuExtractor()
+                                                val links = mutableListOf<ExtractorLink>()
+                                                shortExtractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                                    links.add(link)
+                                                }
                                                 mutex.withLock {
                                                     if (links.isNotEmpty() && linksFound.get() == 0) {
                                                         links.forEach { callback(it) }
                                                         linksFound.addAndGet(links.size)
-                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI WebView: ${links.size} links ✅✅✅")
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI ShortIcu: SUCESSO ✅✅✅")
                                                     }
                                                 }
-                                            } catch (webviewError: Exception) {
-                                                Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${webviewError.message}")
+                                            } catch (shortError: Exception) {
+                                                Log.e(TAG, "❌ ShortIcu também falhou: ${shortError.message}")
                                             }
                                         }
                                     }

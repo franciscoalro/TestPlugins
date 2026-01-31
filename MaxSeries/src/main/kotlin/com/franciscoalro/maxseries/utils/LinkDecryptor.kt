@@ -7,6 +7,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.security.MessageDigest
 import android.util.Base64
+import android.util.Log
 import com.fasterxml.jackson.module.kotlin.readValue
 
 /**

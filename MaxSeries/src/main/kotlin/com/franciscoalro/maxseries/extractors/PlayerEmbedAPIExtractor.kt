@@ -133,36 +133,35 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         Log.d(TAG, "✅ Base64 encontrado: ${base64Data.take(50)}...")
         
-        // 4. DECODIFICAR E DECRIPTAR (v249 - SOLUÇÃO DEFINITIVA)
+        // 4. DECODIFICAR E DECRIPTAR (v250 - CORREÇÃO FINAL)
         try {
             // Decodificar base64 para bytes
             val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
             
-            // SOLUÇÃO DEFINITIVA: Usar Jackson para parsear JSON corretamente
-            // Isso processa escapes \uXXXX e UTF-8 automaticamente
-            val mapper = com.fasterxml.jackson.databind.ObjectMapper()
-            val rootNode = mapper.readTree(decodedBytes)  // Parse direto dos bytes (detecta UTF-8)
+            // Converter para String usando LATIN1 (ISO-8859-1) - preserva bytes 1:1
+            val decodedString = String(decodedBytes, Charsets.ISO_8859_1)
             
-            val userId = rootNode.get("user_id")?.asText()
-            val slug = rootNode.get("slug")?.asText()
-            val md5Id = rootNode.get("md5_id")?.asText()
+            // Extrair campos simples (ASCII)
+            val userIdRegex = """"user_id"\s*:\s*(\d+)""".toRegex()
+            val slugRegex = """"slug"\s*:\s*"([^"]+)"""".toRegex()
+            val md5IdRegex = """"md5_id"\s*:\s*(\d+)""".toRegex()
             
-            // Extrair media como String (Jackson já processou todos os escapes)
-            val mediaString = rootNode.get("media")?.asText()
+            val userId = userIdRegex.find(decodedString)?.groupValues?.get(1)
+            val slug = slugRegex.find(decodedString)?.groupValues?.get(1)
+            val md5Id = md5IdRegex.find(decodedString)?.groupValues?.get(1)
             
-            // Converter para bytes usando ISO-8859-1 (1:1 mapping char->byte)
-            // Isso preserva o valor numérico de cada caractere U+0000-U+00FF como byte 0x00-0xFF
-            val mediaEncrypted = mediaString?.let { 
-                String(it.toByteArray(Charsets.ISO_8859_1), Charsets.ISO_8859_1)
-            }
+            // Extrair campo 'media' dos BYTES RAW (não da String)
+            // Procurar por "media":" nos bytes e extrair até a próxima aspas não-escapada
+            val mediaBytes = extractMediaField(decodedBytes)
+            val mediaEncrypted = mediaBytes?.let { String(it, Charsets.ISO_8859_1) }
             
-            Log.d(TAG, "✅ JSON parseado via Jackson (UTF-8)")
+            Log.d(TAG, "✅ Base64 decodificado")
             Log.d(TAG, "📋 Campos extraídos:")
             Log.d(TAG, "   - userId: $userId")
             Log.d(TAG, "   - slug: $slug")
             Log.d(TAG, "   - md5Id: $md5Id")
             Log.d(TAG, "   - media: ${mediaEncrypted?.length} chars")
-            Log.d(TAG, "   - media first 20 bytes (hex): ${mediaEncrypted?.take(20)?.toByteArray(Charsets.ISO_8859_1)?.joinToString(" ") { "%02x".format(it) }}")
+            Log.d(TAG, "   - media first 20 bytes (hex): ${mediaBytes?.take(20)?.joinToString(" ") { "%02x".format(it) }}")
             
             if (mediaEncrypted.isNullOrEmpty() || userId.isNullOrEmpty() || 
                 slug.isNullOrEmpty() || md5Id.isNullOrEmpty()) {
@@ -264,6 +263,80 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             Log.e(TAG, "❌ Erro no processamento: ${e.message}")
             e.printStackTrace()
         }
+    }
+    
+    /**
+     * Extrai o campo 'media' dos bytes raw do JSON decodificado
+     * O campo media contém dados binários que devem ser preservados exatamente
+     */
+    private fun extractMediaField(decodedBytes: ByteArray): ByteArray? {
+        // Procurar por "media":" nos bytes (0x22 0x6D 0x65 0x64 0x69 0x61 0x22 0x3A 0x22)
+        val mediaKey = byteArrayOf(0x22, 0x6D, 0x65, 0x64, 0x69, 0x61, 0x22, 0x3A, 0x22)
+        
+        var mediaStart = -1
+        for (i in 0..decodedBytes.size - mediaKey.size) {
+            var match = true
+            for (j in mediaKey.indices) {
+                if (decodedBytes[i + j] != mediaKey[j]) {
+                    match = false
+                    break
+                }
+            }
+            if (match) {
+                mediaStart = i + mediaKey.size
+                break
+            }
+        }
+        
+        if (mediaStart < 0) return null
+        
+        val result = java.io.ByteArrayOutputStream()
+        var pos = mediaStart
+        
+        while (pos < decodedBytes.size) {
+            val b = decodedBytes[pos].toInt() and 0xFF
+            
+            when {
+                // Aspas (0x22) - fim do campo
+                b == 0x22 -> break
+                
+                // Backslash (0x5C) - escape sequence
+                b == 0x5C && pos + 1 < decodedBytes.size -> {
+                    val next = decodedBytes[pos + 1].toInt() and 0xFF
+                    when (next) {
+                        0x22, 0x5C, 0x2F -> { result.write(next); pos += 2 } // \", \\, \/
+                        0x62 -> { result.write(0x08); pos += 2 } // \b -> BS
+                        0x66 -> { result.write(0x0C); pos += 2 } // \f -> FF
+                        0x6E -> { result.write(0x0A); pos += 2 } // \n -> LF
+                        0x72 -> { result.write(0x0D); pos += 2 } // \r -> CR
+                        0x74 -> { result.write(0x09); pos += 2 } // \t -> TAB
+                        0x75 -> { // \uXXXX
+                            if (pos + 5 < decodedBytes.size) {
+                                val hex = String(decodedBytes, pos + 2, 4, Charsets.US_ASCII)
+                                try {
+                                    val code = hex.toInt(16)
+                                    result.write(code and 0xFF)
+                                } catch (e: Exception) {
+                                    result.write(0x5C); result.write(0x75)
+                                }
+                                pos += 6
+                            } else {
+                                result.write(b); pos++
+                            }
+                        }
+                        else -> { result.write(next); pos += 2 }
+                    }
+                }
+                
+                // Caractere normal
+                else -> {
+                    result.write(b)
+                    pos++
+                }
+            }
+        }
+        
+        return result.toByteArray()
     }
     
     /**

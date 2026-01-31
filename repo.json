@@ -1,7 +1,7 @@
 {
   "name": "TestPlugins Repository - Brazilian Providers",
   "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
-  "description": "Repositório completo de extensões brasileiras para Cloudstream - 7 providers incluindo MaxSeries v243 (PlayerEmbedAPI Enhanced)",
+  "description": "Repositório completo de extensões brasileiras para Cloudstream - 7 providers incluindo MaxSeries v244 (PlayerEmbedAPI Enhanced)",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"

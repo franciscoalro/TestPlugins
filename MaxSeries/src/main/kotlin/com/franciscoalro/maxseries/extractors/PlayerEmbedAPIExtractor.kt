@@ -151,18 +151,18 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             
             // Extrair media - capturar TUDO entre "media":"..." até a próxima aspas não-escapada
             // Precisamos lidar com escapes Unicode \uXXXX e escapes comuns \\\"
-            val mediaStart = decodedJson.indexOf("\"media\":\"")
+            val mediaStart = decodedString.indexOf("\"media\":\"")
             val mediaEncrypted = if (mediaStart >= 0) {
                 val start = mediaStart + 9 // "media":".length
                 var pos = start
                 val sb = StringBuilder()
-                while (pos < decodedJson.length) {
-                    val c = decodedJson[pos]
+                while (pos < decodedString.length) {
+                    val c = decodedString[pos]
                     if (c == '"') {
                         // Fim do campo
                         break
-                    } else if (c == '\\' && pos + 1 < decodedJson.length) {
-                        val next = decodedJson[pos + 1]
+                    } else if (c == '\\' && pos + 1 < decodedString.length) {
+                        val next = decodedString[pos + 1]
                         when (next) {
                             '"', '\\', '/' -> { sb.append(next); pos += 2 }
                             'b' -> { sb.append('\b'); pos += 2 }
@@ -172,8 +172,8 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
                             't' -> { sb.append('\t'); pos += 2 }
                             'u' -> {
                                 // Unicode escape \uXXXX - converter para caractere
-                                if (pos + 5 < decodedJson.length) {
-                                    val hex = decodedJson.substring(pos + 2, pos + 6)
+                                if (pos + 5 < decodedString.length) {
+                                    val hex = decodedString.substring(pos + 2, pos + 6)
                                     try {
                                         val code = hex.toInt(16)
                                         sb.append(code.toChar())

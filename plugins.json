@@ -2,14 +2,14 @@
   {
     "name": "MaxSeries",
     "internalName": "MaxSeries",
-    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v239/MaxSeries.cs3",
-    "version": 239,
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v240/MaxSeries.cs3",
+    "version": 240,
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "fileSize": 228000,
     "status": 1,
     "language": "pt-BR",
-    "description": "MaxSeries v239 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality",
+    "description": "MaxSeries v240 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality",
     "authors": ["franciscoalro"],
     "tvTypes": ["TvSeries", "Movie"],
     "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"

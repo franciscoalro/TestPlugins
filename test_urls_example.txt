@@ -1,0 +1,9 @@
+# Arquivo de exemplo para teste em batch
+# Uma URL por linha, linhas com # são comentários
+
+# Exemplos de URLs do PlayerEmbedAPI
+# Substitua pelas URLs reais que você quer testar
+
+https://playerembedapi.link/?v=exemplo1
+https://playerembedapi.link/?v=exemplo2
+https://playerembedapi.link/?v=exemplo3

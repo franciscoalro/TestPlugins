@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-01-31T13:26:05.933416",
+  "project_path": "C:\\Users\\KYTHOURS\\Desktop\\brcloudstream",
+  "summary": {
+    "total_tests": 29,
+    "passed": 25,
+    "failed": 3,
+    "warnings": 0,
+    "success_rate": "86.2%"
+  },
+  "results": [
+    {
+      "name": "Sintaxe: PlayerEmbedAPIExtractorV5",
+      "status": "FAIL",
+      "message": "Encontrados 1 erros de sintaxe",
+      "details": [
+        "Linha 35: Caractere de fechamento ']' não corresponde à abertura '(' (linha 35)"
+      ],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Sintaxe: PlayerEmbedAPIWebViewExtractorV5",
+      "status": "FAIL",
+      "message": "Encontrados 1 erros de sintaxe",
+      "details": [
+        "Linha 209: Caractere de fechamento '}' não corresponde à abertura '(' (linha 181)"
+      ],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Sintaxe: MaxSeriesProvider",
+      "status": "FAIL",
+      "message": "Encontrados 1 erros de sintaxe",
+      "details": [
+        "Linha 371: Caractere de fechamento '}' não corresponde à abertura '(' (linha 368)"
+      ],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Dependência: V5 -> WebViewV5",
+      "status": "PASS",
+      "message": "PlayerEmbedAPIExtractorV5 referencia PlayerEmbedAPIWebViewExtractorV5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Dependência: Utils/LinkDecryptor",
+      "status": "PASS",
+      "message": "Utilitário LinkDecryptor: encontrado e importado em V5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Dependência: Utils/QualityDetector",
+      "status": "PASS",
+      "message": "Utilitário QualityDetector: encontrado e importado em V5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Dependência: Utils/VideoUrlCache",
+      "status": "PASS",
+      "message": "Utilitário VideoUrlCache: encontrado e importado em V5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Dependência: Utils/JsonHelper",
+      "status": "PASS",
+      "message": "Utilitário JsonHelper: encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Estrutura V5: Herança ExtractorApi",
+      "status": "PASS",
+      "message": "Encontrado em PlayerEmbedAPIExtractorV5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Estrutura V5: Método getUrl",
+      "status": "PASS",
+      "message": "Encontrado em PlayerEmbedAPIExtractorV5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Estrutura V5: Uso de ExtractorLink",
+      "status": "PASS",
+      "message": "Encontrado em PlayerEmbedAPIExtractorV5",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Import V5",
+      "status": "PASS",
+      "message": "Import de PlayerEmbedAPIExtractorV5 encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Uso do V5",
+      "status": "PASS",
+      "message": "Instanciação de PlayerEmbedAPIExtractorV5 encontrada",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Prioridade V5",
+      "status": "PASS",
+      "message": "Comentário de prioridade 1 para V5 encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Versão",
+      "status": "INFO",
+      "message": "Versão do provider detectada: v253",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Nome",
+      "status": "PASS",
+      "message": "Nome do provider: 'MaxSeries v252'",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Provider: Extractors Suportados",
+      "status": "PASS",
+      "message": "8 extractors encontrados",
+      "details": [
+        "MegaEmbedExtractorV8",
+        "MegaEmbedExtractorV9",
+        "PlayerThreeBloggerExtractor",
+        "MyVidPlayExtractor",
+        "DoodStreamExtractor",
+        "StreamtapeExtractor",
+        "MixdropExtractor",
+        "FilemoonExtractor"
+      ],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Versão",
+      "status": "PASS",
+      "message": "Versão configurada: 253",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Bloco cloudstream",
+      "status": "PASS",
+      "message": "Bloco cloudstream encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Descrição",
+      "status": "PASS",
+      "message": "Descrição: 'MaxSeries v253 - PlayerEmbedAPI v5.0 Enhanced Detection' (contém referência V5)",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Campo authors",
+      "status": "PASS",
+      "message": "Campo authors encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Campo status",
+      "status": "PASS",
+      "message": "Campo status encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Campo tvTypes",
+      "status": "PASS",
+      "message": "Campo tvTypes encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Gradle: Campo language",
+      "status": "PASS",
+      "message": "Campo language encontrado",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Qualidade: Documentação V5",
+      "status": "PASS",
+      "message": "Documentação KDoc encontrada",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Qualidade: Versão Documentada",
+      "status": "PASS",
+      "message": "Versão V5 documentada no código",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Qualidade: Tratamento de Erros",
+      "status": "PASS",
+      "message": "Blocos try-catch encontrados",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Qualidade: Null Safety",
+      "status": "PASS",
+      "message": "Operadores de null safety encontrados",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    },
+    {
+      "name": "Segurança: SSL Error Handler",
+      "status": "PASS",
+      "message": "SSL Error handler configurado corretamente (cancela)",
+      "details": [],
+      "line_number": null,
+      "file_path": null
+    }
+  ]
+}

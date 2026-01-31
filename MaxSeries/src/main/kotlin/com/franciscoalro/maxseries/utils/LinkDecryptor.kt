@@ -59,13 +59,8 @@ object LinkDecryptor {
             val keyBytes = md5Hash.toByteArray(Charsets.UTF_8)
             val ivBytes = keyBytes.copyOfRange(0, 16)
 
-            Log.d("LinkDecryptor", "🔐 Decrypt params:")
-            Log.d("LinkDecryptor", "   preKey: $preKey")
-            Log.d("LinkDecryptor", "   md5Hash: $md5Hash")
-            Log.d("LinkDecryptor", "   keyBytes: ${keyBytes.size} bytes")
-            Log.d("LinkDecryptor", "   ivBytes: ${ivBytes.size} bytes")
-            Log.d("LinkDecryptor", "   encryptedBytes length: ${encryptedBytes.size}")
-            Log.d("LinkDecryptor", "   encryptedBytes first 20 (hex): ${encryptedBytes.take(20).joinToString(" ") { "%02x".format(it) }}")
+            // 🔒 SEGURANÇA: Removido logging de dados sensíveis (chaves, hashes)
+            Log.d("LinkDecryptor", "🔐 Decrypting media: ${encryptedBytes.size} bytes")
 
             val algorithm = "AES/CTR/NoPadding"
             val secretKeySpec = SecretKeySpec(keyBytes, "AES")

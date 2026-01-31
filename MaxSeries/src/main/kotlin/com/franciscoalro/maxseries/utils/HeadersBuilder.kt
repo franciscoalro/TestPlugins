@@ -86,22 +86,20 @@ object HeadersBuilder {
     }
 
     /**
-     * Headers específicos para PlayerEmbedAPI (v101)
-     * MATCH EXATO com os logs do usuário (Firefox 147)
+     * Headers específicos para PlayerEmbedAPI (v243)
+     * REMOVIDO Accept-Encoding para evitar compressão
      */
     fun playerEmbed(referer: String): Map<String, String> {
         return mapOf(
             "User-Agent" to DEFAULT_USER_AGENT,
             "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language" to "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Accept-Encoding" to "gzip, deflate, br",
-            "Referer" to "https://playerthree.online/", // Root como nos logs
+            // REMOVIDO: Accept-Encoding para receber HTML puro sem compressão
+            "Referer" to "https://playerthree.online/",
             "Upgrade-Insecure-Requests" to "1",
             "Sec-Fetch-Dest" to "iframe",
             "Sec-Fetch-Mode" to "navigate",
-            "Sec-Fetch-Site" to "cross-site",
-            "Priority" to "u=4",
-            "Te" to "trailers"
+            "Sec-Fetch-Site" to "cross-site"
         )
     }
 

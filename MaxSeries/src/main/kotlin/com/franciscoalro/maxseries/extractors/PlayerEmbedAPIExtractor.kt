@@ -133,35 +133,37 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
         
         Log.d(TAG, "✅ Base64 encontrado: ${base64Data.take(50)}...")
         
-        // 4. DECODIFICAR E DECRIPTAR (v250 - CORREÇÃO FINAL)
+        // 4. DECODIFICAR E DECRIPTAR (v251 - MESMO FLUXO DO PYTHON)
         try {
-            // Decodificar base64 para bytes
+            // Decodificar base64 -> bytes (igual ao Python)
             val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
             
-            // Converter para String usando LATIN1 (ISO-8859-1) - preserva bytes 1:1
-            val decodedString = String(decodedBytes, Charsets.ISO_8859_1)
+            // Parse JSON com Jackson (equivalente ao json.loads() do Python)
+            // Jackson detecta UTF-8 automaticamente e processa escapes \uXXXX
+            val mapper = com.fasterxml.jackson.databind.ObjectMapper()
+            val jsonNode = mapper.readTree(decodedBytes)
             
-            // Extrair campos simples (ASCII)
-            val userIdRegex = """"user_id"\s*:\s*(\d+)""".toRegex()
-            val slugRegex = """"slug"\s*:\s*"([^"]+)"""".toRegex()
-            val md5IdRegex = """"md5_id"\s*:\s*(\d+)""".toRegex()
+            // Extrair campos (equivalente ao json_data['field'] do Python)
+            val userId = jsonNode.get("user_id")?.asText()
+            val slug = jsonNode.get("slug")?.asText()
+            val md5Id = jsonNode.get("md5_id")?.asText()
             
-            val userId = userIdRegex.find(decodedString)?.groupValues?.get(1)
-            val slug = slugRegex.find(decodedString)?.groupValues?.get(1)
-            val md5Id = md5IdRegex.find(decodedString)?.groupValues?.get(1)
+            // Extrair 'media' como String (Jackson já processou escapes \uXXXX)
+            val mediaString = jsonNode.get("media")?.asText()
             
-            // Extrair campo 'media' dos BYTES RAW (não da String)
-            // Procurar por "media":" nos bytes e extrair até a próxima aspas não-escapada
-            val mediaBytes = extractMediaField(decodedBytes)
-            val mediaEncrypted = mediaBytes?.let { String(it, Charsets.ISO_8859_1) }
+            // Converter String para bytes preservando valores 0-255
+            // Equivalente ao Python: bytes(media_string, 'latin-1')
+            val mediaEncrypted = mediaString?.let { str ->
+                ByteArray(str.length) { i -> str[i].code.toByte() }
+            }
             
-            Log.d(TAG, "✅ Base64 decodificado")
+            Log.d(TAG, "✅ JSON parseado via Jackson (equivalente ao Python)")
             Log.d(TAG, "📋 Campos extraídos:")
             Log.d(TAG, "   - userId: $userId")
             Log.d(TAG, "   - slug: $slug")
             Log.d(TAG, "   - md5Id: $md5Id")
-            Log.d(TAG, "   - media: ${mediaEncrypted?.length} chars")
-            Log.d(TAG, "   - media first 20 bytes (hex): ${mediaBytes?.take(20)?.joinToString(" ") { "%02x".format(it) }}")
+            Log.d(TAG, "   - media: ${mediaString?.length} chars")
+            Log.d(TAG, "   - media first 20 bytes (hex): ${mediaEncrypted?.take(20)?.joinToString(" ") { "%02x".format(it) }}")
             
             if (mediaEncrypted.isNullOrEmpty() || userId.isNullOrEmpty() || 
                 slug.isNullOrEmpty() || md5Id.isNullOrEmpty()) {

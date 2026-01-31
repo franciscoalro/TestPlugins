@@ -52,7 +52,7 @@ object LinkDecryptor {
      * 5. Ciphertext = String.chars (não é base64, é raw bytes charCodeAt)
      * 6. AES/CTR/NoPadding
      */
-    fun decryptPlayerEmbedMedia(mediaEncrypted: String, userId: String, slug: String, md5Id: String): PlayerEmbedMedia? {
+    fun decryptPlayerEmbedMedia(encryptedBytes: ByteArray, userId: String, slug: String, md5Id: String): PlayerEmbedMedia? {
         return try {
             val preKey = "$userId:$slug:$md5Id"
             val md5Hash = md5(preKey)
@@ -64,16 +64,8 @@ object LinkDecryptor {
             Log.d("LinkDecryptor", "   md5Hash: $md5Hash")
             Log.d("LinkDecryptor", "   keyBytes: ${keyBytes.size} bytes")
             Log.d("LinkDecryptor", "   ivBytes: ${ivBytes.size} bytes")
-            Log.d("LinkDecryptor", "   mediaEncrypted length: ${mediaEncrypted.length}")
-            Log.d("LinkDecryptor", "   mediaEncrypted first 50 chars (codes): ${mediaEncrypted.take(50).map { it.code }}")
-
-            // Converter a string criptografada em bytes (charCodeAt logic)
-            val encryptedBytes = ByteArray(mediaEncrypted.length)
-            for (i in mediaEncrypted.indices) {
-                encryptedBytes[i] = mediaEncrypted[i].code.toByte()
-            }
-            
-            Log.d("LinkDecryptor", "   encryptedBytes first 20: ${encryptedBytes.take(20).joinToString(",")}")
+            Log.d("LinkDecryptor", "   encryptedBytes length: ${encryptedBytes.size}")
+            Log.d("LinkDecryptor", "   encryptedBytes first 20 (hex): ${encryptedBytes.take(20).joinToString(" ") { "%02x".format(it) }}")
 
             val algorithm = "AES/CTR/NoPadding"
             val secretKeySpec = SecretKeySpec(keyBytes, "AES")

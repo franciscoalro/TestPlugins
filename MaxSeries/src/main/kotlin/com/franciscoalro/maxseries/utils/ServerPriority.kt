@@ -21,6 +21,8 @@ object ServerPriority {
         // Média prioridade
         "doodstream" to 3,
         "mixdrop" to 4,
+        "playerembedapi" to 3,
+        "megaembed" to 3,
         
         // Servidores adicionais
         "mediafire" to 5,

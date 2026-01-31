@@ -16,24 +16,18 @@ object BRExtractorUtils {
      * Menor número = maior prioridade
      */
     val SERVER_PRIORITY = mapOf(
+        // Alta prioridade - rápidos e confiáveis
         "streamtape" to 1,
         "strtape" to 1,
-        "strtpe" to 1,
-        "filemoon" to 2,
-        "moonmov" to 2,
-        "doodstream" to 3,
-        "dood" to 3,
-        "myvidplay" to 3,
-        "bysebuho" to 3,
-        "g9r6" to 3,
-        "mixdrop" to 4,
-        "mxtape" to 4,
-        "uqload" to 5,
-        "upstream" to 6,
-        "vidcloud" to 7,
-        "embedplay" to 8,
-        "playerembedapi" to 9,
-        "megaembed" to 10
+        "playerembedapi" to 2,   // NOVO: Alta prioridade
+        "megaembed" to 2,        // NOVO: Alta prioridade
+        
+        // Média prioridade
+        "filemoon" to 3,
+        "myvidplay" to 4,
+        "doodstream" to 5,       // Demora muito
+        "dood" to 5,
+        "mixdrop" to 6,
     )
 
     /**

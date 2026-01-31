@@ -63,7 +63,7 @@ object RegexPatterns {
     val SERVER_NAME = Regex("""'([^']*)'\)""")
     
     /** Detecta tipo de servidor em URL */
-    val SERVER_TYPE = Regex("""(streamtape|filemoon|doodstream|mixdrop|mediafire)""", RegexOption.IGNORE_CASE)
+    val SERVER_TYPE = Regex("""(streamtape|filemoon|doodstream|mixdrop|mediafire|playerembedapi|megaembed)""", RegexOption.IGNORE_CASE)
     
     // ==================== URL PARAMETERS ====================
     

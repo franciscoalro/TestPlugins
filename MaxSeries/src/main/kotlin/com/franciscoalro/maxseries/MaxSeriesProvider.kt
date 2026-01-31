@@ -5,6 +5,12 @@ import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Document
 import android.util.Log
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Deferred
+import kotlin.collections.mutableListOf
+import java.util.concurrent.atomic.AtomicInteger
 
 // Utilitários brasileiros
 import com.franciscoalro.maxseries.utils.ServerPriority
@@ -16,8 +22,10 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIWebViewExtractor
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
+import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
 import com.franciscoalro.maxseries.extractors.StreamtapeExtractor
@@ -25,13 +33,47 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 /**
- * MaxSeries Provider v233 - Suporte viewplayer.online + Logs (Jan 2026)
- * 
+ * MaxSeries Provider v239 - PlayerEmbedAPI Direct v4.1 (Jan 2026)
+ *
+ * v239 Changes (30 Jan 2026):
+ * - 🎯 PlayerEmbedAPI v4.1 agora é o extractor PRIMÁRIO (AES-CTR)
+ * - 🚀 ShortIcu movido para fallback secundário
+ * - 🔧 Correção: Provider chama diretamente o extractor com base64 detection
+ *
+ * v238 Changes (30 Jan 2026):
+ * - 🔧 PlayerEmbedAPI v4.1: Múltiplos padrões de regex para base64
+ * - 🎯 Enhanced Base64 Detection com validação
+ * - 📄 Log detalhado do HTML quando não encontra dados
+ * - ⚡ Fallback regex melhorado
+ *
+ * v237 Changes (30 Jan 2026):
+ * - 🐍 PORTE: Algoritmo AES-CTR do PlayerEmbedAPI portado do Python
+ * - 🎯 MULTI-QUALITY: Suporte a 360p, 720p, 1080p simultâneos
+ * - 🚀 PlayerEmbedAPI v4.0 com logging detalhado e fallbacks
+ * - ⚡ Cache por qualidade individual
+ *
+ * v236 Changes (30 Jan 2026):
+ * - 🚀 NOVO: PlayerThreeBloggerExtractor para fluxo playerthree → tason.me → googlevideo
+ * - 🎯 Extrai contentId do HTML e segue redirect para obter URL do googlevideo
+ * - ⚡ Mais rápido que WebView para esse fluxo específico
+ *
+ * v235 Changes (30 Jan 2026):
+ * - 🐛 CORREÇÃO: Erros de coroutine resolvidos (suspend functions em callbacks)
+ * - 🔄 Refatorado: launch → async/awaitAll para extração paralela
+ * - ✅ mutex.withLock agora chamado corretamente dentro de coroutine context
+ *
+ * v234 Changes (30 Jan 2026):
+ * - 🚀 EXTRAÇÃO PARALELA: Todos os extractors rodam simultaneamente
+ * - ⏱️ TIMEOUT GLOBAL: 15 segundos máximo para todo o processo
+ * - 🎯 PRIORIZAÇÃO OTIMIZADA: PlayerEmbedAPI > MyVidPlay > MegaEmbed > DoodStream
+ * - ⚡ EARLY EXIT: Para imediatamente quando encontra o primeiro link
+ * - 🔒 LIMITE DE TENTATIVAS: Máximo 3 extractors simultâneos
+ *
  * v233 Changes (30 Jan 2026):
  * - 🎬 Suporte para viewplayer.online (filmes)
  * - 📝 Logs detalhados para debug de sources
  * - 🔍 Melhora detecção quando não há episódios
- * 
+ *
  * v232 Changes (30 Jan 2026):
  * - 🚀 NOVO: PlayerEmbedAPI ShortIcu Extractor
  * - ⚡ Extrai vídeo via short.icu (mais rápido, sem WebView)
@@ -61,7 +103,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v233"
+    override var name = "MaxSeries v238"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -75,9 +117,9 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v233 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v239 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
-        Log.wtf(TAG, "Extractors: PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
+        Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v233 ShortIcu), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")
         Log.wtf(TAG, "Categories: 23 (Inicio, Em Alta, Adicionados Recentemente, 20 generos)")
     }
 
@@ -498,6 +540,7 @@ class MaxSeriesProvider : MainAPI() {
 
     /**
      * Extrai links de um episódio específico do playerthree
+     * OTIMIZADO v234: Extração paralela com timeout e early exit
      */
     private suspend fun extractFromPlayerthreeEpisode(
         playerthreeUrl: String,
@@ -506,21 +549,19 @@ class MaxSeriesProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Int {
-        var linksFound = 0
+        // 🔥 Timeout global para todo o processo de extração
+        val extractionTimeout = 15_000L // 15 segundos máximo para tudo
         
-        try {
+        val linksFound = AtomicInteger(0)
+        val mutex = Mutex()
+        
+        return try {
             // CORREÇÃO v167: playerthree.online mudou!
-            // O site NÃO carrega botões via hash (#seasonId_episodeId).
-            // É necessário fazer request direto para /episodio/{episodeId}
             val episodeUrl = "https://playerthree.online/episodio/$episodeId"
-            
             Log.d(TAG, "🎬 Buscando episódio: $episodeUrl")
             
-            // Headers customizados usando HeadersBuilder
             val headers = HeadersBuilder.standard(playerthreeUrl)
-            
             val response = app.get(episodeUrl, headers = headers)
-            
             val html = response.text
             
             // Extrair botões de player com data-source
@@ -540,157 +581,233 @@ class MaxSeriesProvider : MainAPI() {
             }
             Log.d(TAG, "🎯========== FIM DA LISTA ==========")
             
-            // PRIORIZAÇÃO AUTOMÁTICA usando ServerPriority
-            val sortedSources = ServerPriority.sortByPriority(sources) { source ->
-                ServerPriority.detectServer(source)
-            }
-            
-            Log.wtf(TAG, "🎬 PROCESSANDO ${sortedSources.size} SOURCES PARA O PLAYER...")
-            
-            // v232: Processar TODOS os sources, mesmo se alguns falharem
-            var processedCount = 0
-            var successCount = 0
-            
-            for (source in sortedSources) {
-                try {
-                    Log.d(TAG, "🔍 [${processedCount + 1}/${sortedSources.size}] Processando: $source")
-                    processedCount++
-                    when {
-                        // v209: MyVidPlay PRIMEIRO (funciona sem iframe!)
-                        source.contains("myvidplay", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando MyVidPlayExtractor...")
-                            try {
-                                MyVidPlayExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ MyVidPlay: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ MyVidPlay falhou: ${e.message}")
-                            }
-                        }
-                        // MegaEmbed V9 (principal - ~95% sucesso)
-                        source.contains("megaembed", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando MegaEmbedExtractorV9...")
-                            try {
-                                MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ MegaEmbed: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ MegaEmbed falhou: ${e.message}")
-                            }
-                        }
-                        // v232: PlayerEmbedAPI com ShortIcu Extractor (NOVO!)
-                        source.contains("playerembedapi", ignoreCase = true) -> {
-                            Log.wtf(TAG, "🌐🌐🌐 PLAYEREMBEDAPI v232 (ShortIcu)! 🌐🌐🌐")
-                            try {
-                                // NOVO: Tenta ShortIcu primeiro (mais rápido e confiável)
-                                val extractor = PlayerEmbedAPIShortIcuExtractor()
-                                val initialCount = linksFound
-                                
-                                extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
-                                    callback(link)
-                                    linksFound++
-                                    successCount++
-                                }
-                                
-                                if (linksFound > initialCount) {
-                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v232 (ShortIcu): SUCESSO ✅✅✅")
-                                } else {
-                                    // Fallback para WebView se ShortIcu falhar
-                                    Log.w(TAG, "⚠️ ShortIcu não retornou links, tentando WebView...")
-                                    try {
-                                        val webviewExtractor = PlayerEmbedAPIWebViewExtractor()
-                                        val links = webviewExtractor.extractFromUrl(source, episodeUrl)
-                                        if (links.isNotEmpty()) {
-                                            links.forEach { callback(it) }
-                                            linksFound += links.size
-                                            successCount += links.size
-                                            Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v232 (WebView): ${links.size} links ✅✅✅")
-                                        } else {
-                                            Log.e(TAG, "❌❌❌ PlayerEmbedAPI v232: SEM LINKS ❌❌❌")
-                                        }
-                                    } catch (webviewError: Exception) {
-                                        Log.e(TAG, "❌ PlayerEmbedAPI WebView falhou: ${webviewError.message}")
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌❌❌ PlayerEmbedAPI v232 ERRO: ${e.message} ❌❌❌")
-                                e.printStackTrace()
-                            }
-                        }
-                        // DoodStream (muito popular - v209)
-                        source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando DoodStreamExtractor...")
-                            try {
-                                DoodStreamExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ DoodStream: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ DoodStream falhou: ${e.message}")
-                            }
-                        }
-                        // StreamTape (alternativa confiável - v209)
-                        source.contains("streamtape", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando StreamtapeExtractor...")
-                            try {
-                                StreamtapeExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ StreamTape: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ StreamTape falhou: ${e.message}")
-                            }
-                        }
-                        // Mixdrop (backup - v209)
-                        source.contains("mixdrop", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando MixdropExtractor...")
-                            try {
-                                MixdropExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ Mixdrop: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ Mixdrop falhou: ${e.message}")
-                            }
-                        }
-                        // Filemoon (novo - v209)
-                        source.contains("filemoon", ignoreCase = true) -> {
-                            Log.d(TAG, "⚡ Tentando FilemoonExtractor...")
-                            try {
-                                FilemoonExtractor().getUrl(source, episodeUrl, subtitleCallback, callback)
-                                linksFound++
-                                successCount++
-                                Log.d(TAG, "✅ Filemoon: SUCESSO")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ Filemoon falhou: ${e.message}")
-                            }
-                        }
-                        else -> {
-                             Log.d(TAG, "⚠️ Source desconhecida, tentando loader genérico: $source")
-                             try {
-                                 loadExtractor(source, episodeUrl, subtitleCallback, callback)
-                                 linksFound++
-                                 successCount++
-                             } catch (e: Exception) {
-                                 Log.e(TAG, "❌ Loader genérico falhou: ${e.message}")
-                             }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "❌ Erro ao processar source: $source", e)
+            // 🔥 PRIORIZAÇÃO OTIMIZADA: mais rápidos primeiro
+            // Ordem: PlayerThreeBlogger > PlayerEmbedAPI > MyVidPlay > MegaEmbed > DoodStream > outros
+            val priorityOrder = listOf("playerthreeblogger", "playerembedapi", "myvidplay", "megaembed", "doodstream", "streamtape", "mixdrop", "filemoon")
+            val sortedSources = sources.sortedBy { source ->
+                val lower = source.lowercase()
+                priorityOrder.indexOfFirst { lower.contains(it) }.let { 
+                    if (it == -1) priorityOrder.size else it 
                 }
             }
             
-            // v232: Log resumo final
-            Log.wtf(TAG, "📊 RESUMO: $successCount/$processedCount sources com sucesso | Total links: $linksFound")
-
+            Log.wtf(TAG, "🎬 PROCESSANDO ${sortedSources.size} SOURCES PARA O PLAYER (v234 - PARALELO)...")
+            
+            // 🔥 EXTRAÇÃO PARALELA com timeout e early exit
+            withTimeoutOrNull(extractionTimeout) {
+                coroutineScope {
+                    val jobs = mutableListOf<Deferred<Unit>>()
+                    var attempts = 0
+                    val maxAttempts = 3 // Limite máximo de tentativas simultâneas
+                    
+                    // Processar sources em ordem de prioridade
+                    for (source in sortedSources) {
+                        // 🚨 Early exit: se já encontrou links, para tudo
+                        if (linksFound.get() > 0) {
+                            Log.d(TAG, "✅ Links encontrados, encerrando busca paralela")
+                            coroutineContext.cancelChildren()
+                            break
+                        }
+                        
+                        // 🚨 Limite máximo de tentativas
+                        if (attempts >= maxAttempts && linksFound.get() == 0) {
+                            Log.w(TAG, "⚠️ Máximo de tentativas ($maxAttempts) atingido sem sucesso")
+                            break
+                        }
+                        
+                        attempts++
+                        
+                        // Lançar cada extractor em paralelo usando async
+                        val job = async(Dispatchers.IO) {
+                            try {
+                                Log.d(TAG, "🔍 [$attempts/${sortedSources.size}] Processando: ${ServerPriority.detectServer(source)}")
+                                
+                                when {
+                                    // Prioridade 0: PlayerThreeBlogger (fluxo playerthree → tason.me → googlevideo)
+                                    source.contains("playerthree.online", ignoreCase = true) || 
+                                    source.contains("tason.me", ignoreCase = true) -> {
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 0 - PlayerThreeBlogger: ${source.take(60)}...")
+                                        try {
+                                            val extractor = PlayerThreeBloggerExtractor()
+                                            val links = mutableListOf<ExtractorLink>()
+                                            extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                                links.add(link)
+                                            }
+                                            mutex.withLock {
+                                                if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                    links.forEach { callback(it) }
+                                                    linksFound.addAndGet(links.size)
+                                                    Log.wtf(TAG, "✅✅✅ PlayerThreeBlogger: SUCESSO (early exit ativado) ✅✅✅")
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "❌ PlayerThreeBlogger falhou: ${e.message}")
+                                        }
+                                    }
+                                    // Prioridade 1: PlayerEmbedAPI v4.1 (AES-CTR - mais confiável)
+                                    source.contains("playerembedapi", ignoreCase = true) -> {
+                                        Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI v4.1: ${source.take(60)}...")
+                                        try {
+                                            val extractor = PlayerEmbedAPIExtractor()
+                                            val links = mutableListOf<ExtractorLink>()
+                                            extractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                                links.add(link)
+                                            }
+                                            mutex.withLock {
+                                                if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                    links.forEach { callback(it) }
+                                                    linksFound.addAndGet(links.size)
+                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v4.1: SUCESSO (early exit ativado) ✅✅✅")
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v4.1 falhou: ${e.message}")
+                                            // Fallback para ShortIcu
+                                            Log.w(TAG, "⚠️ Tentando ShortIcu como fallback...")
+                                            try {
+                                                val shortExtractor = PlayerEmbedAPIShortIcuExtractor()
+                                                val links = mutableListOf<ExtractorLink>()
+                                                shortExtractor.getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                                    links.add(link)
+                                                }
+                                                mutex.withLock {
+                                                    if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                        links.forEach { callback(it) }
+                                                        linksFound.addAndGet(links.size)
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI ShortIcu: SUCESSO ✅✅✅")
+                                                    }
+                                                }
+                                            } catch (shortError: Exception) {
+                                                Log.e(TAG, "❌ ShortIcu também falhou: ${shortError.message}")
+                                            }
+                                        }
+                                    }
+                                    // Prioridade 2: MyVidPlay
+                                    source.contains("myvidplay", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ PRIORIDADE 2 - MyVidPlay: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        MyVidPlayExtractor().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ MyVidPlay: SUCESSO (early exit ativado)")
+                                            }
+                                        }
+                                    }
+                                    // Prioridade 3: MegaEmbed
+                                    source.contains("megaembed", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ PRIORIDADE 3 - MegaEmbed: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        MegaEmbedExtractorV9().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ MegaEmbed: SUCESSO (early exit ativado)")
+                                            }
+                                        }
+                                    }
+                                    // Prioridade 4: DoodStream (mais lento)
+                                    source.contains("doodstream", ignoreCase = true) || source.contains("dood.", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ PRIORIDADE 4 - DoodStream: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        DoodStreamExtractor().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ DoodStream: SUCESSO (early exit ativado)")
+                                            }
+                                        }
+                                    }
+                                    // Outros: StreamTape
+                                    source.contains("streamtape", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ StreamTape: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        StreamtapeExtractor().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ StreamTape: SUCESSO")
+                                            }
+                                        }
+                                    }
+                                    // Outros: Mixdrop
+                                    source.contains("mixdrop", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ Mixdrop: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        MixdropExtractor().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ Mixdrop: SUCESSO")
+                                            }
+                                        }
+                                    }
+                                    // Outros: Filemoon
+                                    source.contains("filemoon", ignoreCase = true) -> {
+                                        Log.d(TAG, "⚡ Filemoon: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        FilemoonExtractor().getUrl(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ Filemoon: SUCESSO")
+                                            }
+                                        }
+                                    }
+                                    else -> {
+                                        Log.d(TAG, "⚠️ Loader genérico: ${source.take(60)}...")
+                                        val links = mutableListOf<ExtractorLink>()
+                                        loadExtractor(source, episodeUrl, subtitleCallback) { link ->
+                                            links.add(link)
+                                        }
+                                        mutex.withLock {
+                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                links.forEach { callback(it) }
+                                                linksFound.addAndGet(links.size)
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "❌ Erro processando ${ServerPriority.detectServer(source)}: ${e.message}")
+                            }
+                            Unit
+                        }
+                        jobs.add(job)
+                    }
+                    
+                    // Aguardar todos os jobs completarem
+                    jobs.awaitAll()
+                }
+            } ?: run {
+                Log.w(TAG, "⏱️ Timeout global ($extractionTimeout ms) atingido")
+            }
+            
+            Log.wtf(TAG, "📊 RESUMO v234: ${linksFound.get()} links encontrados em paralelo")
+            linksFound.get()
+            
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro ao extrair episódio: ${e.message}")
+            linksFound.get()
         }
-        
-        return linksFound
     }
 
     /**

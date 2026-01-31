@@ -1,7 +1,7 @@
-version = 233
+version = 238
 
 cloudstream {
-    description = "MaxSeries v233 - Suporte viewplayer.online + Logs detalhados"
+    description = "MaxSeries v238 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

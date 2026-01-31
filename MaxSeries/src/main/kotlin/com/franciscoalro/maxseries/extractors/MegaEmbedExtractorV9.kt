@@ -2,6 +2,7 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import android.webkit.*
 import android.os.Handler
 import android.os.Looper
@@ -314,12 +315,17 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         // Cacheia para o futuro
         VideoUrlCache.put(originalUrl, link, quality, name)
         
-        M3u8Helper.generateM3u8(
-            source = name,
-            streamUrl = link,
-            referer = mainUrl,
-            headers = cdnHeaders
-        ).forEach(callback)
+        callback.invoke(
+            newExtractorLink(
+                source = name,
+                name = "$name Auto",
+                url = link,
+                type = ExtractorLinkType.M3U8
+            ) {
+                this.referer = mainUrl
+                this.headers = cdnHeaders
+            }
+        )
     }
 
     private fun extractVideoId(url: String): String? {

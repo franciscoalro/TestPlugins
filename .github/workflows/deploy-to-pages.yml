@@ -8,6 +8,11 @@ on:
       - 'repo.json'
       - 'plugins.json'
   workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Motivo do deploy manual'
+        required: false
+        default: 'Deploy manual'
 
 permissions:
   contents: read

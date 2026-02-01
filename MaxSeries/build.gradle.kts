@@ -1,7 +1,7 @@
-﻿version = 257
+version = 258
 
 cloudstream {
-    description = "MaxSeries v257 - PlayerEmbedAPI V8+V7 Fixes"
+    description = "MaxSeries v258 - Clean Build & Fixed Repository"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

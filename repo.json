@@ -3,6 +3,6 @@
     "description": "Repositorio brasileiro de extensoes para CloudStream",
     "manifestVersion": 1,
     "pluginLists": [
-        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/builds/plugins.json"
     ]
 }

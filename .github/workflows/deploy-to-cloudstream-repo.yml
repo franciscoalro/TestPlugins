@@ -6,6 +6,11 @@ on:
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Motivo do deploy manual'
+        required: false
+        default: 'Deploy manual'
 
 permissions:
   contents: read
@@ -13,7 +18,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
       - name: Checkout TestPlugins
@@ -29,18 +34,36 @@ jobs:
           path: cloudstream-repo
 
       - name: Download Build Artifacts
+        if: github.event_name == 'workflow_run'
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           path: artifacts
+          name: Cloudstream-Plugins
 
-      - name: Copy CS3 and JAR Files
+      - name: Copy CS3 and JAR Files (from artifacts)
+        if: github.event_name == 'workflow_run'
         run: |
-          echo "📦 Copiando arquivos .cs3 e .jar..."
+          echo "📦 Copiando arquivos .cs3 e .jar dos artefatos..."
           mkdir -p cloudstream-repo/builds
-          find artifacts -name "*.cs3" -exec cp {} cloudstream-repo/builds/ \;
-          find artifacts -name "*.jar" -exec cp {} cloudstream-repo/builds/ \;
+          
+          # Copiar arquivos dos artefatos
+          cp artifacts/*.cs3 cloudstream-repo/builds/ 2>/dev/null || true
+          cp artifacts/*.jar cloudstream-repo/builds/ 2>/dev/null || true
+          
+          ls -la cloudstream-repo/builds/
+
+      - name: Copy CS3 and JAR Files (from local builds)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📦 Copiando arquivos .cs3 e .jar do diretorio local builds/..."
+          mkdir -p cloudstream-repo/builds
+          
+          # Copiar do diretório builds local
+          cp testplugins/builds/*.cs3 cloudstream-repo/builds/ 2>/dev/null || true
+          cp testplugins/builds/*.jar cloudstream-repo/builds/ 2>/dev/null || true
+          
           ls -la cloudstream-repo/builds/
 
       - name: Update repo.json and plugins.json

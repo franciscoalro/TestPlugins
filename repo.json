@@ -4,6 +4,6 @@
     "description":  "RepositÃ³rio brasileiro com filmes, sÃ©ries, animes, doramas, novelas e TV ao vivo",
     "manifestVersion":  1,
     "pluginLists":  [
-                        "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/plugins.json"
+                        "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/plugins.json"
                     ]
 }

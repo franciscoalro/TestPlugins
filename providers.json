@@ -24,7 +24,7 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "MaxSeries v258 - BOM Fix & Clean Build",
+        "description": "MaxSeries v256 - BOM Fix & Clean Build",
         "version": 256,
         "authors": [
             "franciscoalro"

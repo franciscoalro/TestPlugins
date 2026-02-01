@@ -1,8 +1,6 @@
 {
   "name": "BRCloudStream",
-  "url": "https://franciscoalro.github.io/brcloudstream/plugins.json",
+  "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/plugins.json",
   "description": "Repositório brasileiro com filmes, séries, animes, doramas, novelas e TV ao vivo",
-  "author": "franciscoalro",
-  "icon": "https://franciscoalro.github.io/brcloudstream/icon.png",
-  "homepage": "https://github.com/franciscoalro/brcloudstream"
+  "author": "franciscoalro"
 }

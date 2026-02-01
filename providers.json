@@ -1,38 +1,38 @@
-[
+﻿[
     {
-        "name": "AnimesOnlineCC",
-        "description": "Assista animes online grátis em HD - v8 Updated",
-        "version": 8,
-        "authors": [
-            "franciscoalro"
-        ],
-        "status": 1,
-        "language": "pt-BR",
-        "tvTypes": [
-            "Anime",
-            "OVA",
-            "AnimeMovie"
-        ],
-        "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v46.0/AnimesOnlineCC.cs3"
+        "name":  "AnimesOnlineCC",
+        "description":  "Assista animes online grÃ¡tis em HD - v8 Updated",
+        "version":  8,
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "status":  1,
+        "language":  "pt-BR",
+        "tvTypes":  [
+                        "Anime",
+                        "OVA",
+                        "AnimeMovie"
+                    ],
+        "iconUrl":  "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v46.0/AnimesOnlineCC.cs3"
     },
     {
-        "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
-        "version": 257,
-        "description": "MaxSeries v257 - BUILD CORRIGIDO",
-        "status": 1,
-        "fileSize": 653406,
-        "sha256": "F196D78CDF6407617EE32B2D87C89D15B38C935A1272CFEAB3CF30C3B55B641C",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "authors": [
-            "franciscoalro"
-        ],
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "language": "pt-BR",
-        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
+        "name":  "MaxSeries",
+        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
+        "version":  257,
+        "description":  "MaxSeries v257 - BUILD CORRIGIDO",
+        "status":  1,
+        "fileSize":  653406,
+        "sha256":  "F196D78CDF6407617EE32B2D87C89D15B38C935A1272CFEAB3CF30C3B55B641C",
+        "tvTypes":  [
+                        "TvSeries",
+                        "Movie"
+                    ],
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
+        "language":  "pt-BR",
+        "iconUrl":  "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
     }
 ]

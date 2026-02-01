@@ -1,0 +1,131 @@
+name: Sync Metadata After Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-metadata:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Release Info
+        id: release
+        run: |
+          # Extrair versão da tag
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Buscar informações do release
+          RELEASE_DATA=$(gh release view "v$VERSION" --json assets,tagName)
+          echo "release_data=$RELEASE_DATA" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calculate SHA256 and Update JSONs
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          echo "🔍 Processando release v$VERSION..."
+          
+          # Download dos arquivos .cs3 da release
+          gh release download "v$VERSION" --pattern "*.cs3" --dir temp_cs3
+          
+          # Processar cada arquivo .cs3
+          for cs3_file in temp_cs3/*.cs3; do
+            PLUGIN_NAME=$(basename "$cs3_file" .cs3)
+            FILE_SIZE=$(stat -f%z "$cs3_file" 2>/dev/null || stat -c%s "$cs3_file")
+            SHA256=$(sha256sum "$cs3_file" | awk '{print toupper($1)}')
+            
+            echo "📦 $PLUGIN_NAME:"
+            echo "   Size: $FILE_SIZE bytes"
+            echo "   SHA256: $SHA256"
+            
+            # Atualizar plugins.json
+            jq --arg name "$PLUGIN_NAME" \
+               --arg version "$VERSION" \
+               --arg size "$FILE_SIZE" \
+               --arg hash "$SHA256" \
+               --arg url "https://github.com/${{ github.repository }}/releases/download/v$VERSION/$PLUGIN_NAME.cs3" \
+               --arg date "$(date +'%Y-%m-%d %H:%M:%S')" \
+               '(.[] | select(.name == $name) | .version) = ($version | tonumber) |
+                (.[] | select(.name == $name) | .fileSize) = ($size | tonumber) |
+                (.[] | select(.name == $name) | .fileHash) = $hash |
+                (.[] | select(.name == $name) | .url) = $url |
+                (.[] | select(.name == $name) | .updatedAt) = $date' \
+               plugins.json > plugins.json.tmp && mv plugins.json.tmp plugins.json
+            
+            # Atualizar providers.json
+            jq --arg name "$PLUGIN_NAME" \
+               --arg version "$VERSION" \
+               --arg size "$FILE_SIZE" \
+               --arg hash "$SHA256" \
+               --arg url "https://github.com/${{ github.repository }}/releases/download/v$VERSION/$PLUGIN_NAME.cs3" \
+               '(.[] | select(.name == $name) | .version) = ($version | tonumber) |
+                (.[] | select(.name == $name) | .fileSize) = ($size | tonumber) |
+                (.[] | select(.name == $name) | .sha256) = $hash |
+                (.[] | select(.name == $name) | .url) = $url' \
+               providers.json > providers.json.tmp && mv providers.json.tmp providers.json
+          done
+          
+          rm -rf temp_cs3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update CloudstreamRepo Submodule
+        run: |
+          cd CloudstreamRepo
+          
+          # Copiar plugins.json atualizado
+          cp ../plugins.json .
+          
+          # Commit no submódulo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          if [[ -n $(git status --porcelain) ]]; then
+            git add plugins.json
+            git commit -m "Auto-sync: Update metadata for v${{ steps.release.outputs.version }}"
+            git push
+            echo "✅ CloudstreamRepo atualizado"
+          else
+            echo "ℹ️ Nenhuma alteração no CloudstreamRepo"
+          fi
+
+      - name: Commit and Push Main Repo
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          git add plugins.json providers.json CloudstreamRepo
+          
+          if [[ -n $(git status --porcelain) ]]; then
+            git commit -m "chore(v${{ steps.release.outputs.version }}): Auto-sync metadata with correct SHA256 hashes"
+            git push
+            echo "✅ Metadados sincronizados com sucesso!"
+          else
+            echo "ℹ️ Nenhuma alteração detectada"
+          fi
+
+      - name: Create Summary
+        run: |
+          echo "## 🔄 Metadata Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release: v${{ steps.release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **plugins.json** atualizado" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **providers.json** atualizado" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **CloudstreamRepo** sincronizado" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [CloudstreamRepo](https://github.com/franciscoalro/CloudstreamRepo)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Plugin JSON](https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/plugins.json)" >> $GITHUB_STEP_SUMMARY

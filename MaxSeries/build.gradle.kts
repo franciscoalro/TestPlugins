@@ -1,7 +1,7 @@
-version = 256
+﻿version = 257
 
 cloudstream {
-    description = "MaxSeries v256 - PlayerEmbedAPI V8+V7 Fixes (Pure HTTP + WebView Optimized, Timeout 25s, 12 URL Patterns)"
+    description = "MaxSeries v257 - PlayerEmbedAPI V8+V7 Fixes"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")
@@ -11,12 +11,6 @@ cloudstream {
 
 android {
     namespace = "com.franciscoalro.maxseries"
-    
-    sourceSets {
-        getByName("main") {
-            res.srcDirs("src/main/res")
-        }
-    }
     
     buildTypes {
         getByName("release") {

@@ -1,69 +1,105 @@
-# Script para deploy do CloudstreamRepo para GitHub Pages
-# Atualiza os JSONs e faz commit/push
+# Script de Deploy para GitHub Pages
+# BRCloudStream Repository
 
-$ErrorActionPreference = "Stop"
+param(
+    [string]$CommitMessage = "Update repository - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+)
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  DEPLOY CLOUDSTREAM REPO - GITHUB PAGES" -ForegroundColor Cyan
+Write-Host "   BRCloudStream - Deploy Script       " -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
 
-$RepoDir = "C:\Users\KYTHOURS\Desktop\brcloudstream\CloudstreamRepo"
-
-# Verificar se está na pasta correta
-if (-not (Test-Path "$RepoDir\plugins.json")) {
-    Write-Host "❌ ERRO: Pasta CloudstreamRepo não encontrada!" -ForegroundColor Red
+# Verificar se estamos em um repositorio git
+if (-not (Test-Path .git)) {
+    Write-Host "ERRO: Nao esta em um repositorio git!" -ForegroundColor Red
+    Write-Host "Execute primeiro: git init" -ForegroundColor Yellow
     exit 1
 }
 
-Set-Location $RepoDir
-
-# Verificar status do git
-Write-Host "`n📊 Status do repositório:" -ForegroundColor Yellow
-git status --short
-
-# Adicionar arquivos modificados
-Write-Host "`n📤 Adicionando arquivos..." -ForegroundColor Yellow
-git add plugins.json
-git add repo.json
-git add releases\MaxSeries-v256.cs3
-
-# Verificar se há algo para commitar
-$status = git status --porcelain
-if (-not $status) {
-    Write-Host "`n⚠️ Nenhuma alteração para commitar." -ForegroundColor Yellow
-    exit 0
+# Copiar arquivos para a pasta builds (se necessario)
+Write-Host "1. Verificando arquivos .cs3..." -ForegroundColor Yellow
+$cs3Files = Get-ChildItem -Path "builds/*.cs3" -ErrorAction SilentlyContinue
+if ($cs3Files.Count -eq 0) {
+    Write-Host "   Copiando arquivos .aar para builds..." -ForegroundColor Gray
+    New-Item -ItemType Directory -Force -Path "builds" | Out-Null
+    Get-ChildItem -Path "*/build/outputs/aar/*-release.aar" | ForEach-Object {
+        $name = $_.Name -replace "-release.aar", ".cs3"
+        Copy-Item $_.FullName -Destination "builds/$name" -Force
+        Write-Host "   Copiado: $name" -ForegroundColor Green
+    }
 }
 
-# Criar commit
-$CommitMessage = "Update to v256 - PlayerEmbedAPI V8+V7 Fixes`n`n- PlayerEmbedAPI V8: 12 URL patterns, improved regex`n- PlayerEmbedAPI V7: Memory leak fix, atomic cleanup flag`n- Provider: Timeout 25s, maxAttempts 5`n- MaxSeries.cs3: 638 KB`n- Updated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+# Verificar arquivos necessarios
+Write-Host "2. Verificando arquivos do repositorio..." -ForegroundColor Yellow
+$requiredFiles = @("builds/plugins.json", "builds/repo.json", "builds/index.html")
+$allExist = $true
+foreach ($file in $requiredFiles) {
+    if (Test-Path $file) {
+        Write-Host "   OK: $file" -ForegroundColor Green
+    } else {
+        Write-Host "   FALTANDO: $file" -ForegroundColor Red
+        $allExist = $false
+    }
+}
 
-Write-Host "`n📝 Criando commit..." -ForegroundColor Yellow
-git commit -m $CommitMessage
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Falha ao criar commit" -ForegroundColor Red
+if (-not $allExist) {
+    Write-Host "ERRO: Alguns arquivos estao faltando!" -ForegroundColor Red
     exit 1
 }
 
-# Push para origin
-Write-Host "`n🚀 Fazendo push para GitHub..." -ForegroundColor Yellow
-git push origin main
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Falha no push. Tentando pull primeiro..." -ForegroundColor Yellow
-    git pull origin main --rebase
-    git push origin main
+# Listar arquivos .cs3
+Write-Host "3. Providers disponiveis:" -ForegroundColor Yellow
+Get-ChildItem -Path "builds/*.cs3" | ForEach-Object {
+    $sizeKB = [math]::Round($_.Length / 1KB, 2)
+    Write-Host "   - $($_.Name) (${sizeKB} KB)" -ForegroundColor Gray
 }
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "`n✅ DEPLOY CONCLUÍDO COM SUCESSO!" -ForegroundColor Green
-    Write-Host "`n📋 URLs atualizadas:" -ForegroundColor Cyan
-    Write-Host "   Repo: https://franciscoalro.github.io/CloudstreamRepo/repo.json" -ForegroundColor White
-    Write-Host "   Plugins: https://franciscoalro.github.io/CloudstreamRepo/plugins.json" -ForegroundColor White
-    Write-Host "`n⏱️  Aguarde 1-2 minutos para o GitHub Pages atualizar..." -ForegroundColor Yellow
+# Verificar branch gh-pages
+Write-Host "4. Configurando GitHub Pages..." -ForegroundColor Yellow
+$branches = git branch -a
+if ($branches -match "gh-pages") {
+    Write-Host "   Branch gh-pages existe" -ForegroundColor Green
 } else {
-    Write-Host "`n❌ Falha no deploy" -ForegroundColor Red
-    exit 1
+    Write-Host "   Criando branch gh-pages..." -ForegroundColor Gray
+    git checkout --orphan gh-pages
+    git rm -rf .
+    git add builds/
+    git mv builds/* .
+    git commit -m "Initial GitHub Pages commit"
+    git checkout main
+    Write-Host "   Branch gh-pages criada!" -ForegroundColor Green
 }
 
-Write-Host "`n========================================" -ForegroundColor Cyan
+# Commit na main
+Write-Host "5. Commitando alteracoes na main..." -ForegroundColor Yellow
+git add .
+git commit -m "$CommitMessage" -ErrorAction SilentlyContinue
+Write-Host "   Commit realizado!" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "              PROXIMOS PASSOS          " -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Para publicar no GitHub Pages:" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "1. Crie um repositorio no GitHub:" -ForegroundColor White
+Write-Host "   https://github.com/new" -ForegroundColor Gray
+Write-Host ""
+Write-Host "2. Envie o codigo:" -ForegroundColor White
+Write-Host "   git remote add origin https://github.com/SEU_USUARIO/brcloudstream.git" -ForegroundColor Gray
+Write-Host "   git push -u origin main" -ForegroundColor Gray
+Write-Host "   git push origin gh-pages" -ForegroundColor Gray
+Write-Host ""
+Write-Host "3. Configure o GitHub Pages:" -ForegroundColor White
+Write-Host "   - Va em Settings > Pages" -ForegroundColor Gray
+Write-Host "   - Source: Deploy from a branch" -ForegroundColor Gray
+Write-Host "   - Branch: gh-pages / root" -ForegroundColor Gray
+Write-Host ""
+Write-Host "4. URL do repositorio:" -ForegroundColor White
+Write-Host "   https://SEU_USUARIO.github.io/brcloudstream/plugins.json" -ForegroundColor Green
+Write-Host ""
+Write-Host "5. Shortcode sugerido: 'brcs'" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan

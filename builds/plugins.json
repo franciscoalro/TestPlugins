@@ -1,47 +1,130 @@
-[
+{
+  "name": "BRCloudStream Repository",
+  "description": "Repositório brasileiro de plugins para CloudStream com filmes, séries, animes, doramas, novelas e TV ao vivo",
+  "author": "franciscoalro",
+  "version": 3,
+  "repositoryUrl": "https://github.com/franciscoalro/brcloudstream",
+  "plugins": [
     {
-        "name": "AnimesOnlineCC",
-        "internalName": "AnimesOnlineCC",
-        "description": "Assista animes online gratis em HD no AnimesOnlineCC",
-        "version": 10,
-        "authors": [
-            "franciscoalro"
-        ],
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "status": 1,
-        "language": "pt-BR",
-        "tvTypes": [
-            "Anime",
-            "OVA",
-            "AnimeMovie"
-        ],
-        "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
-        "apiVersion": 1,
-        "isAdult": false,
-        "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v10/AnimesOnlineCC.cs3"
+      "name": "MaxSeries",
+      "description": "Filmes e séries com múltiplos extractores (PlayerEmbedAPI, MegaEmbed, DoodStream, etc.)",
+      "version": 256,
+      "versionCode": 256,
+      "url": "https://franciscoalro.github.io/brcloudstream/MaxSeries.cs3",
+      "status": 1,
+      "lang": ["pt"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
     },
     {
-        "name": "MaxSeries",
-        "internalName": "MaxSeries",
-        "description": "MaxSeries v257 - BUILD CORRIGIDO",
-        "version": 257,
-        "authors": [
-            "franciscoalro"
-        ],
-        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-        "status": 1,
-        "language": "pt-BR",
-        "tvTypes": [
-            "TvSeries",
-            "Movie"
-        ],
-        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
-        "apiVersion": 1,
-        "isAdult": false,
-        "fileSize": 654395,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
-        "fileHash": "E1464E768180953F37CFC4923748A55AAD6B6A101E540BB86A1FF05A3EBD5216",
-        "updatedAt": "2026-01-31 18:53:57"
+      "name": "Animes Online CC",
+      "description": "Animes online com posters em alta qualidade via Kitsu/Jikan API",
+      "version": 2,
+      "versionCode": 2,
+      "url": "https://franciscoalro.github.io/brcloudstream/AnimesOnlineCC.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Anime", "OVA", "AnimeMovie"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "Doramas Online",
+      "description": "Doramas coreanos, chineses e japoneses",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/Doramas.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "NovelasFlix",
+      "description": "Novelas mexicanas, brasileiras, colombianas e turcas",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/NovelasFlix.cs3",
+      "status": 1,
+      "lang": ["pt"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "Donghua No Sekai",
+      "description": "Animes chineses (Donghuas) com posters em alta qualidade",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/DonghuaNoSekai.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Anime", "OVA", "AnimeMovie"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "EmbedCanais TV",
+      "description": "TV Ao Vivo - Canais abertos, esportes, notícias e entretenimento",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/EmbedCanais.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "MegaFlix",
+      "description": "Filmes e séries online",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/MegaFlix.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "NetCine",
+      "description": "Filmes e séries online",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/NetCine.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "OverFlix",
+      "description": "Filmes e séries online",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/OverFlix.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "PobreFlix",
+      "description": "Filmes e séries online",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/PobreFlix.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
+    },
+    {
+      "name": "Vizer",
+      "description": "Filmes e séries online",
+      "version": 1,
+      "versionCode": 1,
+      "url": "https://franciscoalro.github.io/brcloudstream/Vizer.cs3",
+      "status": 1,
+      "lang": ["pt-BR"],
+      "tvTypes": ["Movie", "TvSeries"],
+      "authors": ["franciscoalro"]
     }
-]
+  ]
+}

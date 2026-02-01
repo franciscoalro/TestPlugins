@@ -2,10 +2,11 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, master]
     paths:
       - 'builds/**'
+      - 'repo.json'
+      - 'plugins.json'
   workflow_dispatch:
 
 permissions:
@@ -19,28 +20,39 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Pages
-        uses: actions/configure-pages@v4
-      
-      - name: Copy builds to root
+        uses: actions/configure-pages@v5
+
+      - name: Prepare files for Pages
         run: |
-          mkdir -p _site
-          cp -r builds/* _site/
+          mkdir -p _site/builds
+          cp repo.json _site/
+          cp plugins.json _site/builds/ 2>/dev/null || true
+          cp -r builds/* _site/builds/ 2>/dev/null || true
+          
+          echo "Files prepared:"
           ls -la _site/
-      
+          ls -la _site/builds/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '_site'
-      
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Output Repository URL
+        run: |
+          echo "## 🚀 Deploy Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Repository URL for CloudStream:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.deployment.outputs.page_url }}repo.json" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

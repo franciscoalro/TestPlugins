@@ -1,9 +1,9 @@
-{
-  "name": "BRCloudStream Repo",
-  "iconUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/icon.png",
-  "description": "Repositório brasileiro com filmes, séries, animes, doramas, novelas e TV ao vivo",
-  "manifestVersion": 1,
-  "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/plugins.json"
-  ]
+﻿{
+    "name":  "BRCloudStream Repo",
+    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/icon.png",
+    "description":  "RepositÃ³rio brasileiro com filmes, sÃ©ries, animes, doramas, novelas e TV ao vivo",
+    "manifestVersion":  1,
+    "pluginLists":  [
+                        "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/plugins.json"
+                    ]
 }

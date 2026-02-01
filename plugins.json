@@ -1,178 +1,232 @@
-[
-  {
-    "iconUrl": "https://www.maxseries.pics/favicon.ico",
-    "fileSize": 705175,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 256,
-    "internalName": "MaxSeries",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/MaxSeries.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/MaxSeries.cs3",
-    "name": "MaxSeries",
-    "description": "MaxSeries - Filmes e séries com múltiplos extractores"
-  },
-  {
-    "iconUrl": "https://animesonlinecc.to/favicon.ico",
-    "fileSize": 28951,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Anime", "OVA", "AnimeMovie"],
-    "version": 2,
-    "internalName": "AnimesOnlineCC",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/AnimesOnlineCC.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/AnimesOnlineCC.cs3",
-    "name": "Animes Online CC",
-    "description": "Animes Online CC - Animes com posters em alta qualidade via API"
-  },
-  {
-    "iconUrl": "https://doramasonline.co/wp-content/uploads/2025/07/cropped-doramas2-180x180.png",
-    "fileSize": 27889,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["AsianDrama"],
-    "version": 1,
-    "internalName": "Doramas",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/Doramas.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/Doramas.cs3",
-    "name": "Doramas Online",
-    "description": "Doramas Online - Doramas coreanos, chineses e japoneses"
-  },
-  {
-    "iconUrl": "https://novelasflix4k.me/favicon.ico",
-    "fileSize": 31538,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "NovelasFlix",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/NovelasFlix.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/NovelasFlix.cs3",
-    "name": "NovelasFlix",
-    "description": "NovelasFlix - Novelas mexicanas, brasileiras e turcas"
-  },
-  {
-    "iconUrl": "https://donghuanosekai.com/wp-content/uploads/2020/09/cropped-icon_dnsk.png",
-    "fileSize": 34582,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Anime", "AnimeMovie"],
-    "version": 1,
-    "internalName": "DonghuaNoSekai",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/DonghuaNoSekai.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/DonghuaNoSekai.cs3",
-    "name": "Donghua No Sekai",
-    "description": "Donghua No Sekai - Animes chineses (Donghuas)"
-  },
-  {
-    "iconUrl": "https://embedcanais.com/icons/embedcanaistv.png",
-    "fileSize": 20779,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Live"],
-    "version": 1,
-    "internalName": "EmbedCanais",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/EmbedCanais.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/EmbedCanais.cs3",
-    "name": "EmbedCanais TV",
-    "description": "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, notícias"
-  },
-  {
-    "iconUrl": "https://megaflix.co/favicon.ico",
-    "fileSize": 21904,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "MegaFlix",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/MegaFlix.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/MegaFlix.cs3",
-    "name": "MegaFlix",
-    "description": "MegaFlix - Filmes e séries online"
-  },
-  {
-    "iconUrl": "https://netcine.biz/favicon.ico",
-    "fileSize": 28938,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "NetCine",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/NetCine.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/NetCine.cs3",
-    "name": "NetCine",
-    "description": "NetCine - Filmes e séries online"
-  },
-  {
-    "iconUrl": "https://overflix.me/favicon.ico",
-    "fileSize": 40432,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "OverFlix",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/OverFlix.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/OverFlix.cs3",
-    "name": "OverFlix",
-    "description": "OverFlix - Filmes e séries online"
-  },
-  {
-    "iconUrl": "https://pobreflix.tv/favicon.ico",
-    "fileSize": 35241,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "PobreFlix",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/PobreFlix.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/PobreFlix.cs3",
-    "name": "PobreFlix",
-    "description": "PobreFlix - Filmes e séries online"
-  },
-  {
-    "iconUrl": "https://vizer.tv/favicon.ico",
-    "fileSize": 42867,
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/franciscoalro/CloudstreamRepo",
-    "status": 1,
-    "language": "pt",
-    "authors": ["franciscoalro"],
-    "tvTypes": ["Movie", "TvSeries"],
-    "version": 1,
-    "internalName": "Vizer",
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/Vizer.jar",
-    "url": "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/Vizer.cs3",
-    "name": "Vizer",
-    "description": "Vizer - Filmes e séries online"
-  }
+﻿[
+    {
+        "iconUrl":  "https://www.maxseries.pics/favicon.ico",
+        "fileSize":  705175,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  256,
+        "internalName":  "MaxSeries",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MaxSeries.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MaxSeries.cs3",
+        "name":  "MaxSeries",
+        "description":  "MaxSeries - Filmes e sÃ©ries com mÃºltiplos extractores"
+    },
+    {
+        "iconUrl":  "https://animesonlinecc.to/favicon.ico",
+        "fileSize":  28951,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Anime",
+                        "OVA",
+                        "AnimeMovie"
+                    ],
+        "version":  2,
+        "internalName":  "AnimesOnlineCC",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/AnimesOnlineCC.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/AnimesOnlineCC.cs3",
+        "name":  "Animes Online CC",
+        "description":  "Animes Online CC - Animes com posters em alta qualidade via API"
+    },
+    {
+        "iconUrl":  "https://doramasonline.co/wp-content/uploads/2025/07/cropped-doramas2-180x180.png",
+        "fileSize":  27889,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "AsianDrama"
+                    ],
+        "version":  1,
+        "internalName":  "Doramas",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Doramas.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Doramas.cs3",
+        "name":  "Doramas Online",
+        "description":  "Doramas Online - Doramas coreanos, chineses e japoneses"
+    },
+    {
+        "iconUrl":  "https://novelasflix4k.me/favicon.ico",
+        "fileSize":  31538,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "NovelasFlix",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NovelasFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NovelasFlix.cs3",
+        "name":  "NovelasFlix",
+        "description":  "NovelasFlix - Novelas mexicanas, brasileiras e turcas"
+    },
+    {
+        "iconUrl":  "https://donghuanosekai.com/wp-content/uploads/2020/09/cropped-icon_dnsk.png",
+        "fileSize":  34582,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Anime",
+                        "AnimeMovie"
+                    ],
+        "version":  1,
+        "internalName":  "DonghuaNoSekai",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/DonghuaNoSekai.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/DonghuaNoSekai.cs3",
+        "name":  "Donghua No Sekai",
+        "description":  "Donghua No Sekai - Animes chineses (Donghuas)"
+    },
+    {
+        "iconUrl":  "https://embedcanais.com/icons/embedcanaistv.png",
+        "fileSize":  20779,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Live"
+                    ],
+        "version":  1,
+        "internalName":  "EmbedCanais",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/EmbedCanais.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/EmbedCanais.cs3",
+        "name":  "EmbedCanais TV",
+        "description":  "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, notÃ­cias"
+    },
+    {
+        "iconUrl":  "https://megaflix.co/favicon.ico",
+        "fileSize":  21904,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "MegaFlix",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MegaFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MegaFlix.cs3",
+        "name":  "MegaFlix",
+        "description":  "MegaFlix - Filmes e sÃ©ries online"
+    },
+    {
+        "iconUrl":  "https://netcine.biz/favicon.ico",
+        "fileSize":  28938,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "NetCine",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NetCine.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NetCine.cs3",
+        "name":  "NetCine",
+        "description":  "NetCine - Filmes e sÃ©ries online"
+    },
+    {
+        "iconUrl":  "https://overflix.me/favicon.ico",
+        "fileSize":  40432,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "OverFlix",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/OverFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/OverFlix.cs3",
+        "name":  "OverFlix",
+        "description":  "OverFlix - Filmes e sÃ©ries online"
+    },
+    {
+        "iconUrl":  "https://pobreflix.tv/favicon.ico",
+        "fileSize":  35241,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "PobreFlix",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/PobreFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/PobreFlix.cs3",
+        "name":  "PobreFlix",
+        "description":  "PobreFlix - Filmes e sÃ©ries online"
+    },
+    {
+        "iconUrl":  "https://vizer.tv/favicon.ico",
+        "fileSize":  42867,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "Vizer",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Vizer.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Vizer.cs3",
+        "name":  "Vizer",
+        "description":  "Vizer - Filmes e sÃ©ries online"
+    }
 ]

@@ -1,4 +1,4 @@
-﻿version = 258
+version = 258
 
 cloudstream {
     description = "MaxSeries v258 - Clean Build & Fixed Repository"

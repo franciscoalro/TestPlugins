@@ -1,47 +1,47 @@
 ﻿[
     {
-        "name":  "AnimesOnlineCC",
-        "internalName":  "AnimesOnlineCC",
-        "description":  "Assista animes online gratis em HD no AnimesOnlineCC",
-        "version":  10,
-        "authors":  [
-                        "franciscoalro"
-                    ],
-        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
-        "status":  1,
-        "language":  "pt-BR",
-        "tvTypes":  [
-                        "Anime",
-                        "OVA",
-                        "AnimeMovie"
-                    ],
-        "iconUrl":  "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
-        "apiVersion":  1,
-        "isAdult":  false,
-        "fileSize":  15000,
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v10/AnimesOnlineCC.cs3"
+        "name": "AnimesOnlineCC",
+        "internalName": "AnimesOnlineCC",
+        "description": "Assista animes online gratis em HD no AnimesOnlineCC",
+        "version": 10,
+        "authors": [
+            "franciscoalro"
+        ],
+        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+        "status": 1,
+        "language": "pt-BR",
+        "tvTypes": [
+            "Anime",
+            "OVA",
+            "AnimeMovie"
+        ],
+        "iconUrl": "https://animesonlinecc.to/wp-content/uploads/2020/01/cropped-favicon-32x32.png",
+        "apiVersion": 1,
+        "isAdult": false,
+        "fileSize": 15000,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v10/AnimesOnlineCC.cs3"
     },
     {
-        "name":  "MaxSeries",
-        "internalName":  "MaxSeries",
-        "description":  "MaxSeries v257 - BUILD CORRIGIDO",
-        "version":  257,
-        "authors":  [
-                        "franciscoalro"
-                    ],
-        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
-        "status":  1,
-        "language":  "pt-BR",
-        "tvTypes":  [
-                        "TvSeries",
-                        "Movie"
-                    ],
-        "iconUrl":  "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
-        "apiVersion":  1,
-        "isAdult":  false,
-        "fileSize":  653406,
-        "url":  "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
-        "fileHash":  "F196D78CDF6407617EE32B2D87C89D15B38C935A1272CFEAB3CF30C3B55B641C",
-        "updatedAt":  "2026-01-31 18:53:57"
+        "name": "MaxSeries",
+        "internalName": "MaxSeries",
+        "description": "MaxSeries v257 - BUILD CORRIGIDO",
+        "version": 257,
+        "authors": [
+            "franciscoalro"
+        ],
+        "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+        "status": 1,
+        "language": "pt-BR",
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
+        "apiVersion": 1,
+        "isAdult": false,
+        "fileSize": 653406,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
+        "fileHash": "F196D78CDF6407617EE32B2D87C89D15B38C935A1272CFEAB3CF30C3B55B641C",
+        "updatedAt": "2026-01-31 22:00:00"
     }
 ]

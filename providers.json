@@ -18,12 +18,12 @@
     },
     {
         "name": "MaxSeries",
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v252/MaxSeries.cs3",
-        "version": 252,
-        "description": "MaxSeries v252 - PlayerEmbedAPI v4.1 Enhanced Base64 Detection + Multi-Quality Support",
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
+        "version": 257,
+        "description": "MaxSeries v257 - BUILD CORRIGIDO",
         "status": 1,
-        "fileSize": 228000,
-        "sha256": "",
+        "fileSize": 654395,
+        "sha256": "E1464E768180953F37CFC4923748A55AAD6B6A101E540BB86A1FF05A3EBD5216",
         "tvTypes": [
             "TvSeries",
             "Movie"
@@ -33,6 +33,6 @@
         ],
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "language": "pt-BR",
-        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
+        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png"
     }
 ]

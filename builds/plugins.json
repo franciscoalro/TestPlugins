@@ -16,7 +16,7 @@
         "version":  256,
         "internalName":  "MaxSeries",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3?v=1769995249",
         "name":  "MaxSeries",
         "description":  "MaxSeries - Filmes e series com multiplos extractores"
     },
@@ -38,7 +38,7 @@
         "version":  2,
         "internalName":  "AnimesOnlineCC",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC.cs3?v=1769995249",
         "name":  "Animes Online CC",
         "description":  "Animes Online CC - Animes com posters em alta qualidade via API"
     },
@@ -58,7 +58,7 @@
         "version":  1,
         "internalName":  "Doramas",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Doramas.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Doramas\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Doramas.cs3?v=1769995249",
         "name":  "Doramas Online",
         "description":  "Doramas Online - Doramas coreanos, chineses e japoneses"
     },
@@ -79,7 +79,7 @@
         "version":  1,
         "internalName":  "NovelasFlix",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NovelasFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NovelasFlix\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NovelasFlix.cs3?v=1769995249",
         "name":  "NovelasFlix",
         "description":  "NovelasFlix - Novelas mexicanas, brasileiras e turcas"
     },
@@ -100,7 +100,7 @@
         "version":  1,
         "internalName":  "DonghuaNoSekai",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/DonghuaNoSekai.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/DonghuaNoSekai\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/DonghuaNoSekai.cs3?v=1769995249",
         "name":  "Donghua No Sekai",
         "description":  "Donghua No Sekai - Animes chineses (Donghuas)"
     },
@@ -120,7 +120,7 @@
         "version":  1,
         "internalName":  "EmbedCanais",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/EmbedCanais.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/EmbedCanais\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/EmbedCanais.cs3?v=1769995249",
         "name":  "EmbedCanais TV",
         "description":  "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, noticias"
     },
@@ -141,7 +141,7 @@
         "version":  1,
         "internalName":  "MegaFlix",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MegaFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MegaFlix\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MegaFlix.cs3?v=1769995249",
         "name":  "MegaFlix",
         "description":  "MegaFlix - Filmes e series online"
     },
@@ -162,7 +162,7 @@
         "version":  1,
         "internalName":  "NetCine",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NetCine.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NetCine\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NetCine.cs3?v=1769995249",
         "name":  "NetCine",
         "description":  "NetCine - Filmes e series online"
     },
@@ -183,7 +183,7 @@
         "version":  1,
         "internalName":  "OverFlix",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/OverFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/OverFlix\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/OverFlix.cs3?v=1769995249",
         "name":  "OverFlix",
         "description":  "OverFlix - Filmes e series online"
     },
@@ -204,7 +204,7 @@
         "version":  1,
         "internalName":  "PobreFlix",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/PobreFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/PobreFlix\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/PobreFlix.cs3?v=1769995249",
         "name":  "PobreFlix",
         "description":  "PobreFlix - Filmes e series online"
     },
@@ -225,7 +225,7 @@
         "version":  1,
         "internalName":  "Vizer",
         "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Vizer.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Vizer\.cs3?v=1769995249",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Vizer.cs3?v=1769995249",
         "name":  "Vizer",
         "description":  "Vizer - Filmes e series online"
     }

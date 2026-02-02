@@ -19,7 +19,7 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 27630,
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC.cs3?v=1769995249"
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC.cs3?v=1769997000"
     },
     {
         "name": "MaxSeries",
@@ -40,7 +40,7 @@
         "apiVersion": 1,
         "isAdult": false,
         "fileSize": 653406,
-        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3?v=1769995249",
+        "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3?v=1769997000",
         "updatedAt": "2026-02-01 16:50:00"
     }
 ]

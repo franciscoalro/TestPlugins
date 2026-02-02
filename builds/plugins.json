@@ -1,9 +1,9 @@
-﻿[
+[
     {
         "iconUrl":  "https://www.maxseries.pics/favicon.ico",
-        "fileSize":  705175,
+        "fileSize":  653406,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -15,16 +15,16 @@
                     ],
         "version":  256,
         "internalName":  "MaxSeries",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MaxSeries.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MaxSeries.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries\.cs3?v=1769995249",
         "name":  "MaxSeries",
-        "description":  "MaxSeries - Filmes e sÃ©ries com mÃºltiplos extractores"
+        "description":  "MaxSeries - Filmes e series com multiplos extractores"
     },
     {
         "iconUrl":  "https://animesonlinecc.to/favicon.ico",
-        "fileSize":  28951,
+        "fileSize":  27630,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -37,16 +37,16 @@
                     ],
         "version":  2,
         "internalName":  "AnimesOnlineCC",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/AnimesOnlineCC.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/AnimesOnlineCC.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/AnimesOnlineCC\.cs3?v=1769995249",
         "name":  "Animes Online CC",
         "description":  "Animes Online CC - Animes com posters em alta qualidade via API"
     },
     {
         "iconUrl":  "https://doramasonline.co/wp-content/uploads/2025/07/cropped-doramas2-180x180.png",
-        "fileSize":  27889,
+        "fileSize":  27375,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -57,16 +57,16 @@
                     ],
         "version":  1,
         "internalName":  "Doramas",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Doramas.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Doramas.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Doramas.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Doramas\.cs3?v=1769995249",
         "name":  "Doramas Online",
         "description":  "Doramas Online - Doramas coreanos, chineses e japoneses"
     },
     {
         "iconUrl":  "https://novelasflix4k.me/favicon.ico",
-        "fileSize":  31538,
+        "fileSize":  30636,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -78,16 +78,16 @@
                     ],
         "version":  1,
         "internalName":  "NovelasFlix",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NovelasFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NovelasFlix.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NovelasFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NovelasFlix\.cs3?v=1769995249",
         "name":  "NovelasFlix",
         "description":  "NovelasFlix - Novelas mexicanas, brasileiras e turcas"
     },
     {
         "iconUrl":  "https://donghuanosekai.com/wp-content/uploads/2020/09/cropped-icon_dnsk.png",
-        "fileSize":  34582,
+        "fileSize":  33076,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -99,16 +99,16 @@
                     ],
         "version":  1,
         "internalName":  "DonghuaNoSekai",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/DonghuaNoSekai.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/DonghuaNoSekai.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/DonghuaNoSekai.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/DonghuaNoSekai\.cs3?v=1769995249",
         "name":  "Donghua No Sekai",
         "description":  "Donghua No Sekai - Animes chineses (Donghuas)"
     },
     {
         "iconUrl":  "https://embedcanais.com/icons/embedcanaistv.png",
-        "fileSize":  20779,
+        "fileSize":  20139,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -119,16 +119,16 @@
                     ],
         "version":  1,
         "internalName":  "EmbedCanais",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/EmbedCanais.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/EmbedCanais.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/EmbedCanais.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/EmbedCanais\.cs3?v=1769995249",
         "name":  "EmbedCanais TV",
-        "description":  "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, notÃ­cias"
+        "description":  "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, noticias"
     },
     {
         "iconUrl":  "https://megaflix.co/favicon.ico",
-        "fileSize":  21904,
+        "fileSize":  21595,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -140,16 +140,16 @@
                     ],
         "version":  1,
         "internalName":  "MegaFlix",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MegaFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/MegaFlix.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MegaFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MegaFlix\.cs3?v=1769995249",
         "name":  "MegaFlix",
-        "description":  "MegaFlix - Filmes e sÃ©ries online"
+        "description":  "MegaFlix - Filmes e series online"
     },
     {
         "iconUrl":  "https://netcine.biz/favicon.ico",
-        "fileSize":  28938,
+        "fileSize":  28346,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -161,16 +161,16 @@
                     ],
         "version":  1,
         "internalName":  "NetCine",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NetCine.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/NetCine.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NetCine.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/NetCine\.cs3?v=1769995249",
         "name":  "NetCine",
-        "description":  "NetCine - Filmes e sÃ©ries online"
+        "description":  "NetCine - Filmes e series online"
     },
     {
         "iconUrl":  "https://overflix.me/favicon.ico",
-        "fileSize":  40432,
+        "fileSize":  39078,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -182,16 +182,16 @@
                     ],
         "version":  1,
         "internalName":  "OverFlix",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/OverFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/OverFlix.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/OverFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/OverFlix\.cs3?v=1769995249",
         "name":  "OverFlix",
-        "description":  "OverFlix - Filmes e sÃ©ries online"
+        "description":  "OverFlix - Filmes e series online"
     },
     {
         "iconUrl":  "https://pobreflix.tv/favicon.ico",
-        "fileSize":  35241,
+        "fileSize":  34193,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -203,16 +203,16 @@
                     ],
         "version":  1,
         "internalName":  "PobreFlix",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/PobreFlix.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/PobreFlix.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/PobreFlix.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/PobreFlix\.cs3?v=1769995249",
         "name":  "PobreFlix",
-        "description":  "PobreFlix - Filmes e sÃ©ries online"
+        "description":  "PobreFlix - Filmes e series online"
     },
     {
         "iconUrl":  "https://vizer.tv/favicon.ico",
-        "fileSize":  42867,
+        "fileSize":  41496,
         "apiVersion":  1,
-        "repositoryUrl":  "https://github.com/franciscoalro/CloudstreamRepo",
+        "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
         "status":  1,
         "language":  "pt",
         "authors":  [
@@ -224,9 +224,9 @@
                     ],
         "version":  1,
         "internalName":  "Vizer",
-        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Vizer.jar",
-        "url":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/refs/heads/main/builds/Vizer.cs3",
+        "jarUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Vizer.jar",
+        "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/Vizer\.cs3?v=1769995249",
         "name":  "Vizer",
-        "description":  "Vizer - Filmes e sÃ©ries online"
+        "description":  "Vizer - Filmes e series online"
     }
 ]

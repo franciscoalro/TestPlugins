@@ -1,7 +1,6 @@
 # Build outputs
 build/
 */build/
-*.cs3
 
 # Gradle
 .gradle/

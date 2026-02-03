@@ -1,9 +1,9 @@
-﻿{
-    "name":  "BRCloudStream Repo",
-    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/icon.png",
-    "description":  "RepositÃ³rio brasileiro com filmes, sÃ©ries, animes, doramas, novelas e TV ao vivo",
-    "manifestVersion":  1,
-    "pluginLists":  [
-                        "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/builds/plugins.json"
-                    ]
+{
+    "name": "MaxSeries Repository",
+    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "description": "Repositório MaxSeries com PlayerEmbedAPI ultra-rápido (~250ms)",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/cloud-deploy/plugins.json"
+    ]
 }

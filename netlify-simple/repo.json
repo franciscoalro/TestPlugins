@@ -1,9 +1,9 @@
 {
-    "pluginLists":  [
-                        "https://resilient-arithmetic-9a594e.netlify.app/plugins.json"
-                    ],
-    "description":  "Repositorio brasileiro com filmes, series, animes, doramas, novelas e TV ao vivo",
-    "name":  "BRCloudStream Repo",
-    "manifestVersion":  1,
-    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/CloudstreamRepo/main/icon.png"
+    "name": "MaxSeries Repository",
+    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "description": "Repositório MaxSeries com PlayerEmbedAPI ultra-rápido (~250ms)",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/netlify-simple/plugins.json"
+    ]
 }

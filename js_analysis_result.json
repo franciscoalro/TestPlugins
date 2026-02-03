@@ -1,0 +1,83 @@
+{
+  "obfuscation_type": [
+    "Javascript Obfuscator",
+    "Obfuscator.io",
+    "Hex Encoded"
+  ],
+  "statistics": {
+    "code_size": 213996,
+    "strings_count": 1877,
+    "functions_count": 100,
+    "endpoints_count": 8,
+    "crypto_calls_count": 2
+  },
+  "suspicious_functions": [],
+  "suspicious_strings": [
+    "\\x20is\\x20dep','click','performanc','-cancel\\x22>C','toLowerCas','t\\x20support\\x20','Time','request','names','#66CC00','\\x20\\x20\\x20\\x20\\x20\\x20</di','/mp4/','.js','.jpg?','findIndex','pl-notify-','h:\\x20360px;\\x0a','#FF00FF','__generato','\\x2062.7\\x20v\\x20-1','SourceBuff','sition:\\x20fi','__esModule','add','ing','6\\x20v\\x2019.3\\x20c','\\x20\\x20\\x20\\x20\\x20}\\x0a\\x0a\\x20\\x20','15px;font-','setTime','\\x20way\\x20we\\x20me','thumbnails','>\\x0a\\x20\\x20\\x20\\x20\\x20\\x20\\x20\\x20','split','namespaces','\\x20to\\x20<u>','\\x20\\x20\\x20\\x20\\x20\\x20\\x20lef','imaryKey','getCurrent','max','y-custom','show','in.','\\x20.75rem;\\x20\\x0a','#FF0066','90%;min-wi','\\x200\\x20240\\x20240','k;\\x0a\\x20\\x20\\x20\\x20\\x20\\x20\\x20','files','path','blocked','watching?<','ivecode]}','nfinite;\\x0a}','done','\\x20font-size','oldVersion','join','tableName','hours','test','.jw-contro','navigator','r-radius:\\x20','city:0.6;\\x20','-3.03598\\x208','n.iamcdn.n','kground-co','document','none;\\x0a\\x20\\x20\\x20\\x20','devtoolsFo',':\\x20action.i',';base64,','splice','9.3\\x20h\\x20-48.','\\x20codecs=\\x22m','#66CC33','\\x20unsecure\\x20','52502,-2.1','body','ent','apply','string','ere?\\x20This\\x20','inejoin=\\x22r','pStopped','indexedDB','insertBefo','vc1.4D401E','slug','leapis.com','UVWXYZabcd','Apple','eruda','100svh','sent','storage','piece','.31579,0.3','curr','nge','\\x20\\x20\\x20\\x20\\x20\\x20.jwp','worker','stify-cont','wn.openx.x','ngChecker','speedBuffe','__nwjs','layer/poly','574,-1.480','#0099CC','0%;\\x20}\\x0a\\x0a#lo','07,4.76396','in-bottom:','function-t','\\x0a\\x20\\x20var\\x20act','l-body{fon','=\\x22jwpl-not','events','emit','isteners','\\x20l\\x2041.8,-2','video/mp4;','getAll','remove','\\x20\\x20\\x20\\x20\\x20\\x20<div','ock\\x20or\\x20rem','addButton','tor','e-in-out\\x20i','ssage:\\x20%s','AES-CTR','ht:700;tex','\\x20codecs=\\x22v','oter\\x20{\\x0a\\x20\\x20\\x20','Browser\\x20no','eNames','dep','\\x20.jw-displ','isOpen','\\x20\\x0a\\x20\\x20\\x20\\x20colo','https://st','Due\\x20to\\x20cer','formatters','enable','encoder','.notify-fo','excludes','color','n\\x20of\\x20",
+    ".','t\\x20connecti','0.3);\\x0a\\x20\\x20\\x20\\x20','findByDecr','ont-size:1','media','days','eset:\\x20%s','24979\\x20-2.7','AbortError','1138534nzAqJB','forEach','second','30626\\x20-10.','tData=0','#FF3300','erval','urrent:\\x20%s','data','lesyndicat','-icon-forw','ormance.no','KLMNOPQRST','ustify-con','viewBox=\\x220','been\\x20denie','89569,0.03','.modal{bac','getKey','ast?url=','_ff','gument\\x20','browser','\\x20\\x20\\x20.jwpl-n','gger','0.6\\x20-8.600','#FF3333','#FFCC33','https://ia','ethod\\x20",
+    "=\\x22http://w",
+    "=\\x22http://w",
+    "https://pi",
+    "https://cd",
+    "https://pa",
+    "https://do",
+    "https://st",
+    "https://im",
+    "https://ia",
+    "decryptStr",
+    "decryptStr",
+    "https://cd",
+    "https://cd",
+    "https://pi",
+    "https://st",
+    "https://",
+    "decrypt",
+    "encrypt"
+  ],
+  "endpoints": [
+    {
+      "url": "https://pi",
+      "domain": "pi"
+    },
+    {
+      "url": "https://cd",
+      "domain": "cd"
+    },
+    {
+      "url": "http://w",
+      "domain": "w"
+    },
+    {
+      "url": "https://pa",
+      "domain": "pa"
+    },
+    {
+      "url": "https://do",
+      "domain": "do"
+    },
+    {
+      "url": "https://st",
+      "domain": "st"
+    },
+    {
+      "url": "https://im",
+      "domain": "im"
+    },
+    {
+      "url": "https://ia",
+      "domain": "ia"
+    }
+  ],
+  "crypto_calls": [
+    {
+      "algorithm": "btoa",
+      "matches": [
+        "_0x2637ec['a'][_0x260806(0x3e0",
+        "btoa(_0x5291ab"
+      ],
+      "count": 2
+    }
+  ],
+  "variables": {},
+  "sotrym_found": false
+}

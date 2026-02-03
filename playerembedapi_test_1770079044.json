@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-02-02T21:37:24.680770",
+  "test_url": "https://playerembedapi.link/?v=rTxfmoIhd",
+  "http_extraction": {
+    "method": "HTTP",
+    "status_code": 200,
+    "html_size": 9933,
+    "has_jwplayer": true,
+    "has_encrypted_data": true,
+    "has_crypto": false,
+    "video_urls_found": 0,
+    "video_urls": [],
+    "html_file": "playerembedapi_http_1770079044.html"
+  },
+  "client_server_analysis": {
+    "client_side": {
+      "accessible": [
+        "HTML content (after JS execution)",
+        "JWPlayer configuration (after initialization)",
+        "Network requests (via browser)",
+        "LocalStorage/SessionStorage",
+        "Decrypted video URLs (after AES-CTR decryption)",
+        "DOM elements and attributes"
+      ],
+      "not_accessible": [
+        "Encrypted data without JS execution",
+        "AES-CTR key derivation (complex)",
+        "Server-side validation logic",
+        "Token generation algorithms"
+      ]
+    },
+    "server_side": {
+      "controls": [
+        "HTML generation with encrypted data",
+        "AES-CTR encryption key",
+        "Video URL generation",
+        "Referer validation",
+        "Token expiration",
+        "Google Cloud Storage access"
+      ],
+      "cannot_prevent": [
+        "Browser automation (Playwright/Selenium)",
+        "Network interception in browser",
+        "JWPlayer config extraction (after JS runs)",
+        "Video URL capture (after decryption)"
+      ]
+    },
+    "extraction_methods": {
+      "pure_http": {
+        "success_rate": "0%",
+        "reason": "Data is AES-CTR encrypted, cannot decrypt without JS",
+        "speed": "Fast (~1s)",
+        "reliability": "Low"
+      },
+      "browser_automation": {
+        "success_rate": "100%",
+        "reason": "JS executes and decrypts data naturally",
+        "speed": "Slow (~5-10s)",
+        "reliability": "High"
+      }
+    }
+  }
+}

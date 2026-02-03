@@ -1,0 +1,59 @@
+{
+  "basic": {
+    "status_code": 200,
+    "content_length": 8804,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Date": "Tue, 03 Feb 2026 02:51:46 GMT",
+      "Content-Type": "text/html; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Connection": "keep-alive",
+      "Server": "cloudflare",
+      "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+      "Vary": "Accept-Encoding",
+      "Cache-Control": "public, max-age=300",
+      "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=BM5qRBq%2BbhJ6vwpxOaDxr2xJtLckiJJpJHzTpAw8ruSm0wjTeB2Dq3DuecBFKA0Vqc%2FO2rztfpF5f%2Fhs3zFB0rADINQ1xNveCMlIWCO1gyz4Rg%3D%3D\"}]}",
+      "cf-cache-status": "DYNAMIC",
+      "Content-Encoding": "br",
+      "CF-RAY": "9c7ea0dd98c8066a-GRU"
+    },
+    "cookies": {}
+  },
+  "html_analysis": {
+    "forms": [],
+    "scripts": [
+      "https://statics.sssrr.org/player/jwplayer.min.js",
+      "https://statics.sssrr.org/player/jwpsrv.js",
+      "https://statics.sssrr.org/player/jwplayer.core.controls.html5.js",
+      "https://www.googletagmanager.com/gtag/js?id=G-RB29PDDFNK",
+      "https://iamcdn.net/player-v2/core.bundle.js"
+    ],
+    "links": [],
+    "inputs": [],
+    "meta": {
+      "count": 1
+    },
+    "video_data": {
+      "slug": "rZeP5UzqD",
+      "md5_id": 29077990,
+      "user_id": 482120
+    }
+  },
+  "js_analysis": {
+    "size": 213996,
+    "has_sotrym": true,
+    "has_crypto": false,
+    "has_jwplayer": true
+  },
+  "security_headers": {
+    "X-Frame-Options": "N/A",
+    "X-XSS-Protection": "N/A",
+    "X-Content-Type-Options": "N/A",
+    "Strict-Transport-Security": "N/A",
+    "Content-Security-Policy": "N/A"
+  },
+  "constructed_urls": [
+    "https://rZeP5UzqD.sssrr.org/sora/29077990/",
+    "https://cdn.sssrr.org/sora/29077990/"
+  ]
+}

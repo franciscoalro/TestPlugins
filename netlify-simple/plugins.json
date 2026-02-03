@@ -1,0 +1,232 @@
+[
+    {
+        "iconUrl":  "https://www.maxseries.pics/favicon.ico",
+        "fileSize":  653406,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  256,
+        "internalName":  "MaxSeries",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/MaxSeries.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/MaxSeries.cs3",
+        "name":  "MaxSeries",
+        "description":  "MaxSeries - Filmes e series com multiplos extractores"
+    },
+    {
+        "iconUrl":  "https://animesonlinecc.to/favicon.ico",
+        "fileSize":  27630,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Anime",
+                        "OVA",
+                        "AnimeMovie"
+                    ],
+        "version":  2,
+        "internalName":  "AnimesOnlineCC",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/AnimesOnlineCC.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/AnimesOnlineCC.cs3",
+        "name":  "Animes Online CC",
+        "description":  "Animes Online CC - Animes com posters em alta qualidade via API"
+    },
+    {
+        "iconUrl":  "https://doramasonline.co/wp-content/uploads/2025/07/cropped-doramas2-180x180.png",
+        "fileSize":  27375,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "AsianDrama"
+                    ],
+        "version":  1,
+        "internalName":  "Doramas",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/Doramas.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/Doramas.cs3",
+        "name":  "Doramas Online",
+        "description":  "Doramas Online - Doramas coreanos, chineses e japoneses"
+    },
+    {
+        "iconUrl":  "https://novelasflix4k.me/favicon.ico",
+        "fileSize":  30636,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "NovelasFlix",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/NovelasFlix.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/NovelasFlix.cs3",
+        "name":  "NovelasFlix",
+        "description":  "NovelasFlix - Novelas mexicanas, brasileiras e turcas"
+    },
+    {
+        "iconUrl":  "https://donghuanosekai.com/wp-content/uploads/2020/09/cropped-icon_dnsk.png",
+        "fileSize":  33076,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Anime",
+                        "AnimeMovie"
+                    ],
+        "version":  1,
+        "internalName":  "DonghuaNoSekai",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/DonghuaNoSekai.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/DonghuaNoSekai.cs3",
+        "name":  "Donghua No Sekai",
+        "description":  "Donghua No Sekai - Animes chineses (Donghuas)"
+    },
+    {
+        "iconUrl":  "https://embedcanais.com/icons/embedcanaistv.png",
+        "fileSize":  20139,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Live"
+                    ],
+        "version":  1,
+        "internalName":  "EmbedCanais",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/EmbedCanais.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/EmbedCanais.cs3",
+        "name":  "EmbedCanais TV",
+        "description":  "EmbedCanais TV - TV Ao Vivo - Canais abertos, esportes, noticias"
+    },
+    {
+        "iconUrl":  "https://megaflix.co/favicon.ico",
+        "fileSize":  21595,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "MegaFlix",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/MegaFlix.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/MegaFlix.cs3",
+        "name":  "MegaFlix",
+        "description":  "MegaFlix - Filmes e series online"
+    },
+    {
+        "iconUrl":  "https://netcine.biz/favicon.ico",
+        "fileSize":  28346,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "NetCine",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/NetCine.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/NetCine.cs3",
+        "name":  "NetCine",
+        "description":  "NetCine - Filmes e series online"
+    },
+    {
+        "iconUrl":  "https://overflix.me/favicon.ico",
+        "fileSize":  39078,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "OverFlix",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/OverFlix.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/OverFlix.cs3",
+        "name":  "OverFlix",
+        "description":  "OverFlix - Filmes e series online"
+    },
+    {
+        "iconUrl":  "https://pobreflix.tv/favicon.ico",
+        "fileSize":  34193,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "PobreFlix",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/PobreFlix.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/PobreFlix.cs3",
+        "name":  "PobreFlix",
+        "description":  "PobreFlix - Filmes e series online"
+    },
+    {
+        "iconUrl":  "https://vizer.tv/favicon.ico",
+        "fileSize":  41496,
+        "apiVersion":  1,
+        "repositoryUrl":  "https://resilient-arithmetic-9a594e.netlify.app",
+        "status":  1,
+        "language":  "pt",
+        "authors":  [
+                        "franciscoalro"
+                    ],
+        "tvTypes":  [
+                        "Movie",
+                        "TvSeries"
+                    ],
+        "version":  1,
+        "internalName":  "Vizer",
+        "jarUrl":  "https://resilient-arithmetic-9a594e.netlify.app/Vizer.jar",
+        "url":  "https://resilient-arithmetic-9a594e.netlify.app/Vizer.cs3",
+        "name":  "Vizer",
+        "description":  "Vizer - Filmes e series online"
+    }
+]

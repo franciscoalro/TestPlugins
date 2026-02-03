@@ -1,0 +1,3 @@
+﻿# Redirects para compatibilidade
+/plugins /plugins.json 200
+/repo /repo.json 200

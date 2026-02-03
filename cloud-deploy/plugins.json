@@ -1,6 +1,6 @@
 {
-  "name": "MaxSeries Repo - PlayerEmbedAPI Ultra-Fast",
-  "description": "Repositório MaxSeries com extração PlayerEmbedAPI otimizada (~250ms)",
+  "name": "MaxSeries Repository",
+  "description": "Repositório MaxSeries com PlayerEmbedAPI ultra-rápido (~250ms)",
   "author": "franciscoalro",
   "version": 1,
   "plugins": [
@@ -8,7 +8,7 @@
       "name": "MaxSeries",
       "description": "MaxSeries - PlayerEmbedAPI ultra-rápido (~250ms) + Suite Kali",
       "version": "2.2.0",
-      "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+      "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/cloud-deploy/MaxSeries.cs3",
       "status": 1,
       "apiVersion": 1,
       "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",

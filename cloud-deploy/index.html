@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRCloudStream Repository</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .url-box { background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .url { font-family: monospace; background: #000; padding: 10px; border-radius: 4px; word-break: break-all; }
+        .plugin-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .plugin { background: #2d2d2d; padding: 15px; border-radius: 8px; }
+        .plugin h3 { margin: 0 0 10px 0; color: #4CAF50; }
+        .size { color: #888; font-size: 0.9em; }
+        .copy-btn { background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        .copy-btn:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ðŸ‡§ðŸ‡· BRCloudStream Repository</h1>
+            <p>RepositÃ³rio brasileiro para Cloudstream com 11 plugins</p>
+        </div>
+
+        <div class="url-box">
+            <h2>ðŸ“± URL para Cloudstream:</h2>
+            <div class="url" id="repoUrl">https://SEU-DOMINIO.com/repo.json</div>
+            <button class="copy-btn" onclick="copyUrl()">Copiar URL</button>
+        </div>
+
+        <div class="url-box">
+            <h2>ðŸ”— URLs Alternativas:</h2>
+            <div class="url">https://SEU-DOMINIO.com/repo-alternative.json</div>
+            <div class="url" style="margin-top: 10px;">https://SEU-DOMINIO.com/plugins.json</div>
+        </div>
+
+        <h2>ðŸŽ® Plugins DisponÃ­veis:</h2>
+        <div class="plugin-list" id="pluginList">
+            <!-- Plugins serÃ£o carregados via JavaScript -->
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; color: #888;">
+            <p>Atualizado automaticamente â€¢ Hospedado na nuvem</p>
+        </div>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const url = document.getElementById('repoUrl').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL copiada!');
+            });
+        }
+
+        // Carregar plugins dinamicamente
+        fetch('./plugins.json')
+            .then(response => response.json())
+            .then(plugins => {
+                const container = document.getElementById('pluginList');
+                plugins.forEach(plugin => {
+                    const div = document.createElement('div');
+                    div.className = 'plugin';
+                    div.innerHTML = 
+                        <h3></h3>
+                        <p></p>
+                        <div class="size">VersÃ£o:  â€¢ Tamanho:  KB</div>
+                    ;
+                    container.appendChild(div);
+                });
+            })
+            .catch(err => console.error('Erro ao carregar plugins:', err));
+    </script>
+</body>
+</html>

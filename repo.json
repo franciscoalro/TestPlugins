@@ -1,9 +1,9 @@
-﻿{
-    "name": "BRCloudStream Repo",
+{
+    "name": "MaxSeries Repo - PlayerEmbedAPI Ultra-Fast",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "description": "RepositÃ³rio brasileiro com filmes, sÃ©ries, animes, doramas, novelas e TV ao vivo",
+    "description": "Repositório MaxSeries com extração PlayerEmbedAPI otimizada (~250ms)",
     "manifestVersion": 1,
     "pluginLists": [
-        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/plugins.json"
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/cloud-deploy/plugins.json"
     ]
 }

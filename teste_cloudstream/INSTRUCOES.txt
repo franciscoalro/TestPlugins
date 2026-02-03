@@ -1,0 +1,51 @@
+============================================
+INSTRUCOES RAPIDAS - TESTE CLOUDSTREAM
+============================================
+
+1. ESTRUTURA DE ARQUIVOS
+------------------------
+Copiar para seu projeto CloudStream:
+
+cloudstream-extensions/
+└── MaxSeries/
+    └── src/
+        └── main/
+            └── kotlin/
+                └── com/
+                    └── franciscoalro/
+                        └── maxseries/
+                            ├── MaxSeriesProvider.kt
+                            └── extractors/
+                                └── PlayerEmbedAPIExtractor.kt  <- NOVO
+
+2. COMANDOS DE BUILD
+--------------------
+./gradlew :MaxSeries:clean
+./gradlew :MaxSeries:build
+./gradlew :MaxSeries:generateCS3
+
+3. INSTALACAO
+-------------
+- Transferir MaxSeries/build/MaxSeries.cs3 para celular
+- Abrir CloudStream → Configuracoes → Extensoes
+- Instalar de arquivo .cs3
+
+4. VERIFICACAO
+--------------
+adb logcat -s MaxSeries:D PlayerEmbedAPI:D
+
+Logs esperados:
+D/PlayerEmbedAPI: Extracao rapida em XXXms
+
+============================================
+LINKS UTEIS
+============================================
+
+Release GitHub:
+https://github.com/franciscoalro/TestPlugins/releases/tag/v2.1.0
+
+Documentacao completa:
+- INTEGRACAO_MAXSERIES.md
+- TESTE_CLOUDSTREAM.md
+
+============================================

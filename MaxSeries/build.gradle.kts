@@ -1,7 +1,7 @@
-version = 260
+version = 261
 
 cloudstream {
-    description = "MaxSeries v260 - AES Decryptor + CDN Constructor + Session Manager"
+    description = "MaxSeries v261 - Multi-Source: Captura TODAS as sources simultaneamente"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

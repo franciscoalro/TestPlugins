@@ -1,6 +1,6 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries Provider v260",
+  "description": "MaxSeries v260 - AES Decryptor + CDN Constructor + Session Manager",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

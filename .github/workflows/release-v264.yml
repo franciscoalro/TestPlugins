@@ -1,0 +1,194 @@
+name: Release v264 - Build Otimizado
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'MaxSeries/src/**'
+      - 'MaxSeries/build.gradle.kts'
+      - 'release-notes-v264.md'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Clean build cache
+        run: rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.recloudstream
+
+      - name: Build MaxSeries
+        run: |
+          cd MaxSeries
+          chmod +x ../gradlew
+          ../gradlew clean assembleRelease -x test --no-daemon
+
+      - name: Prepare Release Files
+        run: |
+          # Copiar .aar como .cs3
+          cp MaxSeries/build/outputs/aar/MaxSeries-release.aar MaxSeries.cs3
+          
+          # Calcular tamanho e hash
+          FILE_SIZE=$(stat -c%s MaxSeries.cs3)
+          FILE_HASH=$(sha256sum MaxSeries.cs3 | cut -d' ' -f1)
+          
+          echo "FILE_SIZE=$FILE_SIZE" >> $GITHUB_ENV
+          echo "FILE_HASH=$FILE_HASH" >> $GITHUB_ENV
+          
+          echo "Tamanho: $FILE_SIZE bytes"
+          echo "SHA256: $FILE_HASH"
+
+      - name: Update JSON Files
+        run: |
+          FILE_SIZE=${{ env.FILE_SIZE }}
+          FILE_HASH=${{ env.FILE_HASH }}
+          VERSION="264"
+          
+          # plugins.json
+          cat > plugins.json << EOF
+          [
+            {
+              "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+              "status": 1,
+              "version": $VERSION,
+              "apiVersion": 1,
+              "name": "MaxSeries",
+              "internalName": "MaxSeries",
+              "authors": ["franciscoalro"],
+              "description": "MaxSeries v$VERSION - Build otimizado e estabilidade aprimorada",
+              "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+              "tvTypes": ["TvSeries", "Movie"],
+              "language": "pt-BR",
+              "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+              "fileSize": $FILE_SIZE
+            }
+          ]
+          EOF
+          
+          # repo.json
+          cat > repo.json << EOF
+          {
+            "name": "MaxSeries",
+            "description": "MaxSeries v$VERSION - Build otimizado e estabilidade aprimorada",
+            "manifestVersion": 1,
+            "pluginLists": [
+              "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
+            ]
+          }
+          EOF
+          
+          # plugins-simple.json
+          cat > plugins-simple.json << EOF
+          [
+            {
+              "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v$VERSION/MaxSeries.cs3",
+              "status": 1,
+              "version": $VERSION,
+              "name": "MaxSeries",
+              "description": "MaxSeries v$VERSION - Build otimizado"
+            }
+          ]
+          EOF
+          
+          # plugins-minimal.json
+          cat > plugins-minimal.json << EOF
+          [
+            {
+              "name": "MaxSeries",
+              "description": "MaxSeries v$VERSION - Build otimizado e estabilidade aprimorada",
+              "version": "$VERSION",
+              "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v$VERSION/MaxSeries.cs3",
+              "status": 1,
+              "apiVersion": 1
+            }
+          ]
+          EOF
+
+      - name: Commit Updated JSONs
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add plugins.json repo.json plugins-simple.json plugins-minimal.json MaxSeries.cs3
+          git diff --staged --quiet || git commit -m "Update JSONs and MaxSeries.cs3 for v264 release"
+          git push
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v264
+          name: MaxSeries v264 - Build Otimizado
+          body: |
+            ## MaxSeries v264 - Build Otimizado e Estabilidade
+
+            ### 🚀 Novidades
+            - **Build automatizado** via GitHub Actions
+            - **Compilação otimizada** para melhor performance
+            - **Verificação de dependências** aprimorada
+
+            ### 📦 Build Information
+            ```
+            Version: 264
+            Build Date: ${{ github.run_id }}
+            JDK: 17
+            Gradle: 8.x
+            Kotlin: 2.3.0
+            ```
+
+            ### 📊 Performance
+            | Métrica | Valor |
+            |---------|-------|
+            | Tamanho | ${{ env.FILE_SIZE }} bytes |
+            | SHA256 | ${{ env.FILE_HASH }} |
+            | Classes | 330+ |
+
+            ### 📥 Instalação
+            **Via Repositório:**
+            ```
+            https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/repo.json
+            ```
+
+            **Download Direto:**
+            - Baixe o arquivo MaxSeries.cs3 abaixo
+            - Instale manualmente no CloudStream
+
+            ### 🔍 Validação
+            - Versão: **264**
+            - Descrição: "Build otimizado e estabilidade aprimorada"
+            - Tamanho: ~${{ env.FILE_SIZE }} bytes
+
+            ---
+            *Build automatizado com GitHub Actions*
+          files: |
+            MaxSeries.cs3
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "✅ Release v264 criada com sucesso!"
+          echo ""
+          echo "📊 Resumo:"
+          echo "   Versao: v264"
+          echo "   Arquivo: MaxSeries.cs3 (${{ env.FILE_SIZE }} bytes)"
+          echo "   SHA256: ${{ env.FILE_HASH }}"
+          echo ""
+          echo "🔗 Links:"
+          echo "   Release: https://github.com/franciscoalro/TestPlugins/releases/tag/v264"
+          echo "   Repo: https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/repo.json"

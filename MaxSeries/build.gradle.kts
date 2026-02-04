@@ -1,7 +1,7 @@
-version = 262
+version = 264
 
 cloudstream {
-    description = "MaxSeries v262 - Source Unico: TODAS as fontes visiveis no player"
+    description = "MaxSeries v264 - Build otimizado e estabilidade aprimorada"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

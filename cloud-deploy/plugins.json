@@ -1,13 +1,13 @@
 {
-  "name": "MaxSeries Plugins",
-  "description": "MaxSeries v260 com extração ultra-rápida",
+  "name": "MaxSeries",
+  "description": "MaxSeries Provider",
   "author": "franciscoalro",
   "version": 1,
   "plugins": [
     {
       "name": "MaxSeries",
       "description": "MaxSeries v260 - AES Decryptor + CDN Constructor + Session Manager",
-      "version": "2.6.0",
+      "version": "260",
       "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
       "status": 1,
       "apiVersion": 1,

@@ -148,10 +148,13 @@ class PlayerThreeBloggerExtractor : ExtractorApi() {
             // 6. Salvar no cache e retornar
             VideoUrlCache.put(url, videoUrl, quality, name)
             
+            // Gerar nome único para evitar agrupamento no CloudStream
+            val uniqueName = "${name}_${System.currentTimeMillis() % 10000}"
+            
             callback.invoke(
                 newExtractorLink(
-                    source = name,
-                    name = "$name $qualityLabel (Direct)",
+                    source = uniqueName,
+                    name = "$name $qualityLabel",
                     url = videoUrl,
                     type = ExtractorLinkType.VIDEO
                 ) {

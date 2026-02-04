@@ -1,9 +1,9 @@
 [
   {
     "name": "MaxSeries",
-    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v257/MaxSeries.cs3",
-    "version": 257,
-    "description": "MaxSeries v257 - BUILD CORRIGIDO",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v263/MaxSeries.cs3",
+    "version": 263,
+    "description": "MaxSeries v263 - PlayerEmbedAPI Otimizado: V8 (Pure HTTP) prioritário + V7 (WebView) com timeout 25s como fallback",
     "authors": ["franciscoalro"],
     "status": 1,
     "tvTypes": ["TvSeries", "Movie"],

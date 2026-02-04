@@ -24,8 +24,8 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "MaxSeries v103 - Assista filmes e séries online grátis em HD. Suporte completo a episódios, temporadas e filmes.",
-        "version": 103,
+        "description": "MaxSeries v263 - PlayerEmbedAPI Otimizado: V8 (Pure HTTP) prioritário + V7 (WebView) com timeout 25s como fallback",
+        "version": 263,
         "authors": [
             "franciscoalro"
         ],
@@ -36,10 +36,10 @@
             "TvSeries",
             "Movie"
         ],
-        "iconUrl": "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png",
+        "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
         "apiVersion": 1,
         "isAdult": false,
-        "fileSize": 15000,
-        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v57.0/MaxSeries.cs3?v=103"
+        "fileSize": 747487,
+        "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v263/MaxSeries.cs3"
     }
 ]

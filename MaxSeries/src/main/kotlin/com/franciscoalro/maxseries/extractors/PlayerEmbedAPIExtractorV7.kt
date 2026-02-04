@@ -36,7 +36,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
     
     companion object {
         private const val TAG = "PlayerEmbedAPI-v7"
-        private const val TIMEOUT_SECONDS = 15L
+        private const val TIMEOUT_SECONDS = 25L  // Aumentado de 15s para 25s
         private val cleanedUp = AtomicBoolean(false)  // NOVO: Flag atômica
         
         // Padrões de URL de vídeo para capturar

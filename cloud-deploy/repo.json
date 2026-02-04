@@ -1,9 +1,9 @@
 {
-    "name": "MaxSeries Repository",
+    "name": "MaxSeries Repo - v260 AES+CDN+Session",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "description": "Repositório MaxSeries com PlayerEmbedAPI ultra-rápido (~250ms)",
+    "description": "Repositorio MaxSeries v260 com AES Decryptor, CDN Constructor e Session Manager",
     "manifestVersion": 1,
     "pluginLists": [
-        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/cloud-deploy/plugins.json"
+        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
     ]
 }

@@ -1,21 +1,21 @@
 {
-  "name": "MaxSeries Repository",
-  "description": "Repositório MaxSeries com PlayerEmbedAPI ultra-rápido (~250ms)",
+  "name": "MaxSeries Repo - v260 AES+CDN+Session",
+  "description": "Repositorio MaxSeries v260 com AES Decryptor, CDN Constructor e Session Manager",
   "author": "franciscoalro",
   "version": 1,
   "plugins": [
     {
       "name": "MaxSeries",
-      "description": "MaxSeries - PlayerEmbedAPI ultra-rápido (~250ms) + Suite Kali",
-      "version": "2.2.0",
-      "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/cloud-deploy/MaxSeries.cs3",
+      "description": "MaxSeries v260 - 3 Fases: AES Decryptor + CDN Constructor + Session Manager. Extracao 50-150ms (98% mais rapido)",
+      "version": "2.6.0",
+      "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
       "status": 1,
       "apiVersion": 1,
       "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
       "language": "pt",
       "filename": "MaxSeries.cs3",
-      "sha256": "16661F02613B392EB8B1E91FDB3FD59B36128BE21B95E0B7DA4251EC370A0355",
-      "size": 222592
+      "sha256": "18336f760dd3a267cd37888dc71d4d44d85bdfbfee58376b25ce59df018cc56a",
+      "size": 333781
     }
   ]
 }

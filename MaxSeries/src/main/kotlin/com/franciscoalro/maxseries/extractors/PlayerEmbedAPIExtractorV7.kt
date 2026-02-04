@@ -79,7 +79,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
             Log.d(TAG, "Cache HIT")
             callback.invoke(
                 newExtractorLink(
-                    source = name,
+                    source = "${name}_${System.currentTimeMillis() % 10000}",
                     name = "$name ${QualityDetector.getQualityLabel(cached.quality)} (Cached)",
                     url = cached.url,
                     type = ExtractorLinkType.VIDEO
@@ -385,7 +385,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                 
                 callback.invoke(
                     newExtractorLink(
-                        source = name,
+                        source = "${name}_${System.currentTimeMillis() % 10000}",
                         name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView v7)",
                         url = videoUrl,
                         type = type

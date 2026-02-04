@@ -561,7 +561,7 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         
         callback.invoke(
             newExtractorLink(
-                source = name,
+                source = "${name}_${System.currentTimeMillis() % 10000}",
                 name = sourceName,
                 url = url,
                 type = type

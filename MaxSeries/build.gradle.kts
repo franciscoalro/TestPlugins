@@ -1,7 +1,7 @@
-version = 261
+version = 262
 
 cloudstream {
-    description = "MaxSeries v261 - Multi-Source: Captura TODAS as sources simultaneamente"
+    description = "MaxSeries v262 - Source Unico: TODAS as fontes visiveis no player"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -2,16 +2,16 @@
   {
     "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
     "status": 1,
-    "version": 261,
+    "version": 262,
     "apiVersion": 1,
     "name": "MaxSeries",
     "internalName": "MaxSeries",
     "authors": ["franciscoalro"],
-    "description": "MaxSeries v261 - Multi-Source: PlayerThreeBlogger + PlayerEmbedAPI v7/v8 + MyVidPlay + MegaEmbed + DoodStream + StreamTape + Mixdrop + Filemoon",
+    "description": "MaxSeries v262 - Source Unico: Todas as fontes visiveis no player (PlayerThreeBlogger, PlayerEmbedAPI, MyVidPlay, MegaEmbed, DoodStream, StreamTape, Mixdrop, Filemoon)",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize": 333810
+    "fileSize": 334342
   }
 ]

@@ -51,7 +51,7 @@ class MyVidPlayExtractor : ExtractorApi() {
             
             callback.invoke(
                 newExtractorLink(
-                    source = name,
+                    source = "${name}_${System.currentTimeMillis() % 10000}",
                     name = "$name ${QualityDetector.getQualityLabel(cached.quality)}",
                     url = cached.url,
                     type = ExtractorLinkType.VIDEO
@@ -146,7 +146,7 @@ class MyVidPlayExtractor : ExtractorApi() {
                 // 5. INVOCAR CALLBACK
                 callback.invoke(
                     newExtractorLink(
-                        source = name,
+                        source = "${name}_${System.currentTimeMillis() % 10000}",
                         name = "$name ${QualityDetector.getQualityLabel(quality)}",
                         url = finalUrl,
                         type = ExtractorLinkType.VIDEO

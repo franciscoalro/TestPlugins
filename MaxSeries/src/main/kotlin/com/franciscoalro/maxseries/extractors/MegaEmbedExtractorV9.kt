@@ -316,7 +316,7 @@ class MegaEmbedExtractorV9 : ExtractorApi() {
         
         callback.invoke(
             newExtractorLink(
-                source = name,
+                source = "${name}_${System.currentTimeMillis() % 10000}",
                 name = "$name Auto",
                 url = link,
                 type = ExtractorLinkType.M3U8

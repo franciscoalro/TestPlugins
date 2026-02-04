@@ -78,7 +78,7 @@ class FilemoonExtractor : ExtractorApi() {
                 } else {
                     listOf(
                         newExtractorLink(
-                            source = name,
+                            source = "${name}_${System.currentTimeMillis() % 10000}",
                             name = "$name HD",
                             url = videoUrl,
                             type = ExtractorLinkType.VIDEO

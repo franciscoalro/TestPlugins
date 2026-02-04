@@ -1,7 +1,7 @@
-version = 259
+version = 260
 
 cloudstream {
-    description = "MaxSeries v259 - PlayerEmbedAPI WebView Priority Fix"
+    description = "MaxSeries v260 - AES Decryptor + CDN Constructor + Session Manager"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -639,13 +639,10 @@ class MaxSeriesProvider : MainAPI() {
                     val maxAttempts = 5  // Aumentado de 3 para dar chance a mais extractores
                     
                     for (source in sortedSources) {
-                        if (linksFound.get() > 0) {
-                            Log.d(TAG, "✅ Links encontrados, encerrando busca paralela")
-                            coroutineContext.cancelChildren()
-                            break
-                        }
+                        // REMOVIDO: Early exit que impedia múltiplas sources
+                        // Agora capturamos TODAS as sources disponíveis
                         
-                        if (attempts >= maxAttempts && linksFound.get() == 0) {
+                        if (attempts >= maxAttempts) {
                             Log.w(TAG, "⚠️ Máximo de tentativas ($maxAttempts) atingido")
                             break
                         }
@@ -667,10 +664,10 @@ class MaxSeriesProvider : MainAPI() {
                                                 links.add(link)
                                             }
                                             mutex.withLock {
-                                                if (links.isNotEmpty() && linksFound.get() == 0) {
+                                                if (links.isNotEmpty()) {
                                                     links.forEach { callback(it) }
                                                     linksFound.addAndGet(links.size)
-                                                    Log.wtf(TAG, "✅✅✅ PlayerThreeBlogger: SUCESSO ✅✅✅")
+                                                    Log.wtf(TAG, "✅✅✅ PlayerThreeBlogger: ${links.size} links ✅✅✅")
                                                 }
                                             }
                                         } catch (e: Exception) {
@@ -691,15 +688,13 @@ class MaxSeriesProvider : MainAPI() {
                                                 linksV7.add(link)
                                             }
                                             
-                                            // Se v7 funcionou, usar seus links
+                                            // Se v7 funcionou, adicionar links (não substituir)
                                             if (linksV7.isNotEmpty()) {
                                                 mutex.withLock {
-                                                    if (linksFound.get() == 0) {
-                                                        linksV7.forEach { callback(it) }
-                                                        linksFound.addAndGet(linksV7.size)
-                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v7 (WebView): ${linksV7.size} links ✅✅✅")
-                                                        v7Succeeded = true
-                                                    }
+                                                    linksV7.forEach { callback(it) }
+                                                    linksFound.addAndGet(linksV7.size)
+                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v7 (WebView): ${linksV7.size} links ✅✅✅")
+                                                    v7Succeeded = true
                                                 }
                                             } else {
                                                 Log.d(TAG, "⚠️ v7 (WebView) retornou vazio")
@@ -708,28 +703,30 @@ class MaxSeriesProvider : MainAPI() {
                                             Log.e(TAG, "❌ PlayerEmbedAPI v7 exception: ${e.message}")
                                         }
                                         
-                                        // FASE 2: Fallback para v8 (Pure HTTP) se v7 falhou
-                                        if (!v7Succeeded && linksFound.get() == 0) {
-                                            Log.d(TAG, "⚠️ v7 falhou, tentando v8 (Pure HTTP - mais rápido)...")
-                                            try {
-                                                val extractorV8 = PlayerEmbedAPIExtractorV8()
-                                                val linksV8 = mutableListOf<ExtractorLink>()
-                                                extractorV8.getUrl(source, referer, subtitleCallback) { link ->
-                                                    linksV8.add(link)
-                                                }
-                                                
-                                                mutex.withLock {
-                                                    if (linksV8.isNotEmpty() && linksFound.get() == 0) {
-                                                        linksV8.forEach { callback(it) }
-                                                        linksFound.addAndGet(linksV8.size)
-                                                        Log.wtf(TAG, "✅ PlayerEmbedAPI v8 (Pure HTTP Fallback): ${linksV8.size} links")
-                                                    } else if (linksV8.isEmpty()) {
-                                                        Log.e(TAG, "❌ v8 (Pure HTTP) também retornou vazio")
-                                                    }
-                                                }
-                                            } catch (e: Exception) {
-                                                Log.e(TAG, "❌ PlayerEmbedAPI v8 também falhou: ${e.message}")
+                                        // FASE 2: Tentar v8 (Pure HTTP) também - adiciona mais links
+                                        if (!v7Succeeded) {
+                                            Log.d(TAG, "⚠️ v7 falhou ou vazio, tentando v8 (Pure HTTP - mais rápito)...")
+                                        } else {
+                                            Log.d(TAG, "🔄 v7 funcionou, mas tentando v8 também para mais qualidades...")
+                                        }
+                                        try {
+                                            val extractorV8 = PlayerEmbedAPIExtractorV8()
+                                            val linksV8 = mutableListOf<ExtractorLink>()
+                                            extractorV8.getUrl(source, referer, subtitleCallback) { link ->
+                                                linksV8.add(link)
                                             }
+                                            
+                                            mutex.withLock {
+                                                if (linksV8.isNotEmpty()) {
+                                                    linksV8.forEach { callback(it) }
+                                                    linksFound.addAndGet(linksV8.size)
+                                                    Log.wtf(TAG, "✅ PlayerEmbedAPI v8 (Pure HTTP): ${linksV8.size} links")
+                                                } else {
+                                                    Log.e(TAG, "❌ v8 (Pure HTTP) retornou vazio")
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v8 falhou: ${e.message}")
                                         }
                                     }
                                     source.contains("myvidplay", ignoreCase = true) -> {
@@ -739,10 +736,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ MyVidPlay: SUCESSO")
+                                                Log.d(TAG, "✅ MyVidPlay: ${links.size} links")
                                             }
                                         }
                                     }
@@ -753,10 +750,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ MegaEmbed: SUCESSO")
+                                                Log.d(TAG, "✅ MegaEmbed: ${links.size} links")
                                             }
                                         }
                                     }
@@ -767,10 +764,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ DoodStream: SUCESSO")
+                                                Log.d(TAG, "✅ DoodStream: ${links.size} links")
                                             }
                                         }
                                     }
@@ -781,10 +778,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ StreamTape: SUCESSO")
+                                                Log.d(TAG, "✅ StreamTape: ${links.size} links")
                                             }
                                         }
                                     }
@@ -795,10 +792,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ Mixdrop: SUCESSO")
+                                                Log.d(TAG, "✅ Mixdrop: ${links.size} links")
                                             }
                                         }
                                     }
@@ -809,10 +806,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
-                                                Log.d(TAG, "✅ Filemoon: SUCESSO")
+                                                Log.d(TAG, "✅ Filemoon: ${links.size} links")
                                             }
                                         }
                                     }
@@ -823,9 +820,10 @@ class MaxSeriesProvider : MainAPI() {
                                             links.add(link)
                                         }
                                         mutex.withLock {
-                                            if (links.isNotEmpty() && linksFound.get() == 0) {
+                                            if (links.isNotEmpty()) {
                                                 links.forEach { callback(it) }
                                                 linksFound.addAndGet(links.size)
+                                                Log.d(TAG, "✅ Loader genérico: ${links.size} links")
                                             }
                                         }
                                     }

@@ -1,7 +1,7 @@
-version = 259
+version = 261
 
 cloudstream {
-    description = "MaxSeries v259 - PlayerEmbedAPI WebView Priority Fix"
+    description = "MaxSeries v261 - Multi-Source: Captura TODAS as sources simultaneamente"
     authors = listOf("franciscoalro")
     status = 1
     tvTypes = listOf("TvSeries", "Movie")

@@ -1,6 +1,6 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v260 - AES Decryptor + CDN Constructor + Session Manager",
+  "description": "MaxSeries v261 - Multi-Source: Captura TODAS as sources simultaneamente",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

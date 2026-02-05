@@ -1,7 +1,7 @@
 [
     {
         "iconUrl": "https://www.maxseries.pics/favicon.ico",
-        "fileSize": 291019,
+        "fileSize": 747170,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,
@@ -13,16 +13,16 @@
             "Movie",
             "TvSeries"
         ],
-        "version": 259,
+        "version": 264,
         "internalName": "MaxSeries",
         "jarUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.jar",
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3",
         "name": "MaxSeries",
-        "description": "MaxSeries - Filmes e series com multiplos extractores"
+        "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada"
     },
     {
         "iconUrl": "https://animesonlinecc.to/favicon.ico",
-        "fileSize": 15945,
+        "fileSize": 27630,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,
@@ -126,7 +126,7 @@
     },
     {
         "iconUrl": "https://megaflix.co/favicon.ico",
-        "fileSize": 15126,
+        "fileSize": 21595,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,
@@ -168,7 +168,7 @@
     },
     {
         "iconUrl": "https://overflix.me/favicon.ico",
-        "fileSize": 22835,
+        "fileSize": 39078,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,
@@ -189,7 +189,7 @@
     },
     {
         "iconUrl": "https://pobreflix.tv/favicon.ico",
-        "fileSize": 20855,
+        "fileSize": 34193,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,
@@ -210,7 +210,7 @@
     },
     {
         "iconUrl": "https://vizer.tv/favicon.ico",
-        "fileSize": 26373,
+        "fileSize": 41496,
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
         "status": 1,

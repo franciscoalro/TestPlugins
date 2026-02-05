@@ -24,8 +24,8 @@
     {
         "name": "MaxSeries",
         "internalName": "MaxSeries",
-        "description": "MaxSeries v256 - BOM Fix & Clean Build",
-        "version": 256,
+        "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
+        "version": 264,
         "authors": [
             "franciscoalro"
         ],
@@ -39,7 +39,7 @@
         "iconUrl": "https://www.maxseries.pics/wp-content/themes/dooplay/assets/img/favicon.png",
         "apiVersion": 1,
         "isAdult": false,
-        "fileSize": 290925,
+        "fileSize": 747166,
         "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3",
         "updatedAt": "2026-02-01 16:50:00"
     }

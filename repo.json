@@ -1,6 +1,6 @@
 {
-  "name": "Franciscoalro Plugins",
-  "description": "Repositorio de plugins para CloudStream3",
+  "name": "MaxSeries",
+  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

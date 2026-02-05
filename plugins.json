@@ -7,10 +7,11 @@
     "name": "MaxSeries",
     "internalName": "MaxSeries",
     "authors": ["franciscoalro"],
-    "description": "MaxSeries v264 - Build otimizado",
+    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",
-    "fileSize": 747484
+    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "fileSize": 747480
   }
 ]

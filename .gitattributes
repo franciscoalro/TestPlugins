@@ -1,0 +1,7 @@
+# Force JSON files to be treated as binary to prevent line ending conversion
+*.json binary
+*.cs3 binary
+
+# Or explicitly set line endings
+*.json text eol=lf
+*.md text eol=lf

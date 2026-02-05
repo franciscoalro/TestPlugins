@@ -1,7 +1,8 @@
 package com.franciscoalro.maxseries
 
+import android.content.Context
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
-import com.lagradost.cloudstream3.plugins.BasePlugin
+import com.lagradost.cloudstream3.plugins.Plugin
 
 // Importar TODOS os extractors necessários
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
@@ -14,8 +15,8 @@ import com.franciscoalro.maxseries.extractors.MixdropExtractor
 import com.franciscoalro.maxseries.extractors.FilemoonExtractor
 
 @CloudstreamPlugin
-class MaxSeriesPlugin: BasePlugin() {
-    override fun load() {
+class MaxSeriesPlugin: Plugin() {
+    override fun load(context: Context) {
         // Registrar provider principal
         registerMainAPI(MaxSeriesProvider())
         

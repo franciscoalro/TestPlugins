@@ -127,7 +127,7 @@ import com.franciscoalro.maxseries.extractors.FilemoonExtractor
  */
 class MaxSeriesProvider : MainAPI() {
     override var mainUrl = "https://www.maxseries.pics"
-    override var name = "MaxSeries v256"
+    override var name = "MaxSeries"
     override val hasMainPage = true
     override val hasQuickSearch = true
     override var lang = "pt"
@@ -141,7 +141,7 @@ class MaxSeriesProvider : MainAPI() {
     }
     
     init {
-        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v256 CARREGADO! 🚀🚀🚀")
+        Log.wtf(TAG, "🚀🚀🚀 MAXSERIES PROVIDER v264 CARREGADO! 🚀🚀🚀")
         Log.wtf(TAG, "Name: $name, MainUrl: $mainUrl")
         Log.wtf(TAG, "Correções: PlayerEmbedAPI V8 (Pure HTTP) + V7 (WebView 25s timeout) + Prioridade V8")
         Log.wtf(TAG, "Extractors: PlayerThreeBlogger, PlayerEmbedAPI (v8.0), MegaEmbed, MyVidPlay, DoodStream, StreamTape, Mixdrop, Filemoon")

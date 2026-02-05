@@ -1,1 +1,7 @@
-{"name":"Franciscoalro Plugins","manifestVersion":1,"pluginLists":["https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"]}
+{
+  "name": "Franciscoalro Plugins",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
+  ]
+}

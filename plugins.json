@@ -1,20 +1,99 @@
-{
-    "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
-    "status":  1,
-    "version":  264,
-    "apiVersion":  1,
-    "name":  "MaxSeries",
-    "internalName":  "MaxSeries",
-    "authors":  [
-                    "franciscoalro"
-                ],
-    "description":  "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
-    "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
-    "tvTypes":  [
-                    "TvSeries",
-                    "Movie"
-                ],
-    "language":  "pt-BR",
-    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize":  747487
-}
+﻿[  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+    "status": 1,
+    "version": 264,
+    "apiVersion": 1,
+    "name": "MaxSeries",
+    "internalName": "MaxSeries",
+    "authors": ["franciscoalro"],
+    "description": "MaxSeries v264",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 747487
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/AnimesOnlineCC.cs3",
+    "status": 1,
+    "version": 10,
+    "apiVersion": 1,
+    "name": "AnimesOnlineCC",
+    "internalName": "AnimesOnlineCC",
+    "authors": ["franciscoalro"],
+    "description": "AnimesOnlineCC v10",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["Anime"],
+    "language": "pt-BR",
+    "fileSize": 27630
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/Vizer.cs3",
+    "status": 1,
+    "version": 2,
+    "apiVersion": 1,
+    "name": "Vizer",
+    "internalName": "Vizer",
+    "authors": ["franciscoalro"],
+    "description": "Vizer v2",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 41496
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/NetCine.cs3",
+    "status": 1,
+    "version": 2,
+    "apiVersion": 1,
+    "name": "NetCine",
+    "internalName": "NetCine",
+    "authors": ["franciscoalro"],
+    "description": "NetCine v2",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 28346
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MegaFlix.cs3",
+    "status": 1,
+    "version": 2,
+    "apiVersion": 1,
+    "name": "MegaFlix",
+    "internalName": "MegaFlix",
+    "authors": ["franciscoalro"],
+    "description": "MegaFlix v2",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 21595
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/PobreFlix.cs3",
+    "status": 1,
+    "version": 2,
+    "apiVersion": 1,
+    "name": "PobreFlix",
+    "internalName": "PobreFlix",
+    "authors": ["franciscoalro"],
+    "description": "PobreFlix v2",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 34193
+  },
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/OverFlix.cs3",
+    "status": 1,
+    "version": 2,
+    "apiVersion": 1,
+    "name": "OverFlix",
+    "internalName": "OverFlix",
+    "authors": ["franciscoalro"],
+    "description": "OverFlix v2",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "fileSize": 39078
+  }
+]

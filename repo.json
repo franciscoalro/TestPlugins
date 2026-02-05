@@ -1,6 +1,6 @@
 {
-  "name": "MaxSeries",
-  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
+  "name": "Franciscoalro Plugins",
+  "description": "Repositório de plugins para CloudStream3 - MaxSeries, AnimesOnlineCC, Vizer, NetCine, MegaFlix, PobreFlix, OverFlix",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

@@ -1,1 +1,17 @@
-[{"iconUrl":"https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png","fileSize":747170,"apiVersion":1,"repositoryUrl":"https://github.com/franciscoalro/TestPlugins","status":1,"language":"pt-br","authors":["franciscoalro"],"tvTypes":["Movie","TvSeries"],"version":264,"internalName":"MaxSeries","jarUrl":"https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.jar","description":"MaxSeries - Filmes e Series em FHD e HD.","url":"https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3","name":"MaxSeries"}]
+[
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+    "status": 1,
+    "version": 264,
+    "apiVersion": 1,
+    "name": "MaxSeries",
+    "internalName": "MaxSeries",
+    "authors": ["franciscoalro"],
+    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "fileSize": 747166
+  }
+]

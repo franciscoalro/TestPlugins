@@ -363,6 +363,11 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
                 val videoUrl = match.value
                     .replace("\\", "") // Remove escapes
                     .trim('"', '\'', ' ') // Remove quotes
+                val lowerUrl = videoUrl.lowercase()
+                if (NON_VIDEO_EXTENSIONS.any { lowerUrl.contains(it) }) {
+                    Log.d(TAG, "  ✗ Ignored non-video URL via pattern ${index + 1}: ${videoUrl.take(60)}...")
+                    continue
+                }
                 
                 if (isValidVideoUrl(videoUrl)) {
                     Log.d(TAG, "  ✓ Found via pattern ${index + 1}: ${videoUrl.take(60)}...")
@@ -593,8 +598,9 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
                 url = url,
                 type = type
             ) {
-                this.referer = headers["Referer"]!!
-                this.headers = headers
+                val referer = headers["Referer"] ?: mainUrl
+                this.referer = referer
+                this.headers = if (headers.isEmpty()) mapOf("Referer" to referer) else headers
                 this.quality = quality
             }
         )

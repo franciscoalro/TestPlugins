@@ -311,6 +311,13 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                             if (isValidVideoUrl(it)) {
                                 Log.d(TAG, "🔍 LoadResource: ${it.take(80)}...")
                                 foundUrls.add(it)
+                                // Fallback: liberar imediatamente se for mídia direta
+                                if (!cleanedUp.get() &&
+                                    (it.contains(".m3u8", ignoreCase = true) ||
+                                     it.contains(".mp4", ignoreCase = true))) {
+                                    latch.countDown()
+                                    cleanupRef?.invoke()
+                                }
                             }
                         }
                     }

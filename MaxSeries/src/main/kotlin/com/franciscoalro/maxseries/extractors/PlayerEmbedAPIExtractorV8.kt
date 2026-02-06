@@ -200,8 +200,17 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
      * jwplayer('player').setup({ file: 'https://...' })
      * jwplayer('player').setup({ sources: [{ file: 'https://...' }] })
      */
-    private fun extractFromJWPlayerSetup(html: String): String? {
+    internal fun extractFromJWPlayerSetup(html: String): String? {
         Log.d(TAG, "[Method 1] Trying JWPlayer setup extraction...")
+
+        // Fallback simples: pegar 'file' diretamente
+        Regex("""['"]file['"]\s*:\s*['"]([^'"]+)['"]""").find(html)?.let {
+            val directUrl = it.groupValues[1]
+            if (isValidVideoUrl(directUrl)) {
+                Log.d(TAG, "  ✓ Found via direct file regex: ${directUrl.take(60)}...")
+                return directUrl
+            }
+        }
         
         // Regex: jwplayer('player').setup({...})
         val setupRegex = Regex(
@@ -225,7 +234,7 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
                 .replace(Regex(""",\s*]"""), "]")
             
             // Tentar parsear como JSON
-            val config = JSONObject(setupJson)
+            val config = JSONObject(setupJson.replace("'", "\""))
             
             // Tentar 'file' direto
             if (config.has("file")) {

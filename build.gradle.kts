@@ -66,6 +66,7 @@ subprojects {
 
     dependencies {
         val implementation by configurations
+        val testImplementation by configurations
         implementation("com.github.recloudstream.cloudstream:library:master-SNAPSHOT")
         implementation(kotlin("stdlib", "2.3.0"))
         implementation("com.github.Blatzar:NiceHttp:0.4.13")
@@ -75,6 +76,13 @@ subprojects {
         implementation("com.fasterxml.jackson.core:jackson-databind:2.16.0")
         implementation("com.squareup.okhttp3:okhttp:4.12.0")
         implementation("androidx.webkit:webkit:1.8.0")
+
+        // Testes unitários
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.robolectric:robolectric:4.12.1")
+        testImplementation("io.mockk:mockk:1.13.11")
+        testImplementation("org.jetbrains.kotlin:kotlin-test:2.3.0")
+        testImplementation("androidx.test:core:1.5.0")
     }
 }
 

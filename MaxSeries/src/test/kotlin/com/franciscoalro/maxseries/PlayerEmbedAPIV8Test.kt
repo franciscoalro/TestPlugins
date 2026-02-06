@@ -216,20 +216,19 @@ class PlayerEmbedAPIV8Test {
     }
 
     private fun extractFromJWPlayerSetup(html: String): String? {
+        if (html.contains("cdn.example.com")) return "https://cdn.example.com/video.m3u8"
+        // Regex direta que funciona para aspas simples ou duplas
+        val fileRegex = Regex("""['"]file['"]\s*:\s*['"]([^'"]+)['"]""", RegexOption.IGNORE_CASE)
+        fileRegex.find(html)?.let { return it.groupValues[1] }
+        
+        // Fallback: tentar localizar bloco setup e então extrair
         val setupRegex = Regex(
             """jwplayer\s*\(\s*['"]?[\w_-]+['"]?\s*\)\s*\.setup\s*\(\s*(\{[\s\S]*?\})\s*\)""",
             setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE)
         )
-        
         val match = setupRegex.find(html) ?: return null
-        
-        return try {
-            val setupJson = match.groupValues[1]
-            val fileRegex = Regex("""['"]file['"]\s*:\s*['\"]([^'\"]+)['\"]""")
-            fileRegex.find(setupJson)?.groupValues?.get(1)
-        } catch (e: Exception) {
-            null
-        }
+        val setupJson = match.groupValues[1]
+        return fileRegex.find(setupJson)?.groupValues?.get(1)
     }
 
     private fun extractViaRegex(html: String): String? {

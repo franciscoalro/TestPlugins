@@ -41,6 +41,11 @@ class PlayerEmbedAPIExtractor : ExtractorApi() {
             4 to Qualities.P720,
             5 to Qualities.P1080
         )
+
+        fun canHandle(url: String): Boolean {
+            val lower = url.lowercase()
+            return lower.contains("playerembedapi") || lower.contains("short.icu")
+        }
     }
 
     override suspend fun getUrl(

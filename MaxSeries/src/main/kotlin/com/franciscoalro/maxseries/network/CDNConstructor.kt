@@ -44,6 +44,8 @@ import java.net.URL
 object CDNConstructor {
     
     private const val TAG = "CDNConstructor"
+    private fun safeLogD(msg: String) = runCatching { Log.d(TAG, msg) }
+    private fun safeLogE(msg: String, t: Throwable? = null) = runCatching { Log.e(TAG, msg, t) }
     
     /**
      * Domínios CDN conhecidos (descobertos via fuzzing)
@@ -168,11 +170,11 @@ object CDNConstructor {
      * Combina múltiplas estratégias de extração
      */
     fun extractVideoData(html: String): VideoData? {
-        Log.d(TAG, "🔍 Extraindo dados de vídeo do HTML...")
+        safeLogD("🔍 Extraindo dados de vídeo do HTML...")
         
         // Estratégia 1: Usar AesCtrDecryptor para extrair metadata
         AesCtrDecryptor.extractMetadata(html)?.let { metadata ->
-            Log.d(TAG, "✅ Dados extraídos via AesCtrDecryptor")
+            safeLogD("✅ Dados extraídos via AesCtrDecryptor")
             return VideoData(
                 slug = metadata.slug,
                 md5Id = metadata.md5Id.toString(),
@@ -183,29 +185,29 @@ object CDNConstructor {
         
         // Estratégia 2: Extrair de variáveis JavaScript
         extractFromJavaScript(html)?.let {
-            Log.d(TAG, "✅ Dados extraídos de JavaScript")
+            safeLogD("✅ Dados extraídos de JavaScript")
             return it
         }
         
         // Estratégia 3: Extrair de atributos data-*
         extractFromDataAttributes(html)?.let {
-            Log.d(TAG, "✅ Dados extraídos de atributos data-*")
+            safeLogD("✅ Dados extraídos de atributos data-*")
             return it
         }
         
         // Estratégia 4: Extrair de meta tags
         extractFromMetaTags(html)?.let {
-            Log.d(TAG, "✅ Dados extraídos de meta tags")
+            safeLogD("✅ Dados extraídos de meta tags")
             return it
         }
         
         // Estratégia 5: Regex direto no HTML
         extractViaRegex(html)?.let {
-            Log.d(TAG, "✅ Dados extraídos via regex")
+            safeLogD("✅ Dados extraídos via regex")
             return it
         }
         
-        Log.d(TAG, "❌ Não foi possível extrair dados de vídeo")
+        safeLogD("❌ Não foi possível extrair dados de vídeo")
         return null
     }
     
@@ -214,7 +216,11 @@ object CDNConstructor {
      * Retorna lista de candidatos para validação
      */
     fun constructCDNUrls(videoData: VideoData): List<String> {
-        Log.d(TAG, "🏗️ Construindo URLs CDN para: ${videoData.slug}/${videoData.md5Id}")
+        safeLogD("🏗️ Construindo URLs CDN para: ${videoData.slug}/${videoData.md5Id}")
+        
+        if (videoData.slug.isBlank() && videoData.md5Id.isBlank() && videoData.videoId.isBlank()) {
+            return emptyList()
+        }
         
         val urls = mutableListOf<String>()
         
@@ -238,7 +244,7 @@ object CDNConstructor {
             }
         }
         
-        Log.d(TAG, "📊 ${urls.size} URLs CDN construídas")
+        safeLogD("📊 ${urls.size} URLs CDN construídas")
         return urls.distinct()
     }
     
@@ -255,18 +261,18 @@ object CDNConstructor {
         
         // Extrair dados
         val videoData = extractVideoData(html) ?: run {
-            Log.d(TAG, "❌ Falha ao extrair dados de vídeo")
+            safeLogD("❌ Falha ao extrair dados de vídeo")
             return null
         }
         
         // Construir URLs
         val urls = constructCDNUrls(videoData)
         if (urls.isEmpty()) {
-            Log.d(TAG, "❌ Nenhuma URL CDN construída")
+            safeLogD("❌ Nenhuma URL CDN construída")
             return null
         }
         
-        Log.d(TAG, "🔍 Validando ${urls.size} URLs em paralelo...")
+        safeLogD("🔍 Validando ${urls.size} URLs em paralelo...")
         
         // Validar em paralelo
         val validationResults = validateUrlsParallel(urls.take(maxConcurrent), timeoutMs)
@@ -285,7 +291,7 @@ object CDNConstructor {
                 validUrl = firstValid.url
             )
         } else {
-            Log.d(TAG, "⚠️ Nenhuma URL válida encontrada após ${duration}ms")
+            safeLogD("⚠️ Nenhuma URL válida encontrada após ${duration}ms")
             CDNResult(
                 urls = urls,
                 source = videoData.source,

@@ -3,6 +3,6 @@
     "description":  "MaxSeries v267 - Build otimizado e estabilidade aprimorada",
     "manifestVersion":  1,
     "pluginLists":  [
-                        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/d2368889c05dd46097d4c3909e4ce01582f69354/plugins.json"
+                        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/ddaf98fc/plugins.json"
                     ]
 }

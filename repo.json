@@ -1,8 +1,8 @@
 {
-  "name": "MaxSeries",
-  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
-  "manifestVersion": 1,
-  "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
-  ]
+    "name":  "MaxSeries",
+    "description":  "MaxSeries v266 - Build otimizado e estabilidade aprimorada",
+    "manifestVersion":  1,
+    "pluginLists":  [
+                        "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
+                    ]
 }

@@ -1,13 +1,13 @@
 [
   {
-    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3",
     "status": 1,
-    "version": 264,
+    "version": 265,
     "apiVersion": 1,
     "name": "MaxSeries",
     "internalName": "MaxSeries",
     "authors": ["franciscoalro"],
-    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
+    "description": "MaxSeries v265 - Build otimizado e estabilidade aprimorada",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",

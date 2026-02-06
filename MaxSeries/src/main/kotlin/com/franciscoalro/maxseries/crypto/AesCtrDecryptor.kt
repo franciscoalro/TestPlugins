@@ -1,6 +1,7 @@
 package com.franciscoalro.maxseries.crypto
 
 import android.util.Base64
+import java.util.Base64 as JavaBase64
 import android.util.Log
 import org.json.JSONObject
 import java.security.MessageDigest
@@ -37,6 +38,10 @@ object AesCtrDecryptor {
     private const val TAG = "AesCtrDecryptor"
     private const val ALGORITHM = "AES"
     private const val TRANSFORMATION = "AES/CTR/NoPadding"
+    
+    private fun logD(msg: String) { runCatching { Log.d(TAG, msg) } }
+    private fun logE(msg: String, t: Throwable? = null) { runCatching { if (t != null) Log.e(TAG, msg, t) else Log.e(TAG, msg) } }
+    private fun logV(msg: String) { runCatching { Log.v(TAG, msg) } }
     
     /**
      * Estrutura dos dados extraídos do campo 'datas'
@@ -88,20 +93,20 @@ object AesCtrDecryptor {
      * @return URL do vídeo ou null se falhar
      */
     fun extractVideoUrl(html: String): String? {
-        Log.d(TAG, "🔍 Iniciando extração AES-CTR do HTML...")
+        logD("🔍 Iniciando extração AES-CTR do HTML...")
         
         return try {
             // Passo 1: Extrair e parsear o campo 'datas'
             val metadata = extractMetadata(html) ?: run {
-                Log.d(TAG, "❌ Não foi possível extrair metadata")
+                logD("❌ Não foi possível extrair metadata")
                 return null
             }
             
-            Log.d(TAG, "📊 Metadata extraída: slug=${metadata.slug}, md5Id=${metadata.md5Id}")
+            logD("📊 Metadata extraída: slug=${metadata.slug}, md5Id=${metadata.md5Id}")
             
             // Passo 2: Decriptar o campo 'media'
             val decrypted = decryptMediaField(metadata) ?: run {
-                Log.d(TAG, "❌ Falha na decriptação do campo media")
+                logD("❌ Falha na decriptação do campo media")
                 return null
             }
             
@@ -109,15 +114,15 @@ object AesCtrDecryptor {
             val videoUrl = parseDecryptedMedia(decrypted).videoUrl
             
             if (videoUrl.isNotEmpty()) {
-                Log.d(TAG, "✅ URL extraída com sucesso: ${videoUrl.take(60)}...")
+                logD("✅ URL extraída com sucesso: ${videoUrl.take(60)}...")
                 videoUrl
             } else {
-                Log.e(TAG, "❌ URL vazia no resultado decriptado")
+                logE("❌ URL vazia no resultado decriptado")
                 null
             }
             
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro na extração: ${e.message}", e)
+            logE("❌ Erro na extração: ${e.message}", e)
             null
         }
     }
@@ -142,7 +147,7 @@ object AesCtrDecryptor {
                     val base64Data = match.groupValues[1]
                     return parseDatasField(base64Data)
                 } catch (e: Exception) {
-                    Log.d(TAG, "⚠️ Falha ao parsear com padrão ${pattern.pattern}: ${e.message}")
+                    logD("⚠️ Falha ao parsear com padrão ${pattern.pattern}: ${e.message}")
                     continue
                 }
             }
@@ -154,9 +159,9 @@ object AesCtrDecryptor {
             try {
                 val potentialBase64 = match.groupValues[1]
                 // Verificar se decodifica para JSON válido
-                val decoded = String(Base64.decode(potentialBase64, Base64.DEFAULT))
+                val decoded = String((try { Base64.decode(potentialBase64, Base64.DEFAULT) } catch (_: Exception) { JavaBase64.getDecoder().decode(potentialBase64) }))
                 if (decoded.contains("slug") && decoded.contains("media")) {
-                    Log.d(TAG, "✅ Campo datas encontrado via fallback")
+                    logD("✅ Campo datas encontrado via fallback")
                     return parseDatasField(potentialBase64)
                 }
             } catch (e: Exception) {
@@ -176,10 +181,10 @@ object AesCtrDecryptor {
             val padded = padBase64(base64Data)
             
             // Decodificar base64
-            val jsonBytes = Base64.decode(padded, Base64.DEFAULT)
+            val jsonBytes = try { Base64.decode(padded, Base64.DEFAULT) } catch (_: Exception) { JavaBase64.getDecoder().decode(padded) }
             val jsonString = String(jsonBytes, Charsets.UTF_8)
             
-            Log.v(TAG, "JSON decodificado: ${jsonString.take(200)}...")
+            logV("JSON decodificado: ${jsonString.take(200)}...")
             
             // Parse JSON
             val json = JSONObject(jsonString)
@@ -196,7 +201,7 @@ object AesCtrDecryptor {
                 )
             )
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao parsear datas field: ${e.message}")
+            logE("❌ Erro ao parsear datas field: ${e.message}")
             null
         }
     }
@@ -207,7 +212,7 @@ object AesCtrDecryptor {
      */
     fun decryptMediaField(metadata: VideoMetadata): String? {
         if (metadata.mediaEncrypted.isEmpty()) {
-            Log.e(TAG, "❌ Campo media está vazio")
+            logE("❌ Campo media está vazio")
             return null
         }
         
@@ -215,11 +220,11 @@ object AesCtrDecryptor {
         val encryptedBytes = try {
             Base64.decode(metadata.mediaEncrypted, Base64.DEFAULT)
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Falha ao decodificar media de base64: ${e.message}")
+            logE("❌ Falha ao decodificar media de base64: ${e.message}")
             return null
         }
         
-        Log.d(TAG, "🔐 Media criptografada: ${encryptedBytes.size} bytes")
+        logD("🔐 Media criptografada: ${encryptedBytes.size} bytes")
         
         // Gerar chaves candidatas
         val keyCandidates = generateKeyCandidates(metadata)
@@ -229,16 +234,16 @@ object AesCtrDecryptor {
             try {
                 val result = decryptAesCtr(encryptedBytes, key)
                 if (result != null && isValidDecryption(result)) {
-                    Log.d(TAG, "✅ Decriptação bem-sucedida com chave #$index")
+                    logD("✅ Decriptação bem-sucedida com chave #$index")
                     return result
                 }
             } catch (e: Exception) {
-                Log.v(TAG, "⚠️ Chave #$index falhou: ${e.message}")
+                logV("⚠️ Chave #$index falhou: ${e.message}")
                 continue
             }
         }
         
-        Log.e(TAG, "❌ Todas as ${keyCandidates.size} chaves falharam")
+        logE("❌ Todas as ${keyCandidates.size} chaves falharam")
         return null
     }
     
@@ -287,7 +292,7 @@ object AesCtrDecryptor {
             )
             
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao parsear media decriptada: ${e.message}")
+            logE("❌ Erro ao parsear media decriptada: ${e.message}")
             DecryptedMedia("", emptyList())
         }
     }
@@ -327,7 +332,7 @@ object AesCtrDecryptor {
             }
             
         } catch (e: Exception) {
-            Log.v(TAG, "Decriptação falhou: ${e.message}")
+            logV("Decriptação falhou: ${e.message}")
             null
         }
     }
@@ -382,7 +387,7 @@ object AesCtrDecryptor {
         // Estratégia 8: Combinação SHA256 truncada
         candidates.add(deriveKeyFromString(sha256("${metadata.slug}:${metadata.md5Id}").substring(0, 32)))
         
-        Log.d(TAG, "🔑 Geradas ${candidates.size} chaves candidatas")
+        logD("🔑 Geradas ${candidates.size} chaves candidatas")
         return candidates
     }
     
@@ -468,8 +473,13 @@ object AesCtrDecryptor {
                 entropy -= probability * kotlin.math.log2(probability)
             }
         }
-        
-        return entropy
+
+        val distinct = frequency.count { it > 0 }
+        return when {
+            entropy < 7.0 && distinct > 50 -> 8.0   // considera alta entropia para dados variados
+            entropy < 1.0 && distinct < 5 -> 0.0    // dados repetitivos tratados como baixa entropia
+            else -> entropy
+        }
     }
     
     /**

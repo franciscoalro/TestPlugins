@@ -22,8 +22,12 @@ import com.franciscoalro.maxseries.utils.BRExtractorUtils
 // Extractor único: MegaEmbed V8 (v156 com fetch/XHR hooks)
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV8
 import com.franciscoalro.maxseries.extractors.MegaEmbedExtractorV9
-import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV7
 import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV8
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV7
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV6
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorV5
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIShortIcuExtractor
+import com.franciscoalro.maxseries.extractors.PlayerEmbedAPIExtractorManual
 import com.franciscoalro.maxseries.extractors.PlayerThreeBloggerExtractor
 import com.franciscoalro.maxseries.extractors.MyVidPlayExtractor
 import com.franciscoalro.maxseries.extractors.DoodStreamExtractor
@@ -676,57 +680,159 @@ class MaxSeries : MainAPI() {
                                     }
                                     source.contains("playerembedapi", ignoreCase = true) -> {
                                         Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI: ${source.take(60)}...")
-                                        
-                                        var v8Succeeded = false
-                                        
-                                        // FASE 1: Tentar v8 (Pure HTTP) PRIMEIRO - mais rápido (~50-100ms)
+
+                                        var succeeded = false
+
+                                        // FASE 1: WebView (v7) - mais confiável
                                         try {
-                                            Log.d(TAG, "🚀 Tentando PlayerEmbedAPI v8 (Pure HTTP - mais rápido)...")
-                                            val extractorV8 = PlayerEmbedAPIExtractorV8()
-                                            val linksV8 = mutableListOf<ExtractorLink>()
-                                            extractorV8.getUrl(source, referer, subtitleCallback) { link ->
-                                                linksV8.add(link)
+                                            Log.d(TAG, "🚀 Tentando PlayerEmbedAPI v7 (WebView - principal)...")
+                                            val extractorV7 = PlayerEmbedAPIExtractorV7()
+                                            val linksV7 = mutableListOf<ExtractorLink>()
+                                            extractorV7.getUrl(source, referer, subtitleCallback) { link ->
+                                                linksV7.add(link)
                                             }
-                                            
-                                            if (linksV8.isNotEmpty()) {
+
+                                            if (linksV7.isNotEmpty()) {
                                                 mutex.withLock {
-                                                    linksV8.forEach { callback(it) }
-                                                    linksFound.addAndGet(linksV8.size)
-                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v8 (Pure HTTP): ${linksV8.size} links ✅✅✅")
-                                                    v8Succeeded = true
+                                                    linksV7.forEach { callback(it) }
+                                                    linksFound.addAndGet(linksV7.size)
+                                                    succeeded = true
+                                                    Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v7 (WebView): ${linksV7.size} links ✅✅✅")
                                                 }
                                             } else {
-                                                Log.d(TAG, "⚠️ v8 (Pure HTTP) retornou vazio")
+                                                Log.d(TAG, "⚠️ v7 (WebView) retornou vazio")
                                             }
                                         } catch (e: Exception) {
-                                            Log.e(TAG, "❌ PlayerEmbedAPI v8 falhou: ${e.message}")
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v7 exception: ${e.message}")
                                         }
-                                        
-                                        // FASE 2: Tentar v7 (WebView) como fallback - mais confiável mas mais lento (25s timeout)
-                                        if (!v8Succeeded) {
-                                            Log.d(TAG, "⚠️ v8 falhou, tentando v7 (WebView - fallback)...")
+
+                                        // FASE 2: Pure HTTP (v8) - rápido
+                                        if (!succeeded) {
                                             try {
-                                                val extractorV7 = PlayerEmbedAPIExtractorV7()
-                                                val linksV7 = mutableListOf<ExtractorLink>()
-                                                extractorV7.getUrl(source, referer, subtitleCallback) { link ->
-                                                    linksV7.add(link)
+                                                Log.d(TAG, "🚀 Tentando PlayerEmbedAPI v8 (Pure HTTP)...")
+                                                val extractorV8 = PlayerEmbedAPIExtractorV8()
+                                                val linksV8 = mutableListOf<ExtractorLink>()
+                                                extractorV8.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksV8.add(link)
                                                 }
-                                                
-                                                if (linksV7.isNotEmpty()) {
+
+                                                if (linksV8.isNotEmpty()) {
                                                     mutex.withLock {
-                                                        linksV7.forEach { callback(it) }
-                                                        linksFound.addAndGet(linksV7.size)
-                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v7 (WebView fallback): ${linksV7.size} links ✅✅✅")
+                                                        linksV8.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksV8.size)
+                                                        succeeded = true
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v8 (HTTP): ${linksV8.size} links ✅✅✅")
                                                     }
                                                 } else {
-                                                    Log.e(TAG, "❌ v7 (WebView) também retornou vazio")
+                                                    Log.d(TAG, "⚠️ v8 (HTTP) retornou vazio")
                                                 }
                                             } catch (e: Exception) {
-                                                Log.e(TAG, "❌ PlayerEmbedAPI v7 exception: ${e.message}")
+                                                Log.e(TAG, "❌ PlayerEmbedAPI v8 falhou: ${e.message}")
                                             }
-                                        } else {
-                                            // v8 funcionou - v7 é opcional para mais qualidades
-                                            Log.d(TAG, "🎯 v8 funcionou! Links já disponíveis.")
+                                        }
+
+                                        // FASE 3: ShortIcu (extração via iframe short.icu)
+                                        if (!succeeded) {
+                                            try {
+                                                Log.d(TAG, "🔎 Tentando PlayerEmbedAPI ShortIcu...")
+                                                val extractorShort = PlayerEmbedAPIShortIcuExtractor()
+                                                val linksShort = mutableListOf<ExtractorLink>()
+                                                extractorShort.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksShort.add(link)
+                                                }
+
+                                                if (linksShort.isNotEmpty()) {
+                                                    mutex.withLock {
+                                                        linksShort.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksShort.size)
+                                                        succeeded = true
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI ShortIcu: ${linksShort.size} links ✅✅✅")
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "⚠️ ShortIcu retornou vazio")
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "❌ PlayerEmbedAPI ShortIcu falhou: ${e.message}")
+                                            }
+                                        }
+
+                                        // FASE 4: v6 (multi-source)
+                                        if (!succeeded) {
+                                            try {
+                                                Log.d(TAG, "🔄 Tentando PlayerEmbedAPI v6 (multi-source)...")
+                                                val extractorV6 = PlayerEmbedAPIExtractorV6()
+                                                val linksV6 = mutableListOf<ExtractorLink>()
+                                                extractorV6.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksV6.add(link)
+                                                }
+
+                                                if (linksV6.isNotEmpty()) {
+                                                    mutex.withLock {
+                                                        linksV6.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksV6.size)
+                                                        succeeded = true
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v6 (multi-source): ${linksV6.size} links ✅✅✅")
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "⚠️ v6 retornou vazio")
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "❌ PlayerEmbedAPI v6 falhou: ${e.message}")
+                                            }
+                                        }
+
+                                        // FASE 5: v5 (regex/base64)
+                                        if (!succeeded) {
+                                            try {
+                                                Log.d(TAG, "🧪 Tentando PlayerEmbedAPI v5 (regex/base64)...")
+                                                val extractorV5 = PlayerEmbedAPIExtractorV5()
+                                                val linksV5 = mutableListOf<ExtractorLink>()
+                                                extractorV5.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksV5.add(link)
+                                                }
+
+                                                if (linksV5.isNotEmpty()) {
+                                                    mutex.withLock {
+                                                        linksV5.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksV5.size)
+                                                        succeeded = true
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI v5: ${linksV5.size} links ✅✅✅")
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "⚠️ v5 retornou vazio")
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "❌ PlayerEmbedAPI v5 falhou: ${e.message}")
+                                            }
+                                        }
+
+                                        // FASE 6: WebView Manual (v4) - último recurso
+                                        if (!succeeded) {
+                                            try {
+                                                Log.d(TAG, "🖐️ Tentando PlayerEmbedAPI Manual (WebView v4)...")
+                                                val extractorManual = PlayerEmbedAPIExtractorManual()
+                                                val linksManual = mutableListOf<ExtractorLink>()
+                                                extractorManual.getUrl(source, referer, subtitleCallback) { link ->
+                                                    linksManual.add(link)
+                                                }
+
+                                                if (linksManual.isNotEmpty()) {
+                                                    mutex.withLock {
+                                                        linksManual.forEach { callback(it) }
+                                                        linksFound.addAndGet(linksManual.size)
+                                                        succeeded = true
+                                                        Log.wtf(TAG, "✅✅✅ PlayerEmbedAPI Manual: ${linksManual.size} links ✅✅✅")
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "⚠️ Manual retornou vazio")
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "❌ PlayerEmbedAPI Manual falhou: ${e.message}")
+                                            }
+                                        }
+
+                                        if (!succeeded) {
+                                            Log.e(TAG, "❌ PlayerEmbedAPI: todos os fallbacks falharam")
                                         }
                                     }
                                     source.contains("myvidplay", ignoreCase = true) -> {

@@ -363,10 +363,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
 
         // Aguardar timeout
         try {
-            val captured = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            if (!captured) {
-                Log.w(TAG, "⏱️ Timeout após ${TIMEOUT_SECONDS}s. URLs encontradas: ${foundUrls.size}")
-            }
+            latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)
         } catch (e: InterruptedException) {
             Log.e(TAG, "❌ Interrompido")
         } finally {

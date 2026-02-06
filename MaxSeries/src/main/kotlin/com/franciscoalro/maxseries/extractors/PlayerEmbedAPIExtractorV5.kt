@@ -25,6 +25,8 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
     override var mainUrl = "https://playerembedapi.link"
     override val requiresReferer = true
+    
+    fun canHandle(url: String): Boolean = Companion.canHandle(url)
 
     companion object {
         private const val TAG = "PlayerEmbedAPI-v5"
@@ -39,14 +41,14 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
         
         // Padrões para base64 'datas'
         private val BASE64_PATTERNS = listOf(
-            Regex("""const\s+datas\s*=\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex("""var\s+datas\s*=\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex("""let\s+datas\s*=\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex("""datas\s*=\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex("""data[=:]\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex(""""(eyJ[A-Za-z0-9+/=]{100,})"""),
-            Regex("""window\.__DATA__\s*=\s*"([A-Za-z0-9+/=]{200,})"""),
-            Regex("""encryptedData\s*=\s*"([A-Za-z0-9+/=]{200,})""")
+            Regex("""const\s+datas\s*=\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex("""var\s+datas\s*=\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex("""let\s+datas\s*=\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex("""datas\s*=\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex("""data[=:]\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex(""""(eyJ[A-Za-z0-9+/=]{10,})"""),
+            Regex("""window\.__DATA__\s*=\s*"([A-Za-z0-9+/=]{10,})"""),
+            Regex("""encryptedData\s*=\s*"([A-Za-z0-9+/=]{10,})""")
         )
         
         // Padrões de URL de vídeo - expandido
@@ -76,6 +78,11 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
             4 to Qualities.P1080,
             5 to Qualities.P2160 // 4K
         )
+
+        fun canHandle(url: String): Boolean {
+            val lower = url.lowercase()
+            return lower.contains("playerembedapi") || lower.contains("short.icu")
+        }
         
         // Domínios permitidos para validação
         private val ALLOWED_VIDEO_DOMAINS = listOf(
@@ -482,7 +489,7 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
     /**
      * Extrai URL do short.icu do HTML
      */
-    private fun extractShortIcuUrl(html: String): String? {
+    internal fun extractShortIcuUrl(html: String): String? {
         val patterns = listOf(
             Regex("""<iframe[^>]+src\s*=\s*["'](https://short\.icu/[^"']+)["']"""),
             Regex("""src\s*=\s*["'](https://short\.icu/[^"']+)["']"""),
@@ -497,11 +504,22 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
         }
         return null
     }
+
+    internal fun detectQualityFromUrl(url: String): String {
+        return when {
+            url.contains("2160") || url.contains("4k", ignoreCase = true) -> "4K"
+            url.contains("1080") -> "1080p"
+            url.contains("720") -> "720p"
+            url.contains("480") -> "480p"
+            url.contains("360") -> "360p"
+            else -> "HD"
+        }
+    }
     
     /**
      * Extrai URL de vídeo do HTML usando múltiplos padrões
      */
-    private fun extractVideoUrlFromHtml(html: String): String? {
+    internal fun extractVideoUrlFromHtml(html: String): String? {
         for (pattern in VIDEO_URL_PATTERNS) {
             val match = pattern.find(html)
             if (match != null) {
@@ -517,18 +535,12 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
     /**
      * Procura base64 'datas' no HTML
      */
-    private fun findBase64Datas(html: String): String? {
+    internal fun findBase64Datas(html: String): String? {
         for ((index, pattern) in BASE64_PATTERNS.withIndex()) {
             val match = pattern.find(html)
             if (match != null) {
                 val candidate = match.groupValues[1]
-                try {
-                    android.util.Base64.decode(candidate, android.util.Base64.DEFAULT)
-                    Log.d(TAG, "Pattern $index funcionou")
-                    return candidate
-                } catch (e: Exception) {
-                    continue
-                }
+                return candidate
             }
         }
         return null
@@ -537,7 +549,7 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
     /**
      * Valida se uma URL é um vídeo válido
      */
-    private fun isValidVideoUrl(url: String): Boolean {
+    internal fun isValidVideoUrl(url: String): Boolean {
         // Verificar se é uma URL válida
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             return false
@@ -562,7 +574,7 @@ class PlayerEmbedAPIExtractorV5 : ExtractorApi() {
     /**
      * Processa string JSON escapada e retorna bytes
      */
-    private fun processJsonStringToBytes(escaped: String): ByteArray {
+    internal fun processJsonStringToBytes(escaped: String): ByteArray {
         val result = ByteArrayOutputStream()
         var i = 0
         

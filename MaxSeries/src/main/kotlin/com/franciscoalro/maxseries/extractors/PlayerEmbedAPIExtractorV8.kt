@@ -62,6 +62,22 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
             Regex("""https?://[^"\s]*mp4[^"\s]*"""),                    // MP4 direto
             Regex("""https?://[^"\s]*\.ts[^"\s]*""")                    // Transport Stream
         )
+
+        // Extensões que NÃO são vídeo e devem ser bloqueadas
+        private val NON_VIDEO_EXTENSIONS = listOf(
+            ".js",
+            ".css",
+            ".html",
+            ".woff",
+            ".woff2",
+            ".ttf",
+            ".svg",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".gif",
+            ".webp"
+        )
     }
 
     private val headers = mapOf(
@@ -87,8 +103,18 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         val cached = VideoUrlCache.get(url)
         if (cached != null && !cached.isExpired()) {
             Log.d(TAG, "✅ Cache HIT - returning cached URL")
-            emitLink(cached.url, cached.quality, callback, isCached = true)
-            return
+            if (!isValidVideoUrl(cached.url)) {
+                Log.w(TAG, "⚠️ Cached URL invalid, clearing cache entry")
+                VideoUrlCache.remove(url)
+            } else {
+                try {
+                    emitLink(cached.url, cached.quality, callback, isCached = true)
+                    return
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Cache emit failed, clearing entry: ${e.message}", e)
+                    VideoUrlCache.remove(url)
+                }
+            }
         }
         
         try {
@@ -347,10 +373,17 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
                 val videoUrl = match.value
                     .replace("\\", "") // Remove escapes
                     .trim('"', '\'', ' ') // Remove quotes
+                val lowerUrl = videoUrl.lowercase()
+                if (NON_VIDEO_EXTENSIONS.any { lowerUrl.contains(it) }) {
+                    Log.d(TAG, "  ✗ Ignored non-video URL via pattern ${index + 1}: ${videoUrl.take(60)}...")
+                    continue
+                }
                 
                 if (isValidVideoUrl(videoUrl)) {
                     Log.d(TAG, "  ✓ Found via pattern ${index + 1}: ${videoUrl.take(60)}...")
                     return videoUrl
+                } else {
+                    Log.d(TAG, "  ✗ Ignored non-video URL via pattern ${index + 1}: ${videoUrl.take(60)}...")
                 }
             }
         }
@@ -518,6 +551,11 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         if (!urlRegex.matches(url)) return false
         
         val lowerUrl = url.lowercase()
+
+        // Bloquear assets e arquivos não-vídeo
+        for (ext in NON_VIDEO_EXTENSIONS) {
+            if (lowerUrl.contains(ext)) return false
+        }
         
         // Extensões e CDNs conhecidos
         return lowerUrl.contains(".m3u8") ||
@@ -546,6 +584,10 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         isCached: Boolean = false,
         method: String = "Pure"
     ) {
+        if (!isValidVideoUrl(url)) {
+            Log.d(TAG, "  ✗ emitLink blocked non-video URL: ${url.take(80)}")
+            return
+        }
         val type = if (url.contains(".m3u8", ignoreCase = true)) {
             ExtractorLinkType.M3U8
         } else {
@@ -566,8 +608,9 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
                 url = url,
                 type = type
             ) {
-                this.referer = headers["Referer"]!!
-                this.headers = headers
+                val referer = headers["Referer"] ?: mainUrl
+                this.referer = referer
+                this.headers = if (headers.isEmpty()) mapOf("Referer" to referer) else headers
                 this.quality = quality
             }
         )

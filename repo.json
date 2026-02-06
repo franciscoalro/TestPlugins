@@ -1,6 +1,6 @@
 {
-    "name":  "FranciscoAlro Repo",
-    "description":  "Repositório de plugins CloudStream - Filmes, Séries e Animes",
+    "name":  "MaxSeries",
+    "description":  "MaxSeries v266 - Build otimizado e estabilidade aprimorada",
     "manifestVersion":  1,
     "pluginLists":  [
                         "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

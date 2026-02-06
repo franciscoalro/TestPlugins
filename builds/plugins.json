@@ -1,17 +1,21 @@
-[
-  {
-    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3",
-    "status": 1,
-    "version": 265,
-    "apiVersion": 1,
-    "name": "MaxSeries",
-    "internalName": "MaxSeries",
-    "authors": ["franciscoalro"],
-    "description": "MaxSeries v265 - Build otimizado e estabilidade aprimorada",
-    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "tvTypes": ["TvSeries", "Movie"],
-    "language": "pt",
-    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "isAdult": false
-  }
-]
+{
+    "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.cs3",
+    "status":  1,
+    "version":  266,
+    "apiVersion":  1,
+    "name":  "MaxSeries",
+    "internalName":  "MaxSeries",
+    "authors":  [
+                    "franciscoalro"
+                ],
+    "description":  "MaxSeries v266 - Build otimizado e estabilidade aprimorada",
+    "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes":  [
+                    "TvSeries",
+                    "Movie"
+                ],
+    "language":  "pt",
+    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "isAdult":  false,
+    "fileSize":  334548
+}

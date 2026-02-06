@@ -12,7 +12,6 @@
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize": 334219,
-    "jarUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/builds/MaxSeries.jar"
+    "isAdult": false
   }
 ]

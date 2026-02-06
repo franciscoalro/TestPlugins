@@ -103,8 +103,18 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         val cached = VideoUrlCache.get(url)
         if (cached != null && !cached.isExpired()) {
             Log.d(TAG, "✅ Cache HIT - returning cached URL")
-            emitLink(cached.url, cached.quality, callback, isCached = true)
-            return
+            if (!isValidVideoUrl(cached.url)) {
+                Log.w(TAG, "⚠️ Cached URL invalid, clearing cache entry")
+                VideoUrlCache.remove(url)
+            } else {
+                try {
+                    emitLink(cached.url, cached.quality, callback, isCached = true)
+                    return
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Cache emit failed, clearing entry: ${e.message}", e)
+                    VideoUrlCache.remove(url)
+                }
+            }
         }
         
         try {

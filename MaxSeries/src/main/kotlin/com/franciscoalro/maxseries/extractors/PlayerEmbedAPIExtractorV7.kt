@@ -45,9 +45,11 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
             ".mp4",
             ".mkv",
             ".webm",
+            ".ts",
             "cloudatacdn.com",
             "storage.googleapis.com",
             "sssrr.org",
+            "/sora/",
             "/video",
             "/stream",
             "/hls",
@@ -159,7 +161,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                             console.log('[PlayerEmbedAPI-v7] JS Error: ' + msg);
                         };
 
-                        const VIDEO_PATTERNS = ['.m3u8', '.mp4', '.mkv', '.webm', 'cloudatacdn', 'googleapis', 'sssrr', '/video', '/stream', '/hls'];
+                        const VIDEO_PATTERNS = ['.m3u8', '.mp4', '.mkv', '.webm', '.ts', 'cloudatacdn', 'googleapis', 'sssrr', '/sora/', '/video', '/stream', '/hls'];
                         
                         function isVideoUrl(url) {
                             if (!url || typeof url !== 'string') return false;

@@ -25,8 +25,11 @@ def run_build():
     
     # Executar build
     print("\nExecutando build...")
+    gradle_cmd = ["./gradlew", "assembleRelease", "-x", "test", "--no-daemon"]
+    if os.name == "nt":
+        gradle_cmd[0] = ".\\gradlew.bat"
     result = subprocess.run(
-        ["./gradlew", "assembleRelease", "-x", "test", "--no-daemon"],
+        gradle_cmd,
         capture_output=True,
         text=True
     )
@@ -62,12 +65,12 @@ def copy_aar_to_cs3():
         # Preferir release, mas usar debug se não existir
         if os.path.exists(aar_release):
             shutil.copy(aar_release, cs3_file)
-            print(f"  ✓ {provider}.cs3 (release)")
+            print(f"  OK {provider}.cs3 (release)")
         elif os.path.exists(aar_debug):
             shutil.copy(aar_debug, cs3_file)
-            print(f"  ✓ {provider}.cs3 (debug)")
+            print(f"  OK {provider}.cs3 (debug)")
         else:
-            print(f"  ✗ {provider} - AAR não encontrado")
+            print(f"  FAIL {provider} - AAR nao encontrado")
             continue
         
         # Obter tamanho
@@ -100,7 +103,7 @@ def update_json_files(plugins):
     with open("plugins.json", "wb") as f:
         f.write(json.dumps(plugins, indent=2, ensure_ascii=False).encode("utf-8"))
         f.write(b"\n")
-    print("  ✓ plugins.json")
+    print("  OK plugins.json")
     
     # repo.json
     repo = {
@@ -115,7 +118,7 @@ def update_json_files(plugins):
     with open("repo.json", "wb") as f:
         f.write(json.dumps(repo, indent=2, ensure_ascii=False).encode("utf-8"))
         f.write(b"\n")
-    print("  ✓ repo.json")
+    print("  OK repo.json")
 
 def verify_files():
     """Verifica se os arquivos estão corretos"""
@@ -125,23 +128,23 @@ def verify_files():
     with open("plugins.json", "rb") as f:
         data = f.read()
         if data[0:3] == b"\xef\xbb\xbf":
-            print("  ✗ plugins.json tem BOM!")
+            print("  FAIL plugins.json tem BOM!")
         else:
-            print("  ✓ plugins.json sem BOM")
+            print("  OK plugins.json sem BOM")
         
         plugins = json.loads(data.decode("utf-8"))
         if isinstance(plugins, list):
-            print(f"  ✓ plugins.json é array com {len(plugins)} plugins")
+            print(f"  OK plugins.json e array com {len(plugins)} plugins")
         else:
-            print("  ✗ plugins.json não é array!")
+            print("  FAIL plugins.json nao e array!")
     
     # Verificar CS3
     with open("MaxSeries.cs3", "rb") as f:
         header = f.read(4)
         if header[:2] == b"PK":
-            print("  ✓ MaxSeries.cs3 é ZIP válido (AAR)")
+            print("  OK MaxSeries.cs3 e ZIP valido (AAR)")
         else:
-            print(f"  ✗ MaxSeries.cs3 não é ZIP. Header: {header.hex()}")
+            print(f"  FAIL MaxSeries.cs3 nao e ZIP. Header: {header.hex()}")
 
 def main():
     # Build

@@ -2,6 +2,9 @@ package com.franciscoalro.maxseries.extractors
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import android.util.Log
 import org.json.JSONObject
 import org.json.JSONArray
@@ -131,6 +134,27 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
             val fetchTime = System.currentTimeMillis() - startTime
             
             Log.d(TAG, "📄 HTML fetched in ${fetchTime}ms (${html.length} bytes) with session")
+
+            // ─────────────────────────────────────────────────────────────
+            // RACE: executar métodos rápidos em paralelo e pegar o primeiro sucesso
+            // ─────────────────────────────────────────────────────────────
+            val winner = coroutineScope {
+                awaitAll(
+                    async { extractViaInlineMedia(html) },      // v269 inline datas
+                    async { extractViaAesDecryption(html) },    // AES
+                    async { extractViaCDNConstruction(html) },  // CDN
+                    async { extractFromJWPlayerSetup(html) },   // JW setup
+                    async { extractViaRegex(html) },            // Regex direta
+                    async { extractViaAPI(html, url) }          // APIs
+                )
+            }.firstOrNull { isValidVideoUrl(it) }
+
+            if (winner != null) {
+                val quality = QualityDetector.detectFromUrl(winner)
+                VideoUrlCache.put(url, winner, quality, name)
+                emitLink(winner, quality, callback, method = "Race")
+                return
+            }
             
             // ═══════════════════════════════════════════════════════════════════
             // FASE 1.5: Fallback rápido lendo bloco inline `datas` (base64)

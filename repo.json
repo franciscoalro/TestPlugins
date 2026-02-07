@@ -1,8 +1,8 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v269 - PlayerEmbedAPI inline datas fallback + GCS fix",
+  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
+    "https://cdn.jsdelivr.net/gh/franciscoalro/TestPlugins@main/plugins.json"
   ]
 }

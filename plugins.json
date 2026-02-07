@@ -2,16 +2,16 @@
   {
     "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
     "status": 1,
-    "version": 269,
+    "version": 264,
     "apiVersion": 1,
     "name": "MaxSeries",
     "internalName": "MaxSeries",
     "authors": ["franciscoalro"],
-    "description": "MaxSeries v269 - PlayerEmbedAPI inline datas fallback + GCS fix",
+    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "isAdult": false
+    "fileSize": 766618
   }
 ]

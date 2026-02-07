@@ -1,5 +1,5 @@
 // use an integer for version numbers
-version = 278
+version = 279
 
 cloudstream {
     // All of these properties are optional, you can safely remove them
@@ -22,7 +22,7 @@ cloudstream {
     tvTypes = listOf("Movie", "TvSeries")
     iconUrl = "https://www.maxseries.one/wp-content/themes/dooplay/assets/img/favicon.png"
 
-    isCrossPlatform = true
+    isCrossPlatform = false
 }
 
 android {

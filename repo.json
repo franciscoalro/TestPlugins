@@ -1,6 +1,6 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
+  "description": "MaxSeries v279 - cs3 formato dex (compat)",
   "manifestVersion": 1,
   "pluginLists": [
     "https://github.com/franciscoalro/TestPlugins/raw/main/plugins.json"

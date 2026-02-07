@@ -3,6 +3,6 @@
   "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/3d31cab4/plugins.json"
+    "https://github.com/franciscoalro/TestPlugins/raw/main/plugins.json"
   ]
 }

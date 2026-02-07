@@ -1,20 +1,17 @@
-﻿{
-    "url":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
-    "status":  1,
-    "version":  269,
-    "apiVersion":  1,
-    "name":  "MaxSeries",
-    "internalName":  "MaxSeries",
-    "authors":  [
-                    "franciscoalro"
-                ],
-    "description":  "MaxSeries v269 - PlayerEmbedAPI inline datas fallback + GCS fix",
-    "repositoryUrl":  "https://github.com/franciscoalro/TestPlugins",
-    "tvTypes":  [
-                    "TvSeries",
-                    "Movie"
-                ],
-    "language":  "pt-BR",
-    "iconUrl":  "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize":  339133
-}
+[
+  {
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
+    "status": 1,
+    "version": 269,
+    "apiVersion": 1,
+    "name": "MaxSeries",
+    "internalName": "MaxSeries",
+    "authors": ["franciscoalro"],
+    "description": "MaxSeries v269 - PlayerEmbedAPI inline datas fallback + GCS fix",
+    "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
+    "tvTypes": ["TvSeries", "Movie"],
+    "language": "pt-BR",
+    "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
+    "isAdult": false
+  }
+]

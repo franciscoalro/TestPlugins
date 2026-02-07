@@ -133,6 +133,17 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
             Log.d(TAG, "📄 HTML fetched in ${fetchTime}ms (${html.length} bytes) with session")
             
             // ═══════════════════════════════════════════════════════════════════
+            // FASE 1.5: Fallback rápido lendo bloco inline `datas` (base64)
+            // ═══════════════════════════════════════════════════════════════════
+            extractViaInlineMedia(html)?.let { videoUrl ->
+                Log.wtf(TAG, "✅ SUCCESS via inline media (base64 datas)")
+                val quality = QualityDetector.detectFromUrl(videoUrl)
+                VideoUrlCache.put(url, videoUrl, quality, name)
+                emitLink(videoUrl, quality, callback, method = "Inline")
+                return
+            }
+            
+            // ═══════════════════════════════════════════════════════════════════
             // FASE 2: AES-CTR Decryption (Prioridade Máxima)
             // ═══════════════════════════════════════════════════════════════════
             extractViaAesDecryption(html)?.let { videoUrl ->
@@ -546,6 +557,26 @@ class PlayerEmbedAPIExtractorV8 : ExtractorApi() {
         }
         
         return null
+    }
+    
+    /**
+     * Fallback: usa o bloco `datas = "..."` já presente no HTML.
+     * - Decodifica Base64 → metadata
+     * - Decripta o campo `media` via AesCtrDecryptor
+     * - Retorna a melhor URL encontrada (videoUrl ou primeira quality).
+     */
+    private fun extractViaInlineMedia(html: String): String? {
+        val datas = Regex("""datas\s*=\s*"([^"]+)"""").find(html)?.groupValues?.get(1) ?: return null
+        return try {
+            val metadata = AesCtrDecryptor.parseDatasField(datas) ?: return null
+            val decrypted = AesCtrDecryptor.decryptMediaField(metadata) ?: return null
+            val media = AesCtrDecryptor.parseDecryptedMedia(decrypted)
+            val primary = media.videoUrl.takeIf { isValidVideoUrl(it) }
+            primary ?: media.qualities.firstOrNull { isValidVideoUrl(it.url) }?.url
+        } catch (e: Exception) {
+            Log.d(TAG, "Inline media parse failed: ${e.message}")
+            null
+        }
     }
     
     /**

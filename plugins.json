@@ -1,22 +1,17 @@
 [
   {
-    "url": "https://github.com/franciscoalro/TestPlugins/raw/main/MaxSeries.cs3",
+    "url": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/MaxSeries.cs3",
     "status": 1,
-    "version": 279,
+    "version": 264,
     "apiVersion": 1,
     "name": "MaxSeries",
     "internalName": "MaxSeries",
-    "authors": [
-      "franciscoalro"
-    ],
-    "description": "MaxSeries v279 - cs3 formato dex (compat)",
+    "authors": ["franciscoalro"],
+    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
-    "tvTypes": [
-      "TvSeries",
-      "Movie"
-    ],
+    "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize": 342164
+    "fileSize": 766618
   }
 ]

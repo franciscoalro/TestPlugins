@@ -1,8 +1,8 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v278 - PlayerEmbedAPI sora/ts capture + tests",
+  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://cdn.jsdelivr.net/gh/franciscoalro/TestPlugins@main/plugins.json"
+    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/3d31cab4/plugins.json"
   ]
 }

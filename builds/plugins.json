@@ -17,7 +17,6 @@
         ],
         "language": "pt-BR",
         "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-        "isAdult": false,
-        "fileSize": 339133
+        "isAdult": false
     }
 ]

@@ -6,7 +6,13 @@ from playwright.sync_api import sync_playwright
 import json
 import time
 
-def capture_playerembedapi_video(player_url):
+from playerembedapi_capture_utils import (
+    extract_urls_from_jwplayer_config,
+    is_video_candidate,
+    normalize_video_urls,
+)
+
+def capture_playerembedapi_video(player_url, headless=False):
     """
     Capture video URL from PlayerEmbedAPI
     
@@ -29,7 +35,7 @@ def capture_playerembedapi_video(player_url):
     with sync_playwright() as p:
         # Launch browser
         print("[*] Launching browser...")
-        browser = p.chromium.launch(headless=False)  # Set to True for headless
+        browser = p.chromium.launch(headless=headless)
         context = browser.new_context(
             viewport={'width': 1280, 'height': 720},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -40,7 +46,7 @@ def capture_playerembedapi_video(player_url):
         def handle_request(request):
             url = request.url
             # Capture video-related requests
-            if any(ext in url for ext in ['.m3u8', '.mp4', '.ts', '/sora/', 'sssrr.org']):
+            if is_video_candidate(url):
                 print(f"[+] Network request: {url}")
                 results['network_requests'].append({
                     'url': url,
@@ -51,7 +57,7 @@ def capture_playerembedapi_video(player_url):
         def handle_response(response):
             url = response.url
             # Capture video URLs from responses
-            if any(ext in url for ext in ['.m3u8', '.mp4', '.ts']):
+            if is_video_candidate(url):
                 print(f"[+] Video response: {url} (status: {response.status})")
                 if response.status in [200, 206]:  # 206 = Partial Content (video streaming)
                     results['video_urls'].append(url)
@@ -102,16 +108,11 @@ def capture_playerembedapi_video(player_url):
                 print(json.dumps(jwplayer_config, indent=2))
                 results['jwplayer_config'] = jwplayer_config
                 
-                # Extract video URL from config
-                if jwplayer_config.get('file'):
-                    results['video_urls'].append(jwplayer_config['file'])
-                    print(f"[+] Video URL from config: {jwplayer_config['file']}")
-                
-                if jwplayer_config.get('sources'):
-                    for source in jwplayer_config['sources']:
-                        if isinstance(source, dict) and source.get('file'):
-                            results['video_urls'].append(source['file'])
-                            print(f"[+] Video URL from sources: {source['file']}")
+                extracted_urls = extract_urls_from_jwplayer_config(jwplayer_config)
+                if extracted_urls:
+                    for url in extracted_urls:
+                        results['video_urls'].append(url)
+                        print(f"[+] Video URL from config: {url}")
             else:
                 print("[-] Could not extract JWPlayer config")
                 results['errors'].append("JWPlayer config not found")
@@ -176,7 +177,7 @@ def capture_playerembedapi_video(player_url):
         browser.close()
     
     # Remove duplicates from video_urls
-    results['video_urls'] = list(set(results['video_urls']))
+    results['video_urls'] = normalize_video_urls(results['video_urls'])
     
     # Save results
     output_file = f"playerembedapi_capture_{int(time.time())}.json"

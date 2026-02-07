@@ -34,7 +34,8 @@ class PlayerEmbedAPIWebViewExtractorV5 {
         )
         
         // Extensões de vídeo
-        private val VIDEO_EXTENSIONS = listOf(".mp4", ".m3u8", ".mkv", ".webm")
+        private val VIDEO_EXTENSIONS = listOf(".mp4", ".m3u8", ".mkv", ".webm", ".ts")
+        private val VIDEO_HINTS = listOf("/sora/", "sssrr.org")
     }
     
     @SuppressLint("SetJavaScriptEnabled")
@@ -43,7 +44,7 @@ class PlayerEmbedAPIWebViewExtractorV5 {
         Log.d(TAG, "URL: $sourceUrl")
         
         return withContext(Dispatchers.Main) {
-            val capturedUrls = mutableListOf<String>()
+            val capturedUrls = linkedSetOf<String>()
             var webView: WebView? = null
             var isCompleted = false
             var job: Job? = null
@@ -337,6 +338,8 @@ class PlayerEmbedAPIWebViewExtractorV5 {
     private fun isVideoUrl(url: String): Boolean {
         return VIDEO_EXTENSIONS.any { ext ->
             url.contains(ext, ignoreCase = true)
+        } || VIDEO_HINTS.any { hint ->
+            url.contains(hint, ignoreCase = true)
         } || (url.contains("googleapis.com") && url.contains(".mp4"))
     }
     

@@ -7,11 +7,11 @@
     "name": "MaxSeries",
     "internalName": "MaxSeries",
     "authors": ["franciscoalro"],
-    "description": "MaxSeries v279 - cs3 formato dex (compat)",
+    "description": "MaxSeries v279 - PlayerEmbedAPI V7 com bloqueio de redirecionamento externo e captura otimizada",
     "repositoryUrl": "https://github.com/franciscoalro/TestPlugins",
     "tvTypes": ["TvSeries", "Movie"],
     "language": "pt-BR",
     "iconUrl": "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/icon.png",
-    "fileSize": 301878
+    "fileSize": 343964
   }
 ]

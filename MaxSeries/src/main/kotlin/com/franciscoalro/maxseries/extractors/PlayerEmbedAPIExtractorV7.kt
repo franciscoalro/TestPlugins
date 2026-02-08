@@ -303,6 +303,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                         if (url != null && !isAllowedHost(url)) {
                             Log.d(TAG, "🚫 Navegação externa detectada no onPageStarted: ${url.take(80)}...")
                             view?.stopLoading()
+                            view?.loadUrl("about:blank")
                             return
                         }
                         Log.d(TAG, "🟢 Page Started: $url")
@@ -313,6 +314,10 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                         Log.d(TAG, "🏁 Page Finished: $url")
                         
                         if (cleanedUp.get()) return  // Não injetar se já limpou
+                        if (url != null && !isAllowedHost(url)) {
+                            Log.d(TAG, "🚫 Ignorando injeção em host externo: ${url.take(80)}...")
+                            return
+                        }
                         
                         // Injetar script para interceptar requisições
                         try {
@@ -366,6 +371,17 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
                         val requestUrl = request?.url?.toString()
                         requestUrl?.let {
+                            if (!isAllowedHost(it)) {
+                                Log.d(TAG, "🚫 Bloqueando request externo: ${it.take(80)}...")
+                                return WebResourceResponse(
+                                    "text/plain",
+                                    "utf-8",
+                                    403,
+                                    "Blocked",
+                                    mapOf(),
+                                    java.io.ByteArrayInputStream(ByteArray(0))
+                                )
+                            }
                             if (isValidVideoUrl(it)) {
                                 Log.d(TAG, "🕵️ Intercepted: ${it.take(80)}...")
                                 foundUrls.add(it)

@@ -1,9 +1,9 @@
 [
   {
     "name": "MaxSeries",
-    "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
-    "version": "264",
-    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v264/MaxSeries.cs3",
+    "description": "MaxSeries v263 - PlayerEmbedAPI Otimizado: V8 (Pure HTTP) prioritario + V7 (WebView) com timeout 25s como fallback",
+    "version": "263",
+    "url": "https://github.com/franciscoalro/TestPlugins/releases/download/v263/MaxSeries.cs3",
     "status": 1,
     "apiVersion": 1
   }

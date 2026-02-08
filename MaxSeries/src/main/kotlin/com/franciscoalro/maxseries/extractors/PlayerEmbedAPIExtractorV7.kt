@@ -412,7 +412,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                 webView.loadUrl(url, headers)
 
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Erro ao iniciar WebView: ${e.message}")
+                Log.e(TAG, "❌ Erro ao iniciar WebView", e)
                 latch.countDown()
             }
         }
@@ -432,34 +432,51 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
             Log.wtf(TAG, "=== ${capturedUrls.size} URLs capturadas ===")
 
             val normalizedUrls = normalizeVideoUrls(capturedUrls)
+            if (normalizedUrls.isEmpty()) {
+                Log.e(TAG, "❌ URLs capturadas, mas nenhuma válida após normalização")
+                return
+            }
+
+            var emittedCount = 0
 
             normalizedUrls.forEachIndexed { index, videoUrl ->
-                val quality = QualityDetector.detectFromUrl(videoUrl)
-                val type = if (videoUrl.contains(".m3u8", ignoreCase = true)) {
-                    ExtractorLinkType.M3U8
-                } else {
-                    ExtractorLinkType.VIDEO
-                }
-                
-                // Cachear primeira URL
-                if (index == 0) {
-                    VideoUrlCache.put(url, videoUrl, quality, name)
-                }
-                
-                callback.invoke(
-                    newExtractorLink(
-                        source = "${name}_${System.currentTimeMillis() % 10000}",
-                        name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView v7)",
-                        url = videoUrl,
-                        type = type
-                    ) {
-                        this.referer = headers["Referer"]!!
-                        this.headers = headers
-                        this.quality = quality
+                try {
+                    val quality = QualityDetector.detectFromUrl(videoUrl)
+                    val type = if (videoUrl.contains(".m3u8", ignoreCase = true)) {
+                        ExtractorLinkType.M3U8
+                    } else {
+                        ExtractorLinkType.VIDEO
                     }
-                )
-                
-                Log.d(TAG, "✓ Link ${index + 1}: ${videoUrl.take(60)}...")
+
+                    // Cachear primeira URL
+                    if (index == 0) {
+                        VideoUrlCache.put(url, videoUrl, quality, name)
+                    }
+
+                    callback.invoke(
+                        newExtractorLink(
+                            source = "${name}_${System.currentTimeMillis() % 10000}",
+                            name = "$name ${QualityDetector.getQualityLabel(quality)} (WebView v7)",
+                            url = videoUrl,
+                            type = type
+                        ) {
+                            this.referer = headers["Referer"]!!
+                            this.headers = headers
+                            this.quality = quality
+                        }
+                    )
+
+                    emittedCount++
+                    Log.d(TAG, "✓ Link ${index + 1}: ${videoUrl.take(60)}...")
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Falha ao emitir link v7: ${videoUrl.take(80)}", e)
+                }
+            }
+
+            if (emittedCount == 0) {
+                Log.e(TAG, "❌ Nenhum link v7 pôde ser emitido")
+            } else {
+                Log.d(TAG, "✅ Total de links emitidos v7: $emittedCount")
             }
         } else {
             Log.e(TAG, "❌ Nenhuma URL de vídeo capturada")

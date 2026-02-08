@@ -1,6 +1,6 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v263 - PlayerEmbedAPI Otimizado: V8 (Pure HTTP) prioritario + V7 (WebView) com timeout 25s como fallback",
+  "description": "MaxSeries v279 - PlayerEmbedAPI V7 com bloqueio de redirecionamento externo e captura otimizada",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

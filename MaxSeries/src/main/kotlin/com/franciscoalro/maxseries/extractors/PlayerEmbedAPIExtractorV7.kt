@@ -55,6 +55,16 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
             "/hls",
             "/play"
         )
+
+        private val ALLOWED_HOSTS = listOf(
+            "playerembedapi.link",
+            "iamcdn.net",
+            "sssrr.org",
+            "statics.sssrr.org",
+            "short.icu",
+            "googleapis.com",
+            "cloudatacdn.com"
+        )
     }
 
     private val headers = mapOf(
@@ -268,6 +278,15 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                 }
 
                 webView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                        val requestUrl = request?.url?.toString() ?: return false
+                        if (!isAllowedHost(requestUrl)) {
+                            Log.d(TAG, "🚫 Bloqueando navegação externa: ${requestUrl.take(80)}...")
+                            return true
+                        }
+                        return false
+                    }
+
                     override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                         super.onPageStarted(view, url, favicon)
                         Log.d(TAG, "🟢 Page Started: $url")
@@ -443,5 +462,10 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                     .thenByDescending { it.contains("sssrr.org", ignoreCase = true) }
             )
             .toList()
+    }
+
+    private fun isAllowedHost(url: String): Boolean {
+        val lower = url.lowercase()
+        return ALLOWED_HOSTS.any { lower.contains(it) }
     }
 }

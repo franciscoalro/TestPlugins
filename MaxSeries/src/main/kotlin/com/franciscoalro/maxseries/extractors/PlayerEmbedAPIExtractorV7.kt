@@ -3,11 +3,13 @@ package com.franciscoalro.maxseries.extractors
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import android.net.Uri
 import android.webkit.*
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -37,7 +39,6 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
     companion object {
         private const val TAG = "PlayerEmbedAPI-v7"
         private const val TIMEOUT_SECONDS = 25L  // Aumentado de 15s para 25s
-        private val cleanedUp = AtomicBoolean(false)  // NOVO: Flag atômica
         
         // Padrões de URL de vídeo para capturar
         private val VIDEO_PATTERNS = listOf(
@@ -104,7 +105,8 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
             return
         }
         
-        val foundUrls = mutableSetOf<String>()
+        val cleanedUp = AtomicBoolean(false)
+        val foundUrls = ConcurrentHashMap.newKeySet<String>()
         val latch = CountDownLatch(1)
         val handler = Handler(Looper.getMainLooper())
         var cleanupRef: (() -> Unit)? = null
@@ -278,6 +280,15 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                 }
 
                 webView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                        val requestUrl = url ?: return false
+                        if (!isAllowedHost(requestUrl)) {
+                            Log.d(TAG, "🚫 Bloqueando navegação externa (legacy): ${requestUrl.take(80)}...")
+                            return true
+                        }
+                        return false
+                    }
+
                     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                         val requestUrl = request?.url?.toString() ?: return false
                         if (!isAllowedHost(requestUrl)) {
@@ -289,6 +300,11 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
 
                     override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                         super.onPageStarted(view, url, favicon)
+                        if (url != null && !isAllowedHost(url)) {
+                            Log.d(TAG, "🚫 Navegação externa detectada no onPageStarted: ${url.take(80)}...")
+                            view?.stopLoading()
+                            return
+                        }
                         Log.d(TAG, "🟢 Page Started: $url")
                     }
 
@@ -395,10 +411,11 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
         }
 
         // Processar URLs encontradas
-        if (foundUrls.isNotEmpty()) {
-            Log.wtf(TAG, "=== ${foundUrls.size} URLs capturadas ===")
+        val capturedUrls = foundUrls.toSet()
+        if (capturedUrls.isNotEmpty()) {
+            Log.wtf(TAG, "=== ${capturedUrls.size} URLs capturadas ===")
 
-            val normalizedUrls = normalizeVideoUrls(foundUrls)
+            val normalizedUrls = normalizeVideoUrls(capturedUrls)
 
             normalizedUrls.forEachIndexed { index, videoUrl ->
                 val quality = QualityDetector.detectFromUrl(videoUrl)
@@ -439,6 +456,10 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
     private fun isValidVideoUrl(url: String?): Boolean {
         if (url.isNullOrBlank()) return false
         val lowerUrl = url.lowercase()
+        if (!lowerUrl.startsWith("http://") && !lowerUrl.startsWith("https://")) return false
+        if (lowerUrl.endsWith(".js") || lowerUrl.contains(".js?")) return false
+        if (lowerUrl.endsWith(".css") || lowerUrl.contains(".css?")) return false
+        if (lowerUrl.contains("jwplayer") || lowerUrl.contains("jwpsrv")) return false
         
         return VIDEO_PATTERNS.any { pattern ->
             lowerUrl.contains(pattern.lowercase())
@@ -465,7 +486,13 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
     }
 
     private fun isAllowedHost(url: String): Boolean {
-        val lower = url.lowercase()
-        return ALLOWED_HOSTS.any { lower.contains(it) }
+        return try {
+            val host = Uri.parse(url).host?.lowercase() ?: return false
+            ALLOWED_HOSTS.any { allowed ->
+                host == allowed || host.endsWith(".$allowed")
+            }
+        } catch (_: Exception) {
+            false
+        }
     }
 }

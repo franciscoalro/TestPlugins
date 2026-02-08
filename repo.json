@@ -1,6 +1,6 @@
 {
   "name": "MaxSeries",
-  "description": "MaxSeries v279 - PlayerEmbedAPI V7 com bloqueio de redirecionamento externo e captura otimizada",
+  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"

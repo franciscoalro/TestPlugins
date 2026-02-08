@@ -142,15 +142,15 @@ object AesCtrDecryptor {
         )
         
         for (pattern in patterns) {
-            pattern.find(html)?.let { match ->
-                try {
-                    val base64Data = match.groupValues[1]
-                    return parseDatasField(base64Data)
-                } catch (e: Exception) {
-                    logD("⚠️ Falha ao parsear com padrão ${pattern.pattern}: ${e.message}")
-                    continue
-                }
+            val match = pattern.find(html) ?: continue
+            val base64Data = match.groupValues[1]
+            val metadata = try {
+                parseDatasField(base64Data)
+            } catch (e: Exception) {
+                logD("Falha ao parsear com padrao ${pattern.pattern}: ${e.message}")
+                null
             }
+            if (metadata != null) return metadata
         }
         
         // Fallback: Procurar qualquer string base64 grande que pareça ser o datas

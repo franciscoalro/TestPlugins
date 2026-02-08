@@ -1,12 +1,10 @@
 package com.franciscoalro.maxseries.resolver
 
 import android.content.Context
-import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resume
@@ -37,7 +35,7 @@ class MegaEmbedWebViewResolver(private val context: Context) {
         val latch = CountDownLatch(1)
         var capturedUrl: String? = null
 
-        webView.webViewClient = object : WebViewClientCompat() {
+        webView.webViewClient = object : WebViewClient() {
 
             // Intercepta todas as requisições de rede
             override fun shouldInterceptRequest(

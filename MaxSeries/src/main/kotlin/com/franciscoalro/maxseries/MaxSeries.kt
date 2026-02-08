@@ -681,6 +681,11 @@ class MaxSeries : MainAPI() {
                                     source.contains("playerembedapi", ignoreCase = true) -> {
                                         Log.wtf(TAG, "🌐 PRIORIDADE 1 - PlayerEmbedAPI: ${source.take(60)}...")
 
+                                        if (linksFound.get() > 0) {
+                                            Log.d(TAG, "⏩ Pulando PlayerEmbedAPI: já existem links válidos de outras fontes")
+                                            return@async Unit
+                                        }
+
                                         var succeeded = false
 
                                         // FASE 1: WebView (v7) - mais confiável
@@ -704,6 +709,12 @@ class MaxSeries : MainAPI() {
                                             }
                                         } catch (e: Exception) {
                                             Log.e(TAG, "❌ PlayerEmbedAPI v7 exception", e)
+                                        }
+
+                                        // Otimização: evita cadeia longa de fallbacks lentos quando já temos outras fontes melhores.
+                                        if (!succeeded) {
+                                            Log.w(TAG, "⏭️ PlayerEmbedAPI sem link no v7; pulando fallbacks v8/v6/v5/manual para reduzir espera")
+                                            return@async Unit
                                         }
 
                                         // FASE 2: Pure HTTP (v8) - rápido

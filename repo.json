@@ -1,9 +1,8 @@
 ﻿{
   "name": "MaxSeries",
-  "description": "MaxSeries v281 - PlayerEmbedAPI V7 com tratamento robusto de excecoes e logs completos",
+  "description": "MaxSeries v282 - PlayerEmbedAPI com fallback rapido para reduzir tempo de espera",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
   ]
 }
-

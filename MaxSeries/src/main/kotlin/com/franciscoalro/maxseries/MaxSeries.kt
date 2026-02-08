@@ -703,7 +703,7 @@ class MaxSeries : MainAPI() {
                                                 Log.d(TAG, "⚠️ v7 (WebView) retornou vazio")
                                             }
                                         } catch (e: Exception) {
-                                            Log.e(TAG, "❌ PlayerEmbedAPI v7 exception: ${e.message}")
+                                            Log.e(TAG, "❌ PlayerEmbedAPI v7 exception", e)
                                         }
 
                                         // FASE 2: Pure HTTP (v8) - rápido

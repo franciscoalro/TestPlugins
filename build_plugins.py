@@ -16,7 +16,7 @@ import zipfile
 
 
 PROVIDERS = {
-    "MaxSeries": {"version": 280, "tvTypes": ["TvSeries", "Movie"]},
+    "MaxSeries": {"version": 281, "tvTypes": ["TvSeries", "Movie"]},
     "AnimesOnlineCC": {"version": 10, "tvTypes": ["Anime"]},
     "Vizer": {"version": 2, "tvTypes": ["TvSeries", "Movie"]},
     "NetCine": {"version": 2, "tvTypes": ["TvSeries", "Movie"]},

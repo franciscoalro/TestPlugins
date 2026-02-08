@@ -3,6 +3,6 @@
   "description": "MaxSeries v279 - cs3 formato dex (compat)",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://github.com/franciscoalro/TestPlugins/raw/main/plugins.json"
+    "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
   ]
 }

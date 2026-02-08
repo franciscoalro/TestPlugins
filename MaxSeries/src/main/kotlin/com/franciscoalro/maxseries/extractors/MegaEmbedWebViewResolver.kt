@@ -9,9 +9,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resume
 
 class MegaEmbedWebViewResolver(private val context: Context) {
@@ -36,7 +34,7 @@ class MegaEmbedWebViewResolver(private val context: Context) {
                     "X-Requested-With" to "XMLHttpRequest"
                 )
                 
-                webViewClient = object : WebViewClientCompat() {
+                webViewClient = object : WebViewClient() {
                     private var resolved = false
 
                     override fun shouldInterceptRequest(

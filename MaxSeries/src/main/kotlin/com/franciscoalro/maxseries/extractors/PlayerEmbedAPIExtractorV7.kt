@@ -248,8 +248,8 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                                 
                                 if (isValidVideoUrl(urlPart)) {
                                     foundUrls.add(urlPart)
-                                    // Não dar latch.countDown() imediatamente - continuar procurando mais qualidades
-                                    if (foundUrls.size >= 3) {
+                                    // Encerrar ao achar media direta, ou apos varias fontes
+                                    if (isDirectPlayableUrl(urlPart) || foundUrls.size >= 3) {
                                         latch.countDown()
                                         cleanupRef?.invoke()
                                     }
@@ -297,6 +297,11 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                                             if (playlist && playlist.length > 0) {
                                                 playlist.forEach(function(item) {
                                                     if (item.file) console.log('PLAYEREMBEDAPI_VIDEO_URL:' + item.file + '|SOURCE:JWPLAYER_DIRECT');
+                                                    if (item.sources) {
+                                                        item.sources.forEach(function(src) {
+                                                            if (src.file) console.log('PLAYEREMBEDAPI_VIDEO_URL:' + src.file + '|SOURCE:JWPLAYER_DIRECT_SOURCE');
+                                                        });
+                                                    }
                                                 });
                                             }
                                         }
@@ -315,8 +320,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                                 foundUrls.add(it)
                                 // Fallback: liberar imediatamente se for mídia direta
                                 if (!cleanedUp.get() &&
-                                    (it.contains(".m3u8", ignoreCase = true) ||
-                                     it.contains(".mp4", ignoreCase = true))) {
+                                    isDirectPlayableUrl(it)) {
                                     latch.countDown()
                                     cleanupRef?.invoke()
                                 }
@@ -333,8 +337,7 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
                                 
                                 // Se encontrou .m3u8 ou .mp4 diretamente, liberar
                                 if (!cleanedUp.get() && 
-                                    (it.contains(".m3u8", ignoreCase = true) || 
-                                     it.contains(".mp4", ignoreCase = true))) {
+                                    isDirectPlayableUrl(it)) {
                                     latch.countDown()
                                     cleanupRef?.invoke()
                                 }
@@ -375,8 +378,10 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
         // Processar URLs encontradas
         if (foundUrls.isNotEmpty()) {
             Log.wtf(TAG, "=== ${foundUrls.size} URLs capturadas ===")
-            
-            foundUrls.forEachIndexed { index, videoUrl ->
+
+            val normalizedUrls = normalizeVideoUrls(foundUrls)
+
+            normalizedUrls.forEachIndexed { index, videoUrl ->
                 val quality = QualityDetector.detectFromUrl(videoUrl)
                 val type = if (videoUrl.contains(".m3u8", ignoreCase = true)) {
                     ExtractorLinkType.M3U8
@@ -419,5 +424,24 @@ class PlayerEmbedAPIExtractorV7 : ExtractorApi() {
         return VIDEO_PATTERNS.any { pattern ->
             lowerUrl.contains(pattern.lowercase())
         }
+    }
+
+    private fun isDirectPlayableUrl(url: String): Boolean {
+        val lower = url.lowercase()
+        return lower.contains(".m3u8") || lower.contains(".mp4") || lower.contains(".ts")
+    }
+
+    private fun normalizeVideoUrls(urls: Set<String>): List<String> {
+        return urls
+            .asSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .sortedWith(
+                compareByDescending<String> { isDirectPlayableUrl(it) }
+                    .thenByDescending { it.contains("/sora/", ignoreCase = true) }
+                    .thenByDescending { it.contains("sssrr.org", ignoreCase = true) }
+            )
+            .toList()
     }
 }

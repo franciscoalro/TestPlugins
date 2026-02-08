@@ -1,9 +1,8 @@
-﻿{
+{
   "name": "MaxSeries",
-  "description": "MaxSeries v281 - PlayerEmbedAPI V7 com tratamento robusto de excecoes e logs completos",
+  "description": "MaxSeries v264 - Build otimizado e estabilidade aprimorada",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/franciscoalro/TestPlugins/main/plugins.json"
   ]
 }
-

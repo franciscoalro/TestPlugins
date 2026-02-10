@@ -1,0 +1,24 @@
+=== STRINGS RELACIONADAS A CRYPTO ===
+AES
+crypto
+decrypt
+decryptStr
+encrypt
+importKey
+subtle
+
+=== STRINGS RELACIONADAS A PARÂMETROS ===
+md5_id
+media
+mediaId
+media\x20
+mediastor
+slug
+user_id
+
+=== POSSÍVEIS FUNÇÕES DE HASH ===
+md5_id
+
+=== STRINGS HEXADECIMAIS (possíveis chaves) ===
+
+=== URLS E ENDPOINTS ===

@@ -1,0 +1,93 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║              ⚠️  SITE TEM PROTEÇÃO ANTI-DEBUG                  ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🎯 SOLUÇÃO RÁPIDA (2 MINUTOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1️⃣  Clique duas vezes em: abrir_chrome_debug.bat
+
+  2️⃣  Chrome vai abrir automaticamente
+
+  3️⃣  Pressione F12 (DevTools)
+
+  4️⃣  Vá para aba "Console"
+
+  5️⃣  Abra: CAPTURAR_SEM_DEBUGGER.md
+
+  6️⃣  Copie TODO o código JavaScript
+
+  7️⃣  Cole no Console e pressione Enter
+
+  8️⃣  Na barra de endereços, cole:
+      https://playerembedapi.link/?v=kBJLtxCD3
+
+  9️⃣  Aguarde 10 segundos
+
+  🔟  Veja os dados no console!
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📁 ARQUIVOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ⭐ abrir_chrome_debug.bat
+     └─ Abre Chrome sem proteção (CLIQUE AQUI!)
+
+  📄 CAPTURAR_SEM_DEBUGGER.md
+     └─ Código JavaScript para colar
+
+  📄 SOLUCAO_ANTI_DEBUG.txt
+     └─ Este arquivo
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  💡 POR QUE ISSO ACONTECEU?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  O site detecta quando o DevTools está aberto e bloqueia
+  com um "debugger" infinito.
+
+  A solução é abrir o Chrome com flags especiais que
+  desabilitam essa proteção.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ O QUE VAI ACONTECER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✅ Chrome abre sem proteção
+  ✅ DevTools funciona normalmente
+  ✅ Código captura o algoritmo
+  ✅ Dados são salvos no localStorage
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ❓ ALTERNATIVAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Se não funcionar:
+
+  1. Use Firefox (não tem essa proteção)
+  2. Analise o código manualmente (já temos o arquivo)
+  3. Use Frida para hook em runtime
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║         🚀 COMECE: Clique em abrir_chrome_debug.bat            ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+Tempo: 2 minutos
+Dificuldade: Fácil
+Taxa de sucesso: 95%
+

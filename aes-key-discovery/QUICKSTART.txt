@@ -1,0 +1,212 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║           🔓 AES KEY DISCOVERY - QUICK START                  ║
+║           PlayerEmbedAPI Analysis Tool                         ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│ 🪟 WINDOWS - INÍCIO RÁPIDO                                     │
+└────────────────────────────────────────────────────────────────┘
+
+1. Abrir CMD ou PowerShell
+2. Navegar até o diretório:
+   cd C:\caminho\para\aes-key-discovery
+
+3. Executar:
+   run_wsl.bat
+
+4. Escolher opção do menu
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 🐧 WSL/LINUX - INÍCIO RÁPIDO                                   │
+└────────────────────────────────────────────────────────────────┘
+
+1. Abrir WSL:
+   wsl
+
+2. Navegar:
+   cd /mnt/c/caminho/para/aes-key-discovery
+
+3. Dar permissões:
+   chmod +x *.sh scripts/*.sh
+
+4. Executar teste rápido:
+   bash quick_test.sh
+
+5. OU análise completa:
+   bash run_analysis.sh
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 📊 MÉTODOS DISPONÍVEIS                                         │
+└────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┬──────────┬─────────────┬────────────────┐
+│ Método              │ Tempo    │ Dificuldade │ Efetividade    │
+├─────────────────────┼──────────┼─────────────┼────────────────┤
+│ quick_test.sh       │ 5 min    │ ⭐          │ ⭐⭐⭐         │
+│ run_analysis.sh     │ 15-30min │ ⭐          │ ⭐⭐⭐⭐⭐     │
+│ Burp Suite          │ 30-60min │ ⭐⭐⭐      │ ⭐⭐⭐⭐       │
+│ mitmproxy           │ 20-40min │ ⭐⭐        │ ⭐⭐⭐⭐       │
+│ Frida (hook)        │ 30-60min │ ⭐⭐⭐⭐    │ ⭐⭐⭐⭐⭐     │
+└─────────────────────┴──────────┴─────────────┴────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 🎯 FLUXO RECOMENDADO                                           │
+└────────────────────────────────────────────────────────────────┘
+
+   START
+     │
+     ▼
+┌─────────────────┐
+│ quick_test.sh   │  ◄── Teste rápido (5 min)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ run_analysis.sh │  ◄── Análise completa (15-30 min)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────┐
+│ Ler output/advanced_analysis.txt│  ◄── Ver resultados
+└────────┬────────────────────────┘
+         │
+         ▼
+    ┌────────┐
+    │Encontrou│
+    │fórmula? │
+    └───┬────┘
+        │
+    ┌───┴───┐
+    │       │
+   SIM     NÃO
+    │       │
+    │       ▼
+    │  ┌──────────────┐
+    │  │ Burp Suite   │  ◄── Interceptação
+    │  │ ou Frida     │
+    │  └──────┬───────┘
+    │         │
+    └─────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Validar fórmula │
+└────────┬────────┘
+         │
+         ▼
+       END
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 📁 ARQUIVOS IMPORTANTES                                        │
+└────────────────────────────────────────────────────────────────┘
+
+📄 README.md              - Visão geral do projeto
+📄 USAGE.md               - Guia completo de uso
+📄 EXAMPLES.md            - Exemplos práticos
+📄 QUICKSTART.txt         - Este arquivo
+
+🪟 run_wsl.bat            - Launcher para Windows
+⚡ quick_test.sh          - Teste rápido
+🔬 run_analysis.sh        - Análise completa
+
+📂 scripts/               - Scripts de análise
+📂 output/                - Resultados (gerado automaticamente)
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 🔑 O QUE ESTAMOS PROCURANDO                                    │
+└────────────────────────────────────────────────────────────────┘
+
+Parâmetros conhecidos:
+  user_id = "482120"
+  slug    = "kBJLtxCD3"
+  md5_id  = "28930647"
+
+Possíveis fórmulas:
+  ✓ user_id + slug + md5_id
+  ✓ MD5(user_id + slug + md5_id)
+  ✓ MD5(slug + user_id + md5_id)
+  ✓ MD5(md5_id + user_id + slug)
+  ✓ SHA256(...)
+  ✓ Com separadores: ":" ou "-"
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 📊 RESULTADOS ESPERADOS                                        │
+└────────────────────────────────────────────────────────────────┘
+
+Após executar run_analysis.sh:
+
+output/
+├── 🔑 key_formula.txt         ◄── IMPORTANTE
+├── 🔑 advanced_analysis.txt   ◄── MUITO IMPORTANTE
+├── lite_deobf.js              ◄── Código deobfuscado
+├── crypto_patterns.txt
+├── importkey_analysis.txt
+└── strings.txt
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 💡 COMANDOS ÚTEIS                                              │
+└────────────────────────────────────────────────────────────────┘
+
+# Ver fórmula identificada
+cat output/key_formula.txt
+
+# Ver análise avançada
+cat output/advanced_analysis.txt | less
+
+# Procurar por fórmulas
+grep -i "possível fórmula" output/advanced_analysis.txt
+
+# Procurar por MD5
+grep -i "MD5" output/advanced_analysis.txt
+
+# Ver testes sugeridos
+grep -A 20 "TESTES SUGERIDOS" output/advanced_analysis.txt
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 🚨 TROUBLESHOOTING                                             │
+└────────────────────────────────────────────────────────────────┘
+
+Problema: WSL não instalado
+Solução:  wsl --install
+
+Problema: Permission denied
+Solução:  chmod +x *.sh scripts/*.sh
+
+Problema: Command not found
+Solução:  sudo apt-get install curl jq python3 nodejs
+
+Problema: Caminho não encontrado
+Solução:  cd /mnt/c/Users/Nome/Desktop/aes-key-discovery
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ 📞 AJUDA                                                       │
+└────────────────────────────────────────────────────────────────┘
+
+Documentação detalhada:
+  • USAGE.md    - Guia completo
+  • EXAMPLES.md - Exemplos passo a passo
+
+Suporte WSL:
+  • https://docs.microsoft.com/windows/wsl/
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║  🎯 OBJETIVO: Descobrir a fórmula de derivação da chave AES   ║
+║                                                                ║
+║  ⏱️  TEMPO ESTIMADO: 15-60 minutos                            ║
+║                                                                ║
+║  ✅ TAXA DE SUCESSO: 60-80% (com análise completa)            ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝

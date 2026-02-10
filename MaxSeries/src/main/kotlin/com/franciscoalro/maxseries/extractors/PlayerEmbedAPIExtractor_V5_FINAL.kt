@@ -31,13 +31,13 @@ import com.fasterxml.jackson.module.kotlin.readValue
  * - Não quebra outras funcionalidades do plugin
  * - Fallback garante que sempre funciona
  */
-class PlayerEmbedAPIExtractor : ExtractorApi() {
+class PlayerEmbedAPIExtractor_V5 : ExtractorApi() {
     override var name = "PlayerEmbedAPI"
     override var mainUrl = "https://playerembedapi.link"
     override val requiresReferer = true
 
     companion object {
-        private const val TAG = "PlayerEmbedAPI"
+        private const val TAG = "PlayerEmbedAPI_V5"
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
 
         fun canHandle(url: String): Boolean {

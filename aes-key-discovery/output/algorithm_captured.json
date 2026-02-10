@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-02-10T02:22:01.560Z",
+  "video_slug": "kBJLtxCD3",
+  "key": null,
+  "algorithm": null,
+  "decrypted": null,
+  "rawData": null,
+  "logs": [
+    "✅ INTERCEPTADORES INSTALADOS!",
+    "✅ INTERCEPTADORES INSTALADOS!",
+    "cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation"
+  ]
+}

@@ -1,0 +1,72 @@
+================================================================================
+🔬 ANÁLISE AVANÇADA DE PADRÕES
+================================================================================
+
+📌 [1/6] Analisando contextos de importKey...
+   Encontrados: 1 contextos
+📌 [2/6] Procurando concatenações de parâmetros...
+   Encontradas: 0 concatenações
+📌 [3/6] Procurando funções de hash...
+   Encontradas: 0 funções
+📌 [4/6] Analisando TextEncoder...
+   Encontrados: 1 usos
+📌 [5/6] Procurando variáveis de chave...
+   Encontradas: 0 variáveis
+📌 [6/6] Identificando possíveis fórmulas...
+   Identificadas: 1 fórmulas
+
+================================================================================
+📊 RESULTADOS
+================================================================================
+
+🔑 CONTEXTOS DE IMPORTKEY:
+--------------------------------------------------------------------------------
+
+1. ,'fy.net/1x1','cursor','setPlaying','request','ubtitle?ur',' -50%); ','keys',' been dest','13.1 6.6,-','aSource','table','/sw.js','position','-height:1.','ement',' .bar { ','y-icon-rew','closed','defineProp','isArray',':000','w-svg-icon','ceil','#9933FF','cancel spa','importKey','firebug',',-10.6 8.6',' aspect-','error','ass="modal','_ff','; alig','call','-notify-cu','type','ase use a ','loadingUI','action','box','n.iamcdn.n','charCodeAt','ut has not','What are y','m function','close','een; g','...
+
+
+✨ POSSÍVEIS FÓRMULAS:
+--------------------------------------------------------------------------------
+
+1. slug slug:_0x32096d, // 🔑 PARÂMETRO: md5_id md5_id:_0x1636cd, // 🔑 PARÂMETRO: user_id user_id
+
+================================================================================
+🧪 TESTES SUGERIDOS
+================================================================================
+
+Valores de teste:
+  user_id = 482120
+  slug = kBJLtxCD3
+  md5_id = 28930647
+
+Testes de combinações:
+--------------------------------------------------------------------------------
+
+user_id + slug + md5_id:
+  Valor: 482120kBJLtxCD328930647
+  MD5:   7f2bea2fcccbb2d98ddddb9b08114b7d
+
+user_id + md5_id + slug:
+  Valor: 48212028930647kBJLtxCD3
+  MD5:   6d7f47451b982b4c91558d18df0b3aab
+
+slug + user_id + md5_id:
+  Valor: kBJLtxCD348212028930647
+  MD5:   3d0654e0feb477e3c6bb57bfdf8372aa
+
+slug + md5_id + user_id:
+  Valor: kBJLtxCD328930647482120
+  MD5:   b755eab7ac45a9f5ee51923887ad8abe
+
+md5_id + user_id + slug:
+  Valor: 28930647482120kBJLtxCD3
+  MD5:   1ae4c5d4348ed3edbcfbf4995c9cc8aa
+
+md5_id + slug + user_id:
+  Valor: 28930647kBJLtxCD3482120
+  MD5:   f7ac4b2a11ae7ec1d5b5c11bb13aba61
+
+--------------------------------------------------------------------------------
+
+💡 DICA: Compare estes hashes com a chave usada em importKey
+         nos contextos encontrados acima.

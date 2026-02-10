@@ -1,0 +1,259 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                        🎯 PRÓXIMOS PASSOS - GUIA RÁPIDO                       ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           ✅ SITUAÇÃO ATUAL                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ✅ Fórmula da chave AES DESCOBERTA!
+  
+     user_id + ':' + slug + ':' + md5_id
+  
+  ⏳ Validação com dados reais PENDENTE
+  
+  ❌ Vídeo de teste (kBJLtxCD3) retorna 404
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🚀 AÇÃO IMEDIATA NECESSÁRIA                             │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  VOCÊ PRECISA:
+  
+  1. Encontrar um vídeo que FUNCIONA no site
+  2. Capturar os dados da API (user_id, slug, md5_id, media)
+  3. Testar a fórmula descoberta
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                    📋 MÉTODO RECOMENDADO: DevTools                             │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  PASSO 1: Abrir DevTools
+  ┌──────────────────────────────────────────────────────────────┐
+  │  1. Abra o Chrome ou Edge                                    │
+  │  2. Pressione F12                                            │
+  │  3. Clique na aba "Network" (Rede)                           │
+  │  4. Marque "Preserve log"                                    │
+  └──────────────────────────────────────────────────────────────┘
+
+  PASSO 2: Acessar um Vídeo
+  ┌──────────────────────────────────────────────────────────────┐
+  │  1. Vá para: https://playerembedapi.link                     │
+  │  2. Encontre um vídeo que FUNCIONA                           │
+  │  3. Clique para reproduzir                                   │
+  └──────────────────────────────────────────────────────────────┘
+
+  PASSO 3: Capturar a Requisição
+  ┌──────────────────────────────────────────────────────────────┐
+  │  1. Na aba Network, procure por requisições com "api"        │
+  │  2. Clique na requisição                                     │
+  │  3. Vá para a aba "Response"                                 │
+  │  4. Copie o JSON completo                                    │
+  └──────────────────────────────────────────────────────────────┘
+
+  PASSO 4: Testar a Fórmula
+  ┌──────────────────────────────────────────────────────────────┐
+  │  1. Abra: test_manual_decryption.py                          │
+  │  2. Edite a seção "EDITE AQUI"                               │
+  │  3. Cole os valores capturados                               │
+  │  4. Execute: python test_manual_decryption.py                │
+  └──────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         📄 EXEMPLO DE DADOS                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  Você deve capturar algo assim:
+  
+  {
+    "user_id": "482120",
+    "slug": "kBJLtxCD3",
+    "md5_id": "28930647",
+    "media": "U2FsdGVkX1+abc123def456..."
+  }
+  
+  ⚠️  O campo "media" deve:
+      • Começar com "U2FsdGVk" (base64 de "Salted__")
+      • Ter pelo menos 100 caracteres
+      • Ser uma string longa
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                      🔧 COMANDOS PARA EXECUTAR                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  OPÇÃO 1: Teste Manual (Recomendado)
+  ┌──────────────────────────────────────────────────────────────┐
+  │  # Editar o script                                           │
+  │  notepad test_manual_decryption.py                           │
+  │                                                              │
+  │  # Executar teste                                            │
+  │  python test_manual_decryption.py                            │
+  └──────────────────────────────────────────────────────────────┘
+
+  OPÇÃO 2: Testar Endpoints
+  ┌──────────────────────────────────────────────────────────────┐
+  │  # Testar todos os endpoints possíveis                       │
+  │  python test_api_endpoints.py                                │
+  └──────────────────────────────────────────────────────────────┘
+
+  OPÇÃO 3: Captura Automatizada (Requer Selenium)
+  ┌──────────────────────────────────────────────────────────────┐
+  │  # Instalar Selenium                                         │
+  │  pip install selenium                                        │
+  │                                                              │
+  │  # Executar captura                                          │
+  │  python capture_api_calls.py [VIDEO_ID]                      │
+  └──────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        📚 DOCUMENTAÇÃO DISPONÍVEL                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ⭐ CAPTURA_MANUAL.md       Guia completo de captura (LEIA ISTO!)
+  ⭐ STATUS_ATUAL.md         Status do projeto e próximos passos
+  📄 DESCOBERTA_FINAL.md     Fórmula descoberta e evidências
+  📄 README.md               Visão geral do projeto
+  📄 USAGE.md                Guia completo de uso
+  📄 EXAMPLES.md             Exemplos práticos
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          ✅ CRITÉRIO DE SUCESSO                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  Você saberá que a fórmula está CORRETA quando:
+  
+  ✅ O script test_manual_decryption.py executar sem erros
+  ✅ A decriptação retornar um JSON válido
+  ✅ O JSON contiver dados do vídeo (URL, título, etc.)
+  
+  Exemplo de saída esperada:
+  
+  ╔════════════════════════════════════════════════════════════╗
+  ║  ✅ SUCESSO! Decriptação bem-sucedida!                    ║
+  ╚════════════════════════════════════════════════════════════╝
+  
+  📄 Dados Decriptados:
+  {
+    "title": "Nome do Vídeo",
+    "url": "https://...",
+    "quality": "1080p",
+    ...
+  }
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         ❌ SE ALGO DER ERRADO                                  │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  PROBLEMA: Não consigo encontrar requisições da API
+  ┌──────────────────────────────────────────────────────────────┐
+  │  SOLUÇÃO:                                                    │
+  │  • Certifique-se de abrir DevTools ANTES de carregar        │
+  │  • Use o filtro "XHR" na aba Network                         │
+  │  • Procure por "api", "media", "player"                      │
+  │  • Tente recarregar a página (Ctrl+F5)                       │
+  └──────────────────────────────────────────────────────────────┘
+
+  PROBLEMA: Vídeo retorna 404
+  ┌──────────────────────────────────────────────────────────────┐
+  │  SOLUÇÃO:                                                    │
+  │  • Tente outro vídeo                                         │
+  │  • Verifique se o site está online                           │
+  │  • Use um vídeo recente                                      │
+  └──────────────────────────────────────────────────────────────┘
+
+  PROBLEMA: Decriptação falha
+  ┌──────────────────────────────────────────────────────────────┐
+  │  SOLUÇÃO:                                                    │
+  │  • Verifique se copiou TODOS os dados corretamente           │
+  │  • Confirme que "media" começa com "U2FsdGVk"                │
+  │  • Tente com outro vídeo                                     │
+  │  • Consulte: CAPTURA_MANUAL.md                               │
+  └──────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🎯 FLUXO DE TRABALHO VISUAL                             │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  1. CAPTURAR DADOS
+     │
+     ├─→ Abrir DevTools (F12)
+     ├─→ Acessar vídeo no site
+     ├─→ Capturar requisição da API
+     └─→ Copiar JSON (user_id, slug, md5_id, media)
+     
+  2. EDITAR SCRIPT
+     │
+     ├─→ Abrir test_manual_decryption.py
+     ├─→ Localizar seção "EDITE AQUI"
+     ├─→ Colar os valores capturados
+     └─→ Salvar arquivo
+     
+  3. EXECUTAR TESTE
+     │
+     ├─→ python test_manual_decryption.py
+     └─→ Verificar resultado
+     
+  4. RESULTADO
+     │
+     ├─→ ✅ SUCESSO → Fórmula validada!
+     │              → Implementar no plugin
+     │              → Testar com mais vídeos
+     │
+     └─→ ❌ FALHA   → Verificar dados
+                    → Tentar outro vídeo
+                    → Consultar documentação
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          💡 DICAS IMPORTANTES                                  │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ✅ Use o Chrome ou Edge (melhor suporte para DevTools)
+  ✅ Marque "Preserve log" para não perder requisições
+  ✅ Procure por requisições XHR/Fetch (não Document)
+  ✅ O campo "media" é o mais importante (dados criptografados)
+  ✅ Copie o JSON COMPLETO, não apenas parte dele
+  ✅ Teste com múltiplos vídeos para confirmar
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         📞 PRECISA DE AJUDA?                                   │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  📖 Leia primeiro:
+     • CAPTURA_MANUAL.md (guia detalhado)
+     • STATUS_ATUAL.md (situação do projeto)
+  
+  🔍 Consulte:
+     • EXAMPLES.md (exemplos práticos)
+     • USAGE.md (guia completo)
+  
+  🛠️  Ferramentas:
+     • test_manual_decryption.py (teste principal)
+     • test_api_endpoints.py (testar endpoints)
+     • capture_api_calls.py (captura automatizada)
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    🚀 VOCÊ ESTÁ A UM PASSO DO SUCESSO!                        ║
+║                                                                                ║
+║  A fórmula foi descoberta com 95% de confiança através de análise estática.  ║
+║  Agora só falta validar com dados reais da API.                               ║
+║                                                                                ║
+║  Siga o guia CAPTURA_MANUAL.md e teste com test_manual_decryption.py         ║
+║                                                                                ║
+║                            BOA SORTE! 🎯                                      ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

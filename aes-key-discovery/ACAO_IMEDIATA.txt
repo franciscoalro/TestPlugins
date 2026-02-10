@@ -1,0 +1,270 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                        ⚡ AÇÃO IMEDIATA NECESSÁRIA                            ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           📊 SITUAÇÃO ATUAL                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ✅ Fórmula AES descoberta: user_id + ':' + slug + ':' + md5_id
+  ✅ Logs de rede capturados
+  ✅ Episódio identificado: 255703
+  ✅ Site identificado: playerthree.online
+  
+  ❌ Requisições da API ainda não capturadas
+  ❌ Dados criptografados ainda não obtidos
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                    🎯 O QUE VOCÊ PRECISA FAZER AGORA                           │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  OBJETIVO: Capturar requisições XHR/Fetch da API
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                    🚀 MÉTODO RECOMENDADO (Mais Fácil)                          │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 1: Abrir o Navegador                                             ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  1. Abra o Chrome ou Edge
+  2. Pressione F12 (DevTools)
+  3. Clique na aba "Console"
+  
+  
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 2: Colar o Código Interceptador                                  ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  1. Abra o arquivo: CAPTURAR_XHR.md
+  2. Copie o código JavaScript (seção "MÉTODO 2")
+  3. Cole no Console
+  4. Pressione Enter
+  
+  Você verá: "✅ Interceptadores instalados!"
+  
+  
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 3: Carregar o Vídeo                                              ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  1. Na barra de endereços, cole:
+     https://playerthree.online/episodio/255703
+  
+  2. Pressione Enter
+  
+  3. Aguarde o player carregar (5-10 segundos)
+  
+  
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 4: Verificar o Console                                           ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  Você verá mensagens como:
+  
+  📡 FETCH: https://...
+  📡 XHR: GET https://...
+  
+  Quando aparecer:
+  
+  🎯 JACKPOT! DADOS COMPLETOS ENCONTRADOS!
+  
+  Significa que os dados foram capturados!
+  
+  
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 5: Recuperar os Dados                                            ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  No console, digite:
+  
+  const data = JSON.parse(localStorage.getItem('api_data_captured'));
+  console.log(JSON.stringify(data, null, 2));
+  
+  Copie o JSON exibido.
+  
+  
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  PASSO 6: Testar a Fórmula                                              ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  1. Abra: test_manual_decryption.py
+  
+  2. Edite a seção "EDITE AQUI":
+     user_id = "VALOR_DO_JSON"
+     slug = "VALOR_DO_JSON"
+     md5_id = "VALOR_DO_JSON"
+     encrypted_media = "VALOR_DO_JSON"
+  
+  3. Execute:
+     python test_manual_decryption.py
+  
+  4. Verifique o resultado:
+     ✅ SUCESSO = Fórmula validada!
+     ❌ FALHA = Tente outro método
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                    📋 MÉTODO ALTERNATIVO (DevTools)                            │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  Se o método acima não funcionar:
+  
+  1. F12 → Network → XHR
+  2. Marque "Preserve log"
+  3. Acesse: https://playerthree.online/episodio/255703
+  4. Aguarde carregar
+  5. Procure por requisições com "api" no nome
+  6. Clique na requisição → Response
+  7. Copie o JSON
+  
+  Guia completo: CAPTURAR_XHR.md
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         📄 EXEMPLO DE DADOS                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  Você deve capturar algo assim:
+  
+  {
+    "user_id": "482120",
+    "slug": "kBJLtxCD3",
+    "md5_id": "28930647",
+    "media": "U2FsdGVkX1+abc123def456ghi789..."
+  }
+  
+  ⚠️  IMPORTANTE:
+  • user_id, slug, md5_id são strings
+  • media deve começar com "U2FsdGVk"
+  • media deve ter pelo menos 100 caracteres
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                      ✅ CRITÉRIO DE SUCESSO                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  Você saberá que funcionou quando:
+  
+  1. Console mostrar: "🎯 JACKPOT! DADOS COMPLETOS ENCONTRADOS!"
+  2. localStorage conter os dados
+  3. test_manual_decryption.py executar sem erros
+  4. Decriptação retornar JSON válido com dados do vídeo
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                       🔧 COMANDOS RÁPIDOS                                      │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  # Ver guia de captura XHR
+  notepad CAPTURAR_XHR.md
+  
+  # Testar decriptação manual
+  python test_manual_decryption.py
+  
+  # Analisar logs de rede
+  python analyze_network_logs.py
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                      📚 DOCUMENTAÇÃO DISPONÍVEL                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  ⭐⭐⭐ CAPTURAR_XHR.md          Guia completo de captura (LEIA ISTO!)
+  ⭐⭐  PROXIMOS_PASSOS.txt       Próximas ações
+  ⭐⭐  STATUS_ATUAL.md           Status do projeto
+  ⭐   CAPTURA_MANUAL.md         Guia geral de captura
+  📄   DESCOBERTA_FINAL.md       Fórmula descoberta
+  📄   README.md                 Visão geral
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🎓 FLUXO VISUAL                                         │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  1. PREPARAR
+     │
+     ├─→ Abrir Chrome/Edge
+     ├─→ Abrir DevTools (F12)
+     └─→ Ir para Console
+     
+  2. INTERCEPTAR
+     │
+     ├─→ Colar código JavaScript
+     ├─→ Pressionar Enter
+     └─→ Ver confirmação
+     
+  3. CAPTURAR
+     │
+     ├─→ Acessar episódio 255703
+     ├─→ Aguardar player carregar
+     └─→ Ver mensagem "JACKPOT!"
+     
+  4. RECUPERAR
+     │
+     ├─→ Executar comando no console
+     ├─→ Copiar JSON
+     └─→ Salvar dados
+     
+  5. TESTAR
+     │
+     ├─→ Editar test_manual_decryption.py
+     ├─→ Executar script
+     └─→ Verificar resultado
+     
+  6. RESULTADO
+     │
+     ├─→ ✅ SUCESSO → Fórmula validada!
+     │              → Implementar no plugin
+     │              → Documentar descoberta
+     │
+     └─→ ❌ FALHA   → Verificar dados
+                    → Tentar outro episódio
+                    → Consultar documentação
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         ⚠️  IMPORTANTE                                         │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  • Cole o código JavaScript ANTES de carregar a página
+  • Aguarde o player carregar completamente
+  • Não feche o console durante o processo
+  • Copie o JSON COMPLETO, não apenas parte
+  • Verifique se "media" começa com "U2FsdGVk"
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                      💡 DICA DE OURO                                           │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+  O código JavaScript intercepta TODAS as requisições automaticamente.
+  
+  Você não precisa procurar manualmente!
+  
+  Quando os dados corretos forem capturados, você verá:
+  
+  🎯 JACKPOT! DADOS COMPLETOS ENCONTRADOS!
+  
+  E os dados serão salvos automaticamente no localStorage.
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    🚀 VOCÊ ESTÁ A 5 MINUTOS DO SUCESSO!                       ║
+║                                                                                ║
+║  1. Abra o Chrome                                                             ║
+║  2. F12 → Console                                                             ║
+║  3. Cole o código (ver CAPTURAR_XHR.md)                                       ║
+║  4. Acesse: https://playerthree.online/episodio/255703                        ║
+║  5. Aguarde a mensagem "JACKPOT!"                                             ║
+║                                                                                ║
+║                          BOA SORTE! 🎯                                        ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

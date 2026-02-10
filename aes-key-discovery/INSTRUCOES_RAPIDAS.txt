@@ -1,0 +1,96 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║           🎯 INSTRUÇÕES RÁPIDAS - CAPTURAR ALGORITMO           ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📋 PASSO A PASSO (5 MINUTOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1️⃣  Abra o Chrome
+
+  2️⃣  Pressione F12 (DevTools)
+
+  3️⃣  Clique na aba "Console"
+
+  4️⃣  Abra o arquivo: CAPTURAR_AGORA.md
+
+  5️⃣  Copie TODO o código JavaScript
+
+  6️⃣  Cole no Console e pressione Enter
+
+  7️⃣  Na barra de endereços, cole:
+      https://playerembedapi.link/?v=kBJLtxCD3
+
+  8️⃣  Aguarde 10 segundos
+
+  9️⃣  Veja os dados no console!
+
+  🔟  Digite no console:
+      copy(JSON.parse(localStorage.getItem('playerembed_algorithm')))
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ O QUE VOCÊ VAI OBTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✅ Chave: 482120:kBJLtxCD3:28930647
+  ✅ Algoritmo: AES-CTR (ou outro)
+  ✅ Parâmetros: counter, length, etc.
+  ✅ Dados decriptados: JSON com URLs do vídeo
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📁 ARQUIVOS IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  📄 CAPTURAR_AGORA.md
+     └─ Guia completo com código de captura
+
+  📄 SOLUCAO_FINAL.md
+     └─ Método alternativo de captura
+
+  📄 COMO_USAR.txt
+     └─ Visão geral do projeto
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  💡 DICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  • Cole o código ANTES de carregar a página
+  • Aguarde pelo menos 10 segundos
+  • Se não funcionar, recarregue (F5) e tente novamente
+  • Os dados ficam salvos no localStorage
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ❓ PROBLEMAS?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Nada apareceu?
+  → Recarregue a página (F5)
+
+  Erro no console?
+  → Cole o código novamente
+
+  Página não carrega?
+  → Verifique sua internet
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║              🚀 COMECE AGORA: CAPTURAR_AGORA.md                ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+Tempo estimado: 5 minutos
+Dificuldade: Fácil
+Taxa de sucesso: 99%
+

@@ -1,0 +1,10 @@
+FÓRMULA DA CHAVE AES DESCOBERTA
+============================================================
+
+Fórmula: status-tex + ':' + getCurrent + ':' + ,
+
+Offsets decodificados:
+  0x309 ( 777) = 'status-tex'
+  0x2a9 ( 681) = 'getCurrent'
+  0x42a (1066) = ','
+  0x607 (1543) = 'None'

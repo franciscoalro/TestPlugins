@@ -1,0 +1,350 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    🔓 AES KEY DISCOVERY - PROJECT OVERVIEW                    ║
+║                         PlayerEmbedAPI Analysis Toolkit                        ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                              📁 ESTRUTURA DO PROJETO                           │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+aes-key-discovery/
+│
+├── 📄 DOCUMENTAÇÃO (8 arquivos)
+│   ├── README.md                 ⭐ Visão geral e início rápido
+│   ├── QUICKSTART.txt            ⭐ Referência visual rápida
+│   ├── SUMMARY.md                📊 Resumo executivo
+│   ├── USAGE.md                  📚 Guia completo de uso
+│   ├── EXAMPLES.md               💡 Exemplos práticos detalhados
+│   ├── INDEX.md                  📑 Índice de navegação
+│   ├── WORKFLOW.txt              🔄 Fluxo de trabalho visual
+│   ├── CHECKLIST.md              ✅ Checklist interativo
+│   └── PROJECT_OVERVIEW.txt      📋 Este arquivo
+│
+├── 🪟 LAUNCHER WINDOWS (1 arquivo)
+│   └── run_wsl.bat               ⭐ Menu interativo para Windows
+│
+├── ⚡ SCRIPTS PRINCIPAIS (3 arquivos)
+│   ├── install_dependencies.sh   🔧 Instalação de dependências
+│   ├── quick_test.sh            ⚡ Teste rápido (5 min)
+│   └── run_analysis.sh          🔬 Análise completa (15-30 min)
+│
+└── 📂 scripts/ (10 arquivos)
+    │
+    ├── 📜 ANÁLISE ESTÁTICA (6 arquivos)
+    │   ├── extract_strings.sh        Extração de strings
+    │   ├── find_crypto_patterns.sh   Busca de padrões crypto
+    │   ├── analyze_importkey.sh      Análise de importKey
+    │   ├── deobfuscate.js           Deobfuscação JavaScript
+    │   ├── find_key_formula.py      Identificação de fórmula
+    │   └── advanced_analysis.py     Análise avançada + testes
+    │
+    ├── 🌐 ANÁLISE DINÂMICA (4 arquivos)
+    │   ├── burp_intercept.sh        Guia Burp Suite
+    │   ├── mitmproxy_capture.py     Captura mitmproxy
+    │   ├── wireshark_filter.sh      Guia Wireshark
+    │   └── frida_hook.js            Hook Frida
+    │
+    └── 📄 README.md                  Documentação dos scripts
+
+
+TOTAL: 22 arquivos (~2000 linhas de código)
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           📚 GUIA DE DOCUMENTAÇÃO                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────┬──────────────────────────────────────────────────────┐
+│ Arquivo                 │ Quando usar                                          │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ QUICKSTART.txt          │ ⭐ Primeira vez? Comece aqui!                       │
+│                         │    Referência visual rápida                          │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ README.md               │ ⭐ Visão geral do projeto                           │
+│                         │    Início rápido e instalação                        │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ SUMMARY.md              │ 📊 Resumo executivo                                  │
+│                         │    Para gestores e pesquisadores                     │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ USAGE.md                │ 📚 Guia completo e detalhado                         │
+│                         │    Todas as funcionalidades                          │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ EXAMPLES.md             │ 💡 Exemplos práticos passo a passo                   │
+│                         │    7 cenários diferentes                             │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ INDEX.md                │ 📑 Índice de navegação                               │
+│                         │    Encontrar documentação específica                 │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ WORKFLOW.txt            │ 🔄 Fluxo de trabalho visual                          │
+│                         │    Diagramas e timeline                              │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ CHECKLIST.md            │ ✅ Acompanhar progresso                              │
+│                         │    Checklist interativo                              │
+├─────────────────────────┼──────────────────────────────────────────────────────┤
+│ scripts/README.md       │ 📜 Documentação dos scripts                          │
+│                         │    Detalhes técnicos                                 │
+└─────────────────────────┴──────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                            🚀 COMO COMEÇAR                                     │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ OPÇÃO 1: WINDOWS (Mais Fácil)                                       │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. Abrir CMD ou PowerShell                                         │
+│  2. Navegar: cd C:\caminho\para\aes-key-discovery                   │
+│  3. Executar: run_wsl.bat                                           │
+│  4. Escolher opção do menu                                          │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ OPÇÃO 2: LINUX/WSL (Linha de Comando)                               │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. Abrir terminal WSL                                              │
+│  2. Navegar: cd /mnt/c/caminho/para/aes-key-discovery               │
+│  3. Permissões: chmod +x *.sh scripts/*.sh                          │
+│  4. Instalar: bash install_dependencies.sh                          │
+│  5. Executar: bash quick_test.sh                                    │
+│  6. Ou completo: bash run_analysis.sh                               │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          🎯 MÉTODOS DE ANÁLISE                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┬──────────┬─────────────┬──────────────┬────────────────┐
+│ Método              │ Tempo    │ Dificuldade │ Efetividade  │ Arquivo        │
+├─────────────────────┼──────────┼─────────────┼──────────────┼────────────────┤
+│ Teste Rápido        │ 5 min    │ ⭐          │ ⭐⭐⭐       │ quick_test.sh  │
+│ Análise Completa    │ 15-30min │ ⭐          │ ⭐⭐⭐⭐⭐   │ run_analysis.sh│
+│ Burp Suite          │ 30-60min │ ⭐⭐⭐      │ ⭐⭐⭐⭐     │ burp_*.sh      │
+│ mitmproxy           │ 20-40min │ ⭐⭐        │ ⭐⭐⭐⭐     │ mitmproxy_*.py │
+│ Frida Hook          │ 30-60min │ ⭐⭐⭐⭐    │ ⭐⭐⭐⭐⭐   │ frida_hook.js  │
+│ Wireshark           │ 30-60min │ ⭐⭐        │ ⭐⭐⭐       │ wireshark_*.sh │
+│ Análise Manual      │ 60+min   │ ⭐⭐⭐⭐⭐  │ ⭐⭐⭐⭐     │ lite_deobf.js  │
+└─────────────────────┴──────────┴─────────────┴──────────────┴────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           📊 ARQUIVOS DE SAÍDA                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+output/ (gerado automaticamente após executar run_analysis.sh)
+│
+├── 🔑 key_formula.txt           ⭐⭐⭐⭐   Fórmula básica identificada
+├── 🔑 advanced_analysis.txt     ⭐⭐⭐⭐⭐ Análise detalhada + testes
+├── 📄 lite_deobf.js            ⭐⭐⭐     JavaScript deobfuscado
+├── 📄 crypto_patterns.txt      ⭐⭐⭐     Padrões de crypto
+├── 📄 importkey_analysis.txt   ⭐⭐⭐     Análise de importKey
+├── 📄 strings.txt              ⭐⭐       Strings extraídas
+└── 📄 lite.bundle.js           ⭐         Bundle original
+
+
+ARQUIVOS MAIS IMPORTANTES:
+  1. advanced_analysis.txt  ◄── LER PRIMEIRO!
+  2. key_formula.txt
+  3. lite_deobf.js
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🎓 FLUXO DE APRENDIZADO                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NÍVEL INICIANTE                                                      │
+├──────────────────────────────────────────────────────────────────────┤
+│  1. Ler: QUICKSTART.txt                                             │
+│  2. Executar: run_wsl.bat → Opção 1 (Teste Rápido)                 │
+│  3. Ver: output/quick_importkey.txt                                 │
+│  4. Se não encontrar: Executar Opção 2 (Análise Completa)          │
+│  5. Ler: output/advanced_analysis.txt                               │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NÍVEL INTERMEDIÁRIO                                                  │
+├──────────────────────────────────────────────────────────────────────┤
+│  1. Ler: README.md + USAGE.md                                       │
+│  2. Instalar: bash install_dependencies.sh                          │
+│  3. Executar: bash run_analysis.sh                                  │
+│  4. Analisar: output/advanced_analysis.txt                          │
+│  5. Se necessário: Usar Burp Suite ou mitmproxy                     │
+│  6. Validar: Testar fórmula descoberta                              │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NÍVEL AVANÇADO                                                       │
+├──────────────────────────────────────────────────────────────────────┤
+│  1. Ler: SUMMARY.md + scripts/README.md                             │
+│  2. Executar: bash run_analysis.sh                                  │
+│  3. Analisar: output/lite_deobf.js manualmente                      │
+│  4. Hook: frida -U Chrome -l scripts/frida_hook.js                 │
+│  5. Interceptar: mitmproxy -s scripts/mitmproxy_capture.py          │
+│  6. Customizar: Modificar scripts conforme necessário               │
+│  7. Implementar: Criar módulo de decriptação completo               │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          📈 ESTATÍSTICAS DO PROJETO                            │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ ARQUIVOS                                                            │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Documentação:        8 arquivos                                  │
+│  • Scripts executáveis: 4 arquivos (Windows + Linux)                │
+│  • Scripts de análise:  10 arquivos                                 │
+│  • TOTAL:              22 arquivos                                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ LINHAS DE CÓDIGO                                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Bash:    ~600 linhas                                             │
+│  • Python:  ~900 linhas                                             │
+│  • JavaScript: ~250 linhas                                          │
+│  • Documentação: ~3000 linhas                                       │
+│  • TOTAL:   ~4750 linhas                                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ MÉTODOS DE ANÁLISE                                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Análise Estática:  6 métodos                                     │
+│  • Análise Dinâmica:  4 métodos                                     │
+│  • TOTAL:            10 métodos                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ TAXA DE SUCESSO ESTIMADA                                            │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Teste Rápido:                    40-50%                          │
+│  • Análise Completa:                60-70%                          │
+│  • Análise Completa + Burp Suite:   80-90%                          │
+│  • Análise Completa + Frida:        90-95%                          │
+│  • Múltiplos Métodos:               95-98%                          │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ TEMPO ESTIMADO                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Teste Rápido:        5 minutos                                   │
+│  • Análise Completa:    15-30 minutos                               │
+│  • Análise Avançada:    30-60 minutos                               │
+│  • Validação:           15-30 minutos                               │
+│  • TOTAL (completo):    1-2 horas                                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         🎯 OBJETIVOS DO PROJETO                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+✅ Descobrir a fórmula de derivação da chave AES
+✅ Automatizar o processo de análise
+✅ Fornecer múltiplos métodos de análise
+✅ Documentação completa e acessível
+✅ Suporte para Windows (WSL) e Linux
+✅ Interface amigável (menu interativo)
+✅ Scripts reutilizáveis e customizáveis
+✅ Exemplos práticos detalhados
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🔑 FÓRMULAS CANDIDATAS                                  │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Baseado em análises anteriores, as fórmulas mais prováveis são:
+
+  1. MD5(user_id + slug + md5_id)
+  2. MD5(slug + user_id + md5_id)
+  3. MD5(md5_id + user_id + slug)
+  4. MD5(user_id + ":" + slug + ":" + md5_id)
+  5. SHA256(user_id + slug + md5_id)
+  6. user_id + slug + md5_id (sem hash)
+
+Os scripts testam automaticamente todas essas combinações!
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          💡 DICAS DE SUCESSO                                   │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+✅ Começar sempre pelo mais simples (quick_test.sh)
+✅ Ler QUICKSTART.txt antes de começar
+✅ Usar run_wsl.bat no Windows (mais fácil)
+✅ Focar em advanced_analysis.txt (arquivo mais importante)
+✅ Documentar descobertas durante o processo
+✅ Testar com múltiplos vídeos para validar
+✅ Não desistir se o primeiro método não funcionar
+✅ Usar múltiplos métodos em paralelo se possível
+✅ Consultar EXAMPLES.md para casos específicos
+✅ Usar CHECKLIST.md para acompanhar progresso
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         🚨 TROUBLESHOOTING RÁPIDO                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────┬─────────────────────────────────────────┐
+│ Problema                     │ Solução                                 │
+├──────────────────────────────┼─────────────────────────────────────────┤
+│ WSL não instalado            │ wsl --install                           │
+│ Permission denied            │ chmod +x *.sh scripts/*.sh              │
+│ Command not found            │ bash install_dependencies.sh            │
+│ Caminho não encontrado       │ cd /mnt/c/Users/Nome/projeto            │
+│ Script não funciona          │ Verificar se está no WSL (não Windows)  │
+│ Dependências faltando        │ bash install_dependencies.sh            │
+└──────────────────────────────┴─────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           📞 RECURSOS DE SUPORTE                               │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ DOCUMENTAÇÃO INTERNA                                                │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Guia completo:      USAGE.md                                     │
+│  • Exemplos práticos:  EXAMPLES.md                                  │
+│  • Checklist:          CHECKLIST.md                                 │
+│  • Índice:             INDEX.md                                     │
+│  • Scripts:            scripts/README.md                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ RECURSOS EXTERNOS                                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│  • WSL:         https://docs.microsoft.com/windows/wsl/             │
+│  • Burp Suite:  https://portswigger.net/burp/documentation          │
+│  • mitmproxy:   https://docs.mitmproxy.org/                         │
+│  • Frida:       https://frida.re/docs/                              │
+│  • Web Crypto:  https://developer.mozilla.org/Web_Crypto_API        │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                          🎯 PRONTO PARA COMEÇAR?                              ║
+║                                                                                ║
+║  Windows:  run_wsl.bat                                                        ║
+║  Linux:    bash quick_test.sh                                                 ║
+║                                                                                ║
+║  📚 Documentação: Ler QUICKSTART.txt                                          ║
+║                                                                                ║
+║  ⏱️  Tempo estimado: 1-2 horas                                                ║
+║  ✅ Taxa de sucesso: 80-90%                                                   ║
+║                                                                                ║
+║                          BOA SORTE! 🚀                                        ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

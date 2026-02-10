@@ -1,0 +1,12 @@
+{
+  "name": "aes-key-discovery",
+  "version": "1.0.0",
+  "description": "AES Key Discovery - PlayerEmbedAPI",
+  "main": "capture_algorithm_headless.js",
+  "scripts": {
+    "capture": "node capture_algorithm_headless.js"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}

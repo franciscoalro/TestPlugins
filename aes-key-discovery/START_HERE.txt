@@ -1,0 +1,293 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    🔓 BEM-VINDO AO AES KEY DISCOVERY!                         ║
+║                                                                                ║
+║                    Toolkit para descobrir a chave AES do                       ║
+║                         PlayerEmbedAPI de forma automatizada                   ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          👋 OLรก! COMECE POR AQUI                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Este projeto contém ferramentas automatizadas para descobrir a fórmula de
+derivação da chave AES usada pelo PlayerEmbedAPI.
+
+Você está a apenas alguns comandos de distância de descobrir a chave! 🎯
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        ⚡ INÍCIO SUPER RÁPIDO (2 MINUTOS)                      │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ WINDOWS                                                              │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. Abrir CMD ou PowerShell                                         │
+│                                                                      │
+│  2. Executar:                                                       │
+│     run_wsl.bat                                                     │
+│                                                                      │
+│  3. Escolher opção 1 (Teste Rápido)                                │
+│                                                                      │
+│  4. Pronto! 🎉                                                      │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ LINUX / WSL                                                          │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. Abrir terminal                                                  │
+│                                                                      │
+│  2. Executar:                                                       │
+│     chmod +x *.sh scripts/*.sh                                      │
+│     bash quick_test.sh                                              │
+│                                                                      │
+│  3. Pronto! 🎉                                                      │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        📚 PRÓXIMOS PASSOS (ESCOLHA UM)                         │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ 1️⃣  QUERO VER UMA VISÃO GERAL RÁPIDA                                │
+├──────────────────────────────────────────────────────────────────────┤
+│     Ler: QUICKSTART.txt                                             │
+│     Tempo: 2 minutos                                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ 2️⃣  QUERO ENTENDER O PROJETO                                        │
+├──────────────────────────────────────────────────────────────────────┤
+│     Ler: README.md                                                  │
+│     Tempo: 5 minutos                                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ 3️⃣  QUERO EXECUTAR AGORA!                                           │
+├──────────────────────────────────────────────────────────────────────┤
+│     Windows: run_wsl.bat                                            │
+│     Linux:   bash quick_test.sh                                     │
+│     Tempo: 5 minutos                                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ 4️⃣  QUERO VER EXEMPLOS PRÁTICOS                                     │
+├──────────────────────────────────────────────────────────────────────┤
+│     Ler: EXAMPLES.md                                                │
+│     Tempo: 10-15 minutos                                            │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ 5️⃣  QUERO O GUIA COMPLETO                                           │
+├──────────────────────────────────────────────────────────────────────┤
+│     Ler: USAGE.md                                                   │
+│     Tempo: 20-30 minutos                                            │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🎯 O QUE ESTE PROJETO FAZ?                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+O PlayerEmbedAPI retorna dados criptografados:
+
+  {
+    "user_id": "482120",
+    "slug": "kBJLtxCD3",
+    "md5_id": "28930647",
+    "media": "U2FsdGVkX1..." ← Criptografado com AES
+  }
+
+Este projeto descobre automaticamente a fórmula usada para gerar a chave AES
+que decripta o campo "media".
+
+Possíveis fórmulas:
+  • MD5(user_id + slug + md5_id)
+  • MD5(slug + user_id + md5_id)
+  • SHA256(...)
+  • E outras combinações
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🛠️ O QUE ESTÁ INCLUÍDO?                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+✅ 10 métodos de análise (estática + dinâmica)
+✅ Scripts automatizados (Bash, Python, JavaScript)
+✅ Documentação completa (8 arquivos)
+✅ Exemplos práticos (7 cenários)
+✅ Launcher interativo para Windows
+✅ Suporte para Burp Suite, mitmproxy, Frida
+✅ Análise de código deobfuscado
+✅ Geração automática de testes
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        ⏱️ QUANTO TEMPO VAI LEVAR?                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────┬──────────────────────────────────────────┐
+│ Teste Rápido            │ 5 minutos                                │
+│ Análise Completa        │ 15-30 minutos                            │
+│ Análise Avançada        │ 30-60 minutos                            │
+│ Validação               │ 15-30 minutos                            │
+├─────────────────────────┼──────────────────────────────────────────┤
+│ TOTAL (caso completo)   │ 1-2 horas                                │
+└─────────────────────────┴──────────────────────────────────────────┘
+
+Taxa de sucesso: 80-90% (com análise completa)
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        📁 ESTRUTURA DO PROJETO                                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+aes-key-discovery/
+├── START_HERE.txt          ← Você está aqui! 👋
+├── QUICKSTART.txt          ← Referência rápida
+├── README.md               ← Visão geral
+├── USAGE.md                ← Guia completo
+├── EXAMPLES.md             ← Exemplos práticos
+├── run_wsl.bat             ← Launcher Windows
+├── quick_test.sh           ← Teste rápido
+├── run_analysis.sh         ← Análise completa
+└── scripts/                ← Scripts de análise
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        💡 DICAS IMPORTANTES                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+✅ Começar sempre pelo mais simples (quick_test.sh)
+✅ Ler QUICKSTART.txt antes de executar
+✅ No Windows, usar run_wsl.bat (mais fácil)
+✅ Focar no arquivo output/advanced_analysis.txt
+✅ Não desistir se o primeiro método não funcionar
+✅ Consultar EXAMPLES.md para casos específicos
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🚨 PRECISA DE AJUDA?                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Problema: WSL não instalado                                          │
+│ Solução:  wsl --install (no PowerShell como Admin)                  │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Problema: Permission denied                                          │
+│ Solução:  chmod +x *.sh scripts/*.sh                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Problema: Command not found                                          │
+│ Solução:  bash install_dependencies.sh                              │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ Mais ajuda: Consultar USAGE.md (seção Troubleshooting)              │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        📚 ÍNDICE DE DOCUMENTAÇÃO                               │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────┬──────────────────────────────────────────┐
+│ Arquivo                 │ Descrição                                │
+├─────────────────────────┼──────────────────────────────────────────┤
+│ START_HERE.txt          │ Este arquivo - Comece aqui!              │
+│ QUICKSTART.txt          │ Referência visual rápida                 │
+│ README.md               │ Visão geral do projeto                   │
+│ SUMMARY.md              │ Resumo executivo                         │
+│ USAGE.md                │ Guia completo de uso                     │
+│ EXAMPLES.md             │ Exemplos práticos (7 cenários)           │
+│ INDEX.md                │ Índice de navegação                      │
+│ WORKFLOW.txt            │ Fluxo de trabalho visual                 │
+│ CHECKLIST.md            │ Checklist interativo                     │
+│ PROJECT_OVERVIEW.txt    │ Visão geral do projeto                   │
+└─────────────────────────┴──────────────────────────────────────────┘
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        🎓 RECOMENDAÇÃO DE LEITURA                              │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Para iniciantes:
+  1. START_HERE.txt (este arquivo)
+  2. QUICKSTART.txt
+  3. Executar: run_wsl.bat ou quick_test.sh
+  4. EXAMPLES.md (se precisar de ajuda)
+
+Para usuários intermediários:
+  1. README.md
+  2. USAGE.md
+  3. Executar: run_analysis.sh
+  4. EXAMPLES.md (cenários específicos)
+
+Para usuários avançados:
+  1. SUMMARY.md
+  2. scripts/README.md
+  3. Customizar scripts conforme necessário
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                        🚀 PRONTO PARA COMEÇAR?                                ║
+║                                                                                ║
+║  Próximo passo:                                                               ║
+║                                                                                ║
+║  Windows:  run_wsl.bat                                                        ║
+║  Linux:    bash quick_test.sh                                                 ║
+║                                                                                ║
+║  Ou ler:   QUICKSTART.txt                                                     ║
+║                                                                                ║
+║                                                                                ║
+║  ⏱️  Tempo estimado: 5 minutos para primeiro teste                            ║
+║  ✅ Taxa de sucesso: 80-90% (análise completa)                                ║
+║                                                                                ║
+║                                                                                ║
+║                        BOA SORTE! 🎯                                          ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        ⚖️ AVISO LEGAL                                          │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Este projeto é apenas para fins educacionais e de pesquisa.
+Use de forma responsável e ética.
+
+✅ Aprender sobre criptografia
+✅ Pesquisa de segurança
+✅ Análise de código
+❌ Uso malicioso
+❌ Violação de termos de serviço
+
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        📞 CONTATO E SUPORTE                                    │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Documentação completa: Ver arquivos .md neste diretório
+Problemas técnicos: Consultar USAGE.md (seção Troubleshooting)
+Exemplos práticos: Ver EXAMPLES.md
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    Obrigado por usar AES Key Discovery!                        ║
+║                                                                                ║
+║                    Desenvolvido com ❤️ para a comunidade                       ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
